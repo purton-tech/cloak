@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>My First Parcel App</title>
+    <script type="module" src="index.ts"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    </meta>
+</head>
+
+<body>
+    <div class="l_application">
+        <header>
+            <ul>
+                <li>
+                    <sl-drawer label="Drawer" class="drawer-overview">
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                        <sl-button slot="footer" type="primary">Close</sl-button>
+                    </sl-drawer>
+                    <sl-button>Upload CCSDS Data</sl-button>
+
+                    <script>
+                        const drawer = document.querySelector('.drawer-overview');
+                        const openButton = drawer.nextElementSibling;
+                        const closeButton = drawer.querySelector('sl-button[type="primary"]');
+
+                        openButton.addEventListener('click', () => drawer.show());
+                        closeButton.addEventListener('click', () => drawer.hide());
+                    </script>
+                </li>
+            </ul>
+            <ul>
+                <li><img src="images/logout.svg" type="image/svg" /></li>
+            </ul>
+        </header>
+        <aside>
+            <h1><a href="/app">CREAM</a></h1>
+            <h2>Operator : Acme Satellites</h2>
+            <ul>
+                <li class="selected">
+                    <sl-avatar initials="SL" style="--size: 1.7rem"></sl-avatar>
+                    <a href="/dashboard">Dashboard</a>
+                </li>
+                <li>
+                    <sl-avatar initials="SO" style="--size: 1.7rem"></sl-avatar>
+                    <a href="/app/space_objects">Space Objects</a>
+                </li>
+            </ul>
+        </aside>
+
+        <main>
+            <section class="content">
+                <sl-card style="min-width: 100%">
+                    <div slot="header">
+                        Space Objects
+                        <sl-drawer label="Filter Search Results" class="filter-overview">
+                            Filter the search results
+                            <sl-button slot="footer" type="primary">Close</sl-button>
+                        </sl-drawer>
+                        <sl-button size="small" type="warning">Filter</sl-button>
+
+                        <script>
+                            const drawer2 = document.querySelector('.filter-overview');
+                            const openButton2 = drawer2.nextElementSibling;
+                            const closeButton2 = drawer2.querySelector('sl-button[type="primary"]');
+
+                            openButton2.addEventListener('click', () => drawer2.show());
+                            closeButton2.addEventListener('click', () => drawer2.hide());
+                        </script>
+                    </div>
+                </sl-card>
+            </section>
+        </main>
+    </div>
+
+    <div style="display: none">
+        <img src="images/logout.svg" type="image/svg" />
+    </div>
+
+</body>
+
+</html>
