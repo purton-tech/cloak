@@ -4,14 +4,30 @@
 <head>
   <meta charset="utf-8">
   <title>MyBlog</title>
+  <link rel="stylesheet" href="{{ get_url(path="index.css") | safe }}">
 </head>
 
-<body>
-  <section class="section">
-    <div class="container">
-      {% block content %} {% endblock %}
+<body class="l_marketing">
+  <header>
+    <div class="m_navbar">
+      <nav><input id="toggle" type="checkbox"></input><label class="hamburger" for="toggle">
+          <div class="top_bun"></div>
+          <div class="meat"></div>
+          <div class="bottom_bun"></div>
+        </label><a href="/"><span>Cream</span></a>
+        <ul>
+          <li><a href="/">Contact Us</a></li>
+          <li><a href="/">API Docs</a></li>
+          <li><a href="/auth/sign_in">Sign In</a></li>
+          <li><a href="/auth/sign_up">Sign Up</a></li>
+        </ul>
+      </nav>
     </div>
-  </section>
+  </header>
+  <div id="main" class="container">
+      {% block content %} {% endblock %}
+  </div>
+  <footer class="m_footer"></footer>
 </body>
 
 </html>
