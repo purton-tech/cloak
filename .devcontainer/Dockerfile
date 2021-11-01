@@ -5,8 +5,9 @@ COPY *.bash .
 RUN cat *.bash >> ~/.bashrc && sudo rm *.bash
 
 # Zola
-RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v0.10.0/zola-v0.10.0-x86_64-unknown-linux-gnu.tar.gz \
-    && sudo tar -xvf zola-v0.10.0-x86_64-unknown-linux-gnu.tar.gz \
+ARG ZOLA_VERSION=0.13.0
+RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSION/zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
+    && sudo tar -xvf zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
     && sudo mv zola /usr/bin/zola \
     && sudo chmod +x /usr/bin/zola
 
