@@ -1,6 +1,6 @@
 # Git aliases.
 alias gst='git status'
-alias gcm='git checkout master'
+alias gcm='git checkout main'
 alias c=clear
 alias gp='git push'
 alias gcam='git commit -a -m'
@@ -12,6 +12,10 @@ alias gcr='f() { git checkout -b $1 origin/$1; }; f'
 
 # Cargo watch
 alias cw='cargo watch --no-gitignore -i *.scss -i *.ts -i "package*" -x fmt -x clippy -x run'
+
+# Zola
+#alias zola-serve='docker run -u "$(id -u):$(id -g)" -v $HOST_PROJECT_PATH:/app --workdir /app -p 8080:8080 balthek/zola:0.14.0 serve --interface 0.0.0.0 --port 8080 --base-url development'
+#alias zola='docker run -u "$(id -u):$(id -g)" -v $HOST_PROJECT_PATH:/app --workdir /app -p 8080:8080 balthek/zola:0.14.0'
 
 # npm
 alias nrs='npm run start'

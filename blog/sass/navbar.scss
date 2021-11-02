@@ -1,0 +1,165 @@
+@import 'responsive-mixin';
+
+/* Responsive navigation no js */
+div.m_navbar {
+    background-color: var(--geist-background);
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    border-bottom: 1px solid var(--accents-2);
+  
+    nav {
+      width: var(--content-width);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 80px;
+      padding-left: 1em;
+      padding-right: 1em;
+      margin: 0;
+    
+      > input {
+        position: absolute;
+        left: -999em;
+      }
+    
+      > ul {
+        display: none;
+        list-style: none;
+      }
+    
+      > label {
+        display: block;
+        color: var(--geist-foreground);
+      }
+    
+      a {
+        text-decoration: none;
+      }
+      
+      // Make the logo a bit nicer.
+      > a {
+        border: 1px solid white;
+        font-weight: 400;
+        padding-right: .5em;
+        
+        span {
+          font-weight: 600;
+          color: black;
+        }
+      }
+    
+      .hamburger {
+        cursor: pointer;
+      }
+      
+      .hamburger div {
+        position: relative;
+        width: 2em;
+        height: 5px;
+        border-radius: 1px;
+        background-color: black;
+        margin-top: 6px;
+        margin-bottom: 6px;
+        transition: all 0.3s ease-in-out;
+      }
+    }
+  }
+  
+  @include for-phone-only {
+    #toggle:checked + .hamburger .top_bun {
+        transform: rotate(-45deg);
+    }
+    #toggle:checked + .hamburger .bottom_bun {
+        transform: rotate(45deg);
+        margin-top: -22px;
+    }
+    #toggle:checked + .hamburger .meat {
+        transform: rotate(45deg);
+        opacity: 0;
+    }
+  
+    #toggle:checked ~ ul {
+        text-align: center;
+        display: block;
+        position: absolute;
+        top: 80px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--geist-background);
+        padding: 1em;
+        margin: 0;
+        z-index: 100;
+        
+        > li {
+            padding: 1em;
+            width: 100%;
+            border: 1px solid var(--accents-2);
+            margin-bottom: 1em;
+            font-weight: 500;
+            font-size: 0.875rem;
+            border-radius: 5px;
+  
+            > a {
+              color: var(--accents-5);
+            }
+        }
+  
+        > li:last-child {
+            background-color: var(--geist-success);
+  
+            > a {
+              color: var(--geist-background);
+            }
+        }
+    }
+  }
+  
+  @include for-tablet-portrait-up {
+  
+      div.m_navbar nav {
+          > ul {
+              display: flex;
+              
+              li.selected {
+                  border-bottom: 1px solid var(--geist-foreground);
+              }
+  
+              li {
+                margin-left: 1em;
+                display: flex;
+                padding: 8px;
+                a {
+                  color: #666;
+                }
+                font-size: 0.875rem;
+              }
+  
+              li:last-of-type {
+                border-radius: 5px;
+                background-color: var(--geist-success);
+                a {
+                  color: var(--geist-background);
+                }
+              }
+          }
+  
+          > label {
+              display: none;
+          }
+      }
+  }
+  
+  // IE11 specific stuff
+  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+      /* IE10+ CSS styles go here */
+      div.m_navbar nav {
+          // Make the logo a bit nicer.
+          > a {
+          position: absolute;
+          top: 25px;
+          }
+      }
+  }
+    
