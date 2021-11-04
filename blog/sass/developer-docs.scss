@@ -1,9 +1,28 @@
 .l_developers {
+    &.intro {
+        > aside > ul > li:nth-child(1) {
+            background-color: red;
+        }
+    }
+    padding-left: 1em;
+    padding-right: 1em;
     display: flex;
     flex-direction: row;
     width: var(--content-width);
 
     > aside {
-        background-color: red;
+        > ul {
+            list-style-type: none;
+            padding-left: 0;
+
+            &.selected {
+                background-color: red;
+            }
+        }
+        width: 200px;
+    }
+
+    > main {
+        padding-left: 1em;
     }
 }

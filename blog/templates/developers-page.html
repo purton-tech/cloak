@@ -4,7 +4,11 @@
 <div  class="container">
   <section class="l_developers">
     <aside>
+      {% set section = get_section(path="developers/_index.md") %}
       <ul>
+        {% for page in section.pages %}
+        <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+        {% endfor %}
       </ul>
     </aside>
     <main>
