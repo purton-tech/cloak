@@ -2,9 +2,11 @@
 
 {% block content %}
 <div  class="container">
-  <section class="l_developers intro">
+  <section class="l_developers">
+    {% set intro_page = get_page(path="developer-introduction.md") %}
     <aside>
       <ul>
+        <li class="selected"><a href="/developers">{{ intro_page.title }}</a></li>
         {% for page in section.pages %}
         <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
         {% endfor %}
@@ -12,8 +14,10 @@
     </aside>
     <main>
       <h1 class="title">
-        {{ section.title }}
+        {{ intro_page.title }}
       </h1>
+      <p class="subtitle"><strong>{{ intro_page.date }}</strong></p>
+      {{ intro_page.content | safe }}
     </main>
   </section>
 </div>
