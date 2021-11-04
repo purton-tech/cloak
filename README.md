@@ -1,3 +1,8 @@
+## Start Zola
+
+- `cd blog`
+- `zola serve`
+
 ## Alternatives
 
 ### 1Password

@@ -1,0 +1,9 @@
+.l_developers {
+    display: flex;
+    flex-direction: row;
+    width: var(--content-width);
+
+    > aside {
+        background-color: red;
+    }
+}

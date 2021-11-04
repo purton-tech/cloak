@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div  class="container">
+  <section class="l_developers">
+    <aside>
+      <ul>
+        {% for page in section.pages %}
+        <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </aside>
+    <main>
+      <h1 class="title">
+        {{ section.title }}
+      </h1>
+    </main>
+  </section>
+</div>
+{% endblock content %}
