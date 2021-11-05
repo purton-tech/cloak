@@ -24,6 +24,9 @@
 
         > div.text {
             grid-area: text;
+            > p {
+                font-size: 0.8rem;
+            }
         }
 
         > h1 {
@@ -47,7 +50,7 @@
             padding-bottom: 1rem;
             h2 {
                 color: #999;
-                font-size: 0.875rem;
+                font-size: 0.7rem;
             }
         }
     }
@@ -69,6 +72,9 @@
                 // Fix i.e. 11 or it overflows into the image
                 max-width: 500px;
                 color: var(--accents-6);
+                > p {
+                    font-size: 1.5rem;
+                }
             }
 
             > div.image {
@@ -85,102 +91,13 @@
                 max-width: 500px;
                 font-size: 4em;
             }
+
+            > div.footer {
+                h2 {
+                    font-size: 1rem;
+                }
+            }
         }
 
     }
-    
-    /**> div {
-        padding: 80px 20px 0 20px;
-        display: grid;
-        align-items: start;
-        grid-gap: 0 40px;
-        grid-template:  "headline pic"
-                        "text     pic"
-                        "buttons  pic"
-                        "more     more"
-                        / 1fr 1fr;
-        width: var(--content-width);
-
-        > h1 {
-            grid-area: headline;
-            font-size: 4em;
-            font-weight: 700;
-            margin: 0;
-        }
-
-        > div.buttons {
-            grid-area: buttons;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            grid-gap: 10px;
-        }
-
-        > div.image {
-            grid-area: pic;
-            text-align: right;
-            img {
-                width: 100%;
-                height: 450px;
-            }
-        }
-
-        > div.footer {
-            grid-area: more;
-            text-align: center;
-            margin-top: 30px;
-            h2 {
-                color: #999;
-                font-size: 0.875rem;
-            }
-        }
-
-        > div.text {
-            grid-area: text;
-            display: flex;
-            flex-direction: column;
-            color: var(--accents-6);
-            br {
-                margin-top: 2em;
-                display: block;
-            }
-        }
-        
-        @include for-phone-only {
-            padding: 20px 10px 0 10px;
-            grid-template:  "headline"
-                            "pic"
-                            "text"
-                            "buttons"
-                            "more";
-            > div.image {
-                img {
-                    margin-top: 2em;
-                    height: 300px;
-                }
-            }
-
-            > div.buttons {
-                display: flex;
-                flex-direction: column;
-                button:nth-child(1) {
-                    margin-bottom: 20px;
-                }
-                button {
-                    margin-right: 0px;
-                }
-            }
-
-            > h1 {
-                font-size: 40px;
-                text-align: center;
-            }
-
-            > div.text {
-                > p br {
-                    display: none;
-                }
-                text-align: center;
-            }
-        }
-    }**/
 }

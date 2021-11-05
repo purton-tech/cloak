@@ -1,5 +1,5 @@
 +++
-title = "My first post"
+title = "How to choose the best typography for your blog"
 date = 2019-11-27
 +++
 The vast majority of software has secrets. While this makes that software sound mysterious, like a femme fatale in a noir film, most software secrets are mundane. But that doesn’t mean those secrets aren’t important! Software secrets management can often be the difference between someone leaking confidential customer data or keeping that data secure. Understanding what secrets management is, and how you should approach it in your application, is a critical step in application maturity. In this post, we’re going to talk about what software secrets are, how you shouldn’t secure them, and what functionality you want in your secrets management approach.

@@ -13,11 +13,13 @@
       </ul>
     </aside>
     <main>
-      <h1 class="title">
-        {{ intro_page.title }}
-      </h1>
-      <p class="subtitle"><strong>{{ intro_page.date }}</strong></p>
-      {{ intro_page.content | safe }}
+      <div>
+        <h1 class="title">
+          {{ intro_page.title }}
+        </h1>
+        <p class="subtitle"><strong>{{ intro_page.date }}</strong></p>
+        {{ intro_page.content | safe }}
+      </div>
     </main>
   </section>
 </div>

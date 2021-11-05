@@ -10,7 +10,7 @@ html {
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 
-        Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif
+        Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 // Make images repsinsive
@@ -47,6 +47,7 @@ img {
 
 :root {
     --content-width: 1040px;
+    --article-width: 45rem;
     --content-padding: 30px 1em 30px 1em;
 }
 
@@ -54,6 +55,13 @@ img {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    font-size: 1.1rem;
+
+    p {
+        color: var(--accents-8);
+        font-weight: 300;
+        line-height: 1.5;
+    }
 }
 
 @import './navbar';

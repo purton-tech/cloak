@@ -14,11 +14,13 @@
       </ul>
     </aside>
     <main>
-      <h1 class="title">
-        {{ page.title }}
-      </h1>
-      <p class="subtitle"><strong>{{ page.date }}</strong></p>
-      {{ page.content | safe }}
+      <div>
+        <h1 class="title">
+          {{ page.title }}
+        </h1>
+        <p class="subtitle"><strong>{{ page.date }}</strong></p>
+        {{ page.content | safe }}
+      </div>
     </main>
   </section>
 </div>

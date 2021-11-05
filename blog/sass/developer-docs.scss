@@ -1,9 +1,9 @@
 .l_developers {
-    padding-left: 1em;
-    padding-right: 1em;
     display: flex;
     flex-direction: row;
-    width: var(--content-width);
+    max-width: var(--content-width);
+    width: 100%;
+    padding: var(--content-padding);
 
     > aside {
         > ul {
@@ -14,10 +14,16 @@
                 background-color: red;
             }
         }
-        width: 300px;
+        width: 200px;
     }
 
     > main {
-        padding-left: 1em;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        > div {
+            max-width: var(--article-width);
+        }
     }
 }
