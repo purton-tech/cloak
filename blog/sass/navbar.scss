@@ -39,12 +39,9 @@ div.m_navbar {
       
       // Make the logo a bit nicer.
       > a {
-        border: 1px solid white;
-        font-weight: 400;
-        padding-right: .5em;
-        
         span {
           font-weight: 600;
+          font-size: 1.5em;
           color: black;
         }
       }
@@ -87,7 +84,7 @@ div.m_navbar {
         bottom: 0;
         left: 0;
         right: 0;
-        background-color: var(--geist-background);
+        background-color: var(--background);
         padding: 1em;
         margin: 0;
         z-index: 100;
@@ -107,10 +104,10 @@ div.m_navbar {
         }
   
         > li:last-child {
-            background-color: var(--geist-success);
+            background-color: var(--success);
   
             > a {
-              color: var(--geist-background);
+              color: var(--background);
             }
         }
     }
@@ -123,7 +120,7 @@ div.m_navbar {
               display: flex;
               
               li.selected {
-                  border-bottom: 1px solid var(--geist-foreground);
+                  border-bottom: 1px solid var(--foreground);
               }
   
               li {
@@ -131,9 +128,9 @@ div.m_navbar {
                 display: flex;
                 padding: 8px;
                 a {
-                  color: #666;
+                  color: var(--accents-6);
                 }
-                font-size: 0.875rem;
+                font-size: 1rem;
               }
   
               li:last-of-type {

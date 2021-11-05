@@ -2,8 +2,9 @@
 <html lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <title>MyBlog</title>
+  <meta charset="utf-8"></meta>
+  <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+  <title>{{ config.title }}</title>
   <link rel="stylesheet" href="{{ get_url(path="index.css") | safe }}">
 </head>
 
@@ -14,7 +15,7 @@
           <div class="top_bun"></div>
           <div class="meat"></div>
           <div class="bottom_bun"></div>
-        </label><a href="/"><span>Cream</span></a>
+        </label><a href="/"><span>{{ config.title }}</span></a>
         <ul>
           <li><a href="/blog">Blog</a></li>
           <li><a href="/developers">Developers</a></li>

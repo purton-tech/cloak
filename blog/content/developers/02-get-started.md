@@ -3,6 +3,11 @@ title = "Get Started"
 date = 2019-11-27
 +++
 
+Test your Installation
+You can verify your installation by running the following command:
+
+`keyvault --version`
+
 Some content
 Get Started with SecretHub
 This guide will show you the very basics of working with the SecretHub CLI.

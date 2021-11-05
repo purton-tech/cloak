@@ -18,7 +18,7 @@
 
             img {
                 width: auto;
-                height: 450px;
+                height: 150px;
             }
         }
 
@@ -28,7 +28,7 @@
 
         > h1 {
             grid-area: headline;
-            font-size: 4em;
+            font-size: 2em;
             font-weight: 700;
         }
 
@@ -52,7 +52,6 @@
         }
     }
     
-    
     @include for-desktop-up {
 
         > div {
@@ -74,11 +73,17 @@
 
             > div.image {
                 text-align: right;
+
+                img {
+                    width: auto;
+                    height: 450px;
+                }
             }
     
             > h1 {
                 // Fix i.e. 11 or it overflows into the image
                 max-width: 500px;
+                font-size: 4em;
             }
         }
 
