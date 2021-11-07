@@ -1,11 +1,12 @@
+@import 'responsive-mixin';
+
 .l_developers {
-    display: flex;
     flex-direction: row;
-    max-width: var(--content-width);
     width: 100%;
     padding: var(--content-padding);
 
     > aside {
+        display: none;
         > ul {
             list-style-type: none;
             padding-left: 0;
@@ -18,12 +19,32 @@
     }
 
     > main {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        max-width: var(--article-width);
         width: 100%;
-        > div {
-            max-width: var(--article-width);
+
+        pre {
+            width: 100%;
+            overflow-x: auto;
         }
+    }
+
+    
+    @include for-tablet-landscape-up {
+
+        > aside {
+            display: block;
+            > ul {
+                list-style-type: none;
+                padding-left: 0;
+    
+                &.selected {
+                    background-color: red;
+                }
+            }
+            width: 200px;
+        }
+
+        display: flex;
+        max-width: var(--content-width);
     }
 }

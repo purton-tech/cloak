@@ -10,8 +10,10 @@
 
 <body class="l_marketing">
   <header>
-    <div class="m_navbar">
-      <nav><input id="toggle" type="checkbox"></input><label class="hamburger" for="toggle">
+    <div class="m_navbar {% block class %}{% endblock %}">
+      <nav>
+        <input id="toggle" type="checkbox"></input>
+        <label class="hamburger" for="toggle">
           <div class="top_bun"></div>
           <div class="meat"></div>
           <div class="bottom_bun"></div>
@@ -19,6 +21,12 @@
         <ul>
           <li><a href="/blog">Blog</a></li>
           <li><a href="/developers">Developers</a></li>
+          {% set intro_page = get_page(path="developer-introduction.md") %}
+          {% set dev_section = get_section(path="developers/_index.md") %}
+          <li class="developer-docs"><a href="/developers">{{ intro_page.title }}</a></li>
+          {% for page in dev_section.pages %}
+          <li class="developer-docs"><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+          {% endfor %}
           <li><a href="/auth/sign_in">Sign In</a></li>
           <li><a href="/auth/sign_up">Sign Up</a></li>
         </ul>

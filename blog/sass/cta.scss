@@ -55,7 +55,7 @@
         }
     }
     
-    @include for-desktop-up {
+    @include for-tablet-landscape-up {
 
         > div {
             text-align: left;

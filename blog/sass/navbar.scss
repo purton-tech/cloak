@@ -18,19 +18,20 @@ div.m_navbar {
       padding-right: 1em;
       margin: 0;
     
+      // The checkbox
       > input {
         position: absolute;
         left: -999em;
       }
     
-      > ul {
-        display: none;
-        list-style: none;
-      }
-    
       > label {
         display: block;
         color: var(--geist-foreground);
+      }
+    
+      > ul {
+        display: none;
+        list-style: none;
       }
     
       a {
@@ -48,17 +49,16 @@ div.m_navbar {
     
       .hamburger {
         cursor: pointer;
-      }
-      
-      .hamburger div {
-        position: relative;
-        width: 2em;
-        height: 5px;
-        border-radius: 1px;
-        background-color: black;
-        margin-top: 6px;
-        margin-bottom: 6px;
-        transition: all 0.3s ease-in-out;
+        > div {
+          position: relative;
+          width: 2em;
+          height: 5px;
+          border-radius: 1px;
+          background-color: black;
+          margin-top: 6px;
+          margin-bottom: 6px;
+          transition: all 0.3s ease-in-out;
+        }
       }
     }
   }
@@ -77,7 +77,6 @@ div.m_navbar {
     }
   
     #toggle:checked ~ ul {
-        text-align: center;
         display: block;
         position: absolute;
         top: 80px;
@@ -90,25 +89,23 @@ div.m_navbar {
         z-index: 100;
         
         > li {
-            padding: 1em;
+            padding-top: 1em;
+            padding-bottom: 1em;
             width: 100%;
-            border: 1px solid var(--accents-2);
-            margin-bottom: 1em;
             font-weight: 500;
             font-size: 0.875rem;
-            border-radius: 5px;
+            border-top: 1px solid var(--accents-5);
   
             > a {
               color: var(--accents-5);
             }
         }
-  
-        > li:last-child {
-            background-color: var(--success);
-  
-            > a {
-              color: var(--background);
-            }
+
+        > li.developer-docs {
+          padding: 0;
+          padding-left: 2em;
+          padding-bottom: 1em;
+          border-top: none;
         }
     }
   }
@@ -131,6 +128,10 @@ div.m_navbar {
                   color: var(--accents-6);
                 }
                 font-size: 1rem;
+              }
+
+              > li.developer-docs {
+                display: none;
               }
   
               li:last-of-type {

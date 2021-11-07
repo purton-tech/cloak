@@ -43,8 +43,11 @@ Here’s a nice shortcut to auto-generate the values for you at ianpurton/demo:
 secrethub demo init
 Next, instead of populating environment variables with plaintext secrets, use secret references:
 
+```
 export DEMO_USERNAME=secrethub://ianpurton/demo/username
 export DEMO_PASSWORD=secrethub://ianpurton/demo/password
+```
+
 Then, wrap the app start command in secrethub run:
 
 secrethub run -- secrethub demo serve
