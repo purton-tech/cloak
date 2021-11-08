@@ -13,6 +13,13 @@
         <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
         {% endfor %}
       </ul>
+      <h2>Reference</h2>
+      <ul>
+        {% set reference_section = get_section(path="reference/_index.md") %}
+        {% for page in reference_section.pages %}
+        <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+        {% endfor %}
+      </ul>
     </aside>
     <main>
       <div>
