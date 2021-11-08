@@ -11,8 +11,9 @@
             list-style-type: none;
             padding-left: 0;
 
-            &.selected {
-                background-color: red;
+            > li {
+                border-left: 1px solid var(--accents-4);
+                padding: 0.5em;
             }
         }
     }
