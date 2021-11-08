@@ -6,6 +6,7 @@
   <section class="l_developers">
     {% set intro_page = get_page(path="developer-introduction.md") %}
     <aside>
+      <h2>Getting Started</h2>
       {% set section = get_section(path="developers/_index.md") %}
       <ul>
         <li><a href="/developers">{{ intro_page.title }}</a></li>
@@ -19,7 +20,6 @@
         <h1 class="title">
           {{ page.title }}
         </h1>
-        <p class="subtitle"><strong>{{ page.date }}</strong></p>
         {{ page.content | safe }}
       </div>
     </main>

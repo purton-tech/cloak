@@ -15,7 +15,6 @@
                 background-color: red;
             }
         }
-        width: 200px;
     }
 
     > main {
@@ -33,6 +32,7 @@
 
         > aside {
             display: block;
+            padding-top: 0.5em;
             > ul {
                 list-style-type: none;
                 padding-left: 0;
@@ -41,7 +41,7 @@
                     background-color: red;
                 }
             }
-            width: 200px;
+            width: 300px;
         }
 
         display: flex;

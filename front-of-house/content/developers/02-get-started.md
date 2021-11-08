@@ -3,24 +3,26 @@ title = "Get Started"
 date = 2019-11-27
 +++
 
-Test your Installation
-You can verify your installation by running the following command:
+If you haven’t done so already, first make sure you’ve set up Keyvault by **signing up** and **installing the CLI** on your workstation.
 
-`keyvault --version`
+### Step 1: Login to your account from the CLI
 
-Some content
-Get Started with SecretHub
-This guide will show you the very basics of working with the SecretHub CLI.
 
-If you haven’t done so already, first make sure you’ve set up SecretHub by signing up and installing the CLI on your workstation.
 
-To make the upcoming example code copy-pasteable for you to smoothly follow along with this guide, fill in your username below:
+```bash
+$ keyvault login you@youremail.com
+Greetings from KeyVault.
+```
 
-ianpurton
-Step 1: Your first secret
-Every account comes with a personal workspace. To help you find your way, we’ve already created a sample secret. To read a secret, run:
+### Step 2: Your first secret
 
-secrethub read ianpurton/start/hello
+When you signed up we created a sample secret using. To read a secret, run:
+
+```bash
+$ keyvault read /start/hello
+Greetings from KeyVault.
+```
+
 You can write a new version of the secret with:
 
 secrethub write ianpurton/start/hello
