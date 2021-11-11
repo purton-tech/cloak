@@ -1,6 +1,6 @@
 ## Start Zola
 
-- `cd blog`
+- `cd front-of-house`
 - `zola serve`
 
 ## Alternatives

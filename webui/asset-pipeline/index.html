@@ -12,30 +12,11 @@
     <div class="l_application">
         <header>
             <ul>
-                <li>
-                    <sl-drawer label="Drawer" class="drawer-overview">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                        <sl-button slot="footer" type="primary">Close</sl-button>
-                    </sl-drawer>
-                    <sl-button>Upload CCSDS Data</sl-button>
-
-                    <script>
-                        const drawer = document.querySelector('.drawer-overview');
-                        const openButton = drawer.nextElementSibling;
-                        const closeButton = drawer.querySelector('sl-button[type="primary"]');
-
-                        openButton.addEventListener('click', () => drawer.show());
-                        closeButton.addEventListener('click', () => drawer.hide());
-                    </script>
-                </li>
-            </ul>
-            <ul>
                 <li><img src="images/logout.svg" type="image/svg" /></li>
             </ul>
         </header>
         <aside>
             <h1><a href="/app">KeyVault</a></h1>
-            <h2>Operator : Acme Satellites</h2>
             <ul>
                 <li class="selected">
                     <sl-avatar initials="SL" style="--size: 1.7rem"></sl-avatar>
@@ -43,7 +24,11 @@
                 </li>
                 <li>
                     <sl-avatar initials="SO" style="--size: 1.7rem"></sl-avatar>
-                    <a href="/app/space_objects">Space Objects</a>
+                    <a href="/app/space_objects">Secrets</a>
+                </li>
+                <li>
+                    <sl-avatar initials="SO" style="--size: 1.7rem"></sl-avatar>
+                    <a href="/app/space_objects">Dynamic Secrets</a>
                 </li>
             </ul>
         </aside>
@@ -69,11 +54,6 @@
                         </script>
                     </div>
                 </sl-card>
-
-                <br/>
-                <br/>
-                <br/>
-                <img src="images/architecture.svg" width="1000" type="image/svg" />
             </section>
         </main>
     </div>
