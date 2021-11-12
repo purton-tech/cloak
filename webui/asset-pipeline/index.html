@@ -6,6 +6,20 @@
     <script type="module" src="index.ts"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     </meta>
+    <script>
+        window.addEventListener('load', function () {
+            showSection('vault-details')
+        })
+
+        function showSection(name) {
+            const sections = document.getElementsByTagName('section')
+            for (var i = 0; i < sections.length; i++) {
+                sections[i].style.display = 'none'
+            }
+            document.getElementById(name).style.display = null
+            return false
+        }
+    </script>
 </head>
 
 <body>
@@ -18,42 +32,67 @@
         <aside>
             <h1><a href="/app">KeyVault</a></h1>
             <ul>
-                <li class="selected">
-                    <sl-avatar initials="SL" style="--size: 1.7rem"></sl-avatar>
-                    <a href="/dashboard">Dashboard</a>
+                <li>
+                    <img src="images/vault.svg" width="32px" type="image/svg" />
+                    <a href="/app/space_objects" onclick="return showSection('vault-details');">Vaults</a>
                 </li>
                 <li>
-                    <sl-avatar initials="SO" style="--size: 1.7rem"></sl-avatar>
-                    <a href="/app/space_objects">Secrets</a>
-                </li>
-                <li>
-                    <sl-avatar initials="SO" style="--size: 1.7rem"></sl-avatar>
-                    <a href="/app/space_objects">Dynamic Secrets</a>
+                    <img src="images/users.svg" width="32px" type="image/svg" />
+                    <a href="/app/space_objects" onclick="return showSection('secret');">Users</a>
                 </li>
             </ul>
         </aside>
 
         <main>
-            <section class="content">
-                <sl-card style="min-width: 100%">
-                    <div slot="header">
-                        Space Objects
-                        <sl-drawer label="Filter Search Results" class="filter-overview">
-                            Filter the search results
-                            <sl-button slot="footer" type="primary">Close</sl-button>
-                        </sl-drawer>
-                        <sl-button size="small" type="warning">Filter</sl-button>
-
-                        <script>
-                            const drawer2 = document.querySelector('.filter-overview');
-                            const openButton2 = drawer2.nextElementSibling;
-                            const closeButton2 = drawer2.querySelector('sl-button[type="primary"]');
-
-                            openButton2.addEventListener('click', () => drawer2.show());
-                            closeButton2.addEventListener('click', () => drawer2.hide());
-                        </script>
-                    </div>
-                </sl-card>
+            <section id="vault-details" class="split-content">
+                <aside>
+                    <ul>
+                        <li><a href="/" onclick="return showSection('vault-details');">Vault Details</a></li>
+                        <li><a href="/" onclick="return showSection('vault-entry');">Github Secret</a></li>
+                        <li>Postgres DB</li>
+                        <li>SendGrid</li>
+                    </ul>
+                </aside>
+                <main>
+                    <sl-card style="min-width: 100%">
+                        <div class="m_card">
+                            <div class="header">Folders</div>
+                            <table class="body">
+                                <tr>
+                                    <th>Name</th>
+                                </tr>
+                                <tr>
+                                    <td>StrongOCin</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </sl-card>
+                </main>
+            </section>
+            <section id="vault-entry" class="split-content">
+                <aside>
+                    <ul>
+                        <li><a href="/" onclick="return showSection('vault-details');">Vault Details</a></li>
+                        <li>Github Secret</li>
+                        <li>Postgres DB</li>
+                        <li>SendGrid</li>
+                    </ul>
+                </aside>
+                <main>
+                </main>
+            </section>
+            <section id="secret" class="content">
+                <div class="m_card">
+                    <div class="header">Folders</div>
+                    <table class="body">
+                        <tr>
+                            <th>Name</th>
+                        </tr>
+                        <tr>
+                            <td>StrongOCin</td>
+                        </tr>
+                    </table>
+                </div>
             </section>
         </main>
     </div>

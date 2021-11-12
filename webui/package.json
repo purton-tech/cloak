@@ -7,9 +7,6 @@
       "release": "parcel build asset-pipeline/index.html"
     },
     "dependencies": {
-      "@shoelace-style/shoelace": "^2.0.0-beta.57",
-      "@swc/helpers": "^0.2.13",
-      "lit": "^2.0.2"
     },
     "devDependencies": {
       "@parcel/transformer-sass": "^2.0.0",

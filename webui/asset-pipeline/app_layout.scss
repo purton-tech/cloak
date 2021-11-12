@@ -102,10 +102,20 @@ body {
     
             > section.content {
                 padding: var(--content-padding);
-                flex: 1;
-    
-                > div {
-                    height: 100%;
+            }
+
+            > section.split-content {
+                height: 100%;
+                display: flex;
+                flex-direction: row;
+                > aside {
+                    padding: var(--content-padding);
+                    width: 300px;
+                }
+                > main {
+                    background-color:var(--background);
+                    padding: var(--content-padding);
+                    width: 100%;
                 }
             }
         }
