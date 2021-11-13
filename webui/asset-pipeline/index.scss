@@ -43,6 +43,11 @@ img {
     --shadow-large: 0 30px 60px rgba(0, 0, 0, 0.12);
     --portal-opacity: 0.25;
     --sidebar-bg: #031b4d;
+    --sidebar-border: rgba(180,188,199,.32);
+
+    // Vault Sidebar
+    --vault-selected: #3c5b99;
+
 }
 
 :root {
@@ -69,5 +74,6 @@ img {
 }
 
 @import './app_layout';
+@import './content_layout';
 @import './cards';
 @import './buttons';

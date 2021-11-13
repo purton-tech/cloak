@@ -32,13 +32,13 @@
         <aside>
             <h1><a href="/app">KeyVault</a></h1>
             <ul>
-                <li>
+                <li class="selected">
                     <img src="images/vault.svg" width="32px" type="image/svg" />
                     <a href="/app/space_objects" onclick="return showSection('vault-details');">Vaults</a>
                 </li>
                 <li>
                     <img src="images/users.svg" width="32px" type="image/svg" />
-                    <a href="/app/space_objects" onclick="return showSection('secret');">Users</a>
+                    <a href="/app/space_objects" onclick="return showSection('secret');">Your Team</a>
                 </li>
             </ul>
         </aside>
@@ -47,10 +47,13 @@
             <section id="vault-details" class="split-content">
                 <aside>
                     <ul>
-                        <li><a href="/" onclick="return showSection('vault-details');">Vault Details</a></li>
+                        <li class="selected">
+                            <img src="images/vault.svg" width="32px" type="image/svg" />
+                            <a href="/" onclick="return showSection('vault-details');">Vault Details</a>
+                        </li>
                         <li><a href="/" onclick="return showSection('vault-entry');">Github Secret</a></li>
-                        <li>Postgres DB</li>
-                        <li>SendGrid</li>
+                        <li><a href="/" onclick="return showSection('vault-entry');">Postgres DB</a></li>
+                        <li><a href="/" onclick="return showSection('vault-entry');">SendGrid</a></li>
                     </ul>
                 </aside>
                 <main>
@@ -72,10 +75,13 @@
             <section id="vault-entry" class="split-content">
                 <aside>
                     <ul>
-                        <li><a href="/" onclick="return showSection('vault-details');">Vault Details</a></li>
-                        <li>Github Secret</li>
-                        <li>Postgres DB</li>
-                        <li>SendGrid</li>
+                        <li>
+                            <img src="images/vault.svg" width="32px" type="image/svg" />
+                            <a href="/" onclick="return showSection('vault-details');">Vault Details</a>
+                        </li>
+                        <li class="selected"><a href="/" onclick="return showSection('vault-entry');">Github Secret</a></li>
+                        <li><a href="/" onclick="return showSection('vault-entry');">Postgres DB</a></li>
+                        <li><a href="/" onclick="return showSection('vault-entry');">SendGrid</a></li>
                     </ul>
                 </aside>
                 <main>
