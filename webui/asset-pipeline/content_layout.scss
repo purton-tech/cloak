@@ -5,6 +5,16 @@ body > .l_application > main {
 
     > section.content {
         padding: var(--content-padding);
+        height: 100%;
+
+        > h2:nth-child(1) {
+            margin: 0;
+            margin-left: -1rem;
+            margin-right: -1rem;
+            padding-left: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid red;
+        }
     }
 
     section.split-content {
@@ -44,8 +54,17 @@ body > .l_application > main {
         }
         > main {
             background-color:var(--background);
-            padding: var(--content-padding);
+            padding: 1em;
             width: 100%;
+
+            > h2:nth-child(1) {
+                margin: 0;
+                margin-left: -1rem;
+                margin-right: -1rem;
+                padding-left: 1rem;
+                padding-bottom: 0.8rem;
+                border-bottom: 1px solid red;
+            }
         }
     }
 }
