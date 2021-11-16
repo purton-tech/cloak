@@ -2,14 +2,16 @@
     <div class="m_card">
         <div class="header">StrongCoin Vault
 
-            <sl-drawer label="Add Folder" class="drawer-overview">
-                Folders keep related secrets together.
-                For example you could have a folder called Database with all
-                the secrets related to database access.
+            <sl-drawer label="Add Secret" class="drawer-overview">
+                <p>Something about secrets.</p>
 
-                <form class="m_form">
-                    <label for="name">Name</label>
-                    <input type="text" name="name" />
+
+                <form class="m_form" style="margin-top: 2em">
+                    <fieldset>
+                        <label for="name">Name</label>
+                        <input type="text" name="name" />
+                        <span class="a_help_text">The name of the vault</span>
+                    </fieldset>
                 </form>
                 <button class="a_button" slot="footer" type="primary">Close</button>
             </sl-drawer>
@@ -26,11 +28,23 @@
         </div>
         <div class="body">
             <sl-tab-group>
-                <sl-tab slot="nav" panel="general">General</sl-tab>
+                <sl-tab slot="nav" panel="general">Secrets</sl-tab>
                 <sl-tab slot="nav" panel="custom">Who has Access?</sl-tab>
                 <sl-tab slot="nav" panel="advanced">Agent Configuration</sl-tab>
 
                 <sl-tab-panel name="general">
+
+                    <sl-drawer label="SendGrid" class="show-secret">
+                        <p>We have the following secrets in this category</p>
+                        <button class="a_button" slot="footer" type="primary">Close</button>
+                    </sl-drawer>
+                    <script>
+                        const secretDrawer = document.querySelector('.show-secret');
+                        function showSecret() {
+                            secretDrawer.show();
+                        }
+                        const secretCloseButton = secretDrawer.querySelector('button[type="primary"]').addEventListener('click', () => secretDrawer.hide());
+                    </script>
 
                     <table class="m_table">
                         <tr>
@@ -40,11 +54,25 @@
                             <th>Items</th>
                         </tr>
 
-                        <tr onclick="return showSection('vault-details');" style="cursor: pointer;">
-                            <td>Ian Purton</td>
+                        <tr onclick="return showSecret();" style="cursor: pointer;">
+                            <td>SendGrid</td>
                             <td>2021-11-15 at 10:17:00 AM</td>
                             <td>2021-11-15 at 10:17:00 AM</td>
                             <td>2</td>
+                        </tr>
+
+                        <tr onclick="return showSecret();" style="cursor: pointer;">
+                            <td>GitHub</td>
+                            <td>2021-11-15 at 10:17:00 AM</td>
+                            <td>2021-11-15 at 10:17:00 AM</td>
+                            <td>1</td>
+                        </tr>
+
+                        <tr onclick="return showSecret();" style="cursor: pointer;">
+                            <td>Database</td>
+                            <td>2021-11-15 at 10:17:00 AM</td>
+                            <td>2021-11-15 at 10:17:00 AM</td>
+                            <td>1</td>
                         </tr>
                     </table>
                 </sl-tab-panel>
