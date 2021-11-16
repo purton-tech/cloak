@@ -45,9 +45,6 @@ img {
     --sidebar-bg: #031b4d;
     --sidebar-border: rgba(180,188,199,.32);
 
-    // Vault Sidebar
-    --vault-selected: #3c5b99;
-
 }
 
 :root {
@@ -78,3 +75,4 @@ img {
 @import './cards';
 @import './buttons';
 @import './tables';
+@import './forms';

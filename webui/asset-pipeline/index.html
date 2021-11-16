@@ -58,7 +58,7 @@
                             For example you could have a folder called Database with all
                             the secrets related to database access.
 
-                            <form>
+                            <form class="m_form">
                                 <label for="name">Name</label>
                                 <input type="text" name="name" />
                             </form>
@@ -125,13 +125,19 @@
 
 
                         <sl-drawer label="Add Vault" class="add-vault">
-                            Folders keep related secrets together.
-                            For example you could have a folder called Database with all
-                            the secrets related to database access.
+                            <p>
+                                Folders keep related secrets together.
+                                For example you could have a folder called Database with all
+                                the secrets related to database access.
+                            </p>
+                            
 
-                            <form>
-                                <label for="name">Name</label>
-                                <input type="text" name="name" />
+                            <form class="m_form" style="margin-top: 2em">
+                                <fieldset>
+                                    <label for="name">Name</label>
+                                    <input type="text" name="name" />
+                                    <span class="a_help_text">The name of the vault</span>
+                                </fieldset>
                             </form>
                             <button class="a_button" slot="footer" type="primary">Close</button>
                         </sl-drawer>
