@@ -51,46 +51,53 @@
         <main>
             <section id="vault-details" class="content">
                 <div class="m_card">
-                    <div class="header">StrongCoin Vault</div>
+                    <div class="header">StrongCoin Vault
+
+                        <sl-drawer label="Add Folder" class="drawer-overview">
+                            Folders keep related secrets together.
+                            For example you could have a folder called Database with all
+                            the secrets related to database access.
+
+                            <form>
+                                <label for="name">Name</label>
+                                <input type="text" name="name" />
+                            </form>
+                            <button class="a_button" slot="footer" type="primary">Close</button>
+                        </sl-drawer>
+                        <button class="a_button">Add Secret</button>
+                        <script>
+                            const drawer = document.querySelector('.drawer-overview');
+                            const openButton = drawer.nextElementSibling;
+                            const closeButton = drawer.querySelector('button[type="primary"]');
+
+                            openButton.addEventListener('click', () => drawer.show());
+                            closeButton.addEventListener('click', () => drawer.hide());
+                        </script>
+
+                    </div>
                     <div class="body">
                         <sl-tab-group>
                             <sl-tab slot="nav" panel="general">General</sl-tab>
                             <sl-tab slot="nav" panel="custom">Who has Access?</sl-tab>
                             <sl-tab slot="nav" panel="advanced">Agent Configuration</sl-tab>
 
-                            <sl-tab-panel name="general">This is the general tab panel.
+                            <sl-tab-panel name="general">
 
-                                <ul>
-                                    <li class="selected">
-                                        <img src="images/vault.svg" width="32px" type="image/svg" />
-                                        <a href="/" onclick="return showSection('vault-details');">Vault Details</a>
-                                    </li>
-                                    <li>
-                                        <sl-drawer label="Add Folder" class="drawer-overview">
-                                            Folders keep related secrets together.
-                                            For example you could have a folder called Database with all
-                                            the secrets related to database access.
+                                <table class="m_table">
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Updated</th>
+                                        <th>Created</th>
+                                        <th>Items</th>
+                                    </tr>
 
-                                            <form>
-                                                <label for="name">Name</label>
-                                                <input type="text" name="name" />
-                                            </form>
-                                            <button class="a_button" slot="footer" type="primary">Close</button>
-                                        </sl-drawer>
-                                        <button class="a_button">Add Folder</button>
-                                        <script>
-                                            const drawer = document.querySelector('.drawer-overview');
-                                            const openButton = drawer.nextElementSibling;
-                                            const closeButton = drawer.querySelector('button[type="primary"]');
-
-                                            openButton.addEventListener('click', () => drawer.show());
-                                            closeButton.addEventListener('click', () => drawer.hide());
-                                        </script>
-                                    </li>
-                                    <li><a href="/" onclick="return showSection('vault-entry');">Github Secret</a></li>
-                                    <li><a href="/" onclick="return showSection('vault-entry');">Postgres DB</a></li>
-                                    <li><a href="/" onclick="return showSection('vault-entry');">SendGrid</a></li>
-                                </ul>
+                                    <tr onclick="return showSection('vault-details');" style="cursor: pointer;">
+                                        <td>Ian Purton</td>
+                                        <td>2021-11-15 at 10:17:00 AM</td>
+                                        <td>2021-11-15 at 10:17:00 AM</td>
+                                        <td>2</td>
+                                    </tr>
+                                </table>
                             </sl-tab-panel>
                             <sl-tab-panel name="custom">This is the custom tab panel.
 
@@ -113,7 +120,31 @@
             </section>
             <section id="vaults" class="content">
                 <div class="m_card">
-                    <div class="header">Folders</div>
+                    <div class="header">
+                        <span>Vaults</span>
+
+
+                        <sl-drawer label="Add Vault" class="add-vault">
+                            Folders keep related secrets together.
+                            For example you could have a folder called Database with all
+                            the secrets related to database access.
+
+                            <form>
+                                <label for="name">Name</label>
+                                <input type="text" name="name" />
+                            </form>
+                            <button class="a_button" slot="footer" type="primary">Close</button>
+                        </sl-drawer>
+                        <button class="a_button">Add Vault</button>
+                        <script>
+                            const addVault = document.querySelector('.add-vault');
+                            const openButton1 = addVault.nextElementSibling;
+                            const closeButton1 = drawer.querySelector('button[type="primary"]');
+
+                            openButton1.addEventListener('click', () => addVault.show());
+                            closeButton1.addEventListener('click', () => addVault.hide());
+                        </script>
+                    </div>
                     <div class="body">
                         <table class="m_table">
                             <tr>
