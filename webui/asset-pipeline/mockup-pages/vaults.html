@@ -24,11 +24,8 @@
             <button class="a_button mini primary">Add Vault</button>
             <script>
                 const addVault = document.querySelector('.add-vault');
-                const openButton1 = addVault.nextElementSibling;
-                const closeButton1 = drawer.querySelector('button[type="primary"]');
-
-                openButton1.addEventListener('click', () => addVault.show());
-                closeButton1.addEventListener('click', () => addVault.hide());
+                addVault.nextElementSibling.addEventListener('click', () => addVault.show());
+                addVault.querySelector('button[type="primary"]').addEventListener('click', () => addVault.hide());
             </script>
         </div>
         <div class="body">
