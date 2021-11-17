@@ -10,6 +10,7 @@
         "@parcel/transformer-sass": "^2.0.0",
         "@shoelace-style/shoelace": "^2.0.0-beta.60",
         "parcel": "^2.0.0",
-        "posthtml-include": "^1.7.2"
+        "posthtml-include": "^1.7.2",
+        "rlite-router": "^2.0.3"
     }
 }
