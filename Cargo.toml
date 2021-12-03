@@ -1,0 +1,9 @@
+[workspace]
+
+members = [
+    "webui",
+]
+
+# Don't add debug information and give us quicker incremental builds
+[profile.dev]
+debug = false
