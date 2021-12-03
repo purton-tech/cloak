@@ -146,6 +146,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "horrorshow"
+version = "0.8.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8371fb981840150b1a54f7cb117bf6699f7466a1d4861daac33bc6fe2b5abea0"
+
+[[package]]
 name = "http"
 version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -559,6 +565,7 @@ name = "webui"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "horrorshow",
  "tokio",
 ]
 
