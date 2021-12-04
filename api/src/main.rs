@@ -1,5 +1,6 @@
 use tonic::transport::Server;
 use vault::vault_server::VaultServer;
+mod config;
 mod server;
 
 pub mod vault {
@@ -9,11 +10,12 @@ pub mod vault {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let addr = "0.0.0.0:50051".parse()?;
-    let greeter = server::VaultImplementation::default();
+    let config = config::Config::new();
+    let addr = config.vault_server_listen_address.parse()?;
+    let vault = server::VaultImplementation::default();
 
     Server::builder()
-        .add_service(VaultServer::new(greeter))
+        .add_service(VaultServer::new(vault))
         .serve(addr)
         .await?;
 

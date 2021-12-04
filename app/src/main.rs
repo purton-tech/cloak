@@ -2,6 +2,7 @@ use actix_web::{web::Data, App, HttpServer};
 mod config;
 mod errors;
 mod layout;
+mod user_id;
 mod vaults;
 
 pub mod vault {

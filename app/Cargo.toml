@@ -13,6 +13,10 @@ horrorshow = "0"
 validator = { version = "0", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 
+# Used for our request parser user_id
+futures = "0.3"
+
+
 # gRPC dependencies
 tonic = "0"
 prost = "0"
