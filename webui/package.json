@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "start": "parcel asset-pipeline/index.html",
-        "release": "parcel build asset-pipeline/index.html"
+        "start": "parcel watch asset-pipeline/index.ts --no-hmr --public-url /auth/static",
+        "release": "parcel build asset-pipeline/index.ts --public-url /auth/static"
     },
     "devDependencies": {
         "@parcel/transformer-sass": "^2.0.0",

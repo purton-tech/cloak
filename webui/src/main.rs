@@ -1,22 +1,28 @@
+use actix_web::{web::Data, App, HttpServer};
 mod config;
+mod errors;
 mod layout;
 mod vaults;
 
-use axum::{routing::get, Router};
-use std::net::SocketAddr;
-
-#[tokio::main]
-async fn main() {
+#[actix_web::main]
+async fn main() -> std::io::Result<()> {
     let config = config::Config::new();
+    let port = config.port;
 
-    // build our application with a route
-    let app = Router::new().route("/", get(vaults::index));
+    HttpServer::new(move || {
+        App::new()
+            .app_data(Data::new(config.clone()))
+            .configure(vaults::routes)
+            .service(statics::static_images)
+            .service(statics::static_file)
+    })
+    .bind(format!("0.0.0.0:{}", port))?
+    .run()
+    .await
+}
 
-    // run it
-    let addr = SocketAddr::from(([127, 0, 0, 1], config.port));
-    println!("listening on {}", addr);
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+// Error here disabled with "rust-analyzer.diagnostics.disabled": ["macro-error"]
+// in .vscode/settings.json
+pub mod statics {
+    include!(concat!(env!("OUT_DIR"), "/statics.rs"));
 }
