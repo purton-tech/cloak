@@ -1,14 +1,15 @@
 syntax = "proto3";
-package helloworld;
 
-service Greeter {
-    rpc SayHello (HelloRequest) returns (HelloReply);
+package vault;
+
+service Vault {
+    rpc CreateVault (VaultRequest) returns (VaultReply);
 }
 
-message HelloRequest {
+message VaultRequest {
    string name = 1;
 }
 
-message HelloReply {
+message VaultReply {
     string message = 1;
 }

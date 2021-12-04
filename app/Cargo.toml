@@ -13,7 +13,11 @@ horrorshow = "0"
 validator = { version = "0", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 
+# gRPC dependencies
+tonic = "0"
+prost = "0"
 
 [build-dependencies]
 sha1 = "0.6"  # Use by build.rs for cache busting.
+tonic-build = "0"
 

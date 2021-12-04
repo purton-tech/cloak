@@ -1,20 +1,20 @@
 use tonic::{Request, Response, Status};
 
-use crate::hello_world::greeter_server::Greeter;
-use crate::hello_world::{HelloReply, HelloRequest};
+use crate::vault::vault_server::Vault;
+use crate::vault::{VaultReply, VaultRequest};
 
 #[derive(Debug, Default)]
-pub struct MyGreeter {}
+pub struct VaultImplementation {}
 
 #[tonic::async_trait]
-impl Greeter for MyGreeter {
-    async fn say_hello(
+impl Vault for VaultImplementation {
+    async fn create_vault(
         &self,
-        request: Request<HelloRequest>,
-    ) -> Result<Response<HelloReply>, Status> {
+        request: Request<VaultRequest>,
+    ) -> Result<Response<VaultReply>, Status> {
         println!("Got a request: {:?}", request);
 
-        let reply = HelloReply {
+        let reply = VaultReply {
             message: format!("Hello {}!", request.into_inner().name),
         };
 

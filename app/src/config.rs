@@ -5,6 +5,8 @@ pub struct Config {
     pub port: u16,
     // The database
     pub database_url: String,
+    // The gRPC server
+    pub vault_server_url: String,
 }
 
 impl Config {
@@ -18,6 +20,7 @@ impl Config {
         Config {
             port,
             database_url: env::var("WEB_APP_DATABASE_URL").expect("WEB_APP_DATABASE_URL not set"),
+            vault_server_url: env::var("VAULT_SERVER_URL").expect("VAULT_SERVER_URL not set"),
         }
     }
 }

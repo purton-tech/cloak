@@ -246,9 +246,12 @@ dependencies = [
  "actix-files",
  "actix-web",
  "horrorshow",
+ "prost",
  "serde",
  "sha1",
  "tokio",
+ "tonic",
+ "tonic-build",
  "validator",
 ]
 

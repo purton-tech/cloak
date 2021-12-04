@@ -51,6 +51,8 @@ services:
       DATABASE_URL: postgresql://keyvault_migrations:testpassword@db:5432/keyvault
       # A less privelaged role for basic INSERTS, SELECT etc.
       WEB_APP_DATABASE_URL: postgresql://keyvault_app:testpassword@db:5432/keyvault
+      # A less privelaged role for basic INSERTS, SELECT etc.
+      VAULT_SERVER_URL: http://localhost:50051
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity

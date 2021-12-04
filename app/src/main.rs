@@ -4,6 +4,10 @@ mod errors;
 mod layout;
 mod vaults;
 
+pub mod vault {
+    tonic::include_proto!("vault");
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let config = config::Config::new();

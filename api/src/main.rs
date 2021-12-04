@@ -1,19 +1,19 @@
-use hello_world::greeter_server::GreeterServer;
 use tonic::transport::Server;
+use vault::vault_server::VaultServer;
 mod server;
 
-pub mod hello_world {
+pub mod vault {
     // The string specified here must match the proto package name
-    tonic::include_proto!("helloworld");
+    tonic::include_proto!("vault");
 }
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let addr = "0.0.0.0:50051".parse()?;
-    let greeter = server::MyGreeter::default();
+    let greeter = server::VaultImplementation::default();
 
     Server::builder()
-        .add_service(GreeterServer::new(greeter))
+        .add_service(VaultServer::new(greeter))
         .serve(addr)
         .await?;
 
