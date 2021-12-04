@@ -1,0 +1,11 @@
+[workspace]
+
+members = [
+    "app",
+    "api",
+    "cli",
+]
+
+# Don't add debug information and give us quicker incremental builds
+[profile.dev]
+debug = false

@@ -1,0 +1,44 @@
+<section id="vault-details" class="content">
+    <div class="m_card">
+        <div class="header">StrongCoin Vault
+
+            <sl-drawer label="Add Secret" class="add-secret">
+                <p>Something about secrets.</p>
+                <form class="m_form" style="margin-top: 2em">
+                    <fieldset>
+                        <label for="name">Name</label>
+                        <input type="text" name="name" />
+                        <span class="a_help_text">The name of the vault</span>
+                    </fieldset>
+                </form>
+                <button class="a_button" slot="footer" type="primary">Close</button>
+            </sl-drawer>
+            <button class="a_button mini primary">Add Secret</button>
+            <script>
+                const addSecret = document.querySelector('.add-secret');
+                addSecret.nextElementSibling.addEventListener('click', () => addSecret.show());
+                addSecret.querySelector('button[type="primary"]').addEventListener('click', () => addSecret.hide());
+            </script>
+
+        </div>
+        <div class="body">
+            <sl-tab-group>
+                <sl-tab slot="nav" panel="secrets">Secrets</sl-tab>
+                <sl-tab slot="nav" panel="who">Who has Access?</sl-tab>
+                <sl-tab slot="nav" panel="agent">Agent Configuration</sl-tab>
+
+                <sl-tab-panel name="secrets">
+                    <include src="asset-pipeline/mockup-pages/vault-secrets.html"></include>
+                </sl-tab-panel>
+                <sl-tab-panel name="who">
+                    <include src="asset-pipeline/mockup-pages/vault-who.html"></include>
+                </sl-tab-panel>
+                <sl-tab-panel name="agent">
+                    <include src="asset-pipeline/mockup-pages/vault-agent.html"></include>
+                </sl-tab-panel>
+            </sl-tab-group>
+
+        </div>
+
+    </div>
+</section>

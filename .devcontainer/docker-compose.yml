@@ -1,21 +1,26 @@
 version: '3.4'
 services:
 
+  # Postgres
   db:
-    image: postgres:alpine
+    build: 
+      context: .
+      dockerfile: Dockerfile.postgres
     environment:
       POSTGRES_PASSWORD: testpassword
-      POSTGRES_USER: vscode
+      POSTGRES_USER: postgres
+      POSTGRES_DB: keyvault
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U vscode"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
 
+
   #auth:
   #  image: contorsystems/contor
   #  environment:
-  #    DATABASE_URL: postgresql://vscode:testpassword@db:5432
+  #    DATABASE_URL: postgresql://keyvault_auth:testpassword@db:5432/cream
   #    SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
   #    FORWARD_URL: development
   #    FORWARD_PORT: 8080
@@ -38,14 +43,14 @@ services:
       - ~/.ssh:/home/host-ssh:cached
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
-      - target:/vscode/webui/target # Set target as a volume for performance. 
+      - target:/vscode/target # Set target as a volume for performance. 
       - node_modules:/vscode/webui/node_modules # Set target as a volume for performance. 
 
     environment:
-      DATABASE_URL: postgresql://vscode:testpassword@db:5432
-
-    #env_file:
-    #  - ../.env
+      # The following is used by the migrations and also for SQLX at compile time.
+      DATABASE_URL: postgresql://keyvault_migrations:testpassword@db:5432/keyvault
+      # A less privelaged role for basic INSERTS, SELECT etc.
+      WEB_APP_DATABASE_URL: postgresql://keyvault_app:testpassword@db:5432/keyvault
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity

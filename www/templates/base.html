@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8"></meta>
+  <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+  <title>{{ config.title }}</title>
+  <link rel="stylesheet" href="{{ get_url(path="index.css") | safe }}">
+</head>
+
+<body class="l_marketing">
+  <header>
+    <div class="m_navbar {% block class %}{% endblock %}">
+      <nav>
+        <input id="toggle" type="checkbox"></input>
+        <label class="hamburger" for="toggle">
+          <div class="top_bun"></div>
+          <div class="meat"></div>
+          <div class="bottom_bun"></div>
+        </label><a href="/"><span>{{ config.title }}</span></a>
+        <ul>
+          <li><a href="/blog">Blog</a></li>
+          <li><a href="/developers">Developers</a></li>
+          {% set intro_page = get_page(path="developer-introduction.md") %}
+          {% set dev_section = get_section(path="developers/_index.md") %}
+          <li class="developer-docs"><a href="/developers">{{ intro_page.title }}</a></li>
+          {% for page in dev_section.pages %}
+          <li class="developer-docs"><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+          {% endfor %}
+          <li><a href="/auth/sign_in">Sign In</a></li>
+          <li><a href="/auth/sign_up">Sign Up</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <div id="main">
+      {% block content %} {% endblock %}
+  </div>
+  <footer class="m_footer"></footer>
+</body>
+
+</html>

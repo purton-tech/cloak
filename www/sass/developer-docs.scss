@@ -1,0 +1,51 @@
+@import 'responsive-mixin';
+
+.l_developers {
+    flex-direction: row;
+    width: 100%;
+    padding: var(--content-padding);
+
+    > aside {
+        display: none;
+        > ul {
+            list-style-type: none;
+            padding-left: 0;
+
+            > li {
+                border-left: 1px solid var(--accents-4);
+                padding: 0.5em;
+            }
+        }
+    }
+
+    > main {
+        max-width: var(--article-width);
+        width: 100%;
+
+        pre {
+            width: 100%;
+            overflow-x: auto;
+        }
+    }
+
+    
+    @include for-tablet-landscape-up {
+
+        > aside {
+            display: block;
+            padding-top: 0.5em;
+            > ul {
+                list-style-type: none;
+                padding-left: 0;
+    
+                &.selected {
+                    background-color: red;
+                }
+            }
+            width: 300px;
+        }
+
+        display: flex;
+        max-width: var(--content-width);
+    }
+}

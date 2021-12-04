@@ -1,0 +1,16 @@
+[package]
+name = "app"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+actix-web = { version = "4.0.0-beta.8", default-features = false }
+actix-files = "0.6.0-beta.6" # Used for our static files, i.e css, js and images.
+tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
+horrorshow = "0"
+
+[build-dependencies]
+sha1 = "0.6"  # Use by build.rs for cache busting.
+

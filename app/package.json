@@ -1,0 +1,16 @@
+{
+    "name": "web-ui",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "start": "parcel watch asset-pipeline/index.ts --no-hmr --public-url /auth/static",
+        "release": "parcel build asset-pipeline/index.ts --public-url /auth/static"
+    },
+    "devDependencies": {
+        "@parcel/transformer-sass": "^2.0.0",
+        "@shoelace-style/shoelace": "^2.0.0-beta.60",
+        "parcel": "^2.0.0",
+        "posthtml-include": "^1.7.2",
+        "rlite-router": "^2.0.3"
+    }
+}

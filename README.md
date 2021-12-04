@@ -1,3 +1,8 @@
+## Start Zola
+
+- `cd front-of-house`
+- `zola serve`
+
 ## Alternatives
 
 ### 1Password

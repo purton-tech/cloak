@@ -1,0 +1,11 @@
+.l_blog {
+    padding: var(--content-padding);
+    max-width: var(--article-width);
+    width: 100%;
+
+    .summary {
+        border: 1px solid var(--accents-3);
+        padding: 2em;
+        margin-bottom: 2em;
+    }
+}

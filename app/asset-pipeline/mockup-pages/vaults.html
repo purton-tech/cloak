@@ -1,0 +1,59 @@
+<section id="vaults" class="content">
+    <div class="m_card">
+        <div class="header">
+            <span>Vaults</span>
+
+
+            <sl-drawer label="Add Vault" class="add-vault">
+                <p>
+                    Folders keep related secrets together.
+                    For example you could have a folder called Database with all
+                    the secrets related to database access.
+                </p>
+
+
+                <form class="m_form" style="margin-top: 2em">
+                    <fieldset>
+                        <label for="name">Name</label>
+                        <input type="text" name="name" />
+                        <span class="a_help_text">The name of the vault</span>
+                    </fieldset>
+                </form>
+                <button class="a_button" slot="footer" type="primary">Close</button>
+            </sl-drawer>
+            <button class="a_button mini primary">Add Vault</button>
+            <script>
+                const addVault = document.querySelector('.add-vault');
+                addVault.nextElementSibling.addEventListener('click', () => addVault.show());
+                addVault.querySelector('button[type="primary"]').addEventListener('click', () => addVault.hide());
+            </script>
+        </div>
+        <div class="body">
+            <table class="m_table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Updated</th>
+                        <th>Created</th>
+                        <th>Items</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr onclick="location.href='#vault-details'; return false;" style="cursor: pointer;">
+                        <td><a href="/#vault-details">StrongCoin</a></td>
+                        <td>2021-11-15 at 10:17:00 AM</td>
+                        <td>2021-11-15 at 10:17:00 AM</td>
+                        <td>2</td>
+                    </tr>
+                    <tr onclick="location.href='#vault-details'; return false;" style="cursor: pointer;">
+                        <td><a href="/#vault-details">CarbonWallet</a></td>
+                        <td>2021-11-15 at 10:17:00 AM</td>
+                        <td>2021-11-15 at 10:17:00 AM</td>
+                        <td>2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
