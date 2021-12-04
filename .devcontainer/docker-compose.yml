@@ -44,7 +44,7 @@ services:
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
       - target:/vscode/target # Set target as a volume for performance. 
-      - node_modules:/vscode/webui/node_modules # Set target as a volume for performance. 
+      - node_modules:/vscode/app/node_modules # Set target as a volume for performance. 
 
     environment:
       # The following is used by the migrations and also for SQLX at compile time.
