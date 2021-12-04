@@ -1,7 +1,8 @@
 [workspace]
 
 members = [
-    "webui",
+    "app",
+    "api",
 ]
 
 # Don't add debug information and give us quicker incremental builds

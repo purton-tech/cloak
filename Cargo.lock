@@ -224,6 +224,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "api"
+version = "0.1.0"
+
+[[package]]
+name = "app"
+version = "0.1.0"
+dependencies = [
+ "actix-files",
+ "actix-web",
+ "horrorshow",
+ "sha1",
+ "tokio",
+]
+
+[[package]]
 name = "askama_escape"
 version = "0.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1082,17 +1097,6 @@ name = "wasi"
 version = "0.10.2+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fd6fbd9a79829dd1ad0cc20627bf1ed606756a7f77edff7b66b7064f9cb327c6"
-
-[[package]]
-name = "webui"
-version = "0.1.0"
-dependencies = [
- "actix-files",
- "actix-web",
- "horrorshow",
- "sha1",
- "tokio",
-]
 
 [[package]]
 name = "winapi"
