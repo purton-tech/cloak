@@ -2,8 +2,10 @@ syntax = "proto3";
 
 package vault;
 
+import "google/protobuf/empty.proto";
+
 service Vault {
-    rpc CreateVault (VaultRequest) returns (VaultReply);
+    rpc CreateVault (VaultRequest) returns (google.protobuf.Empty);
 }
 
 message VaultRequest {

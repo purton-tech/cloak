@@ -1,23 +1,30 @@
 use crate::auth_id::AuthId;
 use crate::errors::CustomError;
 use crate::vault::vault_server::Vault;
-use crate::vault::{VaultReply, VaultRequest};
+use crate::vault::VaultRequest;
 use sqlx::PgPool;
 use tonic::{Request, Response, Status};
+use tracing::{info, instrument};
 
 pub struct VaultImplementation {
     pub db_pool: PgPool,
 }
 
+// Becuse we dont want to print the pool to the logs
+impl std::fmt::Debug for VaultImplementation {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "")
+    }
+}
+
 #[tonic::async_trait]
 impl Vault for VaultImplementation {
-    async fn create_vault(
-        &self,
-        request: Request<VaultRequest>,
-    ) -> Result<Response<VaultReply>, Status> {
+    #[instrument]
+    async fn create_vault(&self, request: Request<VaultRequest>) -> Result<Response<()>, Status> {
         let auth_token = AuthId::from_request(&request)?;
         let new_vault = request.into_inner();
-        println!("Got a request: {:?}", new_vault);
+
+        info!("Creating Vault");
 
         sqlx::query!(
             "
@@ -32,10 +39,6 @@ impl Vault for VaultImplementation {
         .await
         .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let reply = VaultReply {
-            message: format!("Hello {}!", new_vault.name),
-        };
-
-        Ok(Response::new(reply))
+        Ok(Response::new(()))
     }
 }
