@@ -69,7 +69,7 @@ services:
       # The following is used by the migrations and also for SQLX at compile time.
       DATABASE_URL: postgresql://keyvault_migrations:testpassword@db:5432/keyvault
       # A less privelaged role for basic INSERTS, SELECT etc.
-      WEB_APP_DATABASE_URL: postgresql://keyvault_app:testpassword@db:5432/keyvault
+      APP_DATABASE_URL: postgresql://keyvault_app:testpassword@db:5432/keyvault
       # A less privelaged role for basic INSERTS, SELECT etc.
       VAULT_SERVER_URL: http://localhost:7103
       VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103

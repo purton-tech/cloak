@@ -22,6 +22,14 @@ CREATE TABLE sessions (
     otp_code_sent BOOLEAN NOT NULL DEFAULT false
 );
 
+CREATE TABLE vaults (
+    id SERIAL PRIMARY KEY, 
+    user_id INT NOT NULL, 
+    name VARCHAR NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 -- Manage the updated_at column
 SELECT updated_at('users');
 

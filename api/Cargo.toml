@@ -10,5 +10,12 @@ tonic = "0"
 prost = "0"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 
+# The database
+sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "postgres", "macros", "chrono" ] }
+chrono = { version = "0", features = ["serde"] }
+validator = { version = "0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+
+
 [build-dependencies]
 tonic-build = "0"

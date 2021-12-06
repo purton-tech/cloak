@@ -11,7 +11,7 @@ pub struct Config {
 impl Config {
     pub fn new() -> Config {
         Config {
-            database_url: env::var("WEB_APP_DATABASE_URL").expect("WEB_APP_DATABASE_URL not set"),
+            database_url: env::var("APP_DATABASE_URL").expect("APP_DATABASE_URL not set"),
             vault_server_listen_address: env::var("VAULT_SERVER_LISTEN_ADDRESS")
                 .expect("VAULT_SERVER_LISTEN_ADDRESS not set"),
         }

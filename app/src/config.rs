@@ -4,8 +4,6 @@ use tonic::codegen::http::Uri;
 #[derive(Clone, Debug)]
 pub struct Config {
     pub port: u16,
-    // The database
-    pub database_url: String,
     // The gRPC server
     pub vault_server_uri: Uri,
 }
@@ -24,7 +22,6 @@ impl Config {
 
         Config {
             port,
-            database_url: env::var("WEB_APP_DATABASE_URL").expect("WEB_APP_DATABASE_URL not set"),
             vault_server_uri,
         }
     }
