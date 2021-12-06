@@ -66,12 +66,6 @@ impl From<std::io::Error> for CustomError {
     }
 }
 
-impl From<horrorshow::Error> for CustomError {
-    fn from(err: horrorshow::Error) -> CustomError {
-        CustomError::FaultySetup(err.to_string())
-    }
-}
-
 impl From<std::str::Utf8Error> for CustomError {
     fn from(err: std::str::Utf8Error) -> CustomError {
         CustomError::FaultySetup(err.to_string())

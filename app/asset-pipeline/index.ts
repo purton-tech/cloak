@@ -9,7 +9,7 @@ import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
 
 document.querySelectorAll('.drawer-opener').forEach(item => {
     item.addEventListener('click', event => {
-        let element = item.previousElementSibling.firstChild
+        let element = item.previousElementSibling
         if(element instanceof SlDrawer) {
             element.show()  
         }  

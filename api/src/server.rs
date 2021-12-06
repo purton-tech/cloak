@@ -1,7 +1,7 @@
 use crate::auth_id::AuthId;
 use crate::errors::CustomError;
 use crate::vault::vault_server::Vault;
-use crate::vault::VaultRequest;
+use crate::vault::{CreateVaultRequest, ListVaultsRequest, ListVaultsResponse, VaultResponse};
 use sqlx::PgPool;
 use tonic::{Request, Response, Status};
 use tracing::{info, instrument};
@@ -20,7 +20,10 @@ impl std::fmt::Debug for VaultImplementation {
 #[tonic::async_trait]
 impl Vault for VaultImplementation {
     #[instrument]
-    async fn create_vault(&self, request: Request<VaultRequest>) -> Result<Response<()>, Status> {
+    async fn create_vault(
+        &self,
+        request: Request<CreateVaultRequest>,
+    ) -> Result<Response<()>, Status> {
         let auth_token = AuthId::from_request(&request)?;
         let new_vault = request.into_inner();
 
@@ -40,5 +43,30 @@ impl Vault for VaultImplementation {
         .map_err(|e| CustomError::Database(e.to_string()))?;
 
         Ok(Response::new(()))
+    }
+
+    #[instrument]
+    async fn list_vaults(
+        &self,
+        _request: Request<ListVaultsRequest>,
+    ) -> Result<Response<ListVaultsResponse>, Status> {
+        //let auth_token = AuthId::from_request(&request)?;
+        //let new_vault = request.into_inner();
+
+        info!("Getting alist of vaults");
+
+        let vaults = sqlx::query_as!(
+            VaultResponse,
+            "
+                SELECT name FROM vaults
+            "
+        )
+        .fetch_all(&self.db_pool)
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        let response = ListVaultsResponse { vaults };
+
+        Ok(Response::new(response))
     }
 }

@@ -1,5 +1,5 @@
 use crate::errors::CustomError;
-use crate::vault::{vault_client::VaultClient, VaultRequest};
+use crate::vault::{vault_client::VaultClient, CreateVaultRequest};
 use actix_web::{http, web, HttpResponse};
 use serde::Deserialize;
 use tonic::{metadata::MetadataValue, transport::Channel, Request};
@@ -27,7 +27,7 @@ pub async fn new(
         Ok(req)
     });
 
-    let request = tonic::Request::new(VaultRequest {
+    let request = tonic::Request::new(CreateVaultRequest {
         name: form.name.clone(),
     });
 

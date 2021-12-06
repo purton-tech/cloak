@@ -9,12 +9,14 @@ edition = "2021"
 actix-web = { version = "4.0.0-beta.8", default-features = false }
 actix-files = "0.6.0-beta.6" # Used for our static files, i.e css, js and images.
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
-horrorshow = "0"
 validator = { version = "0", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 
 # Used for our request parser user_id
 futures = "0.3"
+
+# HTML generation
+markup = "0"
 
 
 # gRPC dependencies

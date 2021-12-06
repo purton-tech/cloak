@@ -6,7 +6,6 @@ use std::io::prelude::*;
 use std::path::Path;
 
 fn main() {
-    // gRPC
     tonic_build::configure()
         .build_server(false)
         .compile(

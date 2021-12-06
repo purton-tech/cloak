@@ -5,13 +5,21 @@ package vault;
 import "google/protobuf/empty.proto";
 
 service Vault {
-    rpc CreateVault (VaultRequest) returns (google.protobuf.Empty);
+    rpc CreateVault(CreateVaultRequest) returns (google.protobuf.Empty);
+    rpc ListVaults(ListVaultsRequest) returns (ListVaultsResponse);
 }
 
-message VaultRequest {
+message CreateVaultRequest {
    string name = 1;
 }
 
-message VaultReply {
-    string message = 1;
+message ListVaultsRequest {
+}
+
+message ListVaultsResponse {
+    repeated VaultResponse vaults = 1;
+}
+
+message VaultResponse {
+    string name = 1;
 }
