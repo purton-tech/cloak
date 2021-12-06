@@ -1,8 +1,8 @@
 use actix_web::{web::Data, App, HttpServer};
+mod authentication;
 mod config;
 mod errors;
 mod layout;
-mod user_id;
 mod vaults;
 
 pub mod vault {

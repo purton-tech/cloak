@@ -1,3 +1,4 @@
+use crate::auth_id::AuthId;
 use crate::errors::CustomError;
 use crate::vault::vault_server::Vault;
 use crate::vault::{VaultReply, VaultRequest};
@@ -14,19 +15,17 @@ impl Vault for VaultImplementation {
         &self,
         request: Request<VaultRequest>,
     ) -> Result<Response<VaultReply>, Status> {
-        let user_id = 1;
+        let auth_token = AuthId::from_request(&request)?;
         let new_vault = request.into_inner();
         println!("Got a request: {:?}", new_vault);
 
         sqlx::query!(
             "
                 INSERT INTO 
-                    vaults (
-                        user_id, 
-                        name)
+                    vaults (user_id, name)
                 VALUES($1, $2) 
             ",
-            user_id,
+            auth_token.user_id as i32,
             new_vault.name,
         )
         .execute(&self.db_pool)

@@ -5,6 +5,7 @@ use tonic::{Code, Status};
 #[derive(Debug)] // Allow the use of "{:?}" format specifier
 pub enum CustomError {
     Database(String),
+    Unauthorised(String),
 }
 
 // Status is the error returned to GRPC.
@@ -13,6 +14,7 @@ impl From<CustomError> for Status {
     fn from(error: CustomError) -> Status {
         match error {
             CustomError::Database(cause) => Status::new(Code::Internal, cause),
+            CustomError::Unauthorised(cause) => Status::new(Code::Unauthenticated, cause),
         }
     }
 }

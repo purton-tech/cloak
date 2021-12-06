@@ -1,5 +1,6 @@
 use tonic::transport::Server;
 use vault::vault_server::VaultServer;
+mod auth_id;
 mod config;
 mod errors;
 mod models;
