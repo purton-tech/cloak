@@ -16,21 +16,40 @@ services:
       timeout: 5s
       retries: 5
 
+  # MailHog is an email testing tool for developers.
+  smtp:
+    image: mailhog/mailhog
+    ports:
+      - "7102:8025" # Access this with http://localhost:8025 to see the inbox.
 
-  #auth:
-  #  image: contorsystems/contor
-  #  environment:
-  #    DATABASE_URL: postgresql://keyvault_auth:testpassword@db:5432/cream
-  #    SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
-  #    FORWARD_URL: development
-  #    FORWARD_PORT: 8080
-  #    SKIP_AUTH_FOR: /,/contact/*,/static/*,/images/*
-  #    REDIRECT_URL: /
-  #  ports:
-  #    - "9090:9090"
-  #  depends_on:
-  #    db:
-  #      condition: service_healthy
+  # Our external authentication micro service.
+  auth:
+    image: authnproxy/authnproxy
+    environment:
+      AUTH_TYPE: encrypted
+      # The following is used by the migrations and also for SQLX at compile time.
+      DATABASE_URL: postgresql://keyvault_auth:testpassword@db:5432/keyvault
+      SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
+      FORWARD_URL: development
+      FORWARD_PORT: 7101
+      REDIRECT_URL: /app/vaults
+      SKIP_AUTH_FOR: /$$,/static/*
+      ENABLE_EMAIL_OTP: 'true'
+
+      # Send all email to mailhog
+      SMTP_HOST: smtp
+      SMTP_PORT: 1025
+      SMTP_USERNAME: thisisnotused
+      SMTP_PASSWORD: thisisnotused
+      SMTP_TLS_OFF: 'true'
+      RESET_DOMAIN: http://localhost:7100
+      RESET_FROM_EMAIL_ADDRESS: support@wedontknowyet.com
+    ports:
+      - "7100:9090"
+    depends_on:
+      db:
+        condition: service_healthy
+
 
   development:
     build: 
@@ -44,13 +63,16 @@ services:
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
       - target:/vscode/target # Set target as a volume for performance. 
-      - node_modules:/vscode/webui/node_modules # Set target as a volume for performance. 
+      - node_modules:/vscode/app/node_modules # Set target as a volume for performance. 
 
     environment:
       # The following is used by the migrations and also for SQLX at compile time.
       DATABASE_URL: postgresql://keyvault_migrations:testpassword@db:5432/keyvault
       # A less privelaged role for basic INSERTS, SELECT etc.
-      WEB_APP_DATABASE_URL: postgresql://keyvault_app:testpassword@db:5432/keyvault
+      APP_DATABASE_URL: postgresql://keyvault_app:testpassword@db:5432/keyvault
+      # A less privelaged role for basic INSERTS, SELECT etc.
+      VAULT_SERVER_URL: http://localhost:7103
+      VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity

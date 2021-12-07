@@ -6,3 +6,21 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tonic = "0" # Rust gRPC implementation
+prost = "0" # Rust Protocol Buffers implementation
+prost-types = "0" # Contains definitions of Protocol Buffers well-known types
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+# The database
+sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "postgres", "macros", "chrono" ] }
+chrono = { version = "0", features = ["serde"] }
+validator = { version = "0", features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
+
+# Observability
+tracing = { version = "0", features = ["log"] }
+tracing-futures = { version = "0", default-features = false }
+tracing-subscriber = "0.2"
+
+[build-dependencies]
+tonic-build = "0"

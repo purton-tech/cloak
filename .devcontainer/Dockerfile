@@ -20,4 +20,4 @@ RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSI
 # all the volumes configured in the docker-compose.yml
 ARG USERNAME=vscode
 RUN sudo mkdir -p /vscode/target && sudo chown $USERNAME:$USERNAME /vscode/target
-RUN sudo mkdir -p /vscode/webui/node_modules && sudo chown $USERNAME:$USERNAME /vscode/webui/node_modules
+RUN sudo mkdir -p /vscode/app/node_modules && sudo chown $USERNAME:$USERNAME /vscode/app/node_modules

@@ -1,5 +1,25 @@
 syntax = "proto3";
 
-service KeyVault {
-    rpc UploadData(UploadDataRequest) returns (UploadDataResponse);
+package vault;
+
+import "google/protobuf/empty.proto";
+
+service Vault {
+    rpc CreateVault(CreateVaultRequest) returns (google.protobuf.Empty);
+    rpc ListVaults(ListVaultsRequest) returns (ListVaultsResponse);
+}
+
+message CreateVaultRequest {
+   string name = 1;
+}
+
+message ListVaultsRequest {
+}
+
+message ListVaultsResponse {
+    repeated VaultResponse vaults = 1;
+}
+
+message VaultResponse {
+    string name = 1;
 }

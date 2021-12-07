@@ -6,6 +6,15 @@ use std::io::prelude::*;
 use std::path::Path;
 
 fn main() {
+    tonic_build::configure()
+        .build_server(false)
+        .compile(
+            &["api.proto"],     // Files in the path
+            &["../api/protos"], // The path to search
+        )
+        .unwrap();
+
+    // Asset pipelibe
     let mut data = String::new();
 
     data.push_str("use actix_files as fs;\n");

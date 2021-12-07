@@ -5,6 +5,8 @@ use std::fmt;
 #[derive(Debug)]
 pub enum CustomError {
     FaultySetup(String),
+    ServerCommunications(String),
+    Unauthorized(String),
 }
 
 // Allow the use of "{}" format specifier
@@ -12,6 +14,10 @@ impl fmt::Display for CustomError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             CustomError::FaultySetup(ref cause) => write!(f, "Setup Error: {}", cause),
+            CustomError::Unauthorized(ref cause) => write!(f, "Setup Error: {}", cause),
+            CustomError::ServerCommunications(ref cause) => {
+                write!(f, "Communications Error: {}", cause)
+            }
         }
     }
 }
@@ -21,6 +27,8 @@ impl ResponseError for CustomError {
     fn error_response(&self) -> HttpResponse {
         match self {
             CustomError::FaultySetup(err) => HttpResponse::InternalServerError().body(err),
+            CustomError::Unauthorized(err) => HttpResponse::InternalServerError().body(err),
+            CustomError::ServerCommunications(err) => HttpResponse::InternalServerError().body(err),
         }
     }
 }
@@ -33,15 +41,27 @@ impl Error for CustomError {
     }
 }
 
-// Age using a buffered writer
-impl From<std::io::Error> for CustomError {
-    fn from(err: std::io::Error) -> CustomError {
-        CustomError::FaultySetup(err.to_string())
+impl From<tonic::transport::Error> for CustomError {
+    fn from(err: tonic::transport::Error) -> CustomError {
+        CustomError::ServerCommunications(err.to_string())
     }
 }
 
-impl From<horrorshow::Error> for CustomError {
-    fn from(err: horrorshow::Error) -> CustomError {
+impl From<tonic::metadata::errors::InvalidMetadataValue> for CustomError {
+    fn from(err: tonic::metadata::errors::InvalidMetadataValue) -> CustomError {
+        CustomError::ServerCommunications(err.to_string())
+    }
+}
+
+impl From<tonic::Status> for CustomError {
+    fn from(err: tonic::Status) -> CustomError {
+        CustomError::ServerCommunications(err.to_string())
+    }
+}
+
+// Age using a buffered writer
+impl From<std::io::Error> for CustomError {
+    fn from(err: std::io::Error) -> CustomError {
         CustomError::FaultySetup(err.to_string())
     }
 }
