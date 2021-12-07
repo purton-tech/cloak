@@ -6,11 +6,16 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = { version = "4.0.0-beta.8", default-features = false }
-actix-files = "0.6.0-beta.6" # Used for our static files, i.e css, js and images.
-tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
+axum = "0"
+hyper = { version = "0", features = ["server"] }
+pin-project = "1"
+tower = { version = "0", default-features = false }
+tokio = { version = "1", default-features = false, features = ["macros", "rt", "rt-multi-thread"] }
 validator = { version = "0", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
+tracing = "0"
+tracing-subscriber = { version="0", features = ["env-filter"] }
+tower-http = { version = "0", default-features = false, features = ["fs", "trace"] }
 
 # Used for our request parser user_id
 futures = "0.3"
@@ -22,6 +27,10 @@ markup = "0"
 # gRPC dependencies
 tonic = "0"
 prost = "0"
+
+# Access the database
+sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "postgres", "macros", "json" , "chrono" ] }
+chrono = { version = "0", features = ["serde"] }
 
 [build-dependencies]
 sha1 = "0.6"  # Use by build.rs for cache busting.

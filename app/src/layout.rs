@@ -1,14 +1,12 @@
 use crate::errors::CustomError;
-use actix_web::HttpResponse;
+use axum::response::Html;
 
 // page_title and content can be anything that can be rendered. A string, a
 // template, a number, etc.
-pub fn layout(title: &str, content: &str) -> Result<HttpResponse, CustomError> {
+pub fn layout(title: &str, content: &str) -> Result<Html<String>, CustomError> {
     let html = ApplicationLayout { content, title };
 
-    Ok(HttpResponse::Ok()
-        .content_type("text/html")
-        .body(html.to_string().replace("sl_drawer", "sl-drawer")))
+    Ok(Html(html.to_string().replace("sl_drawer", "sl-drawer")))
 }
 
 markup::define! {

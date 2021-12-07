@@ -1,11 +1,10 @@
 use std::env;
-use tonic::codegen::http::Uri;
 
 #[derive(Clone, Debug)]
 pub struct Config {
     pub port: u16,
     // The gRPC server
-    pub vault_server_uri: Uri,
+    pub app_database_url: String,
 }
 
 impl Config {
@@ -16,13 +15,11 @@ impl Config {
             7101
         };
 
-        let server = env::var("VAULT_SERVER_URL").expect("VAULT_SERVER_URL not set");
-
-        let vault_server_uri = server.parse::<Uri>().expect("Could not parse server URI");
+        let app_database_url = env::var("APP_DATABASE_URL").expect("APP_DATABASE_URL not set");
 
         Config {
             port,
-            vault_server_uri,
+            app_database_url,
         }
     }
 }

@@ -7,27 +7,26 @@ use std::path::Path;
 
 fn main() {
     tonic_build::configure()
-        .build_server(false)
         .compile(
-            &["api.proto"],     // Files in the path
-            &["../api/protos"], // The path to search
+            &["api.proto"], // Files in the path
+            &["../protos"], // The path to search
         )
         .unwrap();
 
-    // Asset pipelibe
+    // Asset pipeline
     let mut data = String::new();
 
-    data.push_str("use actix_files as fs;\n");
-    data.push_str("use actix_web::{ get, HttpRequest, Error};\n");
-
-    data.push_str(&create_route(
-        "/static/images",
-        "static_images",
+    data.push_str(&generate_file_routes("./dist/", "asset_pipeline_routes"));
+    data.push_str(&generate_file_routes(
         "./asset-pipeline/images/",
+        "image_routes",
     ));
-    data.push_str(&create_route("/static/assets", "static_file", "./dist/"));
-    data.push_str(&parse_folder(".//dist/", "/static/assets"));
-    data.push_str(&parse_folder("./asset-pipeline/images/", "/static/images"));
+
+    data.push_str(&generate_get_methods("./dist/", "/static/assets"));
+    data.push_str(&generate_get_methods(
+        "./asset-pipeline/images/",
+        "/static/images",
+    ));
 
     let out_dir = env::var_os("OUT_DIR").unwrap();
     let file_path = Path::new(&out_dir).join("statics.rs");
@@ -36,32 +35,48 @@ fn main() {
     dst.write_all(data.as_bytes()).unwrap();
 }
 
-fn create_route(route: &str, method_name: &str, folder: &str) -> String {
-    format!(
-        r#"
-        #[get("{}/{{filename:.*}}")]
-        async fn {}(req: HttpRequest) -> Result<fs::NamedFile, Error> {{
-            let path: std::path::PathBuf = req.match_info().query("filename").parse().unwrap();
+fn generate_file_routes(folder: &str, method_name: &str) -> String {
+    let paths = fs::read_dir(folder).unwrap();
 
-            let mut parts: Vec<&str> = path.to_str().unwrap().split('.').collect();
-            parts.remove(parts.len() - 2);
-            let name = parts.join(".");
-            let name = format!("{}{{}}", name);
+    let mut data = String::new();
 
-            if let Ok(file) = fs::NamedFile::open(name) {{
-                return Ok(file);
-            }} 
-            
-            let name = format!("{}{{}}", path.to_str().unwrap());
-            let file = fs::NamedFile::open(name)?;
-            Ok(file)
-        }}
-    "#,
-        route, method_name, folder, folder
-    )
+    data.push_str(&format!("pub fn {}() -> axum::Router {{\n", method_name));
+    data.push_str("    axum::Router::new()\n");
+
+    for entry in paths {
+        let entry = entry.unwrap();
+        let path = entry.path();
+
+        let metadata = std::fs::metadata(&path).unwrap();
+
+        if metadata.is_file() {
+            let name: String = path.file_name().unwrap().to_string_lossy().into();
+            let file_name = format!("{}{}", folder, name);
+
+            let method = format!(
+                r#".nest(
+                    &get_{}(),
+                    axum::routing::get_service(tower_http::services::ServeFile::new("{}")).handle_error(|error: std::io::Error| async move {{
+                        (
+                            axum::http::StatusCode::INTERNAL_SERVER_ERROR,
+                            format!("Unhandled internal error: {{}}", error),
+                        )
+                    }}),
+                )
+                "#,
+                &name.replace(".", "_").replace("-", "_"),
+                &file_name
+            );
+
+            data.push_str(&method);
+        }
+    }
+
+    data.push_str("}\n");
+    data
 }
 
-fn parse_folder(folder: &str, route: &str) -> String {
+fn generate_get_methods(folder: &str, route: &str) -> String {
     let paths = fs::read_dir(folder).unwrap();
 
     let mut data = String::new();

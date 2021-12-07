@@ -1,4 +1,7 @@
-use actix_web::{HttpResponse, ResponseError};
+use axum::{
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 use std::error::Error;
 use std::fmt;
 
@@ -6,7 +9,8 @@ use std::fmt;
 pub enum CustomError {
     FaultySetup(String),
     ServerCommunications(String),
-    Unauthorized(String),
+    Database(String),
+    //Unauthorized(String),
 }
 
 // Allow the use of "{}" format specifier
@@ -14,22 +18,20 @@ impl fmt::Display for CustomError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             CustomError::FaultySetup(ref cause) => write!(f, "Setup Error: {}", cause),
-            CustomError::Unauthorized(ref cause) => write!(f, "Setup Error: {}", cause),
+            //CustomError::Unauthorized(ref cause) => write!(f, "Setup Error: {}", cause),
             CustomError::ServerCommunications(ref cause) => {
                 write!(f, "Communications Error: {}", cause)
+            }
+            CustomError::Database(ref cause) => {
+                write!(f, "Database Error: {}", cause)
             }
         }
     }
 }
 
-/// Actix web uses `ResponseError` for conversion of errors to a response
-impl ResponseError for CustomError {
-    fn error_response(&self) -> HttpResponse {
-        match self {
-            CustomError::FaultySetup(err) => HttpResponse::InternalServerError().body(err),
-            CustomError::Unauthorized(err) => HttpResponse::InternalServerError().body(err),
-            CustomError::ServerCommunications(err) => HttpResponse::InternalServerError().body(err),
-        }
+impl IntoResponse for CustomError {
+    fn into_response(self) -> Response {
+        (StatusCode::UNPROCESSABLE_ENTITY, "Invalid username").into_response()
     }
 }
 
