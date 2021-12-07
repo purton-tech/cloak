@@ -2,13 +2,12 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use std::error::Error;
 use std::fmt;
+use tonic::{Code, Status};
 
 #[derive(Debug)]
 pub enum CustomError {
     FaultySetup(String),
-    ServerCommunications(String),
     Database(String),
     //Unauthorized(String),
 }
@@ -19,9 +18,6 @@ impl fmt::Display for CustomError {
         match *self {
             CustomError::FaultySetup(ref cause) => write!(f, "Setup Error: {}", cause),
             //CustomError::Unauthorized(ref cause) => write!(f, "Setup Error: {}", cause),
-            CustomError::ServerCommunications(ref cause) => {
-                write!(f, "Communications Error: {}", cause)
-            }
             CustomError::Database(ref cause) => {
                 write!(f, "Database Error: {}", cause)
             }
@@ -29,59 +25,26 @@ impl fmt::Display for CustomError {
     }
 }
 
+// For gRPC we raise a custom error and it gets converted to a gRPC status code.
+impl From<CustomError> for Status {
+    fn from(error: CustomError) -> Status {
+        match error {
+            CustomError::Database(cause) => Status::new(Code::Internal, cause),
+            CustomError::FaultySetup(cause) => Status::new(Code::Internal, cause),
+        }
+    }
+}
+
+// So that errors get prinbted to the browser?
 impl IntoResponse for CustomError {
     fn into_response(self) -> Response {
-        (StatusCode::UNPROCESSABLE_ENTITY, "Invalid username").into_response()
+        (StatusCode::UNPROCESSABLE_ENTITY, self).into_response()
     }
 }
 
-// rust bitcoin Allow this type to be treated like an error
-impl Error for CustomError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        // Generic error, underlying cause isn't tracked.
-        None
-    }
-}
-
-impl From<tonic::transport::Error> for CustomError {
-    fn from(err: tonic::transport::Error) -> CustomError {
-        CustomError::ServerCommunications(err.to_string())
-    }
-}
-
-impl From<tonic::metadata::errors::InvalidMetadataValue> for CustomError {
-    fn from(err: tonic::metadata::errors::InvalidMetadataValue) -> CustomError {
-        CustomError::ServerCommunications(err.to_string())
-    }
-}
-
-impl From<tonic::Status> for CustomError {
-    fn from(err: tonic::Status) -> CustomError {
-        CustomError::ServerCommunications(err.to_string())
-    }
-}
-
-// Age using a buffered writer
-impl From<std::io::Error> for CustomError {
-    fn from(err: std::io::Error) -> CustomError {
-        CustomError::FaultySetup(err.to_string())
-    }
-}
-
-impl From<std::str::Utf8Error> for CustomError {
-    fn from(err: std::str::Utf8Error) -> CustomError {
-        CustomError::FaultySetup(err.to_string())
-    }
-}
-
-impl From<std::num::ParseIntError> for CustomError {
-    fn from(err: std::num::ParseIntError) -> CustomError {
-        CustomError::FaultySetup(err.to_string())
-    }
-}
-
-impl From<std::num::ParseFloatError> for CustomError {
-    fn from(err: std::num::ParseFloatError) -> CustomError {
-        CustomError::FaultySetup(err.to_string())
+// Any errors from sqlx get converted to CustomError
+impl From<sqlx::Error> for CustomError {
+    fn from(err: sqlx::Error) -> CustomError {
+        CustomError::Database(err.to_string())
     }
 }

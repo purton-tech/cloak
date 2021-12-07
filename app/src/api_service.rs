@@ -1,7 +1,10 @@
 use app::vault::*;
+use sqlx::PgPool;
 use tonic::{Request, Response, Status};
 
-pub struct VaultService {}
+pub struct VaultService {
+    pub pool: PgPool,
+}
 
 #[tonic::async_trait]
 impl app::vault::vault_server::Vault for VaultService {
@@ -16,11 +19,16 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         _request: Request<ListVaultsRequest>,
     ) -> Result<Response<ListVaultsResponse>, Status> {
-        let response = ListVaultsResponse {
-            vaults: vec![VaultResponse {
-                name: "Harrry3".to_string(),
-            }],
-        };
+        let vaults = crate::vaults::Vault::get_all(self.pool.clone(), 1).await?;
+
+        let vaults: Vec<VaultResponse> = vaults
+            .iter()
+            .map(|v| VaultResponse {
+                name: v.name.clone(),
+            })
+            .collect();
+
+        let response = ListVaultsResponse { vaults };
 
         Ok(Response::new(response))
     }

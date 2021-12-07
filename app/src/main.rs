@@ -23,6 +23,7 @@ async fn main() {
     let db_pool = PgPool::connect(&config.app_database_url)
         .await
         .expect("Problem connecting to the database");
+    let grpc_db_pool = db_pool.clone();
 
     let axum_make_service = axum::Router::new()
         .merge(vaults::routes())
@@ -34,7 +35,7 @@ async fn main() {
 
     let grpc_service = tonic::transport::Server::builder()
         .add_service(app::vault::vault_server::VaultServer::new(
-            api_service::VaultService {},
+            api_service::VaultService { pool: grpc_db_pool },
         ))
         .into_service();
 
