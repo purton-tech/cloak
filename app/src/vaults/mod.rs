@@ -14,3 +14,8 @@ pub fn routes() -> Router {
         .route(INDEX, get(index::index))
         .route(NEW, post(new_vault::new))
 }
+
+// Our models
+pub struct Vault {
+    pub name: String,
+}

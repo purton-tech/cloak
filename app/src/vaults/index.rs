@@ -1,16 +1,25 @@
 use crate::errors::CustomError;
-use axum::response::Html;
+use axum::{extract::Extension, response::Html};
+use sqlx::PgPool;
 
-pub async fn index(//config: web::Data<crate::config::Config>,
-    //auth: crate::authentication::Authentication,
-) -> Result<Html<String>, CustomError> {
-    let page = VaultsPage {};
+pub async fn index(Extension(pool): Extension<PgPool>) -> Result<Html<String>, CustomError> {
+    let vaults = sqlx::query_as!(
+        super::Vault,
+        "
+            SELECT name FROM vaults
+        "
+    )
+    .fetch_all(&pool)
+    .await
+    .map_err(|e| CustomError::Database(e.to_string()))?;
+
+    let page = VaultsPage { vaults };
 
     crate::layout::layout("Home", &page.to_string())
 }
 
 markup::define! {
-    VaultsPage {
+    VaultsPage(vaults: Vec<super::Vault>) {
         div.m_card {
             div.header {
                 span { "Vaults" }
@@ -45,6 +54,14 @@ markup::define! {
                         }
                     }
                     tbody {
+                        @for vault in vaults {
+                            tr {
+                                td { {vault.name} }
+                                td { "Updated" }
+                                td { "Created" }
+                                td { "Items" }
+                            }
+                        }
                     }
                 }
             }

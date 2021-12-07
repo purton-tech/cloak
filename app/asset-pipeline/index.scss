@@ -76,3 +76,13 @@ img {
 @import './buttons';
 @import './tables';
 @import './forms';
+
+// FOUC - Flash of unstyled content. Hide web components
+// until they are ready.
+sl-drawer {
+    display: block;
+}
+sl-drawer:not(:defined) {
+    display: none;
+}
+
