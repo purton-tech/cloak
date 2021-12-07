@@ -1,14 +1,12 @@
 use crate::errors::CustomError;
-use actix_web::HttpResponse;
+use axum::response::Html;
 
 // page_title and content can be anything that can be rendered. A string, a
 // template, a number, etc.
-pub fn layout(title: &str, content: &str) -> Result<HttpResponse, CustomError> {
+pub fn layout(title: &str, content: &str) -> Result<Html<String>, CustomError> {
     let html = ApplicationLayout { content, title };
 
-    Ok(HttpResponse::Ok()
-        .content_type("text/html")
-        .body(html.to_string().replace("sl_drawer", "sl-drawer")))
+    Ok(Html(html.to_string().replace("sl_drawer", "sl-drawer")))
 }
 
 markup::define! {
@@ -23,9 +21,9 @@ markup::define! {
                 meta [ name="viewport", content="width=device-width, initial-scale=1" ] {}
                 title { {title} }
 
-                script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
+                //script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
 
-                link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
+                //link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
 
             }
 
@@ -42,7 +40,7 @@ markup::define! {
                         }
                         ul {
                             li.selected {
-                                img[src=crate::statics::get_vault_svg(), width="32px", type="image/svg"] {}
+                                //img[src=crate::statics::get_vault_svg(), width="32px", type="image/svg"] {}
                                 a[href=crate::vaults::INDEX] { "Vaults" }
                             }
                         }

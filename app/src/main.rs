@@ -1,33 +1,49 @@
-use actix_web::{web::Data, App, HttpServer};
-mod authentication;
-mod config;
+mod api_service;
 mod errors;
+mod hybrid;
 mod layout;
 mod vaults;
 
-pub mod vault {
-    tonic::include_proto!("vault");
+use app::vault::vault_server::VaultServer;
+use axum::{
+    response::{Html, IntoResponse},
+    routing::get,
+    Router,
+};
+use std::net::SocketAddr;
+
+#[tokio::main]
+async fn main() {
+    let axum_make_service = axum::Router::new()
+        .merge(routes())
+        .merge(vaults::routes())
+        .into_make_service();
+
+    let grpc_service = tonic::transport::Server::builder()
+        .add_service(VaultServer::new(api_service::VaultService {}))
+        .into_service();
+
+    let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], 7101));
+    let server = hyper::Server::bind(&addr).serve(hybrid_make_service);
+
+    if let Err(e) = server.await {
+        eprintln!("server error: {}", e);
+    }
 }
 
-#[actix_web::main]
-async fn main() -> std::io::Result<()> {
-    let config = config::Config::new();
-    let port = config.port;
+pub fn routes() -> Router {
+    axum::Router::new().route("/", get(root))
+}
 
-    HttpServer::new(move || {
-        App::new()
-            .app_data(Data::new(config.clone()))
-            .configure(vaults::routes)
-            .service(statics::static_images)
-            .service(statics::static_file)
-    })
-    .bind(format!("0.0.0.0:{}", port))?
-    .run()
-    .await
+// basic handler that responds with a static string
+async fn root() -> impl IntoResponse {
+    Html("<a href='/app/vaults'>Vaults</a>")
 }
 
 // Error here disabled with "rust-analyzer.diagnostics.disabled": ["macro-error"]
 // in .vscode/settings.json
-pub mod statics {
-    include!(concat!(env!("OUT_DIR"), "/statics.rs"));
-}
+//pub mod statics {
+//    include!(concat!(env!("OUT_DIR"), "/statics.rs"));
+//}

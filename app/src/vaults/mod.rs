@@ -1,12 +1,12 @@
 mod index;
-mod new_vault;
+//mod new_vault;
 
-use actix_web::web;
+use axum::{routing::get, Router};
 
 pub static INDEX: &str = "/app/vaults";
 pub static NEW: &str = "/app/new_vault";
 
-pub fn routes(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::resource(INDEX).route(web::get().to(index::index)));
-    cfg.service(web::resource(NEW).route(web::post().to(new_vault::new)));
+pub fn routes() -> Router {
+    Router::new().route(INDEX, get(index::index))
+    //.route(NEW, post(new_vault::new))
 }

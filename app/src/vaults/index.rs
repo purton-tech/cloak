@@ -1,36 +1,16 @@
 use crate::errors::CustomError;
-use crate::vault::{vault_client::VaultClient, ListVaultsRequest, ListVaultsResponse};
-use actix_web::{web, HttpResponse};
-use tonic::{metadata::MetadataValue, transport::Channel, Request};
+use axum::response::Html;
 
-pub async fn index(
-    config: web::Data<crate::config::Config>,
-    auth: crate::authentication::Authentication,
-) -> Result<HttpResponse, CustomError> {
-    let channel = Channel::builder(config.vault_server_uri.clone())
-        .connect()
-        .await?;
-
-    let token = MetadataValue::from_str(&auth.user_id.to_string())?;
-
-    let mut client = VaultClient::with_interceptor(channel, move |mut req: Request<()>| {
-        req.metadata_mut().insert("x-user-id", token.clone());
-        Ok(req)
-    });
-
-    let request = tonic::Request::new(ListVaultsRequest {});
-
-    let vaults = client.list_vaults(request).await?;
-
-    let page = VaultsPage {
-        vaults: vaults.into_inner(),
-    };
+pub async fn index(//config: web::Data<crate::config::Config>,
+    //auth: crate::authentication::Authentication,
+) -> Result<Html<String>, CustomError> {
+    let page = VaultsPage {};
 
     crate::layout::layout("Home", &page.to_string())
 }
 
 markup::define! {
-    VaultsPage(vaults: ListVaultsResponse) {
+    VaultsPage {
         div.m_card {
             div.header {
                 span { "Vaults" }
@@ -65,14 +45,6 @@ markup::define! {
                         }
                     }
                     tbody {
-                        @for vault in &vaults.vaults {
-                            tr {
-                                td { {vault.name} }
-                                td { "Updated" }
-                                td { "Created" }
-                                td { "Items" }
-                            }
-                        }
                     }
                 }
             }

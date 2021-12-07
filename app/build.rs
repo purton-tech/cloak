@@ -7,7 +7,6 @@ use std::path::Path;
 
 fn main() {
     tonic_build::configure()
-        .build_server(false)
         .compile(
             &["api.proto"],     // Files in the path
             &["../api/protos"], // The path to search
