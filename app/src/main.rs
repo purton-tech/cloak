@@ -1,15 +1,12 @@
 mod api_service;
+mod config;
 mod errors;
 mod hybrid;
 mod layout;
 mod vaults;
 
-use app::vault::vault_server::VaultServer;
-use axum::{
-    response::{Html, IntoResponse},
-    routing::get,
-    Router,
-};
+use axum::AddExtensionLayer;
+use sqlx::PgPool;
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
 
@@ -21,16 +18,24 @@ async fn main() {
     }
     tracing_subscriber::fmt::init();
 
+    let config = config::Config::new();
+
+    let db_pool = PgPool::connect(&config.app_database_url)
+        .await
+        .expect("Problem connecting to the database");
+
     let axum_make_service = axum::Router::new()
-        .merge(routes())
         .merge(vaults::routes())
         .merge(statics::asset_pipeline_routes())
         .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())
+        .layer(AddExtensionLayer::new(db_pool))
         .into_make_service();
 
     let grpc_service = tonic::transport::Server::builder()
-        .add_service(VaultServer::new(api_service::VaultService {}))
+        .add_service(app::vault::vault_server::VaultServer::new(
+            api_service::VaultService {},
+        ))
         .into_service();
 
     let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
@@ -42,15 +47,6 @@ async fn main() {
     if let Err(e) = server.await {
         tracing::error!("server error: {}", e);
     }
-}
-
-pub fn routes() -> Router {
-    axum::Router::new().route("/", get(root))
-}
-
-// basic handler that responds with a static string
-async fn root() -> impl IntoResponse {
-    Html("<a href='/app/vaults'>Vaults</a>")
 }
 
 // Error here disabled with "rust-analyzer.diagnostics.disabled": ["macro-error"]

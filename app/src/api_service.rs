@@ -1,11 +1,10 @@
-use app::vault::vault_server::Vault;
-use app::vault::{CreateVaultRequest, ListVaultsRequest, ListVaultsResponse, VaultResponse};
+use app::vault::*;
 use tonic::{Request, Response, Status};
 
 pub struct VaultService {}
 
 #[tonic::async_trait]
-impl Vault for VaultService {
+impl app::vault::vault_server::Vault for VaultService {
     async fn create_vault(
         &self,
         _request: Request<CreateVaultRequest>,

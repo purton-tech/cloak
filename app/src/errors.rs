@@ -9,6 +9,7 @@ use std::fmt;
 pub enum CustomError {
     FaultySetup(String),
     ServerCommunications(String),
+    Database(String),
     //Unauthorized(String),
 }
 
@@ -20,6 +21,9 @@ impl fmt::Display for CustomError {
             //CustomError::Unauthorized(ref cause) => write!(f, "Setup Error: {}", cause),
             CustomError::ServerCommunications(ref cause) => {
                 write!(f, "Communications Error: {}", cause)
+            }
+            CustomError::Database(ref cause) => {
+                write!(f, "Database Error: {}", cause)
             }
         }
     }
