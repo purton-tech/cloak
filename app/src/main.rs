@@ -1,4 +1,5 @@
 mod api_service;
+mod authentication;
 mod config;
 mod errors;
 mod hybrid;
