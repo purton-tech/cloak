@@ -19,7 +19,7 @@ impl Vault for VaultService {
     ) -> Result<Response<ListVaultsResponse>, Status> {
         let response = ListVaultsResponse {
             vaults: vec![VaultResponse {
-                name: "Harrry".to_string(),
+                name: "Harrry2".to_string(),
             }],
         };
 

@@ -13,6 +13,9 @@ tower = { version = "0" }
 tokio = { version = "1", features = ["macros", "rt", "rt-multi-thread"] }
 validator = { version = "0", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
+tracing = "0"
+tracing-subscriber = { version="0", features = ["env-filter"] }
+tower-http = { version = "0", features = ["fs", "trace"] }
 
 # Used for our request parser user_id
 futures = "0.3"

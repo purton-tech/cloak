@@ -21,9 +21,9 @@ markup::define! {
                 meta [ name="viewport", content="width=device-width, initial-scale=1" ] {}
                 title { {title} }
 
-                //script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
+                script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
 
-                //link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
+                link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
 
             }
 
@@ -40,7 +40,7 @@ markup::define! {
                         }
                         ul {
                             li.selected {
-                                //img[src=crate::statics::get_vault_svg(), width="32px", type="image/svg"] {}
+                                img[src=crate::statics::get_vault_svg(), width="32px", type="image/svg"] {}
                                 a[href=crate::vaults::INDEX] { "Vaults" }
                             }
                         }
