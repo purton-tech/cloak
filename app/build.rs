@@ -8,8 +8,8 @@ use std::path::Path;
 fn main() {
     tonic_build::configure()
         .compile(
-            &["api.proto"],     // Files in the path
-            &["../api/protos"], // The path to search
+            &["api.proto"], // Files in the path
+            &["../protos"], // The path to search
         )
         .unwrap();
 
