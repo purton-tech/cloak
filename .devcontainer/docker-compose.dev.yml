@@ -1,0 +1,30 @@
+version: '3.4'
+services:
+
+  # 7100 - Envoy
+  # 7101 - Envoy Admin
+  # 7103 - Web App and API server
+  # 7110 - Selenium VNC
+  # 7125 - Mail
+
+  envoy:
+    ports:
+      - "7100:7100"
+      - "7101:7101"
+
+  smtp:
+    ports:
+      - "7125:8025" # Access this with http://localhost:7225 to see the inbox.
+
+  # Our external authentication micro service.
+  auth:
+    environment:
+      FORWARD_URL: development
+      FORWARD_PORT: 7103
+    
+  #selenium:
+  #  ports:
+      # NoVNC only in 4.0
+      #- 7902:7900
+      # VNC
+  #    - 7110:5900

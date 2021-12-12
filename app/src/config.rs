@@ -12,7 +12,7 @@ impl Config {
         let port: u16 = if env::var("PORT").is_ok() {
             env::var("PORT").unwrap().parse::<u16>().unwrap()
         } else {
-            7101
+            7103
         };
 
         let app_database_url = env::var("APP_DATABASE_URL").expect("APP_DATABASE_URL not set");

@@ -42,7 +42,7 @@ async fn main() {
 
     let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 7101));
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     tracing::debug!("listening on {}", addr);
     let server = hyper::Server::bind(&addr).serve(hybrid_make_service);
 

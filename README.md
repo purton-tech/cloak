@@ -1,7 +1,7 @@
 ## Start Zola
 
-- `cd front-of-house`
-- `zola serve`
+- `cd www`
+- `zola serve --interface 0.0.0.0 --port 7104`
 
 ## Alternatives
 

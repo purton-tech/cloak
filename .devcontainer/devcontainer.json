@@ -1,7 +1,8 @@
 {
-	"name": "Rust",
+	"name": "KeyVault",
 	"dockerComposeFile": [
-		"docker-compose.yml"
+		"docker-compose.yml",
+		"docker-compose.dev.yml"
 	],
 	"service": "development",
     	"workspaceFolder": "/vscode",
