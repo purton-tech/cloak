@@ -85,7 +85,7 @@ static_resources:
   # The authentication service hand /auth for UI and ext_authz
   - name: ext-authn
     connect_timeout: 0.25s
-    type: logical_dns
+    type: strict_dns
     lb_policy: round_robin
     load_assignment:
       cluster_name: ext-authn
@@ -119,6 +119,7 @@ static_resources:
     type: strict_dns
     lb_policy: round_robin
     dns_lookup_family: V4_ONLY
+    http2_protocol_options: {} # Add this then gRPC starts working
     load_assignment:
       cluster_name: app
       endpoints:
