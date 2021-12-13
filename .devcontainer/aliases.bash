@@ -12,7 +12,7 @@ alias gcr='f() { git checkout -b $1 origin/$1; }; f'
 
 # Cargo watch
 alias cw='mold -run cargo watch --no-gitignore -i "*.scss" -i "*.ts" -i node_modules -x run'
-alias zola='zola serve --base-url localhost:7200 --interface 0.0.0.0 --port 7104'
+alias zs='zola serve --interface 0.0.0.0 --port 7104'
 
 # Zola
 #alias zola-serve='docker run -u "$(id -u):$(id -g)" -v $HOST_PROJECT_PATH:/app --workdir /app -p 8080:8080 balthek/zola:0.14.0 serve --interface 0.0.0.0 --port 8080 --base-url development'
