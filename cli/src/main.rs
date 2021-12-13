@@ -2,7 +2,7 @@ use app::vault::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut client = vault_client::VaultClient::connect("http://localhost:7103").await?;
+    let mut client = vault_client::VaultClient::connect("http://envoy:7100").await?;
 
     let request = tonic::Request::new(ListVaultsRequest {});
 
