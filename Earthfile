@@ -60,13 +60,13 @@ build-cache:
     SAVE ARTIFACT $CARGO_HOME cargo_home
 
 build:
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER/dist $APP_FOLDER
+    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
     COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER
     COPY --dir migrations Cargo.lock Cargo.toml protos .
     COPY +build-cache/cargo_home $CARGO_HOME
     COPY +build-cache/target target
     RUN mkdir asset-pipeline
-    COPY --dir +npm-build/dist $WEBAPP_FOLDER/asset-pipeline
+    COPY --dir +npm-build/dist $APP_FOLDER/
     COPY --dir $APP_FOLDER/asset-pipeline/images $APP_FOLDER/asset-pipeline
     # We need to run inside docker as we need postgres running for SQLX
     ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432
