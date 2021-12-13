@@ -45,7 +45,7 @@ const cloudflaredPod = new kx.PodBuilder({
     volumes: [{
         name: "tunnel-secret-volume",
         secret: {
-            secretName: 'cloudflare-cert-keyvault',
+            secretName: `cloudflare-cert-${NAME_SPACE}`,
             items: [
                 { key: "cert.pem", path: "cert.pem" }
             ]
