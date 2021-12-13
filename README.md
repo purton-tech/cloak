@@ -1,10 +1,11 @@
 ## Folder Structure
 
-* /app - Web and gRPC Server. Rust with Typescript and SCSS.
-* /cli - Command Line Interface. Rust.
-* /protos - Protobuf definations for the API
-* /migrations - Database migrat6ions for buildign the Postgres Database
-* /www The website. Built with Zola
+* `/app` - Web and gRPC Server. Rust with Typescript and SCSS.
+* `/cli` - Command Line Interface. Rust.
+* `/infra` - Infrastructure as Coe. Pulumi.
+* `/protos` - Protobuf definitions for the API
+* `/migrations` - Database migrations for building the Postgres Database
+* `/www` The website. Built with Zola
 
 ## Alternatives
 
