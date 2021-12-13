@@ -6,3 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+app = { path = "../app" }
+tokio = { version = "1", default-features = false, features = ["macros", "rt", "rt-multi-thread"] }
+
+# gRPC dependencies
+tonic = "0"
