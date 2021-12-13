@@ -11,7 +11,7 @@
     <div class="summary">
       <h2>{{ page.title }}</h2>
       <p class="subtitle"><strong>{{ page.date }}</strong></p>
-      <p><a href="{{ page.permalink | safe }}">Read More...</a></p>
+      <p><a href="{{ page.path | safe }}">Read More...</a></p>
     </div>
     {% endfor %}
   </section>
