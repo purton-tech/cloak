@@ -1,48 +1,55 @@
 FROM ianpurton/rust-fullstack-devcontainer:latest
 
-ARG WEBAPP_EXE_NAME=web-ui
-ARG WEBAPP_FOLDER=web-ui
-ARG GRPC_SERVER_EXE_NAME=grpc-server
-ARG GRPC_SERVER_FOLDER=grpc-server
+ARG APP_EXE_NAME=app
+ARG APP_FOLDER=app
+ARG CLI_FOLDER=cli
+ARG CLI_EXE_NAME=cli
+
+# Base images
+ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
+ARG NGINX=nginx:latest
+
+# This file builds the following containers
+ARG APP_IMAGE_NAME=ianpurton/vault:app
+ARG INIT_IMAGE_NAME=ianpurton/vault:init
+ARG ENVOY_IMAGE_NAME=ianpurton/vault:envoy
+ARG WWW_IMAGE_NAME=ianpurton/vault:www
+
 
 WORKDIR /build
 
 USER root
-# Protoc
-RUN apt install -y protobuf-compiler
 
+# Set up for docker in docker
 DO github.com/earthly/lib+INSTALL_DIND
 
 USER vscode
 
 all:
-    #BUILD +init-container
-    BUILD +web-app-container
-    #BUILD +grpc-server-container
-    #BUILD +api-docs-nginx-container
+    BUILD +init-container
+    BUILD +app-container
+    BUILD +envoy-container
+    BUILD +www-container
     #BUILD +integration-test
 
 npm-deps:
-    COPY $WEBAPP_FOLDER/package.json package.json
-    COPY $WEBAPP_FOLDER/package-lock.json package-lock.json
+    COPY $APP_FOLDER/package.json package.json
+    COPY $APP_FOLDER/package-lock.json package-lock.json
     RUN npm install
     SAVE ARTIFACT node_modules
 
 npm-build:
     FROM +npm-deps
-    COPY $WEBAPP_FOLDER/asset-pipeline asset-pipeline
-    COPY $WEBAPP_FOLDER/src src
-    COPY protos protos
-    # Update so we point at the correct location of the proto folder
-    RUN sed -i 's/\.\/protos/\/protos/g' package.json
+    COPY $APP_FOLDER/asset-pipeline asset-pipeline
+    COPY $APP_FOLDER/src src
     COPY +npm-deps/node_modules node_modules
     RUN npm run release
-    SAVE ARTIFACT asset-pipeline/dist
+    SAVE ARTIFACT dist
 
 prepare-cache:
-    COPY --dir $WEBAPP_FOLDER/src $WEBAPP_FOLDER/Cargo.toml $WEBAPP_FOLDER/build.rs $WEBAPP_FOLDER/asset-pipeline $WEBAPP_FOLDER
+    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
+    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER
     COPY Cargo.lock Cargo.toml .
-    COPY --dir $GRPC_SERVER_FOLDER/src $GRPC_SERVER_FOLDER/Cargo.toml $GRPC_SERVER_FOLDER/build.rs $GRPC_SERVER_FOLDER
     RUN cargo chef prepare --recipe-path recipe.json
     SAVE ARTIFACT recipe.json
 
@@ -53,15 +60,14 @@ build-cache:
     SAVE ARTIFACT $CARGO_HOME cargo_home
 
 build:
-    COPY --dir $WEBAPP_FOLDER/src $WEBAPP_FOLDER/Cargo.toml $WEBAPP_FOLDER/build.rs $WEBAPP_FOLDER/asset-pipeline $WEBAPP_FOLDER
+    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER/dist $APP_FOLDER
+    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER
     COPY --dir migrations Cargo.lock Cargo.toml protos .
-    COPY .devcontainer/postgres_users.sql .
-    COPY --dir $GRPC_SERVER_FOLDER/src $GRPC_SERVER_FOLDER/Cargo.toml $GRPC_SERVER_FOLDER/build.rs $GRPC_SERVER_FOLDER
     COPY +build-cache/cargo_home $CARGO_HOME
     COPY +build-cache/target target
     RUN mkdir asset-pipeline
     COPY --dir +npm-build/dist $WEBAPP_FOLDER/asset-pipeline
-    COPY --dir $WEBAPP_FOLDER/asset-pipeline/images $WEBAPP_FOLDER/asset-pipeline
+    COPY --dir $APP_FOLDER/asset-pipeline/images $APP_FOLDER/asset-pipeline
     # We need to run inside docker as we need postgres running for SQLX
     ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432
     USER root
@@ -69,62 +75,50 @@ build:
         --pull postgres:alpine
         RUN docker run -d --rm --network=host -e POSTGRES_PASSWORD=testpassword postgres:alpine \
             && while ! pg_isready --host=localhost --port=5432 --username=postgres; do sleep 1; done ;\
-                psql $DATABASE_URL -f postgres_users.sql \
-            && diesel migration run \
+                diesel migration run \
             && cargo build --release --target x86_64-unknown-linux-musl
     END
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$WEBAPP_EXE_NAME $WEBAPP_EXE_NAME
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$GRPC_SERVER_EXE_NAME $GRPC_SERVER_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME $APP_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME $CLI_EXE_NAME
 
 init-container:
     FROM ianpurton/rust-diesel:latest
-    ARG INIT_IMAGE_NAME=ianpurton/cream:init
     COPY --dir migrations .
     CMD diesel migration run
     SAVE IMAGE --push $INIT_IMAGE_NAME
 
-web-app-container:
+app-container:
     FROM scratch
-    ARG WEBAPP_IMAGE_NAME=ianpurton/cream:webapp
-    COPY +build/$WEBAPP_EXE_NAME rust-exe
-    COPY --dir +npm-build/dist asset-pipeline/dist
-    COPY --dir $WEBAPP_FOLDER/asset-pipeline/images asset-pipeline/images
+    COPY +build/$APP_EXE_NAME rust-exe
+    COPY --dir +npm-build/dist dist
+    COPY --dir $APP_FOLDER/asset-pipeline/images asset-pipeline/images
     ENTRYPOINT ["./rust-exe"]
-    SAVE IMAGE --push $WEBAPP_IMAGE_NAME
+    SAVE IMAGE --push $APP_IMAGE_NAME
 
-grpc-server-container:
-    FROM scratch
-    ARG GRPC_SERVER_IMAGE_NAME=ianpurton/cream:grpc
-    COPY +build/$GRPC_SERVER_EXE_NAME rust-exe
-    ENTRYPOINT ["./rust-exe"]
-    SAVE IMAGE --push $GRPC_SERVER_IMAGE_NAME
+envoy-container:
+    FROM $ENVOY_PROXY
+    COPY .devcontainer/envoy.yaml /etc/envoy/envoy.yaml
+    # Update the first entry in our config to point at the marketing pages
+    RUN sed -i '0,/development/{s/development/www/}' /etc/envoy/envoy.yaml
+    # The second development entry in our cluster list is the app
+    RUN sed -i '0,/development/{s/development/app/}' /etc/envoy/envoy.yaml
+    SAVE IMAGE --push $ENVOY_IMAGE_NAME
 
-api-docs-generate:
-    ARG PROTO_NAME=cream_server.proto
-    ARG SWAGGER_NAME=cream_server
-    FROM namely/gen-grpc-gateway:1.30_0
-    # Node needed for api2html
-    RUN apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/v3.7/main/ nodejs=8.9.3-r1
-    # To handle 'not get uid/gid'
-    # https://stackoverflow.com/questions/52196518/could-not-get-uid-gid-when-building-node-docker
-    RUN npm config set unsafe-perm true
-    RUN npm i api2html -g
-    COPY ./protos /defs
-    COPY ./.devcontainer/strip.sh /defs
-    RUN chmod +x /defs/strip.sh
-    RUN protoc --plugin==protoc-gen-grpc=protoc-gen-swagger --swagger_out=logtostderr=true,fqn_for_swagger_name=true,simple_operation_ids=true:. -I/opt/include -I./ $PROTO_NAME
-    # Convert strings format uint64 to integer
-    RUN ./strip.sh $SWAGGER_NAME.swagger.json > $SWAGGER_NAME.swagger.json.convert
-    RUN mv $SWAGGER_NAME.swagger.json.convert $SWAGGER_NAME.swagger.json
-    # Now generate API docs.
-    RUN api2html $SWAGGER_NAME.swagger.json -o index.html
-    SAVE ARTIFACT /defs
+zola-generate:
+    ARG ZOLA_VERSION=0.12.2
+    RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSION/zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
+        && sudo tar -xvf zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
+        && sudo mv zola /usr/bin/zola \
+        && sudo chmod +x /usr/bin/zola
+    COPY --dir www www
+    RUN cd www && zola build
+    SAVE ARTIFACT www/public public
 
-api-docs-nginx-container:
-    ARG API_DOCS_IMAGE_NAME=ianpurton/cream:api
-    FROM nginx
-    COPY +api-docs-generate/defs /usr/share/nginx/html
-    SAVE IMAGE --push $API_DOCS_IMAGE_NAME
+# Test this with docker run --rm -p7180:80 ianpurton/vault:www
+www-container:
+    FROM $NGINX
+    COPY +zola-generate/public /usr/share/nginx/html/
+    SAVE IMAGE --push $WWW_IMAGE_NAME
 
 # Run the full stack and test it with selenium.
 # To reproduce the tests locally run the following from the terminal

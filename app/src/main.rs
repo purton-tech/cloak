@@ -1,4 +1,5 @@
 mod api_service;
+mod authentication;
 mod config;
 mod errors;
 mod hybrid;
@@ -23,6 +24,7 @@ async fn main() {
     let db_pool = PgPool::connect(&config.app_database_url)
         .await
         .expect("Problem connecting to the database");
+    let grpc_db_pool = db_pool.clone();
 
     let axum_make_service = axum::Router::new()
         .merge(vaults::routes())
@@ -34,13 +36,13 @@ async fn main() {
 
     let grpc_service = tonic::transport::Server::builder()
         .add_service(app::vault::vault_server::VaultServer::new(
-            api_service::VaultService {},
+            api_service::VaultService { pool: grpc_db_pool },
         ))
         .into_service();
 
     let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], 7101));
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     tracing::debug!("listening on {}", addr);
     let server = hyper::Server::bind(&addr).serve(hybrid_make_service);
 

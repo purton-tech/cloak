@@ -1,29 +1,37 @@
-use actix_web::{dev::Payload, FromRequest, HttpRequest};
-use serde::{Deserialize, Serialize};
+use axum::{
+    async_trait,
+    extract::{FromRequest, RequestParts},
+    http::StatusCode,
+    response::{IntoResponse, Response},
+};
 
-use crate::errors::CustomError;
-
-use futures::future::{err, ok, Ready};
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug)]
 pub struct Authentication {
     pub user_id: u32,
 }
 
-impl FromRequest for Authentication {
-    type Error = CustomError;
-    type Future = Ready<Result<Authentication, CustomError>>;
+// From a request extract our authentication token.
+#[async_trait]
+impl<B> FromRequest<B> for Authentication
+where
+    B: Send,
+{
+    type Rejection = Response;
 
-    fn from_request(req: &HttpRequest, _pl: &mut Payload) -> Self::Future {
-        if let Some(user_id) = req.headers().get("x-user-id") {
-            if let Ok(user_id) = user_id.to_str() {
-                if let Ok(user_id) = user_id.parse::<u32>() {
-                    return ok(Authentication { user_id });
+    async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+        if let Some(headers) = req.headers() {
+            if let Some(user_id) = headers.get("x-user-id") {
+                if let Ok(user_id) = user_id.to_str() {
+                    if let Ok(user_id) = user_id.parse::<u32>() {
+                        return Ok(Authentication { user_id });
+                    }
                 }
             }
         }
-        err(CustomError::Unauthorized(
-            "x-user-id not found or unparseable".to_string(),
-        ))
+        Err((
+            StatusCode::UNAUTHORIZED,
+            "x-user-id not found or unparseable as u32",
+        )
+            .into_response())
     }
 }

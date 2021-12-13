@@ -1,17 +1,13 @@
+use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use axum::{extract::Extension, response::Html};
 use sqlx::PgPool;
 
-pub async fn index(Extension(pool): Extension<PgPool>) -> Result<Html<String>, CustomError> {
-    let vaults = sqlx::query_as!(
-        super::Vault,
-        "
-            SELECT name FROM vaults
-        "
-    )
-    .fetch_all(&pool)
-    .await
-    .map_err(|e| CustomError::Database(e.to_string()))?;
+pub async fn index(
+    authentication: Authentication,
+    Extension(pool): Extension<PgPool>,
+) -> Result<Html<String>, CustomError> {
+    let vaults = super::Vault::get_all(pool, authentication.user_id).await?;
 
     let page = VaultsPage { vaults };
 

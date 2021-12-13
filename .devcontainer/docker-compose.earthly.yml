@@ -1,0 +1,25 @@
+version: '3.4'
+services:
+
+  # To reproduce the tests locally run the following from the terminal
+  # docker-compose -f docker-compose.earthly.yml -f docker-compose.yml -p earthly up db auth selenium
+
+  db:
+    ports:
+      - "5432:5432" 
+
+  envoy:
+    ports:
+      - "7150:7100"
+      # The admin panel useful if we want to debug
+      - "7151:7101"
+
+  auth:
+    environment:
+      FORWARD_URL: host.docker.internal
+      FORWARD_PORT: 8080
+    
+  selenium:
+    ports:
+      - 4444:4444
+    volumes:

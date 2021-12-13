@@ -9,16 +9,16 @@
       <h2>Getting Started</h2>
       {% set section = get_section(path="developers/_index.md") %}
       <ul>
-        <li><a href="/developers">{{ intro_page.title }}</a></li>
+        <li><a href="/developers/">{{ intro_page.title }}</a></li>
         {% for page in section.pages %}
-        <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+        <li><a href="{{ page.path | safe }}">{{ page.title }}</a></li>
         {% endfor %}
       </ul>
       <h2>Reference</h2>
       <ul>
         {% set reference_section = get_section(path="reference/_index.md") %}
         {% for page in reference_section.pages %}
-        <li><a href="{{ page.permalink | safe }}">{{ page.title }}</a></li>
+        <li><a href="{{ page.path | safe }}">{{ page.title }}</a></li>
         {% endfor %}
       </ul>
     </aside>
