@@ -1,3 +1,4 @@
+use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form},
@@ -14,6 +15,7 @@ pub struct NewVault {
 }
 
 pub async fn new(
+    authentication: Authentication,
     Form(new_vault): Form<NewVault>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
@@ -25,7 +27,7 @@ pub async fn new(
                 vaults (user_id, name)
             VALUES($1, $2) 
         ",
-        1,
+        authentication.user_id as i32,
         new_vault.name,
     )
     .execute(&pool)

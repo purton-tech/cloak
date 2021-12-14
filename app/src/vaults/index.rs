@@ -60,7 +60,7 @@ markup::define! {
                                 td { "Created" }
                                 td { "Items" }
                                 td {
-                                    a[href=crate::secrets::secret_route(vault)] {
+                                    a[href=crate::secrets::secret_route(vault.id)] {
                                         img[src=statics::get_more_info_svg(), style="width: 18px"] {}
                                     }
                                 }
