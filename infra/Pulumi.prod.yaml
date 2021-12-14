@@ -1,5 +1,5 @@
 config:
-  keyvault:app: sha256:2d1399bd5dd586857bc185edb91242ed6df9fe638f8f2ee07991d69d99f78252
+  keyvault:app: sha256:36c27a255881c1136a43c1d57cb5579bdef0c27c205c7ca039f56d0a5e75e4b0
   keyvault:envoy: sha256:830b1fc4b066193bd5182fd9428ef41ff5615dbbdc6f4f871bdc670625f4d35c
   keyvault:init: sha256:2e056d81c7e495765de90fa3282a712a12eef003cbe753b50779157cbbab4c37
   keyvault:secret_key:
