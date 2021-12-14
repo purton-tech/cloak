@@ -1,5 +1,7 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
+use crate::models;
+use crate::statics;
 use axum::{extract::Extension, response::Html};
 use sqlx::PgPool;
 
@@ -7,7 +9,7 @@ pub async fn index(
     authentication: Authentication,
     Extension(pool): Extension<PgPool>,
 ) -> Result<Html<String>, CustomError> {
-    let vaults = super::Vault::get_all(pool, authentication.user_id).await?;
+    let vaults = models::Vault::get_all(pool, authentication.user_id).await?;
 
     let page = VaultsPage { vaults };
 
@@ -15,7 +17,7 @@ pub async fn index(
 }
 
 markup::define! {
-    VaultsPage(vaults: Vec<super::Vault>) {
+    VaultsPage(vaults: Vec<models::Vault>) {
         div.m_card {
             div.header {
                 span { "Vaults" }
@@ -47,6 +49,7 @@ markup::define! {
                             th { "Updated" }
                             th { "Created" }
                             th { "Items" }
+                            th { "More" }
                         }
                     }
                     tbody {
@@ -56,6 +59,11 @@ markup::define! {
                                 td { "Updated" }
                                 td { "Created" }
                                 td { "Items" }
+                                td {
+                                    a[href=crate::secrets::secret_route(vault)] {
+                                        img[src=statics::get_more_info_svg(), style="width: 18px"] {}
+                                    }
+                                }
                             }
                         }
                     }

@@ -26,6 +26,9 @@ markup::define! {
 
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
 
+                // Only load resources from our server.
+                //meta ["http-equiv"="Content-Security-Policy", content="default-src 'self'"] {}
+
             }
 
             body {

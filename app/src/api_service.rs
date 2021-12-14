@@ -1,3 +1,4 @@
+use crate::models;
 use app::vault::*;
 use sqlx::PgPool;
 use tonic::{Request, Response, Status};
@@ -19,7 +20,7 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         _request: Request<ListVaultsRequest>,
     ) -> Result<Response<ListVaultsResponse>, Status> {
-        let vaults = crate::vaults::Vault::get_all(self.pool.clone(), 1).await?;
+        let vaults = models::Vault::get_all(self.pool.clone(), 1).await?;
 
         let vaults: Vec<VaultResponse> = vaults
             .iter()
