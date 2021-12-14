@@ -54,7 +54,7 @@ fn generate_file_routes(folder: &str, method_name: &str) -> String {
             let file_name = format!("{}{}", folder, name);
 
             let method = format!(
-                r#".nest(
+                r#".route(
                     &get_{}(),
                     axum::routing::get_service(tower_http::services::ServeFile::new("{}")).handle_error(|error: std::io::Error| async move {{
                         (
