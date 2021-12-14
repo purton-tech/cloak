@@ -12,8 +12,9 @@ pub fn layout(title: &str, content: &str) -> Result<Html<String>, CustomError> {
 markup::define! {
     ApplicationLayout<'a>(content: &'a str, title: &'a str)
     {
-        {markup::doctype()}
-        html {
+        @markup::doctype()
+
+        html[lang="en"] {
 
             head {
                 meta [ charset="utf-8" ] {}

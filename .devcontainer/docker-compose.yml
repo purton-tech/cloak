@@ -65,12 +65,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - target:/vscode/target # Set target as a volume for performance. 
       - node_modules:/vscode/app/node_modules # Set target as a volume for performance. 
+      - infra_node_modules:/vscode/infra/node_modules # Set target as a volume for performance. 
 
     environment:
       # The following is used by the migrations and also for SQLX at compile time.
       DATABASE_URL: postgresql://postgres:testpassword@db:5432/keyvault
       # A less privelaged role for basic INSERTS, SELECT etc.
-      APP_DATABASE_URL: postgresql://application:testpassword@db:5432/keyvault
+      APP_DATABASE_URL: postgresql://keyvault:testpassword@db:5432/keyvault
       # A less privelaged role for basic INSERTS, SELECT etc.
       VAULT_SERVER_URL: http://localhost:7103
       VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103
@@ -86,3 +87,4 @@ services:
 volumes:
   target:
   node_modules:
+  infra_node_modules:
