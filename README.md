@@ -1,11 +1,13 @@
 ## Folder Structure
 
-* `/app` - Web and gRPC Server. Rust with Typescript and SCSS.
+* `/app` - Web and gRPC Server. Written in Rust using Axum and Tonixc
+* `/app/asset-pipeline` - Parcel builder for Typescript and SCSS assets.
 * `/cli` - Command Line Interface. Rust.
-* `/infra` - Infrastructure as Coe. Pulumi.
-* `/protos` - Protobuf definitions for the API
-* `/migrations` - Database migrations for building the Postgres Database
-* `/www` The website. Built with Zola
+* `/infra` - Infrastructure as Code. Pulumi.
+* `/protos` - Protobuf definitions for the API.
+* `/migrations` - Database migrations for building the Postgres Database.
+* `/www` - The website. Built with Zola statci site generator.
+* `Earthfile` - Build for CICD.
 
 ## Alternatives
 
