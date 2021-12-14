@@ -1,6 +1,6 @@
 ## Folder Structure
 
-* `/app` - Web and gRPC Server. Written in Rust using Axum and Tonixc
+* `/app` - Web and gRPC Server. Written in Rust using Axum and Tonic
 * `/app/asset-pipeline` - Parcel builder for Typescript and SCSS assets.
 * `/cli` - Command Line Interface. Rust.
 * `/infra` - Infrastructure as Code. Pulumi.
