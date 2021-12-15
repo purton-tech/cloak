@@ -18,6 +18,8 @@
 	},
 
 	"remoteEnv": {
+		"EMAIL": "${localEnv:EMAIL}",
+		"NAME": "${localEnv:NAME}",
 		// Pass in the host directory for Docker mount commands from inside the container
 		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
 	},
