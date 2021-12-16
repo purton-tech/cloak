@@ -1,6 +1,6 @@
 FROM ianpurton/rust-fullstack-devcontainer:latest AS development
 
-COPY *.bash .
+COPY *.bash ./
 
 # Add our aliases and ps1
 RUN cat aliases.bash >> ~/.bashrc && cat ps1.bash >> ~/.bashrc && sudo rm *.bash
