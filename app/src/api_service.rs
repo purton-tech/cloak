@@ -12,8 +12,12 @@ impl app::vault::vault_server::Vault for VaultService {
     async fn create_vault(
         &self,
         _request: Request<CreateVaultRequest>,
-    ) -> Result<Response<()>, Status> {
-        Ok(Response::new(()))
+    ) -> Result<Response<CreateVaultResponse>, Status> {
+        let response = CreateVaultResponse {
+            name: "Test".to_string(),
+        };
+
+        Ok(Response::new(response))
     }
 
     async fn list_vaults(

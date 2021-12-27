@@ -39,6 +39,19 @@ static_resources:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
 
+              # Allow gRPC web access to our server
+              - match: 
+                  prefix: "/"
+                  headers:
+                    - name: "x-grpc-web"
+                      exact_match: "1"
+                route: { cluster: app }
+                # Disable auth
+                typed_per_filter_config:
+                  envoy.filters.http.ext_authz:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                    disabled: true
+
               # Web request to our app
               - match: { prefix: "/app" }
                 route: { cluster: app }
@@ -60,9 +73,11 @@ static_resources:
                   envoy.filters.http.ext_authz:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
-
-          # Use Authn Proxy to authenticate ruotes.       
+     
           http_filters:
+          # Convert incoming gRPC web request to proper gRPC
+          - name: envoy.filters.http.grpc_web
+          # Use Authn Proxy to authenticate routes.  
           - name: envoy.filters.http.ext_authz
             typed_config:
               "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
