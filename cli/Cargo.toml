@@ -12,7 +12,7 @@ tokio = { version = "1", default-features = false, features = ["macros", "rt", "
 tonic = "0"
 prost = "0"
 # We use request to make grpc-web requests
-reqwest = { version = "0.11", default-features = false, features = ["rustls"]  }
+reqwest = { version = "0.11", default-features = false, features = ["rustls-tls"]  }
 
 [build-dependencies]
 rust-grpc-web = { git = "https://github.com/elliptic-email/rust-grpc-web" }
