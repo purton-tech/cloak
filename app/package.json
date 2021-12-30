@@ -12,5 +12,8 @@
         "parcel": "^2.0.0",
         "posthtml-include": "^1.7.2",
         "rlite-router": "^2.0.3"
+    },
+    "dependencies": {
+        "idb": "^7.0.0"
     }
 }

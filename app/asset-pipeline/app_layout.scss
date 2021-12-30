@@ -5,12 +5,6 @@ body {
         color: var(--accents-6);
         min-height: 100vh;
     
-        p {
-            font-size: 14px;
-            line-height: 24px;
-            margin: 0px;
-        }
-    
         > header {
             grid-area: header;
             padding: 0 1rem;

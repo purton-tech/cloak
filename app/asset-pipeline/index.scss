@@ -81,6 +81,10 @@ img {
 // until they are ready.
 sl-drawer {
     display: block;
+
+    > p {
+        margin-bottom: 2rem;
+    }
 }
 sl-drawer:not(:defined) {
     display: none;
