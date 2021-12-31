@@ -36,7 +36,7 @@ markup::define! {
                             span.a_help_text { "Give your vault a name" }
 
                             label[for="kry"] { "Wrapped AES Key" }
-                            textarea[rows="4", required="", readonly="", name="aes-key", id="new-vault-key"] {}
+                            textarea[rows="4", required="", readonly="", name="encrypted_vault_key", id="new-vault-key"] {}
                             span.a_help_text { "The key for this vault" }
                         }
 
