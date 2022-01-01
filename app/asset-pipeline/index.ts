@@ -6,3 +6,4 @@ import '@shoelace-style/shoelace/dist/components/tab/tab.js';
 import '@shoelace-style/shoelace/dist/components/drawer/drawer.js';
 
 import '../src/vaults/new_vault'
+import '../src/secrets/new_secret'

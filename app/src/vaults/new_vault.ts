@@ -3,11 +3,13 @@ import { Vault } from '../../asset-pipeline/vault'
 
 let newVaultButton = document.getElementById('new-vault')
 
-newVaultButton.addEventListener('click', async event => {
-    let element = newVaultButton.previousElementSibling.firstChild
-    if (element instanceof SlDrawer) {
-        element.show()
-
-        document.getElementById('new-vault-key').innerText = (await Vault.newWrappedAesKey()).string
-    }
-})
+if(newVaultButton) {
+    newVaultButton.addEventListener('click', async event => {
+        let element = newVaultButton.previousElementSibling.firstChild
+        if (element instanceof SlDrawer) {
+            element.show()
+    
+            document.getElementById('new-vault-key').innerText = (await Vault.newWrappedAesKey()).string
+        }
+    })
+}

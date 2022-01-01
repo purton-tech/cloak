@@ -9,22 +9,23 @@ export class Vault {
 
     public static async newWrappedAesKey(): Promise<Cipher> {
 
-        const db = await this.openIndexedDB()
-        const aesKey = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
-        db.close()
 
         const newAesKey = await self.crypto.subtle.generateKey(
             AES_OPTIONS,
             true,
             ['decrypt', 'encrypt'])
         const symKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', newAesKey))
-        const protectedSymKey = await this.aesEncrypt(symKeyData.arr, aesKey);
+        const protectedSymKey = await this.aesEncrypt(symKeyData.arr);
 
         return protectedSymKey
     }
 
-    private static async aesEncrypt(data: Uint8Array, key: CryptoKey): Promise<Cipher> {
+    public static async aesEncrypt(data: Uint8Array): Promise<Cipher> {
     
+        const db = await this.openIndexedDB()
+        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        db.close()
+
         const encOptions = {
             name: 'AES-GCM',
             iv: new Uint8Array(16)

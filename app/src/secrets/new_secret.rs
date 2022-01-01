@@ -22,6 +22,7 @@ pub async fn new(
     Form(new_secret): Form<NewSecret>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
+    dbg!(&new_secret);
     sqlx::query!(
         "
             INSERT INTO 

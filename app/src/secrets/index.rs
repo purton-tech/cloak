@@ -28,27 +28,27 @@ markup::define! {
             div.header {
                 span { "Secrets" }
 
-                sl_drawer[label="Add Secret", class="add-secret"] {
-                    p {
-                        "Folders keep related secrets together.
-                        For example you could have a folder called Database with all
-                        the secrets related to database access."
-                    }
+                form.m_form[id="add-secret-form", style="margin-top: 2em", method = "post", action=super::new_route(*vault_id)] {
+                    sl_drawer[label="Add Secret", class="add-secret"] {
+                        p {
+                            "Folders keep related secrets together.
+                            For example you could have a folder called Database with all
+                            the secrets related to database access."
+                        }
 
-                    form.m_form[style="margin-top: 2em", method = "post", action=super::new_route(*vault_id)] {
                         fieldset {
                             label[for="name"] { "Name" }
-                            input[type="text", required="", name="name"] {}
+                            input[id="secret-name", type="text", required="", name="name"] {}
 
                             label[for="secret"] { "Secret" }
-                            input[type="text", required="", name="secret"] {}
+                            input[id="secret-value", type="text", required="", name="secret"] {}
                         }
-                        button.a_button.auto.success[slot="footer", type = "submit"] { "Create Vault" }
+
+                        button.a_button.auto.success[slot="footer", id="create-secret"] { "Create Secret" }
                     }
-                    button[class="a_button", slot="footer", type="primary"] { "Close" }
                 }
 
-                button.a_button.mini.primary."drawer-opener" { "Add Secret" }
+                button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
             }
             div.body {
                 table.m_table {
