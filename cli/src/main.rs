@@ -2,6 +2,8 @@ pub mod vault {
     tonic::include_proto!("vault");
 }
 
+mod config;
+
 use clap::{AppSettings, Parser, Subcommand};
 use std::collections::HashMap;
 use std::env;
@@ -59,8 +61,9 @@ enum Commands {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let client = vault::vault_client::Vault::new(String::from("https://keyvault.authn.tech"));
-    //let client = vault::vault_client::Vault::new(String::from("http://envoy:7100"));
+    let config = config::Config::new();
+
+    let client = vault::vault_client::Vault::new(config.api_host_url);
 
     let response = client.list_vaults(vault::ListVaultsRequest {}).await?;
 
