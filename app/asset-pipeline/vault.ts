@@ -7,25 +7,47 @@ const AES_OPTIONS = {
 
 export class Vault {
 
-    public static async newWrappedAesKey(): Promise<Cipher> {
-
+    public static async newWrappedKey(): Promise<Cipher> {
 
         const newAesKey = await self.crypto.subtle.generateKey(
             AES_OPTIONS,
             true,
             ['decrypt', 'encrypt'])
         const symKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', newAesKey))
-        const protectedSymKey = await this.aesEncrypt(symKeyData.arr);
+        const protectedSymKey = await this.encrypt(symKeyData.arr);
 
         return protectedSymKey
     }
 
-    public static async aesEncrypt(data: Uint8Array): Promise<Cipher> {
+    public static async unwrapKey(cipher: Cipher): Promise<CryptoKey> {
+
+        const byteData = await this.decrypt(cipher)
+        
+        return await self.crypto.subtle.importKey(
+            'raw', byteData.arr.buffer, AES_OPTIONS, false, ['decrypt', 'encrypt']);
+
+    }
+
+    public static async encrypt(data: Uint8Array): Promise<Cipher> {
     
         const db = await this.openIndexedDB()
         const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
         db.close()
+    
+        return await this.aesEncrypt(data, key)
+    }
 
+    public static async decrypt(cipher: Cipher): Promise<ByteData> {
+    
+        const db = await this.openIndexedDB()
+        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        db.close()
+    
+        return await this.aesDecrypt(cipher, key)
+    }
+    
+    public static async aesEncrypt(data: Uint8Array, key: CryptoKey) {
+    
         const encOptions = {
             name: 'AES-GCM',
             iv: new Uint8Array(16)
@@ -37,7 +59,7 @@ export class Vault {
         return new Cipher(ivData, cipher)
     }
     
-    private static async aesDecrypt(cipher: Cipher, key: CryptoKey) {
+    public static async aesDecrypt(cipher: Cipher, key: CryptoKey): Promise<ByteData> {
     
         const decOptions = {
             name: 'AES-GCM',

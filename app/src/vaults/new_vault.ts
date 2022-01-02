@@ -9,7 +9,7 @@ if(newVaultButton) {
         if (element instanceof SlDrawer) {
             element.show()
     
-            document.getElementById('new-vault-key').innerText = (await Vault.newWrappedAesKey()).string
+            document.getElementById('new-vault-key').innerText = (await Vault.newWrappedKey()).string
         }
     })
 }

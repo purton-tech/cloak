@@ -12,10 +12,12 @@ pub async fn index(
     Extension(pool): Extension<PgPool>,
     authentication: Authentication,
 ) -> Result<Html<String>, CustomError> {
-    let secrets = models::Secret::get_all(pool, authentication.user_id, id).await?;
+    let secrets = models::Secret::get_all(&pool, authentication.user_id, id).await?;
+
+    let user_vault = models::UserVault::get(&pool, authentication.user_id as i32, id).await?;
 
     let page = SecretsPage {
-        vault_id: id,
+        user_vault: &user_vault,
         secrets,
     };
 
@@ -23,12 +25,13 @@ pub async fn index(
 }
 
 markup::define! {
-    SecretsPage(vault_id: i32, secrets: Vec<models::Secret>) {
+    SecretsPage<'a>(user_vault: &'a models::UserVault, secrets: Vec<models::Secret>) {
         div.m_card {
             div.header {
                 span { "Secrets" }
 
-                form.m_form[id="add-secret-form", style="margin-top: 2em", method = "post", action=super::new_route(*vault_id)] {
+                form.m_form[id="add-secret-form", style="margin-top: 2em", method = "post",
+                    action=super::new_route(user_vault.vault_id)] {
                     sl_drawer[label="Add Secret", class="add-secret"] {
                         p {
                             "Folders keep related secrets together.
@@ -42,7 +45,14 @@ markup::define! {
 
                             label[for="secret"] { "Secret" }
                             input[id="secret-value", type="text", required="", name="secret"] {}
+
                         }
+
+                        // Store the encrypted vault key here, then we can use it in the client to
+                        // encrypt the secrets we create.
+                        input[type="hidden",
+                            id="vault-key",
+                            value=user_vault.encrypted_vault_key.clone()] {}
 
                         button.a_button.auto.success[slot="footer", id="create-secret"] { "Create Secret" }
                     }
