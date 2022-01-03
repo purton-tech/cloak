@@ -1,0 +1,38 @@
+# markdown-spellcheck spelling configuration file
+# Format - lines beginning # are comments
+# global dictionary is at the start, file overrides afterwards
+# one word per line, to define a file override use ' - filename'
+# where filename is relative to this configuration file
+precompiled
+KeyVault
+ - blog/_index.md
+sort_by
+class_name
+blog.html
+page_template
+ - blog/first.md
+2019-11-27
+SecretHub
+99.99
+ - blog/second.md
+2021-11-08
+ - developer-introduction.md
+SHA256
+keyvault
+keyvault.exe
+ - developers/_index.md
+developers.html
+ - reference/01-security.md
+2022-01-01
+TL
+github
+Bitwarden
+Lastpass
+Blockchain
+PBDKF2
+64
+PBKFD2
+Argon2id
+ - developers/02-get-started.md
+1
+2

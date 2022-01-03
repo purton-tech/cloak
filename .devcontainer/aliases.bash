@@ -14,6 +14,8 @@ alias gcr='f() { git checkout -b $1 origin/$1; }; f'
 alias cw='mold -run cargo watch --no-gitignore -i "*.scss" -i "*.ts" -i node_modules -x run'
 alias zs='zola serve --interface 0.0.0.0 --port 7104'
 
+alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/www/content:/workdir tmaier/markdown-spellcheck:latest "**/*.md"'
+
 # Zola
 #alias zola-serve='docker run -u "$(id -u):$(id -g)" -v $HOST_PROJECT_PATH:/app --workdir /app -p 8080:8080 balthek/zola:0.14.0 serve --interface 0.0.0.0 --port 8080 --base-url development'
 #alias zola='docker run -u "$(id -u):$(id -g)" -v $HOST_PROJECT_PATH:/app --workdir /app -p 8080:8080 balthek/zola:0.14.0'

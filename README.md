@@ -6,7 +6,7 @@
 * `/infra` - Infrastructure as Code. Pulumi.
 * `/protos` - Protobuf definitions for the API.
 * `/migrations` - Database migrations for building the Postgres Database.
-* `/www` - The website. Built with Zola statci site generator.
+* `/www` - The website. Built with Zola static site generator.
 * `Earthfile` - Build for CICD.
 
 ## Alternatives
