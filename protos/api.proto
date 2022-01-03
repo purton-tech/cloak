@@ -5,6 +5,7 @@ package vault;
 service Vault {
     rpc CreateVault(CreateVaultRequest) returns (CreateVaultResponse);
     rpc ListVaults(ListVaultsRequest) returns (ListVaultsResponse);
+    rpc ListSecrets(ListSecretsRequest) returns (ListSecretsResponse);
 }
 
 message CreateVaultRequest {
@@ -16,6 +17,18 @@ message ListVaultsRequest {
 
 message ListVaultsResponse {
     repeated VaultResponse vaults = 1;
+}
+
+message ListSecretsRequest {
+}
+
+message ListSecretsResponse {
+    repeated SecretResponse secrets = 1;
+}
+
+message SecretResponse {
+    string name = 1;
+    string encrypted_secret_value = 2;
 }
 
 message VaultResponse {

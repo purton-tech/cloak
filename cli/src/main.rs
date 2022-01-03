@@ -65,7 +65,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client = vault::vault_client::Vault::new(config.api_host_url);
 
-    let response = client.list_vaults(vault::ListVaultsRequest {}).await?;
+    let response = client.list_secrets(vault::ListSecretsRequest {}).await?;
 
     println!("RESPONSE={:?}", response);
 
