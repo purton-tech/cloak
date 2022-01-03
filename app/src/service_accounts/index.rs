@@ -5,7 +5,7 @@ pub async fn index() -> Result<Html<String>, CustomError> {
     let page = ServiceAccountsPage {};
 
     crate::layout::layout(
-        "Home",
+        "Service Accounts",
         &page.to_string(),
         &crate::layout::SideBar::ServiceAccounts,
     )
@@ -15,10 +15,11 @@ markup::define! {
     ServiceAccountsPage {
         div.m_card {
             div.header {
-                span { "Secrets" }
+                span { "Service Accounts" }
 
+                @super::new_account::ServiceAccountForm {}
 
-                button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
+                button.a_button.mini.primary[id="new-account"] { "Add Service Account" }
             }
             div.body {
                 table.m_table {
