@@ -17,5 +17,8 @@ reqwest = { version = "0.11", default-features = false, features = ["rustls-tls"
 # Command line parser
 clap = { version = "3.0.0-rc.9", features = ["derive"] }
 
+# The encryption
+aes-gcm = "0"
+
 [build-dependencies]
 rust-grpc-web = { git = "https://github.com/elliptic-email/rust-grpc-web" }

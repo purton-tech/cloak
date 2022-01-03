@@ -65,9 +65,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let client = vault::vault_client::Vault::new(config.api_host_url);
 
-    let response = client.list_secrets(vault::ListSecretsRequest {}).await?;
-
-    println!("RESPONSE={:?}", response);
+    let response = client
+        .list_secrets(vault::ListSecretsRequest {})
+        .await?
+        .to_owned();
+    ls(&response).await;
 
     let args = Cli::parse();
 
@@ -104,4 +106,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     Ok(())
+}
+
+async fn ls(secrets: &vault::ListSecretsResponse) {
+    for secret in &secrets.secrets {
+        println!("{:?}={:?}", secret.name, secret.encrypted_secret_value);
+    }
 }
