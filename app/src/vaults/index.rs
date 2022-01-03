@@ -13,7 +13,7 @@ pub async fn index(
 
     let page = VaultsPage { vaults };
 
-    crate::layout::layout("Home", &page.to_string())
+    crate::layout::layout("Home", &page.to_string(), &crate::layout::SideBar::Vaults)
 }
 
 markup::define! {

@@ -21,7 +21,7 @@ pub async fn index(
         secrets,
     };
 
-    crate::layout::layout("Home", &page.to_string())
+    crate::layout::layout("Home", &page.to_string(), &crate::layout::SideBar::Vaults)
 }
 
 markup::define! {

@@ -1,16 +1,42 @@
 use crate::errors::CustomError;
 use axum::response::Html;
 
+#[derive(PartialEq, Eq)]
+pub enum SideBar {
+    Vaults,
+    ServiceAccounts,
+}
+
 // page_title and content can be anything that can be rendered. A string, a
 // template, a number, etc.
-pub fn layout(title: &str, content: &str) -> Result<Html<String>, CustomError> {
-    let html = ApplicationLayout { content, title };
+pub fn layout(title: &str, content: &str, side_bar: &SideBar) -> Result<Html<String>, CustomError> {
+    let html = ApplicationLayout {
+        content,
+        title,
+        side_bar,
+    };
 
     Ok(Html(html.to_string().replace("sl_drawer", "sl-drawer")))
 }
 
 markup::define! {
-    ApplicationLayout<'a>(content: &'a str, title: &'a str)
+
+    SvgSideMenuItem<'a>(side_bar: SideBar, name: &'a str, link: &'a str,
+        svg: &'a str, selected_sidebar: &'a SideBar) {
+        @if *selected_sidebar == side_bar {
+            li.selected {
+                img[alt="Satellite", width = "24px", src = svg] { }
+                a[href=link] { {name} }
+            }
+        } else {
+            li {
+                img[alt="Satellite", width = "24px", src = svg] { }
+                a[href=link] { {name} }
+            }
+        }
+    }
+
+    ApplicationLayout<'a>(content: &'a str, title: &'a str, side_bar: &'a SideBar)
     {
         @markup::doctype()
 
@@ -43,10 +69,15 @@ markup::define! {
                             "Your Vaults"
                         }
                         ul {
-                            li.selected {
-                                img[src=crate::statics::get_vault_svg(), width="32px", type="image/svg"] {}
-                                a[href=crate::vaults::INDEX] { "Vaults" }
-                            }
+
+                            { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Vaults",
+                                link: crate::vaults::INDEX,
+                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+
+
+                            { SvgSideMenuItem { side_bar: SideBar::ServiceAccounts, name: "Service Accounts",
+                                link: crate::service_accounts::INDEX,
+                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
                         }
                     }
                     main.container {
