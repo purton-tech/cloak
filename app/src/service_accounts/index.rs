@@ -36,19 +36,26 @@ markup::define! {
                             th { "Name" }
                             th { "Updated" }
                             th { "Created" }
+                            th { "Action" }
                         }
                     }
                     tbody {
                         @for service_account in service_accounts {
-                            tr {
+                            tr[id=format!("service-account-row-{}", service_account.id), style="cursor: pointer;"] {
                                 td { {service_account.name} }
                                 td { "Updated" }
                                 td { "Created" }
+                                td { a[href="#"] { "Attach to Vault" } }
                             }
                         }
                     }
                 }
             }
         }
+        // Generate all the details flyouts
+        @for service_account in service_accounts {
+            @super::view::ViewServiceAccount{ service_account }
+        }
+
     }
 }
