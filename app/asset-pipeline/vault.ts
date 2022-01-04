@@ -33,15 +33,16 @@ export class Vault {
 
     }
     
-    public static async generateECDHKeyPair() {
+    public static async generateWrappedECDHKeyPair() {
     
         try {
             const keyPair = await self.crypto.subtle.generateKey(ECDH_OPTIONS, true, ['deriveKey', 'deriveBits']);
             const publicKey = new ByteData(await self.crypto.subtle.exportKey('spki', keyPair.publicKey));
             const privateKey = new ByteData(await self.crypto.subtle.exportKey('pkcs8', keyPair.privateKey));
+            const protectedPrivateKey = await this.encrypt(privateKey.arr);
             return {
                 publicKey: publicKey,
-                privateKey: privateKey
+                privateKey: protectedPrivateKey
             };
         } catch (err) {
             console.error(err);

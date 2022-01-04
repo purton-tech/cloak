@@ -10,6 +10,16 @@ if(newVaultButton) {
             element.show()
     
             document.getElementById('new-vault-key').innerText = (await Vault.newWrappedKey()).string
+
+            const keyPairDH = await Vault.generateWrappedECDHKeyPair();
+            const publicKeyField = document.getElementById('public-key')
+            const privateKeyField = document.getElementById('private-key')
+
+            if(publicKeyField instanceof HTMLInputElement &&
+                privateKeyField instanceof HTMLTextAreaElement) {
+                publicKeyField.value = keyPairDH.publicKey.b64
+                privateKeyField.innerText = keyPairDH.privateKey.string
+            }
         }
     })
 }

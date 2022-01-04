@@ -22,27 +22,7 @@ markup::define! {
             div.header {
                 span { "Vaults" }
 
-                form.m_form[style="margin-top: 2em", method = "post", action=super::NEW] {
-                    sl_drawer[label="Add Vault"] {
-                        p {
-                            "Vaults keep related secrets together.
-                            For example you could have a vault called My Project with all
-                            the secrets related to your project."
-                        }
-
-                        fieldset {
-                            label[for="name"] { "Name *" }
-                            input[type="text", required="", name="name"] {}
-                            span.a_help_text { "Give your vault a name" }
-
-                            label[for="kry"] { "Wrapped AES Key" }
-                            textarea[rows="4", required="", readonly="", name="encrypted_vault_key", id="new-vault-key"] {}
-                            span.a_help_text { "The key for this vault" }
-                        }
-
-                        button.a_button.auto.success[slot="footer", type = "submit"] { "Create Vault" }
-                    }
-                }
+                @super::new_vault::VaultForm {}
 
                 button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
             }

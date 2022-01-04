@@ -25,7 +25,7 @@ markup::define! {
                     label[for="secret"] { "ECDH Public Key" }
                     input[id="public-key", type="text", required="", name="public_key"] {}
 
-                    label[for="kry"] { "ECDH Private Key" }
+                    label[for="kry"] { "Wrapped ECDH Private Key" }
                     textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
                     span.a_help_text { "The key for this service account" }
 
