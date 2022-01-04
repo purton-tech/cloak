@@ -25,8 +25,6 @@ pub async fn new(
     Form(new_vault): Form<NewVault>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    dbg!(&new_vault);
-
     let vault = sqlx::query!(
         "
             INSERT INTO 

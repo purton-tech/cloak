@@ -1,5 +1,6 @@
 CREATE TABLE service_accounts (
     id SERIAL PRIMARY KEY, 
+    user_id INT NOT NULL, 
     name VARCHAR NOT NULL,
     encrypted_ecdh_private_key VARCHAR NOT NULL,
     ecdh_public_key VARCHAR NOT NULL,

@@ -1,8 +1,43 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
-use axum::response::{IntoResponse, Redirect};
+use axum::{
+    extract::{Extension, Form},
+    response::{IntoResponse, Redirect},
+};
+use serde::Deserialize;
+use sqlx::PgPool;
+use validator::Validate;
 
-pub async fn new(_authentication: Authentication) -> Result<impl IntoResponse, CustomError> {
+#[derive(Deserialize, Validate, Default, Debug)]
+pub struct NewServiceAccount {
+    #[validate(length(min = 1, message = "The name is mandatory"))]
+    pub name: String,
+    #[validate(length(min = 1, message = "Where did the vault key go?"))]
+    pub public_key: String,
+    #[validate(length(min = 1, message = "Where did the vault key go?"))]
+    pub encrypted_private_key: String,
+}
+
+pub async fn new(
+    authentication: Authentication,
+    Form(new_service_account): Form<NewServiceAccount>,
+    Extension(pool): Extension<PgPool>,
+) -> Result<impl IntoResponse, CustomError> {
+    sqlx::query!(
+        "
+            INSERT INTO 
+                service_accounts (user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
+            VALUES($1, $2, $3, $4) 
+        ",
+        authentication.user_id as i32,
+        new_service_account.name,
+        new_service_account.public_key,
+        new_service_account.encrypted_private_key
+    )
+    .execute(&pool)
+    .await
+    .map_err(|e| CustomError::Database(e.to_string()))?;
+
     Ok(Redirect::to(super::INDEX.parse().unwrap()))
 }
 
@@ -31,7 +66,7 @@ markup::define! {
 
                 }
 
-                button.a_button.auto.success[slot="footer", id="create-secret"] { "Create Service Account" }
+                button.a_button.auto.success[slot="footer", type = "submit"] { "Create Service Account" }
             }
         }
 
