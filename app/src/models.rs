@@ -2,6 +2,26 @@ use crate::errors::CustomError;
 use sqlx::PgPool;
 
 // Our models
+pub struct ServiceAccount {
+    pub id: i32,
+    pub name: String,
+    pub ecdh_public_key: String,
+    pub encrypted_ecdh_private_key: String,
+}
+
+impl ServiceAccount {
+    pub async fn get_all(pool: &PgPool, _user_id: u32) -> Result<Vec<ServiceAccount>, CustomError> {
+        Ok(sqlx::query_as!(
+            ServiceAccount,
+            "
+                SELECT id, name, ecdh_public_key, encrypted_ecdh_private_key FROM service_accounts
+            "
+        )
+        .fetch_all(pool)
+        .await?)
+    }
+}
+
 pub struct Vault {
     pub id: i32,
     pub name: String,

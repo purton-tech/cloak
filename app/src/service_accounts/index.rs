@@ -1,8 +1,16 @@
+use crate::authentication::Authentication;
 use crate::errors::CustomError;
-use axum::response::Html;
+use crate::models;
+use axum::{extract::Extension, response::Html};
+use sqlx::PgPool;
 
-pub async fn index() -> Result<Html<String>, CustomError> {
-    let page = ServiceAccountsPage {};
+pub async fn index(
+    authentication: Authentication,
+    Extension(pool): Extension<PgPool>,
+) -> Result<Html<String>, CustomError> {
+    let service_accounts = models::ServiceAccount::get_all(&pool, authentication.user_id).await?;
+
+    let page = ServiceAccountsPage { service_accounts };
 
     crate::layout::layout(
         "Service Accounts",
@@ -12,7 +20,7 @@ pub async fn index() -> Result<Html<String>, CustomError> {
 }
 
 markup::define! {
-    ServiceAccountsPage {
+    ServiceAccountsPage(service_accounts: Vec<models::ServiceAccount>) {
         div.m_card {
             div.header {
                 span { "Service Accounts" }
@@ -31,6 +39,13 @@ markup::define! {
                         }
                     }
                     tbody {
+                        @for service_account in service_accounts {
+                            tr {
+                                td { {service_account.name} }
+                                td { "Updated" }
+                                td { "Created" }
+                            }
+                        }
                     }
                 }
             }
