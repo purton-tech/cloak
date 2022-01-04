@@ -22,12 +22,16 @@ markup::define! {
                     label[for="name"] { "Name" }
                     input[id="secret-name", type="text", required="", name="name"] {}
 
-                    label[for="secret"] { "Secret" }
-                    input[id="secret-value", type="text", required="", name="secret"] {}
+                    label[for="secret"] { "ECDH Public Key" }
+                    input[id="public-key", type="text", required="", name="public_key"] {}
+
+                    label[for="kry"] { "ECDH Private Key" }
+                    textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
+                    span.a_help_text { "The key for this service account" }
 
                 }
 
-                button.a_button.auto.success[slot="footer", id="create-secret"] { "Create Secret" }
+                button.a_button.auto.success[slot="footer", id="create-secret"] { "Create Service Account" }
             }
         }
 

@@ -9,6 +9,17 @@ if (newAccountButton) {
         let element = newAccountButton.previousElementSibling.firstChild
         if (element instanceof SlDrawer) {
             element.show()
+
+
+            const keyPairDH = await Vault.generateECDHKeyPair();
+            const publicKeyField = document.getElementById('public-key')
+            const privateKeyField = document.getElementById('private-key')
+
+            if(publicKeyField instanceof HTMLInputElement &&
+                privateKeyField instanceof HTMLTextAreaElement) {
+                publicKeyField.value = keyPairDH.publicKey.b64
+                privateKeyField.innerText = keyPairDH.privateKey.b64
+            }
         }
     })
 }

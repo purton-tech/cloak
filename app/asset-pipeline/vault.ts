@@ -5,6 +5,11 @@ const AES_OPTIONS = {
     length: 256
 };
 
+const ECDH_OPTIONS = {
+    name: "ECDH",
+    namedCurve: "P-384"
+};
+
 export class Vault {
 
     public static async newWrappedKey(): Promise<Cipher> {
@@ -26,6 +31,21 @@ export class Vault {
         return await self.crypto.subtle.importKey(
             'raw', byteData.arr.buffer, AES_OPTIONS, false, ['decrypt', 'encrypt']);
 
+    }
+    
+    public static async generateECDHKeyPair() {
+    
+        try {
+            const keyPair = await self.crypto.subtle.generateKey(ECDH_OPTIONS, true, ['deriveKey', 'deriveBits']);
+            const publicKey = new ByteData(await self.crypto.subtle.exportKey('spki', keyPair.publicKey));
+            const privateKey = new ByteData(await self.crypto.subtle.exportKey('pkcs8', keyPair.privateKey));
+            return {
+                publicKey: publicKey,
+                privateKey: privateKey
+            };
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     public static async encrypt(data: Uint8Array): Promise<Cipher> {

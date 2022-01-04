@@ -24,8 +24,8 @@ Note, all these actions happen client side.
 * When you add a secret to a vault it is immediately encrypted with the vault symmetric key.
 * When you add a service account to a vault all the secrets in the vault are copied and encrypted with the service accounts asymmetric public key.
 * Any subsequent secrets added to a vault will be encrypted for each service account that has access to that vault.
-* The command line tool has the public and private asymmetric encryption keys.
-* When the command line toll requests the secrets it decrypts them in memory and injects them into the process.
+* The command line tool has the public and private asymmetric encryption keys for a service account.
+* The command line tool requests decrypts secrets in memory and injects them into the environment for your process.
 
 ## Managing web user keys in the browser
 
