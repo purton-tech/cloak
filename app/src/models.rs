@@ -4,18 +4,24 @@ use sqlx::PgPool;
 // Our models
 pub struct ServiceAccount {
     pub id: i32,
+    pub vault_id: Option<i32>,
     pub name: String,
     pub ecdh_public_key: String,
     pub encrypted_ecdh_private_key: String,
 }
 
 impl ServiceAccount {
-    pub async fn get_all(pool: &PgPool, _user_id: u32) -> Result<Vec<ServiceAccount>, CustomError> {
+    pub async fn get_all(pool: &PgPool, user_id: u32) -> Result<Vec<ServiceAccount>, CustomError> {
         Ok(sqlx::query_as!(
             ServiceAccount,
             "
-                SELECT id, name, ecdh_public_key, encrypted_ecdh_private_key FROM service_accounts
-            "
+                SELECT 
+                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                FROM 
+                    service_accounts
+                WHERE user_id = $1
+            ",
+            user_id as i32
         )
         .fetch_all(pool)
         .await?)
@@ -28,12 +34,18 @@ pub struct Vault {
 }
 
 impl Vault {
-    pub async fn get_all(pool: &PgPool, _user_id: u32) -> Result<Vec<Vault>, CustomError> {
+    pub async fn get_all(pool: &PgPool, user_id: u32) -> Result<Vec<Vault>, CustomError> {
         Ok(sqlx::query_as!(
             Vault,
             "
-                SELECT id, name FROM vaults
-            "
+                SELECT 
+                    id, name 
+                FROM 
+                    vaults
+                WHERE
+                    user_id = $1
+            ",
+            user_id as i32
         )
         .fetch_all(pool)
         .await?)

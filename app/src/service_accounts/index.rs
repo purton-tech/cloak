@@ -9,8 +9,12 @@ pub async fn index(
     Extension(pool): Extension<PgPool>,
 ) -> Result<Html<String>, CustomError> {
     let service_accounts = models::ServiceAccount::get_all(&pool, authentication.user_id).await?;
+    let vaults = models::Vault::get_all(&pool, authentication.user_id).await?;
 
-    let page = ServiceAccountsPage { service_accounts };
+    let page = ServiceAccountsPage {
+        service_accounts,
+        vaults,
+    };
 
     crate::layout::layout(
         "Service Accounts",
@@ -20,7 +24,7 @@ pub async fn index(
 }
 
 markup::define! {
-    ServiceAccountsPage(service_accounts: Vec<models::ServiceAccount>) {
+    ServiceAccountsPage(service_accounts: Vec<models::ServiceAccount>, vaults: Vec<models::Vault>) {
         div.m_card {
             div.header {
                 span { "Service Accounts" }
@@ -54,7 +58,7 @@ markup::define! {
         }
         // Generate all the details flyouts
         @for service_account in service_accounts {
-            @super::view::ViewServiceAccount{ service_account }
+            @super::view::ViewServiceAccount{ service_account, vaults }
         }
 
     }
