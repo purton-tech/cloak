@@ -53,10 +53,15 @@ markup::define! {
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
 
                 // Only load resources from our server.
-                // style-src 'unsafe-inline' => We have soime inline CSS.
-                // connect-src data: => Allow the inlone svg for sl-drawer
+                // style-src 'unsafe-inline' => We have some inline CSS.
+                // connect-src data: => Allow the inline svg for sl-drawer
+                // connect-src 'self' => So Web gRPC works
+                //
+                // We need unsafe-eval because iof this
+                // https://github.com/protocolbuffers/protobuf/issues/6770
                 meta ["http-equiv"="Content-Security-Policy",
-                    content="default-src 'self'; style-src 'unsafe-inline'; connect-src data:"] {}
+                    content="default-src 'self'; script-src 'unsafe-eval';
+                        style-src 'unsafe-inline'; connect-src 'self' data:"] {}
 
             }
 
