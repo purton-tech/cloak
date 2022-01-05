@@ -1,4 +1,7 @@
 import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
+import * as grpcWeb from 'grpc-web';
+import {VaultClient} from '../../asset-pipeline/ApiServiceClientPb';
+import {ListSecretsRequest, ListSecretsResponse} from '../../asset-pipeline/api_pb';
 
 // The user wants to connect a service account to a vault
 const connectButton = document.getElementById('connect-to-vault')

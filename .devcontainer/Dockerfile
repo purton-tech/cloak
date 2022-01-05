@@ -29,6 +29,13 @@ RUN sudo apt-get update --allow-releaseinfo-change && curl -sL https://aka.ms/In
 # k9s
 RUN curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Linux_x86_64.tar.gz | tar xvz -C /tmp && sudo mv /tmp/k9s /usr/bin
 
+# Proto compiler and web grpc.
+RUN sudo apt update \
+    && sudo apt install -y protobuf-compiler \
+    && sudo curl -OL https://github.com/grpc/grpc-web/releases/download/1.3.0/protoc-gen-grpc-web-1.3.0-linux-x86_64  \
+    && sudo mv protoc-gen-grpc-web* /usr/local/bin/protoc-gen-grpc-web \
+    && sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
+
 # all the volumes configured in the docker-compose.yml
 RUN sudo mkdir -p /vscode/target && sudo chown $USERNAME:$USERNAME /vscode/target
 RUN sudo mkdir -p /vscode/app/node_modules && sudo chown $USERNAME:$USERNAME /vscode/app/node_modules
