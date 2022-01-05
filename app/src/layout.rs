@@ -53,7 +53,10 @@ markup::define! {
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
 
                 // Only load resources from our server.
-                //meta ["http-equiv"="Content-Security-Policy", content="default-src 'self'"] {}
+                // style-src 'unsafe-inline' => We have soime inline CSS.
+                // connect-src data: => Allow the inlone svg for sl-drawer
+                meta ["http-equiv"="Content-Security-Policy",
+                    content="default-src 'self'; style-src 'unsafe-inline'; connect-src data:"] {}
 
             }
 

@@ -7,7 +7,7 @@ markup::define! {
 
         form.m_form {
             sl_drawer[label=format!("View {}", service_account.name),
-                id=format!("view-service-account-{}", service_account.id)] {
+                id=format!("view-service-account-row-{}", service_account.id)] {
 
                 @if service_account.vault_id.is_some() {
 
@@ -36,13 +36,8 @@ markup::define! {
                         }
                         span.a_help_text { "The key for this service account" }
                     }
-                    button.a_button.auto.success[slot="footer", type = "submit"] { "Connect to Vault" }
+                    button.a_button.auto.success[slot="footer", id = "connect-to-vault"] { "Connect to Vault" }
                 }
-            }
-            script {
-                {markup::raw(format!("document.getElementById('service-account-row-{}').addEventListener('click',
-                    () => document.getElementById('view-service-account-{}').show());",
-                    service_account.id, service_account.id))}
             }
         }
     }
