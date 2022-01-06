@@ -32,6 +32,15 @@ export class Vault {
             'raw', byteData.arr.buffer, AES_OPTIONS, false, ['decrypt', 'encrypt']);
 
     }
+
+    public static async unwrapECDHKey(cipher: Cipher): Promise<CryptoKey> {
+
+        const byteData = await this.decrypt(cipher)
+        
+        return await self.crypto.subtle.importKey(
+            'pkcs8', byteData.arr.buffer, ECDH_OPTIONS, false, ['deriveKey', 'deriveBits']);
+
+    }
     
     public static async generateWrappedECDHKeyPair() {
     

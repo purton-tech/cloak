@@ -28,15 +28,19 @@ markup::define! {
 
                     fieldset {
                         label[for="secret"] { "ECDH Public Key" }
-                        select[id="vault-select"] {
+                        select[id=format!("vault-select-{}", service_account.id)] {
                             option { {"Select..."} }
                             @for vault in *vaults {
                                 option[value=vault.id] { {vault.name} }
                             }
+                            input[id=format!("service-account-key-{}", service_account.id), type="hidden",
+                                value=service_account.encrypted_ecdh_private_key.clone(),
+                                name="public_key"] {}
                         }
                         span.a_help_text { "The key for this service account" }
                     }
-                    button.a_button.auto.success[slot="footer", id = "connect-to-vault"] { "Connect to Vault" }
+                    button.a_button.auto.success[slot="footer",
+                        id = format!("connect-to-vault-{}", service_account.id)] { "Connect to Vault" }
                 }
             }
         }

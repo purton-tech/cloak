@@ -34,6 +34,26 @@ pub struct Vault {
 }
 
 impl Vault {
+    pub async fn get(pool: &PgPool, user_id: u32, vault_id: u32) -> Result<Vault, CustomError> {
+        Ok(sqlx::query_as!(
+            Vault,
+            "
+                SELECT 
+                    id, name 
+                FROM 
+                    vaults
+                WHERE
+                    id = $1 
+                AND
+                    user_id = $2
+            ",
+            vault_id as i32,
+            user_id as i32
+        )
+        .fetch_one(pool)
+        .await?)
+    }
+
     pub async fn get_all(pool: &PgPool, user_id: u32) -> Result<Vec<Vault>, CustomError> {
         Ok(sqlx::query_as!(
             Vault,

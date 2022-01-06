@@ -10,62 +10,36 @@ pub struct VaultService {
 
 #[tonic::async_trait]
 impl app::vault::vault_server::Vault for VaultService {
-    async fn create_vault(
+    async fn get_vault(
         &self,
-        _request: Request<CreateVaultRequest>,
-    ) -> Result<Response<CreateVaultResponse>, Status> {
-        let response = CreateVaultResponse {
-            name: "Test".to_string(),
-        };
-
-        Ok(Response::new(response))
-    }
-
-    async fn list_vaults(
-        &self,
-        _request: Request<ListVaultsRequest>,
-    ) -> Result<Response<ListVaultsResponse>, Status> {
-        let vaults = models::Vault::get_all(&self.pool, 1).await?;
-
-        let vaults: Vec<VaultResponse> = vaults
-            .iter()
-            .map(|v| VaultResponse {
-                name: v.name.clone(),
-            })
-            .collect();
-
-        let response = ListVaultsResponse { vaults };
-
-        Ok(Response::new(response))
-    }
-
-    async fn list_secrets(
-        &self,
-        request: Request<ListSecretsRequest>,
-    ) -> Result<Response<ListSecretsResponse>, Status> {
+        request: Request<GetVaultRequest>,
+    ) -> Result<Response<GetVaultResponse>, Status> {
         let authenticated_user = authenticate(&request).await?;
 
-        //let req = request.into_inner();
+        let req = request.into_inner();
 
         dbg!(&authenticated_user);
 
-        let vaults = models::Vault::get_all(&self.pool, authenticated_user.user_id).await?;
+        let secrets =
+            models::Secret::get_all(&self.pool, authenticated_user.user_id, req.vault_id).await?;
+        let vault =
+            models::Vault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
+        let user_vault =
+            models::UserVault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
 
-        let mut secrets: Vec<SecretResponse> = Default::default();
+        let secrets = secrets
+            .into_iter()
+            .map(|s| Secret {
+                encrypted_name: s.name,
+                encrypted_secret_value: s.secret,
+            })
+            .collect();
 
-        for vault in vaults.iter() {
-            let zecrets =
-                models::Secret::get_all(&self.pool, authenticated_user.user_id, vault.id as u32)
-                    .await?;
-            for secret in zecrets.iter() {
-                secrets.push(SecretResponse {
-                    encrypted_name: secret.name.clone(),
-                    encrypted_secret_value: secret.name.clone(),
-                });
-            }
-        }
-
-        let response = ListSecretsResponse { secrets };
+        let response = GetVaultResponse {
+            name: vault.name,
+            encrypted_vault_key: user_vault.encrypted_vault_key,
+            secrets,
+        };
 
         Ok(Response::new(response))
     }
