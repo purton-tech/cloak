@@ -8,13 +8,13 @@ use axum::{
 use sqlx::PgPool;
 
 pub async fn index(
-    Path(id): Path<i32>,
+    Path(id): Path<u32>,
     Extension(pool): Extension<PgPool>,
     authentication: Authentication,
 ) -> Result<Html<String>, CustomError> {
     let secrets = models::Secret::get_all(&pool, authentication.user_id, id).await?;
 
-    let user_vault = models::UserVault::get(&pool, authentication.user_id as i32, id).await?;
+    let user_vault = models::UserVault::get(&pool, authentication.user_id, id).await?;
 
     let page = SecretsPage {
         user_vault: &user_vault,

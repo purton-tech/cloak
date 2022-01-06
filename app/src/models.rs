@@ -59,7 +59,7 @@ pub struct UserVault {
 }
 
 impl UserVault {
-    pub async fn get(pool: &PgPool, user_id: i32, vault_id: i32) -> Result<UserVault, CustomError> {
+    pub async fn get(pool: &PgPool, user_id: u32, vault_id: u32) -> Result<UserVault, CustomError> {
         Ok(sqlx::query_as!(
             UserVault,
             "
@@ -69,8 +69,8 @@ impl UserVault {
                 WHERE 
                     user_id = $1 AND vault_id = $2
             ",
-            user_id,
-            vault_id
+            user_id as i32,
+            vault_id as i32
         )
         .fetch_one(pool)
         .await?)
@@ -87,7 +87,7 @@ impl Secret {
     pub async fn get_all(
         pool: &PgPool,
         _user_id: u32,
-        vault_id: i32,
+        vault_id: u32,
     ) -> Result<Vec<Secret>, CustomError> {
         Ok(sqlx::query_as!(
             Secret,
@@ -95,7 +95,7 @@ impl Secret {
                 SELECT  id, name, secret 
                 FROM secrets WHERE vault_id = $1
             ",
-            vault_id
+            vault_id as i32
         )
         .fetch_all(pool)
         .await?)
