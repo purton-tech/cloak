@@ -28,10 +28,10 @@ markup::define! {
 
                     fieldset {
                         label[for="secret"] { "ECDH Public Key" }
-                        select {
+                        select[id="vault-select"] {
                             option { {"Select..."} }
                             @for vault in *vaults {
-                                option { {vault.name} }
+                                option[value=vault.id] { {vault.name} }
                             }
                         }
                         span.a_help_text { "The key for this service account" }

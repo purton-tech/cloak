@@ -39,7 +39,19 @@ static_resources:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
 
-              # Allow gRPC web access to our server
+              # Allow gRPC web access to our server. In this case if authentication-type
+              # header is set then ext auth is triggered. 
+              - match: 
+                  prefix: "/"
+                  headers:
+                    - name: "x-grpc-web"
+                      exact_match: "1"
+                    - name: "authentication-type"
+                      exact_match: "cookie"
+                route: { cluster: app }
+
+              # Allow gRPC web access to our server - Tis is token based access to the API.
+              # eally only needed as gRPC over cloudflare tunnels doesn't seem to work.
               - match: 
                   prefix: "/"
                   headers:

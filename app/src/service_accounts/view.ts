@@ -9,28 +9,33 @@ if(connectButton instanceof HTMLButtonElement) {
     connectButton.addEventListener('click', async event => {
         event.preventDefault()
 
-        const vaultClient = new VaultClient(window.location.protocol 
-            + '//' + window.location.host, null, null);
+        const vaultSelect = document.getElementById('vault-select')
 
-        const request = new ListSecretsRequest();
-        
-        const call = vaultClient.listSecrets(request, {'custom-header-1': 'value1'},
-            (err: grpcWeb.RpcError, response: ListSecretsResponse) => {
-                if (err) {
-                    if (err.code !== grpcWeb.StatusCode.OK) {
-                      console.log('Error code: ' + err.code + ' "' + err.message + '"');
-                    }
-                  } else {
-                    console.log(response.getSecretsList)
-                  }
-            });
 
-        call.on('status', (status: grpcWeb.Status) => {
-            if (status.metadata) {
-                console.log('Received metadata');
-                console.log(status.metadata);
-              }
-        });
+        if(vaultSelect instanceof HTMLSelectElement && vaultSelect.selectedIndex != 0) {
+            const vaultClient = new VaultClient(window.location.protocol 
+                + '//' + window.location.host, null, null);
+    
+            const request = new ListSecretsRequest();
+            request.setVaultId(parseInt(vaultSelect.options[vaultSelect.selectedIndex].value))
+            
+            // Call back to the server
+            const call = vaultClient.listSecrets(request, 
+                
+                // Important, Envoy will pick this up then authorise our request
+                {'authentication-type': 'cookie'},
+
+                (err: grpcWeb.RpcError, response: ListSecretsResponse) => {
+                    if (err) {
+                        if (err.code !== grpcWeb.StatusCode.OK) {
+                          console.log('Error code: ' + err.code + ' "' + err.message + '"');
+                        }
+                      } else {
+                        console.log(response.getSecretsList())
+                        console.log(response.getSecretsList().length)
+                      }
+                });
+        }
     })
 }
 

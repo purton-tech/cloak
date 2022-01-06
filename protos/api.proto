@@ -20,6 +20,7 @@ message ListVaultsResponse {
 }
 
 message ListSecretsRequest {
+    uint32 vault_id = 1;
 }
 
 message ListSecretsResponse {
@@ -27,7 +28,7 @@ message ListSecretsResponse {
 }
 
 message SecretResponse {
-    string name = 1;
+    string encrypted_name = 1;
     string encrypted_secret_value = 2;
 }
 

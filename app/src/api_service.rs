@@ -40,8 +40,12 @@ impl app::vault::vault_server::Vault for VaultService {
 
     async fn list_secrets(
         &self,
-        _request: Request<ListSecretsRequest>,
+        request: Request<ListSecretsRequest>,
     ) -> Result<Response<ListSecretsResponse>, Status> {
+        let req = request.into_inner();
+
+        dbg!(&req);
+
         let vaults = models::Vault::get_all(&self.pool, 1).await?;
 
         let mut secrets: Vec<SecretResponse> = Default::default();
@@ -50,7 +54,7 @@ impl app::vault::vault_server::Vault for VaultService {
             let zecrets = models::Secret::get_all(&self.pool, 1, vault.id).await?;
             for secret in zecrets.iter() {
                 secrets.push(SecretResponse {
-                    name: secret.name.clone(),
+                    encrypted_name: secret.name.clone(),
                     encrypted_secret_value: secret.name.clone(),
                 });
             }
