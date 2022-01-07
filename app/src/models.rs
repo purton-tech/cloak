@@ -31,6 +31,8 @@ impl ServiceAccount {
 pub struct Vault {
     pub id: i32,
     pub name: String,
+    pub encrypted_ecdh_private_key: String,
+    pub ecdh_public_key: String,
 }
 
 impl Vault {
@@ -39,7 +41,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name 
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key
                 FROM 
                     vaults
                 WHERE
@@ -59,7 +61,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name 
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key
                 FROM 
                     vaults
                 WHERE

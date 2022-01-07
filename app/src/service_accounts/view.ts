@@ -1,9 +1,8 @@
 import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
 import * as grpcWeb from 'grpc-web';
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
-import { GetVaultRequest, GetVaultResponse } from '../../asset-pipeline/api_pb';
-import { Vault, Cipher } from '../../asset-pipeline/vault'
-
+import { GetVaultRequest, GetVaultResponse, CreateServiceAccountRequest, CreateServiceAccountResponse } from '../../asset-pipeline/api_pb';
+import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
 
 async function handleConnect(rowId: number) {
 
@@ -14,7 +13,8 @@ async function handleConnect(rowId: number) {
             + '//' + window.location.host, null, null);
 
         const request = new GetVaultRequest();
-        request.setVaultId(parseInt(vaultSelect.options[vaultSelect.selectedIndex].value))
+        const vaultId = parseInt(vaultSelect.options[vaultSelect.selectedIndex].value)
+        request.setVaultId(vaultId)
 
         // Call back to the server
         const call = vaultClient.getVault(request,
@@ -27,9 +27,9 @@ async function handleConnect(rowId: number) {
                     console.log('Error code: ' + err.code + ' "' + err.message + '"');
                 } else {
                     const ecdhKey = document.getElementById('service-account-key-' + rowId)
-                    if(ecdhKey instanceof HTMLInputElement) {
+                    if (ecdhKey instanceof HTMLInputElement) {
                         const cipher = Cipher.fromString(ecdhKey.value)
-                        await decryptSecrets(vault, cipher)
+                        await transferSecretsToServiceAccount(vault, cipher, vaultId, vaultClient)
                     }
                 }
             }
@@ -37,7 +37,8 @@ async function handleConnect(rowId: number) {
     }
 }
 
-async function decryptSecrets(vault: GetVaultResponse, encryptedECDHPrivateKey: Cipher) {
+async function transferSecretsToServiceAccount(vault: GetVaultResponse, 
+    encryptedECDHPrivateKey: Cipher, vaultId: number, vaultClient: VaultClient) {
 
     // Decrypt the vault key.
     const vaultCipher = Cipher.fromString(vault.getEncryptedVaultKey())
@@ -45,17 +46,48 @@ async function decryptSecrets(vault: GetVaultResponse, encryptedECDHPrivateKey: 
 
     // Decrypt the ECDH key
     const ECDHPrivateKey = await Vault.unwrapECDHKey(encryptedECDHPrivateKey)
-    console.log(ECDHPrivateKey)
 
     const dec = new TextDecoder(); // always utf-8
 
-    // Process the secrets convert encrypt them with the 
-    vault.getSecretsList().forEach(async secret => {
+    // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
+    const vaultECDHPublicKeyData = ByteData.fromB64(vault.getVaultPublicEcdhKey())
+    const vaultECDHPublicKey: CryptoKey = await Vault.importPublicECDHKey(vaultECDHPublicKeyData)
+    const aesKeyAgreement: CryptoKey = await Vault.deriveSecretKey(ECDHPrivateKey, vaultECDHPublicKey)
+
+    console.log(aesKeyAgreement)
+
+    // Process the secrets - re-encrypt them with the agreement key.
+    const secretList = vault.getSecretsList()
+    for await (var secret of secretList) {
         const cipherName = Cipher.fromString(secret.getEncryptedName())
-        console.log(cipherName)
-        const plaintextName = await Vault.aesDecrypt(cipherName, vaultKey)
+        const plaintextName: ByteData = await Vault.aesDecrypt(cipherName, vaultKey)
         console.log(dec.decode(plaintextName.arr))
-    })
+        const newEncryptedName = await Vault.aesEncrypt(plaintextName.arr, aesKeyAgreement)
+        secret.setEncryptedName(newEncryptedName.string)
+        const cipherValue = Cipher.fromString(secret.getEncryptedSecretValue())
+        const plaintextValue: ByteData = await Vault.aesDecrypt(cipherValue, vaultKey)
+        const newEncryptedValue = await Vault.aesEncrypt(plaintextValue.arr, aesKeyAgreement)
+        secret.setEncryptedName(newEncryptedValue.string)
+    }
+
+    // Send the enc rypted payload back to the server
+    const request = new CreateServiceAccountRequest()
+    request.setVaultId(vaultId)
+    request.setSecretsList(secretList)
+    
+    const call = vaultClient.createServiceAccount(request,
+
+        // Important, Envoy will pick this up then authorise our request
+        { 'authentication-type': 'cookie' },
+
+        async (err: grpcWeb.RpcError, serviceAccount: CreateServiceAccountResponse) => {
+            if (err) {
+                console.log('Error code: ' + err.code + ' "' + err.message + '"');
+            } else {
+                console.log('sent')
+            }
+        }
+    )
 }
 
 // Configure all the drawers for each service account.

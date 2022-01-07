@@ -38,8 +38,24 @@ impl app::vault::vault_server::Vault for VaultService {
         let response = GetVaultResponse {
             name: vault.name,
             encrypted_vault_key: user_vault.encrypted_vault_key,
+            vault_public_ecdh_key: vault.ecdh_public_key,
             secrets,
         };
+
+        Ok(Response::new(response))
+    }
+
+    async fn create_service_account(
+        &self,
+        request: Request<CreateServiceAccountRequest>,
+    ) -> Result<Response<CreateServiceAccountResponse>, Status> {
+        let _authenticated_user = authenticate(&request).await?;
+
+        let req = request.into_inner();
+
+        dbg!(&req);
+
+        let response = CreateServiceAccountResponse {};
 
         Ok(Response::new(response))
     }
