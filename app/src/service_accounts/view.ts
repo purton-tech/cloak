@@ -7,13 +7,10 @@ import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
 async function handleConnect(serviceAccountId: number) {
 
     const vaultSelect = document.getElementById('vault-select-' + serviceAccountId)
-    const connectForm = document.getElementById('service-account-form-' + serviceAccountId)
-    const connectFormVaultId = document.getElementById('service-account-form-vault-id-' + serviceAccountId)
     const ecdhKey = document.getElementById('service-account-key-' + serviceAccountId)
 
     if (vaultSelect instanceof HTMLSelectElement && vaultSelect.selectedIndex != 0
-        && connectFormVaultId instanceof HTMLInputElement
-        && connectForm instanceof HTMLFormElement) {
+        && ecdhKey instanceof HTMLInputElement) {
 
         const vaultClient = new VaultClient(window.location.protocol
             + '//' + window.location.host, null, null);
@@ -32,15 +29,9 @@ async function handleConnect(serviceAccountId: number) {
                 if (err) {
                     console.log('Error code: ' + err.code + ' "' + err.message + '"');
                 } else {
-                    if (ecdhKey instanceof HTMLInputElement) {
-                        const cipher = Cipher.fromString(ecdhKey.value)
-                        await transferSecretsToServiceAccount(vault, 
-                            cipher, serviceAccountId, vaultClient).then(() => {
-                                // Assuming that all worked, connect the account to the vault
-                                connectFormVaultId.value = '' + vaultId
-                                connectForm.submit()
-                            })
-                    }
+                    const cipher = Cipher.fromString(ecdhKey.value)
+                    await transferSecretsToServiceAccount(vault, 
+                        cipher, serviceAccountId, vaultClient, vaultId)
                 }
             }
         )
@@ -48,7 +39,8 @@ async function handleConnect(serviceAccountId: number) {
 }
 
 async function transferSecretsToServiceAccount(vault: GetVaultResponse, 
-    encryptedECDHPrivateKey: Cipher, serviceAccountId: number, vaultClient: VaultClient) {
+    encryptedECDHPrivateKey: Cipher, serviceAccountId: number, 
+    vaultClient: VaultClient, vaultId: number) {
 
     // Decrypt the vault key.
     const vaultCipher = Cipher.fromString(vault.getEncryptedVaultKey())
@@ -84,20 +76,29 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
     const request = new CreateSecretsRequest()
     request.setServiceAccountId(serviceAccountId)
     request.setSecretsList(secretList)
+
+    const connectForm = document.getElementById('service-account-form-' + serviceAccountId)
+    const connectFormVaultId = document.getElementById('service-account-form-vault-id-' + serviceAccountId)
+
+    if (connectForm instanceof HTMLFormElement && connectFormVaultId instanceof HTMLInputElement) {
     
-    const call = vaultClient.createSecrets(request,
+        const call = vaultClient.createSecrets(request,
 
-        // Important, Envoy will pick this up then authorise our request
-        { 'authentication-type': 'cookie' },
+            // Important, Envoy will pick this up then authorise our request
+            { 'authentication-type': 'cookie' },
 
-        async (err: grpcWeb.RpcError, serviceAccount: CreateSecretsResponse) => {
-            if (err) {
-                console.log('Error code: ' + err.code + ' "' + err.message + '"');
-            } else {
-                console.log('sent')
+            async (err: grpcWeb.RpcError, serviceAccount: CreateSecretsResponse) => {
+                if (err) {
+                    console.log('Error code: ' + err.code + ' "' + err.message + '"');
+                } else {
+                    console.log('sent')
+                    // Assuming that all worked, connect the account to the vault
+                    connectFormVaultId.value = '' + vaultId
+                    connectForm.submit()
+                }
             }
-        }
-    )
+        )
+    }
 }
 
 // Configure all the drawers for each service account.

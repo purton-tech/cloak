@@ -49,11 +49,11 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         request: Request<CreateSecretsRequest>,
     ) -> Result<Response<CreateSecretsResponse>, Status> {
+        dbg!(&request);
+
         let _authenticated_user = authenticate(&request).await?;
 
         let req = request.into_inner();
-
-        dbg!(&req);
 
         let service_account_id = req.service_account_id;
 
