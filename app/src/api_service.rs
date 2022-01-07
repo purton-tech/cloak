@@ -53,6 +53,8 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let req = request.into_inner();
 
+        dbg!(&req);
+
         let service_account_id = req.service_account_id;
 
         let secrets: Vec<models::ServiceAccountSecret> = req

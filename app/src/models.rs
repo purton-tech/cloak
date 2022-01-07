@@ -137,6 +137,8 @@ impl ServiceAccountSecret {
         secrets: Vec<ServiceAccountSecret>,
     ) -> Result<(), CustomError> {
         for secret in secrets {
+            dbg!(&secret.service_account_id);
+            dbg!(&secret.name);
             sqlx::query!(
                 "
                     INSERT INTO service_account_secrets

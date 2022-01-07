@@ -1,4 +1,42 @@
+use crate::authentication::Authentication;
+use crate::errors::CustomError;
 use crate::models;
+use axum::{
+    extract::{Extension, Form},
+    response::{IntoResponse, Redirect},
+};
+use serde::Deserialize;
+use sqlx::PgPool;
+use validator::Validate;
+
+#[derive(Deserialize, Validate, Default, Debug)]
+pub struct ConnectServiceAccount {
+    pub vault_id: u32,
+    pub service_account_id: u32,
+}
+
+pub async fn connect(
+    _authentication: Authentication,
+    Form(vault): Form<ConnectServiceAccount>,
+    Extension(pool): Extension<PgPool>,
+) -> Result<impl IntoResponse, CustomError> {
+    sqlx::query!(
+        "
+            UPDATE service_accounts 
+            SET 
+                vault_id = $1
+            WHERE 
+                id = $2
+        ",
+        vault.vault_id as i32,
+        vault.service_account_id as i32
+    )
+    .execute(&pool)
+    .await
+    .map_err(|e| CustomError::Database(e.to_string()))?;
+
+    Ok(Redirect::to(super::INDEX.parse().unwrap()))
+}
 
 markup::define! {
     ViewServiceAccount<'a>(
@@ -43,6 +81,17 @@ markup::define! {
                         id = format!("connect-to-vault-{}", service_account.id)] { "Connect to Vault" }
                 }
             }
+        }
+        // This is the form that gets submitted for connecting to a vault.
+        // The secrets were already retrieved and re-encrypted by the Typescript.
+        // Here we attach the account and redirect.
+        form.m_form[
+            method = "post", action=super::CONNECT,
+            id=format!("service-account-form-{}", service_account.id)] {
+                input[type="hidden", name="service_account_id",
+                    value=format!("{}", service_account.id)] {}
+                input[type="hidden", name="vault_id",
+                    id=format!("service-account-form-vault-id-{}", service_account.id)] {}
         }
     }
 }

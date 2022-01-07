@@ -7,8 +7,14 @@ import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
 async function handleConnect(serviceAccountId: number) {
 
     const vaultSelect = document.getElementById('vault-select-' + serviceAccountId)
+    const connectForm = document.getElementById('service-account-form-' + serviceAccountId)
+    const connectFormVaultId = document.getElementById('service-account-form-vault-id-' + serviceAccountId)
+    const ecdhKey = document.getElementById('service-account-key-' + serviceAccountId)
 
-    if (vaultSelect instanceof HTMLSelectElement && vaultSelect.selectedIndex != 0) {
+    if (vaultSelect instanceof HTMLSelectElement && vaultSelect.selectedIndex != 0
+        && connectFormVaultId instanceof HTMLInputElement
+        && connectForm instanceof HTMLFormElement) {
+
         const vaultClient = new VaultClient(window.location.protocol
             + '//' + window.location.host, null, null);
 
@@ -26,10 +32,14 @@ async function handleConnect(serviceAccountId: number) {
                 if (err) {
                     console.log('Error code: ' + err.code + ' "' + err.message + '"');
                 } else {
-                    const ecdhKey = document.getElementById('service-account-key-' + serviceAccountId)
                     if (ecdhKey instanceof HTMLInputElement) {
                         const cipher = Cipher.fromString(ecdhKey.value)
-                        await transferSecretsToServiceAccount(vault, cipher, serviceAccountId, vaultClient)
+                        await transferSecretsToServiceAccount(vault, 
+                            cipher, serviceAccountId, vaultClient).then(() => {
+                                // Assuming that all worked, connect the account to the vault
+                                connectFormVaultId.value = '' + vaultId
+                                connectForm.submit()
+                            })
                     }
                 }
             }
@@ -70,7 +80,7 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
         secret.setEncryptedName(newEncryptedValue.string)
     }
 
-    // Send the enc rypted payload back to the server
+    // Send the encrypted payload back to the server
     const request = new CreateSecretsRequest()
     request.setServiceAccountId(serviceAccountId)
     request.setSecretsList(secretList)
