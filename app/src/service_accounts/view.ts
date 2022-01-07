@@ -1,12 +1,12 @@
 import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
 import * as grpcWeb from 'grpc-web';
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
-import { GetVaultRequest, GetVaultResponse, CreateServiceAccountRequest, CreateServiceAccountResponse } from '../../asset-pipeline/api_pb';
+import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse } from '../../asset-pipeline/api_pb';
 import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
 
-async function handleConnect(rowId: number) {
+async function handleConnect(serviceAccountId: number) {
 
-    const vaultSelect = document.getElementById('vault-select-' + rowId)
+    const vaultSelect = document.getElementById('vault-select-' + serviceAccountId)
 
     if (vaultSelect instanceof HTMLSelectElement && vaultSelect.selectedIndex != 0) {
         const vaultClient = new VaultClient(window.location.protocol
@@ -26,10 +26,10 @@ async function handleConnect(rowId: number) {
                 if (err) {
                     console.log('Error code: ' + err.code + ' "' + err.message + '"');
                 } else {
-                    const ecdhKey = document.getElementById('service-account-key-' + rowId)
+                    const ecdhKey = document.getElementById('service-account-key-' + serviceAccountId)
                     if (ecdhKey instanceof HTMLInputElement) {
                         const cipher = Cipher.fromString(ecdhKey.value)
-                        await transferSecretsToServiceAccount(vault, cipher, vaultId, vaultClient)
+                        await transferSecretsToServiceAccount(vault, cipher, serviceAccountId, vaultClient)
                     }
                 }
             }
@@ -38,7 +38,7 @@ async function handleConnect(rowId: number) {
 }
 
 async function transferSecretsToServiceAccount(vault: GetVaultResponse, 
-    encryptedECDHPrivateKey: Cipher, vaultId: number, vaultClient: VaultClient) {
+    encryptedECDHPrivateKey: Cipher, serviceAccountId: number, vaultClient: VaultClient) {
 
     // Decrypt the vault key.
     const vaultCipher = Cipher.fromString(vault.getEncryptedVaultKey())
@@ -71,16 +71,16 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
     }
 
     // Send the enc rypted payload back to the server
-    const request = new CreateServiceAccountRequest()
-    request.setVaultId(vaultId)
+    const request = new CreateSecretsRequest()
+    request.setServiceAccountId(serviceAccountId)
     request.setSecretsList(secretList)
     
-    const call = vaultClient.createServiceAccount(request,
+    const call = vaultClient.createSecrets(request,
 
         // Important, Envoy will pick this up then authorise our request
         { 'authentication-type': 'cookie' },
 
-        async (err: grpcWeb.RpcError, serviceAccount: CreateServiceAccountResponse) => {
+        async (err: grpcWeb.RpcError, serviceAccount: CreateSecretsResponse) => {
             if (err) {
                 console.log('Error code: ' + err.code + ' "' + err.message + '"');
             } else {

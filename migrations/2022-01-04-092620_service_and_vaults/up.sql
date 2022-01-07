@@ -9,6 +9,15 @@ CREATE TABLE service_accounts (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE service_account_secrets (
+    id SERIAL PRIMARY KEY, 
+    service_account_id INT NOT NULL, 
+    name VARCHAR NOT NULL,
+    secret VARCHAR NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
 DELETE FROM secrets;
 DELETE FROM vaults;
 DELETE FROM service_accounts;

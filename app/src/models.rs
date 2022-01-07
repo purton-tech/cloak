@@ -123,3 +123,35 @@ impl Secret {
         .await?)
     }
 }
+
+pub struct ServiceAccountSecret {
+    pub id: i32,
+    pub service_account_id: i32,
+    pub name: String,
+    pub secret: String,
+}
+
+impl ServiceAccountSecret {
+    pub async fn create(
+        pool: &PgPool,
+        secrets: Vec<ServiceAccountSecret>,
+    ) -> Result<(), CustomError> {
+        for secret in secrets {
+            sqlx::query!(
+                "
+                    INSERT INTO service_account_secrets
+                        (service_account_id, name, secret)
+                    VALUES
+                        ($1, $2, $3)
+                ",
+                secret.service_account_id as i32,
+                secret.name,
+                secret.secret
+            )
+            .execute(pool)
+            .await?;
+        }
+
+        Ok(())
+    }
+}

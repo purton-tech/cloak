@@ -5,7 +5,8 @@ package vault;
 service Vault {
     // Get a vault and all the secrets inside
     rpc GetVault(GetVaultRequest) returns (GetVaultResponse);
-    rpc CreateServiceAccount(CreateServiceAccountRequest) returns (CreateServiceAccountResponse);
+    // Add secrets to a service account.
+    rpc CreateSecrets(CreateSecretsRequest) returns (CreateSecretsResponse);
 }
 
 message Secret {
@@ -24,10 +25,10 @@ message GetVaultResponse {
     repeated Secret secrets = 4;
 }
 
-message CreateServiceAccountRequest {
-    uint32 vault_id = 1;
+message CreateSecretsRequest {
+    uint32 service_account_id = 1;
     repeated Secret secrets = 4;
 }
 
-message CreateServiceAccountResponse {
+message CreateSecretsResponse {
 }

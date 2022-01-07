@@ -45,17 +45,30 @@ impl app::vault::vault_server::Vault for VaultService {
         Ok(Response::new(response))
     }
 
-    async fn create_service_account(
+    async fn create_secrets(
         &self,
-        request: Request<CreateServiceAccountRequest>,
-    ) -> Result<Response<CreateServiceAccountResponse>, Status> {
+        request: Request<CreateSecretsRequest>,
+    ) -> Result<Response<CreateSecretsResponse>, Status> {
         let _authenticated_user = authenticate(&request).await?;
 
         let req = request.into_inner();
 
-        dbg!(&req);
+        let service_account_id = req.service_account_id;
 
-        let response = CreateServiceAccountResponse {};
+        let secrets: Vec<models::ServiceAccountSecret> = req
+            .secrets
+            .into_iter()
+            .map(|secret| models::ServiceAccountSecret {
+                id: 0,
+                service_account_id: service_account_id as i32,
+                name: secret.encrypted_name,
+                secret: secret.encrypted_secret_value,
+            })
+            .collect();
+
+        models::ServiceAccountSecret::create(&self.pool, secrets).await?;
+
+        let response = CreateSecretsResponse {};
 
         Ok(Response::new(response))
     }
