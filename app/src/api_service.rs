@@ -14,7 +14,9 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         request: Request<GetServiceAccountRequest>,
     ) -> Result<Response<GetServiceAccountResponse>, Status> {
-        let _req = request.into_inner();
+        let req = request.into_inner();
+
+        dbg!(&req);
 
         let response = GetServiceAccountResponse {
             vault_public_ecdh_key: "".to_string(),

@@ -19,6 +19,7 @@ clap = { version = "3.0.0-rc.9", features = ["derive"] }
 
 # Elliptic Curve Diffie Helman
 p256 = { version = "0.10", default-features = false, features = ["ecdh", "pem"] } 
+base64 = "0" # So we encode DER public key to base64
 
 [build-dependencies]
 rust-grpc-web = { git = "https://github.com/elliptic-email/rust-grpc-web" }

@@ -269,6 +269,7 @@ dependencies = [
 name = "cli"
 version = "0.1.0"
 dependencies = [
+ "base64",
  "clap",
  "p256",
  "prost 0.9.0",
