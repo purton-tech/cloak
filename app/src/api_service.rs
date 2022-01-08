@@ -14,8 +14,6 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         request: Request<GetServiceAccountRequest>,
     ) -> Result<Response<GetServiceAccountResponse>, Status> {
-        let _authenticated_user = authenticate(&request).await?;
-
         let _req = request.into_inner();
 
         let response = GetServiceAccountResponse {

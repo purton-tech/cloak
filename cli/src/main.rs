@@ -5,6 +5,7 @@ pub mod vault {
 mod config;
 
 use clap::{Parser, Subcommand};
+use p256::{elliptic_curve::ecdh, pkcs8::DecodePrivateKey, SecretKey};
 use std::collections::HashMap;
 use std::env;
 use std::ffi::OsString;
@@ -15,6 +16,9 @@ use std::process::{Command, Stdio};
 #[clap(name = "git")]
 #[clap(about = "A fictional versioning CLI")]
 struct Cli {
+    #[clap(short, long)]
+    ecdh_private_key: String,
+
     #[clap(subcommand)]
     command: Commands,
 }
@@ -25,6 +29,8 @@ enum Commands {
     #[clap(external_subcommand)]
     Run(Vec<OsString>),
 }
+
+const PKCS8_PRIVATE_KEY_PEM: &str = include_str!("../key.pem");
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -42,6 +48,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let args = Cli::parse();
 
+    let secret_key = SecretKey::from_pkcs8_pem(PKCS8_PRIVATE_KEY_PEM).unwrap();
+    let public_key = secret_key.public_key();
+    dbg!(public_key.to_string());
+
+    let shared_secret =
+        ecdh::diffie_hellman(secret_key.to_nonzero_scalar(), public_key.as_affine());
+
+    dbg!(&shared_secret.as_bytes());
+
+    // cargo run -- --ecdh-private-key $ECDH_PRIVATE_KEY run ls
     match &args.command {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);

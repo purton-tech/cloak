@@ -132,7 +132,7 @@ document.querySelectorAll('[id^="service-account-row-"]').forEach(async (row) =>
         if (input instanceof HTMLTextAreaElement) {
             const cipher = Cipher.fromString(input.innerText)
             const decryptedKey = await Vault.decrypt(cipher)
-            input.innerText = decryptedKey.b64
+            input.value = decryptedKey.toPem('PRIVATE')
         }
     } catch (e) {
         console.log(e)
