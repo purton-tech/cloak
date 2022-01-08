@@ -102,7 +102,7 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
 }
 
 // Configure all the drawers for each service account.
-document.querySelectorAll('[id^="service-account-row-"]').forEach((row) => {
+document.querySelectorAll('[id^="service-account-row-"]').forEach(async (row) => {
 
     const serviceAccountId = parseInt(row.id.split('-')[3])
 
@@ -124,5 +124,17 @@ document.querySelectorAll('[id^="service-account-row-"]').forEach((row) => {
 
             await handleConnect(serviceAccountId)
         })
+    }
+
+    // Decrypt the ECDH private key
+    try {
+        const input = document.getElementById('wrapped-ecdh-private-key-' + serviceAccountId)
+        if (input instanceof HTMLTextAreaElement) {
+            const cipher = Cipher.fromString(input.innerText)
+            const decryptedKey = await Vault.decrypt(cipher)
+            input.innerText = decryptedKey.b64
+        }
+    } catch (e) {
+        console.log(e)
     }
 })

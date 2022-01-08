@@ -10,6 +10,22 @@ pub struct VaultService {
 
 #[tonic::async_trait]
 impl app::vault::vault_server::Vault for VaultService {
+    async fn get_service_account(
+        &self,
+        request: Request<GetServiceAccountRequest>,
+    ) -> Result<Response<GetServiceAccountResponse>, Status> {
+        let _authenticated_user = authenticate(&request).await?;
+
+        let _req = request.into_inner();
+
+        let response = GetServiceAccountResponse {
+            vault_public_ecdh_key: "".to_string(),
+            secrets: Default::default(),
+        };
+
+        Ok(Response::new(response))
+    }
+
     async fn get_vault(
         &self,
         request: Request<GetVaultRequest>,

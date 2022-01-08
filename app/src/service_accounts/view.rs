@@ -50,14 +50,15 @@ markup::define! {
                 @if service_account.vault_id.is_some() {
 
                     fieldset {
-                        label[for="secret"] { "ECDH Public Key" }
+                        label[for="public_key"] { "ECDH Public Key" }
                         input[id="public-key", type="text",
                             value=service_account.ecdh_public_key.clone(),
                             name="public_key"] {}
 
-                        label[for="kry"] { "Wrapped ECDH Private Key" }
+                        label[for="encrypted_private_key"] { "ECDH Private Key" }
                         textarea[rows="8", required="", readonly="",
-                            name="encrypted_private_key", id="private-key"] {
+                            name="encrypted_private_key",
+                            id=format!("wrapped-ecdh-private-key-{}", service_account.id)] {
                             {service_account.encrypted_ecdh_private_key}
                         }
                         span.a_help_text { "The key for this service account" }
@@ -71,6 +72,7 @@ markup::define! {
                             @for vault in *vaults {
                                 option[value=vault.id] { {vault.name} }
                             }
+
                             input[id=format!("service-account-key-{}", service_account.id), type="hidden",
                                 value=service_account.encrypted_ecdh_private_key.clone(),
                                 name="public_key"] {}
