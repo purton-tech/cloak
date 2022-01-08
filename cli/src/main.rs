@@ -7,8 +7,8 @@ mod config;
 use clap::{Parser, Subcommand};
 use p256::{
     elliptic_curve::ecdh,
-    pkcs8::{DecodePrivateKey, EncodePublicKey},
-    SecretKey,
+    pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePublicKey},
+    PublicKey, SecretKey,
 };
 use std::collections::HashMap;
 use std::env;
@@ -41,12 +41,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let config = config::Config::new();
 
     let secret_key = SecretKey::from_pkcs8_pem(PKCS8_PRIVATE_KEY_PEM).unwrap();
-    let public_key = secret_key.public_key();
-    dbg!(public_key.to_string());
+    let service_account_public_key = secret_key.public_key();
 
     let client = vault::vault_client::Vault::new(config.api_host_url);
 
-    let public_key_der = public_key.to_public_key_der().unwrap();
+    let public_key_der = service_account_public_key.to_public_key_der().unwrap();
     let public_key_der_base64 = base64::encode(public_key_der);
 
     let response = client
@@ -55,16 +54,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         })
         .await?;
 
-    dbg!(&response);
+    let vault_key_der = base64::decode(response.vault_public_ecdh_key).unwrap();
 
-    let args = Cli::parse();
+    let vault_public_key = PublicKey::from_public_key_der(&vault_key_der).unwrap();
 
-    let _shared_secret =
-        ecdh::diffie_hellman(secret_key.to_nonzero_scalar(), public_key.as_affine());
+    let shared_secret =
+        ecdh::diffie_hellman(secret_key.to_nonzero_scalar(), vault_public_key.as_affine());
 
-    //dbg!(&shared_secret.as_bytes());
+    dbg!(base64::encode(&shared_secret.as_bytes()));
 
     // cargo run -- --ecdh-private-key $ECDH_PRIVATE_KEY run ls
+    let args = Cli::parse();
     match &args.command {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);

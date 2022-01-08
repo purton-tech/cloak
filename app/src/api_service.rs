@@ -18,12 +18,23 @@ impl app::vault::vault_server::Vault for VaultService {
 
         dbg!(&req);
 
-        let response = GetServiceAccountResponse {
-            vault_public_ecdh_key: "".to_string(),
-            secrets: Default::default(),
-        };
+        let service_account =
+            models::ServiceAccount::get_by_ecdh_public_key(&self.pool, req.ecdh_public_key).await?;
 
-        Ok(Response::new(response))
+        if let Some(vault_id) = service_account.vault_id {
+            let vault = models::Vault::get_dangerous(&self.pool, vault_id as u32).await?;
+
+            let response = GetServiceAccountResponse {
+                vault_public_ecdh_key: vault.ecdh_public_key,
+                secrets: Default::default(),
+            };
+
+            return Ok(Response::new(response));
+        }
+
+        Err(Status::invalid_argument(
+            "This service account is not attached to a vault",
+        ))
     }
 
     async fn get_vault(

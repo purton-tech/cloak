@@ -26,6 +26,25 @@ impl ServiceAccount {
         .fetch_all(pool)
         .await?)
     }
+
+    pub async fn get_by_ecdh_public_key(
+        pool: &PgPool,
+        ecdh_public_key: String,
+    ) -> Result<ServiceAccount, CustomError> {
+        Ok(sqlx::query_as!(
+            ServiceAccount,
+            "
+                SELECT 
+                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                FROM 
+                    service_accounts
+                WHERE ecdh_public_key = $1
+            ",
+            ecdh_public_key
+        )
+        .fetch_one(pool)
+        .await?)
+    }
 }
 
 pub struct Vault {
@@ -36,6 +55,24 @@ pub struct Vault {
 }
 
 impl Vault {
+    // Only call this if you are sure the user has access.
+    pub async fn get_dangerous(pool: &PgPool, vault_id: u32) -> Result<Vault, CustomError> {
+        Ok(sqlx::query_as!(
+            Vault,
+            "
+                SELECT 
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key
+                FROM 
+                    vaults
+                WHERE
+                    id = $1 
+            ",
+            vault_id as i32
+        )
+        .fetch_one(pool)
+        .await?)
+    }
+
     pub async fn get(pool: &PgPool, user_id: u32, vault_id: u32) -> Result<Vault, CustomError> {
         Ok(sqlx::query_as!(
             Vault,
