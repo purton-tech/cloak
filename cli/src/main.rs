@@ -5,7 +5,11 @@ pub mod vault {
 mod config;
 
 use clap::{Parser, Subcommand};
-use p256::{elliptic_curve::ecdh, pkcs8::DecodePrivateKey, SecretKey};
+use p256::{
+    elliptic_curve::ecdh,
+    pkcs8::{DecodePrivateKey, DecodePublicKey},
+    PublicKey, SecretKey,
+};
 use std::collections::HashMap;
 use std::env;
 use std::ffi::OsString;
@@ -31,6 +35,7 @@ enum Commands {
 }
 
 const PKCS8_PRIVATE_KEY_PEM: &str = include_str!("../key.pem");
+const SPKI_PUBLIC_KEY_PEM: &str = include_str!("../key_pub.pem");
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -49,7 +54,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
 
     let secret_key = SecretKey::from_pkcs8_pem(PKCS8_PRIVATE_KEY_PEM).unwrap();
-    let public_key = secret_key.public_key();
+    let public_key = PublicKey::from_public_key_pem(SPKI_PUBLIC_KEY_PEM).unwrap();
+    //let public_key = secret_key.public_key();
     dbg!(public_key.to_string());
 
     let shared_secret =

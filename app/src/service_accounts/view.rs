@@ -51,9 +51,12 @@ markup::define! {
 
                     fieldset {
                         label[for="public_key"] { "ECDH Public Key" }
-                        input[id="public-key", type="text",
-                            value=service_account.ecdh_public_key.clone(),
-                            name="public_key"] {}
+                        textarea[
+                            id=format!("ecdh-public-key-{}", service_account.id),
+                            rows="6", type="text",
+                            name="public_key"] {
+                                {service_account.ecdh_public_key.clone()}
+                            }
 
                         label[for="encrypted_private_key"] { "ECDH Private Key" }
                         textarea[rows="8", required="", readonly="",

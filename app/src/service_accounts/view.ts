@@ -91,7 +91,6 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
                 if (err) {
                     console.log('Error code: ' + err.code + ' "' + err.message + '"');
                 } else {
-                    console.log('sent')
                     // Assuming that all worked, connect the account to the vault
                     connectFormVaultId.value = '' + vaultId
                     connectForm.submit()
@@ -120,8 +119,6 @@ document.querySelectorAll('[id^="service-account-row-"]').forEach(async (row) =>
         connectButton.addEventListener('click', async event => {
             event.preventDefault()
 
-            console.log('clicked')
-
             await handleConnect(serviceAccountId)
         })
     }
@@ -133,6 +130,11 @@ document.querySelectorAll('[id^="service-account-row-"]').forEach(async (row) =>
             const cipher = Cipher.fromString(input.innerText)
             const decryptedKey = await Vault.decrypt(cipher)
             input.value = decryptedKey.toPem('PRIVATE')
+        }
+        const pubKey = document.getElementById('ecdh-public-key-' + serviceAccountId)
+        if (pubKey instanceof HTMLTextAreaElement) {
+            const data = ByteData.fromB64(pubKey.innerText)
+            pubKey.value = data.toPem('PUBLIC')
         }
     } catch (e) {
         console.log(e)
