@@ -13,7 +13,10 @@ use p256::{
 use std::collections::HashMap;
 use std::env;
 use std::ffi::OsString;
-use std::process::{Command, Stdio};
+//use std::process::{Command, Stdio};
+
+use aes_gcm::aead::{generic_array::GenericArray, Aead, NewAead, Payload};
+use aes_gcm::Aes256Gcm;
 
 /// A fictional versioning CLI
 #[derive(Parser)]
@@ -61,24 +64,61 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let shared_secret =
         ecdh::diffie_hellman(secret_key.to_nonzero_scalar(), vault_public_key.as_affine());
 
-    dbg!(base64::encode(&shared_secret.as_bytes()));
+    for secret in response.secrets {
+        let nonce_and_cipher: Vec<&str> = secret.encrypted_name.split('|').collect();
+
+        if let Some(nonce) = nonce_and_cipher.get(0) {
+            if let Some(cipher) = nonce_and_cipher.get(1) {
+                let nonce_bytes = base64::decode(nonce).unwrap();
+                let cipher_bytes = base64::decode(cipher).unwrap();
+
+                let payload = Payload {
+                    msg: &cipher_bytes,
+                    aad: Default::default(),
+                };
+                let key = GenericArray::from_slice(shared_secret.as_bytes());
+                let nonce = GenericArray::from_slice(&nonce_bytes);
+
+                let cipher = <Aes256Gcm>::new(key);
+                let plaintext = cipher.decrypt(nonce, payload).unwrap();
+
+                dbg!(plaintext);
+            }
+        }
+        println!("{}", secret.encrypted_name);
+    }
+
+    //let key = GenericArray::from_slice(shared_secret.as_bytes());
+    //let nonce = GenericArray::from_slice(vector.nonce);
+    //let mut ciphertext = Vec::from(vector.ciphertext);
+    // ciphertext.extend_from_slice(vector.tag);  // Authenticated
+
+    //let payload = Payload {
+    //    msg: &ciphertext,
+    //    aad: vector.aad,
+    //};
+
+    //let cipher = <$aead>::new(key);
+    //let plaintext = cipher.decrypt(nonce, payload).unwrap();
+
+    //dbg!(base64::encode(&shared_secret.as_bytes()));
 
     // cargo run -- --ecdh-private-key $ECDH_PRIVATE_KEY run ls
     let args = Cli::parse();
     match &args.command {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
-            let filtered_env: HashMap<String, String> = env::vars()
+            let _filtered_env: HashMap<String, String> = env::vars()
                 .filter(|&(ref k, _)| k == "TERM" || k == "TZ" || k == "LANG" || k == "PATH")
                 .collect();
 
-            Command::new("printenv")
-                .stdin(Stdio::null())
-                .stdout(Stdio::inherit())
-                .env_clear()
-                .envs(&filtered_env)
-                .spawn()
-                .expect("printenv failed to start");
+            /***Command::new("printenv")
+            .stdin(Stdio::null())
+            .stdout(Stdio::inherit())
+            .env_clear()
+            .envs(&filtered_env)
+            .spawn()
+            .expect("printenv failed to start");**/
         }
     }
 

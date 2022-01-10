@@ -169,13 +169,31 @@ pub struct ServiceAccountSecret {
 }
 
 impl ServiceAccountSecret {
+    pub async fn get_all(
+        pool: &PgPool,
+        service_account_id: u32,
+    ) -> Result<Vec<ServiceAccountSecret>, CustomError> {
+        Ok(sqlx::query_as!(
+            ServiceAccountSecret,
+            "
+                SELECT  
+                    id, service_account_id, name, secret 
+                FROM 
+                    service_account_secrets 
+                WHERE 
+                    service_account_id = $1
+            ",
+            service_account_id as i32
+        )
+        .fetch_all(pool)
+        .await?)
+    }
+
     pub async fn create(
         pool: &PgPool,
         secrets: Vec<ServiceAccountSecret>,
     ) -> Result<(), CustomError> {
         for secret in secrets {
-            dbg!(&secret.service_account_id);
-            dbg!(&secret.name);
             sqlx::query!(
                 "
                     INSERT INTO service_account_secrets
