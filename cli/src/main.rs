@@ -76,32 +76,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                     msg: &cipher_bytes,
                     aad: Default::default(),
                 };
-                let key = GenericArray::from_slice(shared_secret.as_bytes());
-                let nonce = GenericArray::from_slice(&nonce_bytes);
+                let key: &GenericArray<u8, _> = GenericArray::from_slice(shared_secret.as_bytes());
+                let nonce = GenericArray::from_slice(&nonce_bytes as &[u8]);
 
                 let cipher = <Aes256Gcm>::new(key);
                 let plaintext = cipher.decrypt(nonce, payload).unwrap();
+                let plaintext = std::str::from_utf8(&plaintext).unwrap();
 
                 dbg!(plaintext);
             }
         }
-        println!("{}", secret.encrypted_name);
     }
-
-    //let key = GenericArray::from_slice(shared_secret.as_bytes());
-    //let nonce = GenericArray::from_slice(vector.nonce);
-    //let mut ciphertext = Vec::from(vector.ciphertext);
-    // ciphertext.extend_from_slice(vector.tag);  // Authenticated
-
-    //let payload = Payload {
-    //    msg: &ciphertext,
-    //    aad: vector.aad,
-    //};
-
-    //let cipher = <$aead>::new(key);
-    //let plaintext = cipher.decrypt(nonce, payload).unwrap();
-
-    //dbg!(base64::encode(&shared_secret.as_bytes()));
 
     // cargo run -- --ecdh-private-key $ECDH_PRIVATE_KEY run ls
     let args = Cli::parse();

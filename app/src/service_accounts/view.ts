@@ -58,17 +58,27 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
 
     console.log(aesKeyAgreement)
 
+
+    // Associated Data
+    const associatedData = new Uint8Array(4)
+    const view = new DataView(associatedData.buffer)
+    view.setUint32(0, serviceAccountId, true /* littleEndian */);
+
     // Process the secrets - re-encrypt them with the agreement key.
     const secretList = vault.getSecretsList()
     for await (var secret of secretList) {
         const cipherName = Cipher.fromString(secret.getEncryptedName())
         const plaintextName: ByteData = await Vault.aesDecrypt(cipherName, vaultKey)
         console.log(dec.decode(plaintextName.arr))
-        const newEncryptedName = await Vault.aesEncrypt(plaintextName.arr, aesKeyAgreement)
+        const newEncryptedName = await Vault.aeadEncrypt(plaintextName.arr, 
+            associatedData, aesKeyAgreement)
+
         secret.setEncryptedName(newEncryptedName.string)
         const cipherValue = Cipher.fromString(secret.getEncryptedSecretValue())
         const plaintextValue: ByteData = await Vault.aesDecrypt(cipherValue, vaultKey)
-        const newEncryptedValue = await Vault.aesEncrypt(plaintextValue.arr, aesKeyAgreement)
+
+        const newEncryptedValue = await Vault.aeadEncrypt(plaintextValue.arr, 
+            associatedData, aesKeyAgreement)
         secret.setEncryptedName(newEncryptedValue.string)
     }
 

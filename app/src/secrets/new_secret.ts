@@ -36,9 +36,15 @@ if (createSecretButton) {
                     const vaultCipher = Cipher.fromString(vaultKeyInput.value)
                     const vaultKey = await Vault.unwrapKey(vaultCipher)
 
-                    const cipher = await Vault.aesEncrypt(enc.encode(secretNameInput.value), vaultKey)
+                    const cipher = await Vault.aesEncrypt(
+                        enc.encode(secretNameInput.value), 
+                        vaultKey)
+
+                    const cipher2 = await Vault.aesEncrypt(
+                        enc.encode(secretValueInput.value), 
+                        vaultKey)
+
                     secretNameInput.value = cipher.string
-                    const cipher2 = await Vault.aesEncrypt(enc.encode(secretValueInput.value), vaultKey)
                     secretValueInput.value = cipher2.string
                     secretForm.submit()
                 } catch (err) {

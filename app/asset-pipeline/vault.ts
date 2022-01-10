@@ -107,6 +107,21 @@ export class Vault {
         return new Cipher(ivData, cipher)
     }
 
+    public static async aeadEncrypt(plaintext: Uint8Array, 
+        data: Uint8Array, key: CryptoKey) : Promise<Cipher> {
+
+        const encOptions = {
+            name: 'AES-GCM',
+            iv: new Uint8Array(12),
+            //additionalData: data
+        };
+        self.crypto.getRandomValues(encOptions.iv);
+        const ivData = new ByteData(encOptions.iv.buffer);
+        const cipher = new ByteData(await self.crypto.subtle.encrypt(encOptions, key, plaintext))
+
+        return new Cipher(ivData, cipher)
+    }
+
     public static async aesDecrypt(cipher: Cipher, key: CryptoKey): Promise<ByteData> {
 
         const decOptions = {

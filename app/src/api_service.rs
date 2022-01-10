@@ -37,6 +37,7 @@ impl app::vault::vault_server::Vault for VaultService {
                 .collect();
 
             let response = GetServiceAccountResponse {
+                service_account_id: service_account.id as u32,
                 vault_public_ecdh_key: vault.ecdh_public_key,
                 secrets,
             };

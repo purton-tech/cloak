@@ -4,7 +4,7 @@ package vault;
 
 service Vault {
 
-    // These methodas are called by the CLI.
+    // These methods are called by the CLI.
 
     // Get a service account and all the secrets inside, we need
     // the public ecdh address of the service account.
@@ -29,6 +29,7 @@ message GetServiceAccountRequest {
 }
 
 message GetServiceAccountResponse {
+    uint32 service_account_id = 1;
     string vault_public_ecdh_key = 3;
     repeated Secret secrets = 4;
 }
