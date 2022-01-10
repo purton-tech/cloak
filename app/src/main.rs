@@ -4,6 +4,9 @@ mod config;
 mod errors;
 mod hybrid;
 mod layout;
+mod models;
+mod secrets;
+mod service_accounts;
 mod vaults;
 
 use axum::AddExtensionLayer;
@@ -28,6 +31,8 @@ async fn main() {
 
     let axum_make_service = axum::Router::new()
         .merge(vaults::routes())
+        .merge(secrets::routes())
+        .merge(service_accounts::routes())
         .merge(statics::asset_pipeline_routes())
         .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())

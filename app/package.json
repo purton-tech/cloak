@@ -3,14 +3,20 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "start": "parcel watch asset-pipeline/index.ts --no-hmr --public-url /auth/static",
-        "release": "parcel build asset-pipeline/index.ts --public-url /auth/static"
+        "start": "npm run protoc && parcel watch asset-pipeline/index.ts --no-hmr --public-url /auth/static",
+        "release": "npm run protoc && parcel build asset-pipeline/index.ts --public-url /auth/static",
+        "protoc": "protoc -I=../protos api.proto --js_out=import_style=commonjs,binary:asset-pipeline --grpc-web_out=import_style=typescript,mode=grpcweb:asset-pipeline"
     },
     "devDependencies": {
         "@parcel/transformer-sass": "^2.0.0",
         "@shoelace-style/shoelace": "^2.0.0-beta.60",
+        "google-protobuf": "^3.19.1",
+        "grpc-web": "^1.3.0",
         "parcel": "^2.0.0",
         "posthtml-include": "^1.7.2",
         "rlite-router": "^2.0.3"
+    },
+    "dependencies": {
+        "idb": "^7.0.0"
     }
 }

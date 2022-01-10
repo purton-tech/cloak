@@ -16,10 +16,15 @@ fn main() {
     // Asset pipeline
     let mut data = String::new();
 
-    data.push_str(&generate_file_routes("./dist/", "asset_pipeline_routes"));
+    data.push_str(&generate_file_routes(
+        "./dist/",
+        "asset_pipeline_routes",
+        "/static/assets",
+    ));
     data.push_str(&generate_file_routes(
         "./asset-pipeline/images/",
         "image_routes",
+        "/static/images",
     ));
 
     data.push_str(&generate_get_methods("./dist/", "/static/assets"));
@@ -35,7 +40,7 @@ fn main() {
     dst.write_all(data.as_bytes()).unwrap();
 }
 
-fn generate_file_routes(folder: &str, method_name: &str) -> String {
+fn generate_file_routes(folder: &str, method_name: &str, route: &str) -> String {
     let paths = fs::read_dir(folder).unwrap();
 
     let mut data = String::new();
@@ -53,9 +58,17 @@ fn generate_file_routes(folder: &str, method_name: &str) -> String {
             let name: String = path.file_name().unwrap().to_string_lossy().into();
             let file_name = format!("{}{}", folder, name);
 
+            let method_or_string = if name == "index.css.map" {
+                format!("\"{}/index.css.map\"", route)
+            } else if name == "index.js.map" {
+                format!("\"{}/index.js.map\"", route)
+            } else {
+                format!("&get_{}()", name.replace(".", "_").replace("-", "_"))
+            };
+
             let method = format!(
                 r#".route(
-                    &get_{}(),
+                    {},
                     axum::routing::get_service(tower_http::services::ServeFile::new("{}")).handle_error(|error: std::io::Error| async move {{
                         (
                             axum::http::StatusCode::INTERNAL_SERVER_ERROR,
@@ -64,8 +77,7 @@ fn generate_file_routes(folder: &str, method_name: &str) -> String {
                     }}),
                 )
                 "#,
-                &name.replace(".", "_").replace("-", "_"),
-                &file_name
+                &method_or_string, &file_name
             );
 
             data.push_str(&method);

@@ -1,5 +1,8 @@
 {
     "rust-analyzer.diagnostics.disabled": [
         "macro-error"
-    ]
+    ],
+    // If you're using rust-analyzer we recommend you set "rust-analyzer.cargo.loadOutDirsFromCheck": true 
+    // to correctly load the generated code.
+    "rust-analyzer.cargo.loadOutDirsFromCheck": true
 }

@@ -5,7 +5,7 @@
 		"docker-compose.dev.yml"
 	],
 	"service": "development",
-    	"workspaceFolder": "/vscode",
+    "workspaceFolder": "/vscode",
 	//"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
 
 	// Set *default* container specific settings.json values on container create.
@@ -18,6 +18,8 @@
 	},
 
 	"remoteEnv": {
+		"EMAIL": "${localEnv:EMAIL}",
+		"NAME": "${localEnv:NAME}",
 		// Pass in the host directory for Docker mount commands from inside the container
 		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
 	},

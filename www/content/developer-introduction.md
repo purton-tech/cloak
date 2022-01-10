@@ -9,7 +9,7 @@ Installing the precompiled binary is the easiest way to get started with KeyVaul
 
 | System      | Download Link | SHA256 Checksum |
 | ----------- | ------------- |                 |
-| macOS      | Title         |                 |
+| MacOS      | Title         |                 |
 | Windows   | Text          |                 |
 | Linux   | Text          |                 |
 

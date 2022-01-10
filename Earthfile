@@ -1,5 +1,12 @@
 FROM ianpurton/rust-fullstack-devcontainer:latest
 
+# Proto compiler and web grpc.
+RUN sudo apt update \
+    && sudo apt install -y protobuf-compiler \
+    && sudo curl -OL https://github.com/grpc/grpc-web/releases/download/1.3.0/protoc-gen-grpc-web-1.3.0-linux-x86_64  \
+    && sudo mv protoc-gen-grpc-web* /usr/local/bin/protoc-gen-grpc-web \
+    && sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
+
 ARG APP_EXE_NAME=app
 ARG APP_FOLDER=app
 ARG CLI_FOLDER=cli
@@ -20,7 +27,7 @@ WORKDIR /build
 
 USER root
 
-# Set up for docker in docker
+# Set up for docker in docker https://github.com/earthly/earthly/issues/1225
 DO github.com/earthly/lib+INSTALL_DIND
 
 USER vscode
@@ -33,18 +40,20 @@ all:
     #BUILD +integration-test
 
 npm-deps:
-    COPY $APP_FOLDER/package.json package.json
-    COPY $APP_FOLDER/package-lock.json package-lock.json
-    RUN npm install
-    SAVE ARTIFACT node_modules
+    COPY $APP_FOLDER/package.json $APP_FOLDER/package.json
+    COPY $APP_FOLDER/package-lock.json $APP_FOLDER/package-lock.json
+    RUN cd $APP_FOLDER && npm install
+    SAVE ARTIFACT $APP_FOLDER/node_modules
 
 npm-build:
     FROM +npm-deps
-    COPY $APP_FOLDER/asset-pipeline asset-pipeline
-    COPY $APP_FOLDER/src src
-    COPY +npm-deps/node_modules node_modules
-    RUN npm run release
-    SAVE ARTIFACT dist
+    COPY $APP_FOLDER/asset-pipeline $APP_FOLDER/asset-pipeline
+    COPY $APP_FOLDER/src $APP_FOLDER/src
+    # Protos needed for typescript web gRPC.
+    COPY protos protos
+    COPY +npm-deps/node_modules $APP_FOLDER/node_modules
+    RUN cd $APP_FOLDER && npm run release
+    SAVE ARTIFACT $APP_FOLDER/dist
 
 prepare-cache:
     COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
@@ -76,7 +85,7 @@ build:
         RUN docker run -d --rm --network=host -e POSTGRES_PASSWORD=testpassword postgres:alpine \
             && while ! pg_isready --host=localhost --port=5432 --username=postgres; do sleep 1; done ;\
                 diesel migration run \
-            && cargo build --release --target x86_64-unknown-linux-musl
+            && cargo build --release --bin app --target x86_64-unknown-linux-musl
     END
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME $APP_EXE_NAME
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME $CLI_EXE_NAME
