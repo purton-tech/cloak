@@ -79,7 +79,7 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
 
         const newEncryptedValue = await Vault.aeadEncrypt(plaintextValue.arr, 
             associatedData, aesKeyAgreement)
-        secret.setEncryptedName(newEncryptedValue.string)
+        secret.setEncryptedSecretValue(newEncryptedValue.string)
     }
 
     // Send the encrypted payload back to the server

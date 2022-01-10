@@ -113,7 +113,7 @@ export class Vault {
         const encOptions = {
             name: 'AES-GCM',
             iv: new Uint8Array(12),
-            //additionalData: data
+            additionalData: data
         };
         self.crypto.getRandomValues(encOptions.iv);
         const ivData = new ByteData(encOptions.iv.buffer);
