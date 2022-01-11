@@ -1,7 +1,7 @@
 @import 'responsive-mixin';
 
 .m_cta {
-    background-image: radial-gradient(70% 70% at 50% 100%, rgb(232, 232, 232) 0%, rgb(250, 250, 250) 100%);
+    background: url('bg_arrows.svg') 83px top repeat var(--background);
 
     > div {
         // Set a max width and center content
@@ -26,13 +26,15 @@
             grid-area: text;
             > p {
                 font-size: 0.8rem;
+                color: white;
             }
         }
 
         > h1 {
             grid-area: headline;
-            font-size: 2em;
-            font-weight: 700;
+            font-size: 3.75rem;
+            line-height: 1.25;
+            margin: 0;
         }
 
         > div.buttons {
@@ -66,7 +68,7 @@
                             "text     pic"
                             "buttons  pic"
                             "more     more"
-                            / 1fr 1fr;
+                            / 2fr 1fr;
 
             > div.text {
                 // Fix i.e. 11 or it overflows into the image
@@ -84,12 +86,6 @@
                     width: auto;
                     height: 450px;
                 }
-            }
-    
-            > h1 {
-                // Fix i.e. 11 or it overflows into the image
-                max-width: 500px;
-                font-size: 4em;
             }
 
             > div.footer {

@@ -19,16 +19,16 @@
           <div class="bottom_bun"></div>
         </label><a href="/"><span>{{ config.title }}</span></a>
         <ul>
-          <li><a href="/blog/">Blog</a></li>
-          <li><a href="/developers/">Developers</a></li>
+          <li><a class="menu-item" href="/blog/">Blog</a></li>
+          <li><a class="menu-item" href="/developers/">Developers</a></li>
           {% set intro_page = get_page(path="developer-introduction.md") %}
           {% set dev_section = get_section(path="developers/_index.md") %}
-          <li class="developer-docs"><a href="/developers/">{{ intro_page.title }}</a></li>
+          <li><a class="menu-item" href="/developers/">{{ intro_page.title }}</a></li>
           {% for page in dev_section.pages %}
-          <li class="developer-docs"><a href="{{ page.path | safe }}">{{ page.title }}</a></li>
+          <li><a class="menu-item" href="{{ page.path | safe }}">{{ page.title }}</a></li>
           {% endfor %}
-          <li><a href="/auth/sign_in">Sign In</a></li>
-          <li><a href="/auth/sign_up">Sign Up</a></li>
+          <li><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></li>
+          <li><a class="menu-item" href="/auth/sign_in">Sign In</a></li>
         </ul>
       </nav>
     </div>
@@ -36,7 +36,50 @@
   <div id="main">
       {% block content %} {% endblock %}
   </div>
-  <footer class="m_footer"></footer>
+  <footer class="m_footer">
+    <div class="container">
+      <div class="top-of-footer">
+        <div class="link-block">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="link-block">
+          <h4>Resources</h4>
+          <ul>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+            <li><a href="/blog">Blog</a></li>
+          </ul>
+        </div>
+        <div class="sign-up">
+          <h4>Sign up for our service</h4>
+          <p>Get control of your secrets and add security.</p>
+          <a class="a_button a_button--outline">Check it Out</a>
+        </div>
+      </div>
+      <hr />
+      <div class="bottom-of-footer">
+        <p>Copyright 2022</p>
+        <ul class="social">
+          <li><a href="/blog"><img width="24" src="twitter.svg" /></a></li>
+          <li><a href="/blog"><img width="24" src="github.svg" /></a></li>
+          <li><a href="/blog"><img width="24" src="linkedin.svg" /></a></li>
+        </ul>
+        <ul class="terms">
+          <li><a href="/blog">Terms</a></li>
+          <li><a href="/blog">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
 </body>
 
 </html>

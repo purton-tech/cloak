@@ -2,11 +2,13 @@
 
 /* Responsive navigation no js */
 div.m_navbar {
-    background-color: var(--geist-background);
+    background-color: var(--background);
     display: flex;
     flex-direction: row;
     justify-content: center;
-    border-bottom: 1px solid var(--accents-2);
+    font-family: var(--font-family-mono);
+    text-transform: uppercase;
+    box-shadow: var(--shadow-small);
   
     nav {
       width: var(--content-width);
@@ -26,7 +28,7 @@ div.m_navbar {
     
       > label {
         display: block;
-        color: var(--geist-foreground);
+        color: var(--foreground);
       }
     
       > ul {
@@ -34,12 +36,16 @@ div.m_navbar {
         list-style: none;
       }
     
-      a {
+      .menu-item {
         text-decoration: none;
+        color: black;
+        font-size: .875rem;
+        line-height: 1.25rem;
       }
       
       // Make the logo a bit nicer.
       > a {
+        text-decoration: none;
         span {
           font-weight: 600;
           font-size: 1.5em;
@@ -115,31 +121,14 @@ div.m_navbar {
       div.m_navbar nav {
           > ul {
               display: flex;
+              align-items: center;
               
               li.selected {
                   border-bottom: 1px solid var(--foreground);
               }
   
               li {
-                margin-left: 1em;
-                display: flex;
-                padding: 8px;
-                a {
-                  color: var(--accents-6);
-                }
-                font-size: 1rem;
-              }
-
-              > li.developer-docs {
-                display: none;
-              }
-  
-              li:last-of-type {
-                border-radius: 5px;
-                background-color: var(--geist-success);
-                a {
-                  color: var(--geist-background);
-                }
+                margin-left: 1.5em;
               }
           }
   

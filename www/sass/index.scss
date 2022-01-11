@@ -1,16 +1,32 @@
 @import 'normalise';
 
-// https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
-html {
-    box-sizing: border-box;
-}
-*, *:before, *:after {
-    box-sizing: inherit;
+@font-face {
+    font-family: Lineto Akkurat Regular;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/fonts/lineto-akkurat-regular.woff2) format("woff2")
 }
 
-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 
-        Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+@font-face {
+    font-family: Lineto Akkurat Light;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/fonts/lineto-akkurat-light.woff2) format("woff2")
+}
+
+@font-face {
+    font-family: Lineto Akkuratmono Regular;
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url(/fonts/lineto-akkuratmono-regular.woff2) format("woff2")
+}
+
+// https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
+*, *:before, *:after {
+    box-sizing: inherit;
 }
 
 // Make images repsinsive
@@ -22,7 +38,7 @@ img {
 // Colours
 :root {
     --foreground: #000;
-    --background: #fff;
+    --background: rgba(255,107,74);
     --accents-1: #fafafa;
     --accents-2: #EBEBEB;
     --accents-3: #999999;
@@ -31,6 +47,7 @@ img {
     --accents-6: #444444;
     --accents-7: #333333;
     --accents-8: #111111;
+    --primary: #000;
     --success: #031b4d;
     --error: #ee0000;
     --warning: #f5a623;
@@ -41,30 +58,32 @@ img {
     --shadow-small: 0 5px 10px rgba(0, 0, 0, 0.12);
     --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
     --shadow-large: 0 30px 60px rgba(0, 0, 0, 0.12);
-    --portal-opacity: 0.25;
-    --sidebar-bg: #031b4d;
+}
+
+// Fonts
+:root {
+    --font-family-light: Lineto Akkurat Light, ui-sans-serif, system-ui, -apple-system, 
+        BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, 
+        sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
+    --font-family-regular: Lineto Akkurat Regular, ui-sans-serif, system-ui, -apple-system, 
+        BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, 
+        sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, Times, serif;
+    --font-family-mono: Lineto Akkuratmono Regular, Consolas, Liberation Mono, Courier New, monospace;
 }
 
 :root {
     --content-width: 1040px;
     --article-width: 45rem;
-    --content-padding: 30px 1em 30px 1em;
+    --content-padding: 5.5rem 1em 30px 1em;
 }
 
-.container {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    font-size: 1.1rem;
-
-    p {
-        color: var(--accents-8);
-        font-weight: 300;
-        line-height: 1.5;
-    }
+html {
+    box-sizing: border-box;
+    font-family: var(--font-family-light);
 }
 
 @import './navbar';
+@import './footer';
 @import './buttons';
 @import './cta';
 @import './developer-docs';
