@@ -2,8 +2,8 @@
 {% block class %} developers {% endblock %}
 
 {% block content %}
-<div  class="container">
-  <section class="l_developers">
+<section class="l_developers">
+  <div>
     {% set intro_page = get_page(path="developer-introduction.md") %}
     <aside>
       <h2>Getting Started</h2>
@@ -30,6 +30,6 @@
         {{ page.content | safe }}
       </div>
     </main>
-  </section>
-</div>
+  </div>
+</section>
 {% endblock content %}
