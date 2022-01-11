@@ -1,7 +1,7 @@
 config:
-  keyvault:app: sha256:26404d400781914d3c21c06ca581866799e2485dd9ae5fcf36d39f5b79a75b98
-  keyvault:envoy: sha256:110b13ba90be44b8c31a1107cfc2eaeb7421932a49b81685826756071adc3ccc
-  keyvault:init: sha256:03f69e5b620f2cb39af3bbcc14f22a262ffc37f152ab50ad613ab01875b6f225
+  keyvault:app: sha256:95dd916355a45dada0598eb6656c8d6a8c72e8bae0c5ee1893d20c68ffb3bf4f
+  keyvault:envoy: sha256:bc09853e964810c39ae7676e20d408790496f6389a5c74e8fd446ecebe7baf17
+  keyvault:init: sha256:1b861c0003308ef11c5e59a53d3e027cbd6abbbb59024cb5047fc38f47d399ea
   keyvault:secret_key:
     secure: AAABAFnoTpfMg3QrjakcPdI6+nvu3KAKTX8y2CzzXMyPgIfLF/uKrYD7wuxdv82414SE5lYZYWH6KHjIP+vF5L4D9OKlNVTSiDqVCATyCu3/UtCz/Vitkwn9ppCCzugJ
-  keyvault:www: sha256:4eec6654100feea997bd2174e3e1104f57bb2fae793840d06aaa9b25c080dd53
+  keyvault:www: sha256:7bea29e3335d6a50b94f09b2bac6a9148db76c6ccbc22ff2516b4cbe66290320
