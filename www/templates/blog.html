@@ -2,18 +2,18 @@
 {% block class %} blog {% endblock %}
 
 {% block content %}
-<div class="container">
   <section class="l_blog">
-    <h1 class="title">
-      {{ section.title }}
-    </h1>
-    {% for page in section.pages %}
-    <div class="summary">
-      <h2>{{ page.title }}</h2>
-      <p class="subtitle"><strong>{{ page.date }}</strong></p>
-      <p><a href="{{ page.path | safe }}">Read More...</a></p>
+    <div>
+      <h1 class="title">
+        {{ section.title }}
+      </h1>
+      {% for page in section.pages %}
+      <div class="summary">
+        <h2>{{ page.title }}</h2>
+        <p class="subtitle"><strong>{{ page.date }}</strong></p>
+        <p><a href="{{ page.path | safe }}">Read More...</a></p>
+      </div>
+      {% endfor %}
     </div>
-    {% endfor %}
   </section>
-</div>
 {% endblock content %}
