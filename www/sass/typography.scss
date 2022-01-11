@@ -207,23 +207,6 @@
         list-style-type: lower-alpha;
     }
 
-    .container {
-        display: flex;
-        flex-direction: column;
-        padding: 40px;
-        max-width: 864px;
-        min-height: 100vh;
-        margin: 0 auto;
-
-        @include for-tablet-landscape-up {
-            padding: 20px;
-        }
-    }
-
-    .content {
-        display: flex;
-    }
-
     hr {
         width: 100%;
         border: none;
