@@ -8,7 +8,7 @@ div.m_navbar {
     justify-content: center;
     font-family: var(--font-family-mono);
     text-transform: uppercase;
-    box-shadow: 10px 5px 5px red;
+    box-shadow: var(--shadow-large);
   
     nav {
       width: var(--content-width);

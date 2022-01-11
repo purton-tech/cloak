@@ -1,6 +1,11 @@
 @import 'responsive-mixin';
 
 .m_footer {
+    font-family: var(--font-family-mono);
+    text-transform: uppercase;
+    font-size: .875rem;
+    line-height: 1.25rem;
+
     > div {
         // Set a max width and center content
         margin-left: auto;
@@ -12,8 +17,48 @@
     background-color: black;
     color: white;
 
+    
+    h4 {
+        color: var(--accents-5);
+        margin-bottom: 0;
+    }
+
     a {
         color: white;
+    }
+
+    .link-block {
+        > ul {
+            margin-top: 0.5rem;
+            padding-left: 0;
+            > li {
+                list-style: none;
+                > a {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+
+    .sign-up {
+        > p {
+            margin-top: 0.5rem;
+        }
+    }
+
+    .bottom-of-footer {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+
+        > .social, .terms {
+            list-style: none;
+            display: flex;
+            flex-direction: row;
+            > li {
+                margin-left: 1rem;
+            }
+        }
     }
 }
   
@@ -23,10 +68,6 @@
             display: flex;
             flex-direction: row;
             justify-content: space-between;
-
-            div:last-of-type {
-                margin-left: auto;
-            }
         }
     }
 }
