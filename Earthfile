@@ -70,7 +70,7 @@ build-cache:
 
 build:
     COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
-    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER
+    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER/key.pem $CLI_FOLDER
     COPY --dir migrations Cargo.lock Cargo.toml protos .
     COPY +build-cache/cargo_home $CARGO_HOME
     COPY +build-cache/target target
@@ -85,10 +85,10 @@ build:
         RUN docker run -d --rm --network=host -e POSTGRES_PASSWORD=testpassword postgres:alpine \
             && while ! pg_isready --host=localhost --port=5432 --username=postgres; do sleep 1; done ;\
                 diesel migration run \
-            && cargo build --release --bin app --target x86_64-unknown-linux-musl
+            && cargo build --release --target x86_64-unknown-linux-musl
     END
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME $APP_EXE_NAME
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME $CLI_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/$APP_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_EXE_NAME
 
 init-container:
     FROM ianpurton/rust-diesel:latest
