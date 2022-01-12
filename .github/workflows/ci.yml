@@ -40,9 +40,13 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: earthly --allow-privileged --ci --remote-cache=ianpurton/vault:cache --push +all
       
+    - name: ls -la
+      if: github.ref == 'refs/heads/main'
+      run: ls -la
+      
     - name: Publish Artifacts
       if: github.ref == 'refs/heads/main'
       uses: actions/upload-artifact@v2
       with:
         name: cli
-        path: ./tmp/cli
+        path: cli
