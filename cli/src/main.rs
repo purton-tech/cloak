@@ -69,23 +69,28 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let aad = transform_u32_to_array_of_u8(response.service_account_id);
 
+    let mut env_vars_to_inject: HashMap<String, String> = Default::default();
     for secret in response.secrets {
         let plaintext_name = decrypt_secret(secret.encrypted_name, &aad, &shared_secret)?;
         let plaintext_value = decrypt_secret(secret.encrypted_secret_value, &aad, &shared_secret)?;
-        dbg!(&plaintext_name);
-        dbg!(&plaintext_value);
+        env_vars_to_inject.insert(plaintext_name, plaintext_value);
     }
 
     // cargo run -- printenv
-    // cargo run -- echo '$HOSTNAME'
+    // cargo run -- echo $HOSTNAME
     match &args.command {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
+
             let filtered_env: HashMap<String, String> = env::vars()
                 .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
                 .collect();
 
+            let filtered_env: HashMap<String, String> =
+                filtered_env.into_iter().chain(env_vars_to_inject).collect();
+
             Command::new(&args[0])
+                .args(&args[1..])
                 .stdin(Stdio::null())
                 .stdout(Stdio::inherit())
                 .env_clear()
