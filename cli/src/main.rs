@@ -17,14 +17,18 @@ use std::ffi::OsString;
 
 use aes_gcm::aead::{generic_array::GenericArray, Aead, NewAead, Payload};
 use aes_gcm::Aes256Gcm;
+use dotenv::dotenv;
 
 /// A fictional versioning CLI
 #[derive(Parser)]
 #[clap(name = "git")]
 #[clap(about = "A fictional versioning CLI")]
 struct Cli {
-    #[clap(short, long)]
+    #[clap(short, long, env = "ECDH_PRIVATE_KEY")]
     ecdh_private_key: String,
+
+    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://keyvault.authn.tech"))]
+    api_host_url: String,
 
     #[clap(subcommand)]
     command: Commands,
@@ -41,6 +45,8 @@ const PKCS8_PRIVATE_KEY_PEM: &str = include_str!("../key.pem");
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    dotenv().ok();
+
     let config = config::Config::new();
 
     let secret_key = SecretKey::from_pkcs8_pem(PKCS8_PRIVATE_KEY_PEM).unwrap();

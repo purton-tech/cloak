@@ -6,3 +6,4 @@ api_pb.d.ts
 api_pb.js
 ApiServiceClientPb.ts
 tmp
+.env
