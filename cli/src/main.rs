@@ -2,9 +2,8 @@ pub mod vault {
     tonic::include_proto!("vault");
 }
 
-mod config;
-
 use clap::{Parser, Subcommand};
+use p256::ecdh::SharedSecret;
 use p256::{
     elliptic_curve::ecdh,
     pkcs8::{DecodePrivateKey, DecodePublicKey, EncodePublicKey},
@@ -13,18 +12,22 @@ use p256::{
 use std::collections::HashMap;
 use std::env;
 use std::ffi::OsString;
-//use std::process::{Command, Stdio};
+use std::process::{Command, Stdio};
 
 use aes_gcm::aead::{generic_array::GenericArray, Aead, NewAead, Payload};
 use aes_gcm::Aes256Gcm;
+use dotenv::dotenv;
 
 /// A fictional versioning CLI
 #[derive(Parser)]
 #[clap(name = "git")]
 #[clap(about = "A fictional versioning CLI")]
 struct Cli {
-    #[clap(short, long)]
+    #[clap(short, long, env = "ECDH_PRIVATE_KEY")]
     ecdh_private_key: String,
+
+    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://keyvault.authn.tech"))]
+    api_host_url: String,
 
     #[clap(subcommand)]
     command: Commands,
@@ -37,16 +40,16 @@ enum Commands {
     Run(Vec<OsString>),
 }
 
-const PKCS8_PRIVATE_KEY_PEM: &str = include_str!("../key.pem");
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let config = config::Config::new();
+    dotenv().ok();
 
-    let secret_key = SecretKey::from_pkcs8_pem(PKCS8_PRIVATE_KEY_PEM).unwrap();
+    let args = Cli::parse();
+
+    let secret_key = SecretKey::from_pkcs8_pem(&args.ecdh_private_key).unwrap();
     let service_account_public_key = secret_key.public_key();
 
-    let client = vault::vault_client::Vault::new(config.api_host_url);
+    let client = vault::vault_client::Vault::new(args.api_host_url);
 
     let public_key_der = service_account_public_key.to_public_key_der().unwrap();
     let public_key_der_base64 = base64::encode(public_key_der);
@@ -66,50 +69,66 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let aad = transform_u32_to_array_of_u8(response.service_account_id);
 
+    let mut env_vars_to_inject: HashMap<String, String> = Default::default();
     for secret in response.secrets {
-        let nonce_and_cipher: Vec<&str> = secret.encrypted_name.split('|').collect();
-
-        if let Some(nonce) = nonce_and_cipher.get(0) {
-            if let Some(cipher) = nonce_and_cipher.get(1) {
-                let nonce_bytes = base64::decode(nonce).unwrap();
-                let cipher_bytes = base64::decode(cipher).unwrap();
-
-                let payload = Payload {
-                    msg: &cipher_bytes,
-                    aad: &aad,
-                };
-                let key: &GenericArray<u8, _> = GenericArray::from_slice(shared_secret.as_bytes());
-                let nonce = GenericArray::from_slice(&nonce_bytes as &[u8]);
-
-                let cipher = <Aes256Gcm>::new(key);
-                let plaintext = cipher.decrypt(nonce, payload).unwrap();
-                let plaintext = std::str::from_utf8(&plaintext).unwrap();
-
-                dbg!(plaintext);
-            }
-        }
+        let plaintext_name = decrypt_secret(secret.encrypted_name, &aad, &shared_secret)?;
+        let plaintext_value = decrypt_secret(secret.encrypted_secret_value, &aad, &shared_secret)?;
+        env_vars_to_inject.insert(plaintext_name, plaintext_value);
     }
 
-    // cargo run -- --ecdh-private-key $ECDH_PRIVATE_KEY run ls
-    let args = Cli::parse();
+    // cargo run -- printenv
+    // cargo run -- echo $HOSTNAME
     match &args.command {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
-            let _filtered_env: HashMap<String, String> = env::vars()
-                .filter(|&(ref k, _)| k == "TERM" || k == "TZ" || k == "LANG" || k == "PATH")
+
+            let filtered_env: HashMap<String, String> = env::vars()
+                .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
                 .collect();
 
-            /***Command::new("printenv")
-            .stdin(Stdio::null())
-            .stdout(Stdio::inherit())
-            .env_clear()
-            .envs(&filtered_env)
-            .spawn()
-            .expect("printenv failed to start");**/
+            let filtered_env: HashMap<String, String> =
+                filtered_env.into_iter().chain(env_vars_to_inject).collect();
+
+            Command::new(&args[0])
+                .args(&args[1..])
+                .stdin(Stdio::null())
+                .stdout(Stdio::inherit())
+                .env_clear()
+                .envs(&filtered_env)
+                .spawn()
+                .expect("Failed to run command");
         }
     }
 
     Ok(())
+}
+
+fn decrypt_secret(
+    nonce_and_cipher: String,
+    aad: &[u8; 4],
+    shared_secret: &SharedSecret,
+) -> Result<String, Box<dyn std::error::Error>> {
+    let nonce_and_cipher: Vec<&str> = nonce_and_cipher.split('|').collect();
+    if let Some(nonce) = nonce_and_cipher.get(0) {
+        if let Some(cipher) = nonce_and_cipher.get(1) {
+            let nonce_bytes = base64::decode(nonce).unwrap();
+            let cipher_bytes = base64::decode(cipher).unwrap();
+
+            let payload = Payload {
+                msg: &cipher_bytes,
+                aad,
+            };
+            let key: &GenericArray<u8, _> = GenericArray::from_slice(shared_secret.as_bytes());
+            let nonce = GenericArray::from_slice(&nonce_bytes as &[u8]);
+
+            let cipher = <Aes256Gcm>::new(key);
+            let plaintext = cipher.decrypt(nonce, payload).unwrap();
+            let plaintext = std::str::from_utf8(&plaintext).unwrap();
+
+            return Ok(plaintext.to_string());
+        }
+    }
+    Err("Bad request".into())
 }
 
 fn transform_u32_to_array_of_u8(x: u32) -> [u8; 4] {

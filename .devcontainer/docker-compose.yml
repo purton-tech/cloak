@@ -75,7 +75,6 @@ services:
       # A less privelaged role for basic INSERTS, SELECT etc.
       VAULT_SERVER_URL: http://localhost:7103
       VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103
-      API_HOST_URL: http://envoy:7100
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity
