@@ -5,7 +5,7 @@
     "@semantic-release/release-notes-generator",
     ["@semantic-release/github", {
       "assets": [
-        {"path": "tpm/cli", "label": "CLI Debian"}
+        {"path": "tmp/cli", "label": "cli-linux-amd64"}
       ]
     }]
   ]
