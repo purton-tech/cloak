@@ -4,4 +4,5 @@ plugins:
   - "@semantic-release/commit-analyzer"
   - "@semantic-release/release-notes-generator"
   - "@semantic-release/github":
-    - { path: "tmp/cli", label: "Debian Exe"}
+    assets:
+      - { path: "tmp/cli", label: "Debian Exe"}
