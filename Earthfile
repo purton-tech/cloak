@@ -67,6 +67,7 @@ build-cache:
     RUN cargo chef cook --release --target x86_64-unknown-linux-musl 
     SAVE ARTIFACT target
     SAVE ARTIFACT $CARGO_HOME cargo_home
+    SAVE IMAGE --cache-hint
 
 build:
     COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
@@ -87,8 +88,8 @@ build:
                 diesel migration run \
             && cargo build --release --target x86_64-unknown-linux-musl
     END
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME $APP_EXE_NAME AS LOCAL ./$APP_EXE_NAME
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME $CLI_EXE_NAME AS LOCAL ./$CLI_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/$APP_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_EXE_NAME
 
 init-container:
     FROM ianpurton/rust-diesel:latest

@@ -43,7 +43,7 @@ jobs:
       
     - name: ls -la
       if: github.ref == 'refs/heads/main'
-      run: ls -la
+      run: ls -la /tmp
 
     - name: Semantic Release
       run: npx semantic-release
@@ -53,4 +53,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: cli
-        path: cli
+        path: tmp
