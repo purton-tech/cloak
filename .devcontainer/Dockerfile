@@ -36,6 +36,9 @@ RUN sudo apt update \
     && sudo mv protoc-gen-grpc-web* /usr/local/bin/protoc-gen-grpc-web \
     && sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
 
+# Install secrets management
+RUN sudo /bin/sh -c 'wget https://github.com/ianpurton/keyvault/releases/latest/download/cli -O /usr/local/bin/keyvault && chmod +x /usr/local/bin/keyvault'
+
 # all the volumes configured in the docker-compose.yml
 RUN sudo mkdir -p /vscode/target && sudo chown $USERNAME:$USERNAME /vscode/target
 RUN sudo mkdir -p /vscode/app/node_modules && sudo chown $USERNAME:$USERNAME /vscode/app/node_modules
