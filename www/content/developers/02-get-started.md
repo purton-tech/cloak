@@ -3,13 +3,10 @@ title = "Your First Secret"
 date = 2019-11-27
 +++
 
-If you haven’t done so already, first make sure you’ve set up Keyvault by **signing up** and **installing the CLI** on your workstation.
-
-### Step 1: Login to your account from the CLI
+### Step 1: Install KeyVault
 
 ```bash
-$ keyvault login you@youremail.com
-Greetings from KeyVault.
+$ sudo /bin/sh -c 'wget https://github.com/ianpurton/keyvault/releases/latest/download/cli -O /usr/local/bin/keyvault && chmod +x /usr/local/bin/keyvault'
 ```
 
 ### Step 2: Your first secret

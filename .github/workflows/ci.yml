@@ -41,5 +41,8 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: earthly --allow-privileged --output --ci --remote-cache=ianpurton/vault:cache --push +all
 
+    - name: Update the Release Config
+      run: cd infra && ./update-config.yaml
+
     - name: Semantic Release
       run: npx semantic-release
