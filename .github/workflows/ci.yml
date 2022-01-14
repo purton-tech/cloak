@@ -46,7 +46,7 @@ jobs:
       run: ls -la
 
     - name: Semantic Release
-      run: npm semantic-release
+      run: npx semantic-release
       
     - name: Publish Artifacts
       if: github.ref == 'refs/heads/main'
