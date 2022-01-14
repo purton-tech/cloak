@@ -12,6 +12,7 @@ jobs:
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       FORCE_COLOR: 1
     steps:
     - uses: actions/checkout@v2
@@ -43,6 +44,9 @@ jobs:
     - name: ls -la
       if: github.ref == 'refs/heads/main'
       run: ls -la
+
+    - name: Semantic Release
+      run: npm semantic-release
       
     - name: Publish Artifacts
       if: github.ref == 'refs/heads/main'
