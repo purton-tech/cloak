@@ -40,10 +40,6 @@ jobs:
     - name: Run build and Deploy Containers
       if: github.ref == 'refs/heads/main'
       run: earthly --allow-privileged --output --ci --remote-cache=ianpurton/vault:cache --push +all
-      
-    - name: ls -la
-      if: github.ref == 'refs/heads/main'
-      run: ls -la /tmp
 
     - name: Semantic Release
       run: npx semantic-release
