@@ -5,8 +5,7 @@
     "@semantic-release/release-notes-generator",
     ["@semantic-release/github", {
       "assets": [
-        {"path": "tmp/cli", "label": "cli-linux-amd64"},
-        {"path": "infra/Pulumi.prod.yaml", "label": "Pulumi.prod.yaml"}
+        {"path": "tmp/cli", "label": "cli-linux-amd64"}
       ]
     }]
   ]
