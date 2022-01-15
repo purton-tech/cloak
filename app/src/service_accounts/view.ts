@@ -56,9 +56,6 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
     const vaultECDHPublicKey: CryptoKey = await Vault.importPublicECDHKey(vaultECDHPublicKeyData)
     const aesKeyAgreement: CryptoKey = await Vault.deriveSecretKey(ECDHPrivateKey, vaultECDHPublicKey)
 
-    console.log(aesKeyAgreement)
-
-
     // Associated Data
     const associatedData = new Uint8Array(4)
     const view = new DataView(associatedData.buffer)

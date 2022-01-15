@@ -27,6 +27,30 @@ impl ServiceAccount {
         .await?)
     }
 
+    pub async fn get_by_vault(
+        pool: &PgPool,
+        vault_id: u32,
+        user_id: u32,
+    ) -> Result<Vec<ServiceAccount>, CustomError> {
+        Ok(sqlx::query_as!(
+            ServiceAccount,
+            "
+                SELECT 
+                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                FROM 
+                    service_accounts
+                WHERE 
+                    vault_id = $1
+                AND
+                    user_id = $2
+            ",
+            vault_id as i32,
+            user_id as i32
+        )
+        .fetch_all(pool)
+        .await?)
+    }
+
     pub async fn get_by_ecdh_public_key(
         pool: &PgPool,
         ecdh_public_key: String,
