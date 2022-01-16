@@ -43,20 +43,18 @@ if (createSecretButton) {
                     const plaintextName = secretNameInput.value
                     const plaintextValue = secretValueInput.value
 
-                    const cipher = await Vault.aesEncrypt(
+                    const nameCipher = await Vault.aesEncrypt(
                         enc.encode(plaintextName), 
                         vaultKey)
 
-                    const cipher2 = await Vault.aesEncrypt(
+                    const valueCipher = await Vault.aesEncrypt(
                         enc.encode(plaintextValue), 
                         vaultKey)
 
                     await encryptSecretToConnectedServiceAccounts(
                         vaultKey, vaultId,
-                        plaintextName, plaintextValue, secretForm)
-
-                    secretNameInput.value = cipher.string
-                    secretValueInput.value = cipher2.string
+                        plaintextName, plaintextValue, secretForm, secretNameInput, secretValueInput,
+                        nameCipher, valueCipher)
                 } catch (err) {
                     if (err instanceof Error) {
                         console.log(err.message)
@@ -68,7 +66,9 @@ if (createSecretButton) {
 }
 
 async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaultId: number,
-    secretName: string, secretValue: string, secretForm : HTMLFormElement) {
+    secretName: string, secretValue: string, secretForm : HTMLFormElement,
+    secretNameInput : HTMLInputElement, secretValueInput : HTMLInputElement,
+    nameCipher: Cipher, valueCipher: Cipher) {
 
     const vaultClient = new VaultClient(window.location.protocol
         + '//' + window.location.host, null, null);
@@ -92,7 +92,6 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
                 const createServiceRequest = await deriveServiceAccountSecrets(
                     vault.getServiceAccountsList(), vaultECDHPrivateKey, 
                     secretName, secretValue)
-                console.log(createServiceRequest.getAccountSecretsList().length)
 
                 vaultClient.createSecrets(createServiceRequest,
 
@@ -103,6 +102,9 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
                         if (err) {
                             console.log('Error code: ' + err.code + ' "' + err.message + '"');
                         } else {
+
+                            secretNameInput.value = nameCipher.string
+                            secretValueInput.value = valueCipher.string
                             secretForm.submit()
                         }
                     }
