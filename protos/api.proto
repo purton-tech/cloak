@@ -31,7 +31,7 @@ message ServiceAccount {
 
 message ServiceAccountSecrets {
     uint32 service_account_id = 1;
-    repeated Secret secrets = 4;
+    repeated Secret secrets = 2;
 }
 
 message GetServiceAccountRequest {

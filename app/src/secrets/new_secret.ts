@@ -92,6 +92,7 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
                 const createServiceRequest = await deriveServiceAccountSecrets(
                     vault.getServiceAccountsList(), vaultECDHPrivateKey, 
                     secretName, secretValue)
+                console.log(createServiceRequest.getAccountSecretsList().length)
 
                 vaultClient.createSecrets(createServiceRequest,
 
@@ -116,7 +117,10 @@ async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], va
 
     const createSecretsRequest = new CreateSecretsRequest()
 
-    serviceAccounts.forEach(async serviceAccount => {
+    console.log(serviceAccounts.length)
+
+    for(var index = 0; index < serviceAccounts.length; index ++) {
+        const serviceAccount = serviceAccounts[index]
         // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
         const serviceAccountECDHPublicKeyData = 
             ByteData.fromB64(serviceAccount.getPublicEcdhKey())
@@ -141,10 +145,13 @@ async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], va
         secret.setEncryptedName(newEncryptedName.string)
     
         const serviceAccountSecrets = new ServiceAccountSecrets()
+        serviceAccountSecrets.setServiceAccountId(serviceAccount.getServiceAccountId())
         serviceAccountSecrets.addSecrets(secret)
 
         createSecretsRequest.addAccountSecrets(serviceAccountSecrets)
-    })
+
+        console.log(createSecretsRequest.getAccountSecretsList().length)
+    }
 
     return createSecretsRequest
 }
