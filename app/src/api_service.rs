@@ -111,18 +111,18 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let req = request.into_inner();
 
-        let service_account_id = req.service_account_id;
+        let mut secrets: Vec<models::ServiceAccountSecret> = Default::default();
 
-        let secrets: Vec<models::ServiceAccountSecret> = req
-            .secrets
-            .into_iter()
-            .map(|secret| models::ServiceAccountSecret {
-                id: 0,
-                service_account_id: service_account_id as i32,
-                name: secret.encrypted_name,
-                secret: secret.encrypted_secret_value,
-            })
-            .collect();
+        for account_secret in req.account_secrets {
+            for secret in account_secret.secrets {
+                secrets.push(models::ServiceAccountSecret {
+                    id: 0,
+                    service_account_id: account_secret.service_account_id as i32,
+                    name: secret.encrypted_name,
+                    secret: secret.encrypted_secret_value,
+                })
+            }
+        }
 
         models::ServiceAccountSecret::create(&self.pool, secrets).await?;
 

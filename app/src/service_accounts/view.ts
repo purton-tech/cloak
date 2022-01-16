@@ -1,7 +1,7 @@
 import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
 import * as grpcWeb from 'grpc-web';
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
-import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse } from '../../asset-pipeline/api_pb';
+import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, ServiceAccountSecrets,CreateSecretsResponse } from '../../asset-pipeline/api_pb';
 import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
 
 async function handleConnect(serviceAccountId: number) {
@@ -81,8 +81,10 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
 
     // Send the encrypted payload back to the server
     const request = new CreateSecretsRequest()
-    request.setServiceAccountId(serviceAccountId)
-    request.setSecretsList(secretList)
+    const serviceAccountSecrets = new ServiceAccountSecrets()
+    serviceAccountSecrets.setServiceAccountId(serviceAccountId)
+    serviceAccountSecrets.setSecretsList(secretList)
+    request.addAccountSecrets(serviceAccountSecrets)
 
     const connectForm = document.getElementById('service-account-form-' + serviceAccountId)
     const connectFormVaultId = document.getElementById('service-account-form-vault-id-' + serviceAccountId)

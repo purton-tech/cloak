@@ -15,7 +15,7 @@ service Vault {
 
     // Get a vault and all the secrets inside as well as connected service accounts
     rpc GetVault(GetVaultRequest) returns (GetVaultResponse);
-    // Add secrets to a service account.
+    // Add secrets to multiple service accounts.
     rpc CreateSecrets(CreateSecretsRequest) returns (CreateSecretsResponse);
 }
 
@@ -29,14 +29,19 @@ message ServiceAccount {
     string public_ecdh_key = 2;
 }
 
+message ServiceAccountSecrets {
+    uint32 service_account_id = 1;
+    repeated Secret secrets = 4;
+}
+
 message GetServiceAccountRequest {
     string ecdh_public_key = 1;
 }
 
 message GetServiceAccountResponse {
     uint32 service_account_id = 1;
-    string vault_public_ecdh_key = 3;
-    repeated Secret secrets = 4;
+    string vault_public_ecdh_key = 2;
+    repeated Secret secrets = 3;
 }
 
 message GetVaultRequest {
@@ -53,8 +58,7 @@ message GetVaultResponse {
 }
 
 message CreateSecretsRequest {
-    uint32 service_account_id = 1;
-    repeated Secret secrets = 4;
+    repeated ServiceAccountSecrets account_secrets = 1;
 }
 
 message CreateSecretsResponse {
