@@ -40,7 +40,11 @@ markup::define! {
                     tbody {
                         @for vault in vaults {
                             tr {
-                                td { {vault.name} }
+                                td {
+                                    a[href=crate::secrets::secret_route(vault.id)] {
+                                        {vault.name}
+                                    }
+                                }
                                 td { "Updated" }
                                 td { "Created" }
                                 td { "Items" }
