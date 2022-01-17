@@ -45,4 +45,4 @@ jobs:
       run: cd infra && ./update-config.sh
 
     - name: Semantic Release
-      run: npx semantic-release
+      run: npm install @semantic-release/git -D && npx semantic-release
