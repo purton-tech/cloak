@@ -33,7 +33,6 @@ markup::define! {
                             th { "Name" }
                             th { "Updated" }
                             th { "Created" }
-                            th { "Items" }
                             th { "More" }
                         }
                     }
@@ -45,9 +44,8 @@ markup::define! {
                                         {vault.name}
                                     }
                                 }
-                                td { "Updated" }
-                                td { "Created" }
-                                td { "Items" }
+                                td { {vault.updated_at.to_string()} }
+                                td { {vault.created_at.to_string()} }
                                 td {
                                     a[href=crate::secrets::secret_route(vault.id)] {
                                         img[src=statics::get_more_info_svg(), width="18"] {}

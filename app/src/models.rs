@@ -8,6 +8,8 @@ pub struct ServiceAccount {
     pub name: String,
     pub ecdh_public_key: String,
     pub encrypted_ecdh_private_key: String,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl ServiceAccount {
@@ -16,7 +18,8 @@ impl ServiceAccount {
             ServiceAccount,
             "
                 SELECT 
-                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key,
+                    updated_at, created_at 
                 FROM 
                     service_accounts
                 WHERE user_id = $1
@@ -36,7 +39,8 @@ impl ServiceAccount {
             ServiceAccount,
             "
                 SELECT 
-                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key,
+                    updated_at, created_at  
                 FROM 
                     service_accounts
                 WHERE 
@@ -59,7 +63,8 @@ impl ServiceAccount {
             ServiceAccount,
             "
                 SELECT 
-                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key,
+                    updated_at, created_at  
                 FROM 
                     service_accounts
                 WHERE ecdh_public_key = $1
@@ -76,6 +81,8 @@ pub struct Vault {
     pub name: String,
     pub encrypted_ecdh_private_key: String,
     pub ecdh_public_key: String,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Vault {
@@ -85,7 +92,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -102,7 +109,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -122,7 +129,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -164,6 +171,8 @@ pub struct Secret {
     pub id: i32,
     pub name: String,
     pub secret: String,
+    pub created_at: chrono::NaiveDateTime,
+    pub updated_at: chrono::NaiveDateTime,
 }
 
 impl Secret {
@@ -175,7 +184,9 @@ impl Secret {
         Ok(sqlx::query_as!(
             Secret,
             "
-                SELECT  id, name, secret 
+                SELECT  
+                    id, name, secret ,
+                    updated_at, created_at  
                 FROM secrets WHERE vault_id = $1
             ",
             vault_id as i32

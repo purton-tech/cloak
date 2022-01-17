@@ -51,8 +51,8 @@ markup::define! {
                                         {secret.name}
                                     }
                                 }
-                                td { "Updated" }
-                                td { "Created" }
+                                td { {secret.updated_at.to_string()} }
+                                td { {secret.created_at.to_string()} }
                             }
                         }
                     }
