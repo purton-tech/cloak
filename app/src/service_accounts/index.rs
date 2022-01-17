@@ -45,7 +45,7 @@ markup::define! {
                     }
                     tbody {
                         @for service_account in service_accounts {
-                            tr[id=format!("service-account-row-{}", service_account.id), style="cursor: pointer;"] {
+                            tr.clickable[id=format!("service-account-row-{}", service_account.id)] {
                                 td { {service_account.name} }
                                 td { "Updated" }
                                 td { "Created" }

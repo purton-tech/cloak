@@ -44,7 +44,7 @@ pub async fn new(
 markup::define! {
     NewSecretPage<'a>(user_vault: &'a models::UserVault) {
 
-        form.m_form[id="add-secret-form", style="margin-top: 2em", method = "post",
+        form.m_form[id="add-secret-form", method = "post",
             action=super::new_route(user_vault.vault_id)] {
             sl_drawer[label="Add Secret", class="add-secret"] {
                 p {

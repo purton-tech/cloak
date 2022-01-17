@@ -44,8 +44,7 @@ pub async fn new(
 markup::define! {
     ServiceAccountForm {
 
-        form.m_form[id="add-secret-form", style="margin-top: 2em", method = "post",
-            action=super::NEW] {
+        form.m_form[id="add-secret-form", method = "post", action=super::NEW] {
             sl_drawer[label="Add Service Accounts", class="add-secret"] {
                 p {
                     "To allow applications to access secrets without human intervention,

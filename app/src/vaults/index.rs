@@ -46,7 +46,7 @@ markup::define! {
                                 td { "Items" }
                                 td {
                                     a[href=crate::secrets::secret_route(vault.id)] {
-                                        img[src=statics::get_more_info_svg(), style="width: 18px"] {}
+                                        img[src=statics::get_more_info_svg(), width="18"] {}
                                     }
                                 }
                             }

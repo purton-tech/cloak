@@ -53,7 +53,7 @@ markup::define! {
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
 
                 // Only load resources from our server.
-                // style-src 'unsafe-inline' => We have some inline CSS.
+                // style-src 'unsafe-inline' => Shoelace style insert styling into the dom.
                 // connect-src data: => Allow the inline svg for sl-drawer
                 // connect-src 'self' => So Web gRPC works
                 //
