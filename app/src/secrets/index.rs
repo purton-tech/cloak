@@ -30,33 +30,7 @@ markup::define! {
             div.header {
                 span { "Secrets" }
 
-                form.m_form[id="add-secret-form", style="margin-top: 2em", method = "post",
-                    action=super::new_route(user_vault.vault_id)] {
-                    sl_drawer[label="Add Secret", class="add-secret"] {
-                        p {
-                            "Folders keep related secrets together.
-                            For example you could have a folder called Database with all
-                            the secrets related to database access."
-                        }
-
-                        fieldset {
-                            label[for="name"] { "Name" }
-                            input[id="secret-name", type="text", required="", name="name"] {}
-
-                            label[for="secret"] { "Secret" }
-                            input[id="secret-value", type="text", required="", name="secret"] {}
-
-                        }
-
-                        // Store the encrypted vault key here, then we can use it in the client to
-                        // encrypt the secrets we create.
-                        input[type="hidden",
-                            id="vault-key",
-                            value=user_vault.encrypted_vault_key.clone()] {}
-
-                        button.a_button.auto.success[slot="footer", id="create-secret"] { "Create Secret" }
-                    }
-                }
+                @super::new_secret::NewSecretPage { user_vault }
 
                 button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
             }

@@ -10,7 +10,9 @@ if (newAccountButton) {
         if (element instanceof SlDrawer) {
             element.show()
 
-            const keyPairDH = await Vault.generateWrappedECDHKeyPair();
+            // We create a key pair wrapped with the users key.
+            // Only the user that creates a service account can view the keypair
+            const keyPairDH = await Vault.generateUserWrappedECDHKeyPair();
             const publicKeyField = document.getElementById('public-key')
             const privateKeyField = document.getElementById('private-key')
 

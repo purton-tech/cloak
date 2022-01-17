@@ -42,6 +42,15 @@ export class Vault {
 
     }
 
+    public static async unwrapECDHKeyPair(cipher: Cipher, key: CryptoKey): Promise<CryptoKey> {
+
+        const byteData = await this.aesDecrypt(cipher, key)
+
+        return await self.crypto.subtle.importKey(
+            'pkcs8', byteData.arr.buffer, ECDH_OPTIONS, false, ['deriveKey', 'deriveBits']);
+
+    }
+
     public static async deriveSecretKey(privateKey: CryptoKey, publicKey: CryptoKey): Promise<CryptoKey> {
         return window.crypto.subtle.deriveKey(
             {
@@ -60,13 +69,22 @@ export class Vault {
             ECDH_OPTIONS, false, [])
     }
 
-    public static async generateWrappedECDHKeyPair() {
+    public static async generateUserWrappedECDHKeyPair() {
+
+        const db = await this.openIndexedDB()
+        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        db.close()
+
+        return await this.generateWrappedECDHKeyPair(key)
+    }
+
+    public static async generateWrappedECDHKeyPair(key: CryptoKey) {
 
         try {
             const keyPair = await self.crypto.subtle.generateKey(ECDH_OPTIONS, true, ['deriveKey', 'deriveBits']);
             const publicKey = new ByteData(await self.crypto.subtle.exportKey('spki', keyPair.publicKey));
             const privateKey = new ByteData(await self.crypto.subtle.exportKey('pkcs8', keyPair.privateKey));
-            const protectedPrivateKey = await this.encrypt(privateKey.arr);
+            const protectedPrivateKey = await this.aesEncrypt(privateKey.arr, key);
             return {
                 publicKey: publicKey,
                 privateKey: protectedPrivateKey

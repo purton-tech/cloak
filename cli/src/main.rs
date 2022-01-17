@@ -10,7 +10,6 @@ use p256::{
     PublicKey, SecretKey,
 };
 use std::collections::HashMap;
-use std::env;
 use std::ffi::OsString;
 use std::process::{Command, Stdio};
 
@@ -82,19 +81,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
 
-            let filtered_env: HashMap<String, String> = env::vars()
-                .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
-                .collect();
+            //let filtered_env: HashMap<String, String> = env::vars()
+            //    .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
+            //    .collect();
 
-            let filtered_env: HashMap<String, String> =
-                filtered_env.into_iter().chain(env_vars_to_inject).collect();
+            //let filtered_env: HashMap<String, String> =
+            //    filtered_env.into_iter().chain(env_vars_to_inject).collect();
 
             Command::new(&args[0])
                 .args(&args[1..])
                 .stdin(Stdio::null())
                 .stdout(Stdio::inherit())
                 .env_clear()
-                .envs(&filtered_env)
+                .envs(&env_vars_to_inject)
                 .spawn()
                 .expect("Failed to run command");
         }

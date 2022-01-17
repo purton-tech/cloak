@@ -9,9 +9,11 @@ if(newVaultButton) {
         if (element instanceof SlDrawer) {
             element.show()
     
-            document.getElementById('new-vault-key').innerText = (await Vault.newWrappedKey()).string
+            let wrappedKey = await Vault.newWrappedKey()
+            document.getElementById('new-vault-key').innerText = wrappedKey.string
 
-            const keyPairDH = await Vault.generateWrappedECDHKeyPair();
+            let vaultKey = await Vault.unwrapKey(wrappedKey)
+            const keyPairDH = await Vault.generateWrappedECDHKeyPair(vaultKey);
             const publicKeyField = document.getElementById('public-key')
             const privateKeyField = document.getElementById('private-key')
 

@@ -66,6 +66,12 @@ impl app::vault::vault_server::Vault for VaultService {
             models::Vault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
         let user_vault =
             models::UserVault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
+        let service_accounts = models::ServiceAccount::get_by_vault(
+            &self.pool,
+            req.vault_id,
+            authenticated_user.user_id,
+        )
+        .await?;
 
         let secrets = secrets
             .into_iter()
@@ -75,11 +81,21 @@ impl app::vault::vault_server::Vault for VaultService {
             })
             .collect();
 
+        let service_accounts = service_accounts
+            .into_iter()
+            .map(|s| ServiceAccount {
+                service_account_id: s.id as u32,
+                public_ecdh_key: s.ecdh_public_key,
+            })
+            .collect();
+
         let response = GetVaultResponse {
             name: vault.name,
             encrypted_vault_key: user_vault.encrypted_vault_key,
             vault_public_ecdh_key: vault.ecdh_public_key,
+            encrypted_vault_private_ecdh_key: vault.encrypted_ecdh_private_key,
             secrets,
+            service_accounts,
         };
 
         Ok(Response::new(response))
@@ -95,18 +111,18 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let req = request.into_inner();
 
-        let service_account_id = req.service_account_id;
+        let mut secrets: Vec<models::ServiceAccountSecret> = Default::default();
 
-        let secrets: Vec<models::ServiceAccountSecret> = req
-            .secrets
-            .into_iter()
-            .map(|secret| models::ServiceAccountSecret {
-                id: 0,
-                service_account_id: service_account_id as i32,
-                name: secret.encrypted_name,
-                secret: secret.encrypted_secret_value,
-            })
-            .collect();
+        for account_secret in req.account_secrets {
+            for secret in account_secret.secrets {
+                secrets.push(models::ServiceAccountSecret {
+                    id: 0,
+                    service_account_id: account_secret.service_account_id as i32,
+                    name: secret.encrypted_name,
+                    secret: secret.encrypted_secret_value,
+                })
+            }
+        }
 
         models::ServiceAccountSecret::create(&self.pool, secrets).await?;
 
