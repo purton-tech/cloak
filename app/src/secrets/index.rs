@@ -26,7 +26,7 @@ pub async fn index(
 
 markup::define! {
     SecretsPage<'a>(user_vault: &'a models::UserVault, secrets: Vec<models::Secret>) {
-        div.m_card {
+        div.m_card[id="secrets-table-controller"] {
             div.header {
                 span { "Secrets" }
 
@@ -35,7 +35,7 @@ markup::define! {
                 button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
             }
             div.body {
-                table.m_table {
+                table.m_table.secrets_table {
                     thead {
                         tr {
                             th { "Name" }
@@ -46,7 +46,11 @@ markup::define! {
                     tbody {
                         @for secret in secrets {
                             tr {
-                                td { {secret.name} }
+                                td {
+                                    span[class="cipher"] {
+                                        {secret.name}
+                                    }
+                                }
                                 td { "Updated" }
                                 td { "Created" }
                             }
@@ -54,6 +58,7 @@ markup::define! {
                     }
                 }
             }
+            input[type="hidden", id="wrapped-vault-key", value={user_vault.encrypted_vault_key.clone()}] {}
         }
     }
 }
