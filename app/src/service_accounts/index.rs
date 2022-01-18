@@ -37,23 +37,35 @@ markup::define! {
                 table.m_table {
                     thead {
                         tr {
-                            th { "Name" }
+                            th { "Service Account Name" }
+                            th { "Vault" }
                             th { "Updated" }
                             th { "Created" }
-                            th { "Action" }
                         }
                     }
                     tbody {
                         @for service_account in service_accounts {
-                            tr.clickable[id=format!("service-account-row-{}", service_account.id)] {
-                                td { {service_account.name} }
+                            tr {
+                                td[id=format!("service-account-row-{}", service_account.id)] {
+                                    a[href="#"]
+                                    { {service_account.name} }
+                                }
+                                @if let Some(vault_name) = service_account.vault_name.clone() {
+                                    td {
+                                        {vault_name}
+                                    }
+                                } else {
+                                    td[id=format!("service-account-row-{}", service_account.id)] {
+                                        a[href="#"]
+                                        { "Attach to Vault" }
+                                    }
+                                }
                                 td {
                                     relative_time[datetime=service_account.updated_at.to_rfc3339()] {}
                                 }
                                 td {
                                     relative_time[datetime=service_account.created_at.to_rfc3339()] {}
                                 }
-                                td { a[href="#"] { "Attach to Vault" } }
                             }
                         }
                     }
