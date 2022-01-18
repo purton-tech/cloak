@@ -112,6 +112,18 @@ impl ServiceAccount {
         .execute(pool)
         .await?;
 
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    service_account_secrets
+                WHERE
+                    service_account_id = $1
+            "#,
+            service_account_id as i32
+        )
+        .execute(pool)
+        .await?;
+
         Ok(())
     }
 }
