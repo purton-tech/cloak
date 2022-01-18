@@ -9,7 +9,7 @@
 | `/protos` | Protobuf definitions for the API.|
 | `/migrations` | Database migrations for building the Postgres Database.|
 | `/www` | The website. Built with [Zola](https://www.getzola.org) static site generator.|
-| `Earthfile` -|[Earthly](https://earthly.dev) Make file for CICD|
+| `Earthfile` |[Earthly](https://earthly.dev) Make file for CICD|
 | `.releaserc.json` -|[Semantic Releases](https://github.com/semantic-release/semantic-release)|
 
 ## Alternatives
