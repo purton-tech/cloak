@@ -91,6 +91,29 @@ impl ServiceAccount {
         .fetch_one(pool)
         .await?)
     }
+
+    pub async fn delete(
+        pool: &PgPool,
+        service_account_id: u32,
+        user_id: u32,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    service_accounts
+                WHERE
+                    id = $1
+                AND
+                    user_id = $2
+            "#,
+            service_account_id as i32,
+            user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
 }
 
 pub struct Vault {

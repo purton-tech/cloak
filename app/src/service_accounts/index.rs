@@ -82,12 +82,9 @@ markup::define! {
         // Generate all the details flyouts
         @for service_account in service_accounts {
             @super::view::ViewServiceAccount{ service_account, vaults }
-
-            form.m_form {
-                sl_drawer[label=format!("Delete {}?", service_account.name),
-                    id=format!("delete-account-drawer-{}", service_account.id)] {
-
-                }
+            @super::delete::DeleteServiceAccountForm {
+                service_account_id: service_account.id as u32,
+                service_account_name: service_account.name.clone()
             }
         }
     }
