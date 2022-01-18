@@ -1,6 +1,7 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use crate::models;
+use crate::statics;
 use axum::{extract::Extension, response::Html};
 use sqlx::PgPool;
 
@@ -41,6 +42,7 @@ markup::define! {
                             th { "Vault" }
                             th { "Updated" }
                             th { "Created" }
+                            th { "Action" }
                         }
                     }
                     tbody {
@@ -66,6 +68,11 @@ markup::define! {
                                 td {
                                     relative_time[datetime=service_account.created_at.to_rfc3339()] {}
                                 }
+                                td {
+                                    a[id=format!("delete-account-controller-{}", service_account.id), href="#"] {
+                                        img[src=statics::get_delete_svg(), width="18"] {}
+                                    }
+                                }
                             }
                         }
                     }
@@ -75,7 +82,13 @@ markup::define! {
         // Generate all the details flyouts
         @for service_account in service_accounts {
             @super::view::ViewServiceAccount{ service_account, vaults }
-        }
 
+            form.m_form {
+                sl_drawer[label=format!("Delete {}?", service_account.name),
+                    id=format!("delete-account-drawer-{}", service_account.id)] {
+
+                }
+            }
+        }
     }
 }
