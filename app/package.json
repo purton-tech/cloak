@@ -3,8 +3,9 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "start": "npm run protoc && parcel watch asset-pipeline/index.ts --no-hmr --public-url /auth/static",
-        "release": "npm run protoc && parcel build asset-pipeline/index.ts --public-url /auth/static",
+        "fix-protobuf": "sed -i 's#var global = Function('\\''return this'\\'')();#var global = (function() { return this || window || global || self; }).call(null);#g' asset-pipeline/api_pb.js",
+        "start": "npm run protoc && npm run fix-protobuf && parcel watch asset-pipeline/index.ts --no-hmr --public-url /auth/static",
+        "release": "npm run protoc && npm run fix-protobuf parcel build asset-pipeline/index.ts --public-url /auth/static",
         "protoc": "protoc -I=../protos api.proto --js_out=import_style=commonjs,binary:asset-pipeline --grpc-web_out=import_style=typescript,mode=grpcweb:asset-pipeline"
     },
     "devDependencies": {
