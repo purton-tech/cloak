@@ -51,8 +51,12 @@ markup::define! {
                                         {secret.name}
                                     }
                                 }
-                                td { {secret.updated_at.to_string()} }
-                                td { {secret.created_at.to_string()} }
+                                td {
+                                    relative_time[datetime=secret.updated_at.to_rfc3339()] {}
+                                }
+                                td {
+                                    relative_time[datetime=secret.created_at.to_rfc3339()] {}
+                                }
                             }
                         }
                     }

@@ -16,7 +16,11 @@ pub fn layout(title: &str, content: &str, side_bar: &SideBar) -> Result<Html<Str
         side_bar,
     };
 
-    Ok(Html(html.to_string().replace("sl_drawer", "sl-drawer")))
+    Ok(Html(
+        html.to_string()
+            .replace("sl_drawer", "sl-drawer")
+            .replace("relative_time", "relative-time"),
+    ))
 }
 
 markup::define! {

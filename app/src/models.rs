@@ -8,8 +8,8 @@ pub struct ServiceAccount {
     pub name: String,
     pub ecdh_public_key: String,
     pub encrypted_ecdh_private_key: String,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl ServiceAccount {
@@ -81,8 +81,8 @@ pub struct Vault {
     pub name: String,
     pub encrypted_ecdh_private_key: String,
     pub ecdh_public_key: String,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl Vault {
@@ -171,8 +171,8 @@ pub struct Secret {
     pub id: i32,
     pub name: String,
     pub secret: String,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl Secret {

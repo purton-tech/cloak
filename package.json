@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@github/time-elements": "^3.1.2"
+  }
+}

@@ -47,8 +47,12 @@ markup::define! {
                         @for service_account in service_accounts {
                             tr.clickable[id=format!("service-account-row-{}", service_account.id)] {
                                 td { {service_account.name} }
-                                td { {service_account.updated_at.to_string()} }
-                                td { {service_account.created_at.to_string()} }
+                                td {
+                                    relative_time[datetime=service_account.updated_at.to_rfc3339()] {}
+                                }
+                                td {
+                                    relative_time[datetime=service_account.created_at.to_rfc3339()] {}
+                                }
                                 td { a[href="#"] { "Attach to Vault" } }
                             }
                         }
