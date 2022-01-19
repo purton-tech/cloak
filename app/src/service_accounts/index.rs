@@ -48,15 +48,18 @@ markup::define! {
                     tbody {
                         @for service_account in service_accounts {
                             tr {
-                                td[id=format!("service-account-row-{}", service_account.id)] {
-                                    a[href="#"]
-                                    { {service_account.name} }
-                                }
                                 @if let Some(vault_name) = service_account.vault_name.clone() {
+                                    td[id=format!("service-account-row-{}", service_account.id)] {
+                                        a[href="#"]
+                                        { {service_account.name} }
+                                    }
                                     td {
                                         {vault_name}
                                     }
                                 } else {
+                                    td {
+                                        {service_account.name}
+                                    }
                                     td[id=format!("service-account-row-{}", service_account.id)] {
                                         a[href="#"]
                                         { "Attach to Vault" }

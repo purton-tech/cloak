@@ -221,6 +221,7 @@ impl UserVault {
 
 pub struct Secret {
     pub id: i32,
+    pub vault_id: i32,
     pub name: String,
     pub name_blind_index: String,
     pub secret: String,
@@ -231,24 +232,59 @@ pub struct Secret {
 impl Secret {
     pub async fn get_all(
         pool: &PgPool,
-        _user_id: u32,
+        user_id: u32,
         vault_id: u32,
     ) -> Result<Vec<Secret>, CustomError> {
         Ok(sqlx::query_as!(
             Secret,
             "
                 SELECT  
-                    id, name, name_blind_index, secret,
+                    id, vault_id, name, name_blind_index, secret,
                     updated_at, created_at  
                 FROM secrets WHERE vault_id = $1
+                AND
+                    vault_id 
+                IN
+                    (SELECT vault_id 
+                    FROM
+                        users_vaults
+                    WHERE
+                        user_id = $2)
             ",
-            vault_id as i32
+            vault_id as i32,
+            user_id as i32
         )
         .fetch_all(pool)
         .await?)
     }
 
+    pub async fn get(pool: &PgPool, user_id: u32, secret_id: u32) -> Result<Secret, CustomError> {
+        Ok(sqlx::query_as!(
+            Secret,
+            "
+                SELECT  
+                    id, vault_id, name, name_blind_index, secret,
+                    updated_at, created_at  
+                FROM secrets WHERE id = $1
+                AND
+                    vault_id 
+                IN
+                    (SELECT vault_id 
+                    FROM
+                        users_vaults
+                    WHERE
+                        user_id = $2)
+            ",
+            secret_id as i32,
+            user_id as i32
+        )
+        .fetch_one(pool)
+        .await?)
+    }
+
     pub async fn delete(pool: &PgPool, secret_id: u32, user_id: u32) -> Result<(), CustomError> {
+        let secret = Secret::get(pool, user_id, secret_id).await?;
+
         sqlx::query!(
             r#"
                 DELETE FROM
@@ -266,6 +302,23 @@ impl Secret {
             "#,
             secret_id as i32,
             user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    service_account_secrets
+                WHERE
+                    name_blind_index = $1
+                AND
+                    service_account_id
+                IN
+                    (SELECT id FROM service_accounts WHERE vault_id = $2)
+            "#,
+            secret.name_blind_index,
+            secret.vault_id as i32
         )
         .execute(pool)
         .await?;
