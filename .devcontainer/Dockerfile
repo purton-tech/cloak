@@ -39,6 +39,12 @@ RUN sudo apt update \
 # Install secrets management
 RUN sudo /bin/sh -c 'wget https://github.com/ianpurton/keyvault/releases/latest/download/cli -O /usr/local/bin/keyvault && chmod +x /usr/local/bin/keyvault'
 
+# Install Doppler
+RUN sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gnupg \
+    && curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | sudo apt-key add - \
+    && echo "deb https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list \
+    && sudo apt-get update && sudo apt-get install doppler
+    
 # all the volumes configured in the docker-compose.yml
 RUN sudo mkdir -p /vscode/target && sudo chown $USERNAME:$USERNAME /vscode/target
 RUN sudo mkdir -p /vscode/app/node_modules && sudo chown $USERNAME:$USERNAME /vscode/app/node_modules
