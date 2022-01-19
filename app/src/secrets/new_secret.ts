@@ -24,12 +24,14 @@ if (createSecretButton) {
 
         const secretNameInput = document.getElementById('secret-name')
         const secretValueInput = document.getElementById('secret-value')
+        const blindIndexInput = document.getElementById('name-blind-index')
         const secretForm = document.getElementById('add-secret-form')
         const vaultKeyInput = document.getElementById('vault-key')
         const vaultIdInput = document.getElementById('vault-id')
 
         if (secretNameInput instanceof HTMLInputElement &&
             secretValueInput instanceof HTMLInputElement &&
+            blindIndexInput instanceof HTMLInputElement &&
             vaultKeyInput instanceof HTMLInputElement &&
             vaultIdInput instanceof HTMLInputElement &&
             secretForm instanceof HTMLFormElement) {
@@ -54,6 +56,7 @@ if (createSecretButton) {
                     await encryptSecretToConnectedServiceAccounts(
                         vaultKey, vaultId,
                         plaintextName, plaintextValue, secretForm, secretNameInput, secretValueInput,
+                        blindIndexInput,
                         nameCipher, valueCipher)
                 } catch (err) {
                     if (err instanceof Error) {
@@ -68,6 +71,7 @@ if (createSecretButton) {
 async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaultId: number,
     secretName: string, secretValue: string, secretForm : HTMLFormElement,
     secretNameInput : HTMLInputElement, secretValueInput : HTMLInputElement,
+    blindIndexInput : HTMLInputElement,
     nameCipher: Cipher, valueCipher: Cipher) {
 
     const vaultClient = new VaultClient(window.location.protocol
@@ -89,9 +93,11 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
             } else {
                 const cipher = Cipher.fromString(vault.getEncryptedVaultPrivateEcdhKey())
                 const vaultECDHPrivateKey = await Vault.unwrapECDHKeyPair(cipher, vaultKey)
+                const nameBlindIndex = await Vault.blindIndex(secretName, vaultId)
+
                 const createServiceRequest = await deriveServiceAccountSecrets(
                     vault.getServiceAccountsList(), vaultECDHPrivateKey, 
-                    secretName, secretValue)
+                    secretName, secretValue, nameBlindIndex.b64)
 
                 vaultClient.createSecrets(createServiceRequest,
 
@@ -105,6 +111,7 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
 
                             secretNameInput.value = nameCipher.string
                             secretValueInput.value = valueCipher.string
+                            blindIndexInput.value = nameBlindIndex.b64
                             secretForm.submit()
                         }
                     }
@@ -115,7 +122,7 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
 }
 
 async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], vaultECDHPrivateKey: CryptoKey,
-    plaintextName: string, plaintextValue: string)  : Promise<CreateSecretsRequest> {
+    plaintextName: string, plaintextValue: string, blindIndex: string)  : Promise<CreateSecretsRequest> {
 
     const createSecretsRequest = new CreateSecretsRequest()
 
@@ -144,6 +151,7 @@ async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], va
     
         const secret = new Secret()
         secret.setEncryptedSecretValue(newEncryptedValue.string)
+        secret.setNameBlindIndex(blindIndex)
         secret.setEncryptedName(newEncryptedName.string)
     
         const serviceAccountSecrets = new ServiceAccountSecrets()

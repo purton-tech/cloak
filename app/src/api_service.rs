@@ -32,6 +32,7 @@ impl app::vault::vault_server::Vault for VaultService {
                 .into_iter()
                 .map(|secret| Secret {
                     encrypted_name: secret.name,
+                    name_blind_index: secret.name_blind_index,
                     encrypted_secret_value: secret.secret,
                 })
                 .collect();
@@ -77,6 +78,7 @@ impl app::vault::vault_server::Vault for VaultService {
             .into_iter()
             .map(|s| Secret {
                 encrypted_name: s.name,
+                name_blind_index: s.name_blind_index,
                 encrypted_secret_value: s.secret,
             })
             .collect();
@@ -119,6 +121,7 @@ impl app::vault::vault_server::Vault for VaultService {
                     id: 0,
                     service_account_id: account_secret.service_account_id as i32,
                     name: secret.encrypted_name,
+                    name_blind_index: secret.name_blind_index,
                     secret: secret.encrypted_secret_value,
                 })
             }

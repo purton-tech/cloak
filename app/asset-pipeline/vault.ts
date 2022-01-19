@@ -12,6 +12,13 @@ const ECDH_OPTIONS = {
 
 export class Vault {
 
+    public static async blindIndex(text: string, id: number) : Promise<ByteData> {
+        let enc = new TextEncoder();
+        const data = enc.encode(text + ':' + id)
+        const hash: ArrayBuffer = await crypto.subtle.digest('SHA-256', data)
+        return new ByteData(hash.slice(0, 8))
+    }
+
     public static async newWrappedKey(): Promise<Cipher> {
 
         const newAesKey = await self.crypto.subtle.generateKey(

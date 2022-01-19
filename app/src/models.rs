@@ -222,6 +222,7 @@ impl UserVault {
 pub struct Secret {
     pub id: i32,
     pub name: String,
+    pub name_blind_index: String,
     pub secret: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
@@ -237,7 +238,7 @@ impl Secret {
             Secret,
             "
                 SELECT  
-                    id, name, secret ,
+                    id, name, name_blind_index, secret,
                     updated_at, created_at  
                 FROM secrets WHERE vault_id = $1
             ",
@@ -277,6 +278,7 @@ pub struct ServiceAccountSecret {
     pub id: i32,
     pub service_account_id: i32,
     pub name: String,
+    pub name_blind_index: String,
     pub secret: String,
 }
 
@@ -289,7 +291,7 @@ impl ServiceAccountSecret {
             ServiceAccountSecret,
             "
                 SELECT  
-                    id, service_account_id, name, secret 
+                    id, service_account_id, name, name_blind_index, secret 
                 FROM 
                     service_account_secrets 
                 WHERE 
@@ -309,12 +311,13 @@ impl ServiceAccountSecret {
             sqlx::query!(
                 "
                     INSERT INTO service_account_secrets
-                        (service_account_id, name, secret)
+                        (service_account_id, name, name_blind_index, secret)
                     VALUES
-                        ($1, $2, $3)
+                        ($1, $2, $3, $4)
                 ",
                 secret.service_account_id as i32,
                 secret.name,
+                secret.name_blind_index,
                 secret.secret
             )
             .execute(pool)

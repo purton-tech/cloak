@@ -21,7 +21,8 @@ service Vault {
 
 message Secret {
     string encrypted_name = 1;
-    string encrypted_secret_value = 2;
+    string name_blind_index = 2;
+    string encrypted_secret_value = 3;
 }
 
 message ServiceAccount {
