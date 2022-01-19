@@ -1,6 +1,7 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use crate::models;
+use crate::statics;
 use axum::{
     extract::{Extension, Path},
     response::Html,
@@ -26,7 +27,7 @@ pub async fn index(
 
 markup::define! {
     SecretsPage<'a>(user_vault: &'a models::UserVault, secrets: Vec<models::Secret>) {
-        div.m_card {
+        div.m_card[id="secrets-table-controller"] {
             div.header {
                 span { "Secrets" }
 
@@ -35,24 +36,48 @@ markup::define! {
                 button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
             }
             div.body {
-                table.m_table {
+                table.m_table.secrets_table {
                     thead {
                         tr {
                             th { "Name" }
                             th { "Updated" }
                             th { "Created" }
+                            th { "Action" }
                         }
                     }
                     tbody {
                         @for secret in secrets {
                             tr {
-                                td { {secret.name} }
-                                td { "Updated" }
-                                td { "Created" }
+                                td {
+                                    span[class="cipher"] {
+                                        {secret.name}
+                                    }
+                                }
+                                td {
+                                    relative_time[datetime=secret.updated_at.to_rfc3339()] {}
+                                }
+                                td {
+                                    relative_time[datetime=secret.created_at.to_rfc3339()] {}
+                                }
+                                td {
+                                    a[id=format!("delete-secret-controller-{}", secret.id), href="#"] {
+                                        img[src=statics::get_delete_svg(), width="18"] {}
+                                    }
+                                }
                             }
                         }
                     }
                 }
+            }
+            input[type="hidden", id="wrapped-vault-key", value={user_vault.encrypted_vault_key.clone()}] {}
+        }
+
+        // Generate all the details flyouts
+        @for secret in secrets {
+            @super::delete::DeleteSecretForm {
+                secret_id: secret.id as u32,
+                vault_id: user_vault.vault_id as u32,
+                secret_name: secret.name.clone()
             }
         }
     }

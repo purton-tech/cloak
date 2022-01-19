@@ -6,21 +6,31 @@ pub struct ServiceAccount {
     pub id: i32,
     pub vault_id: Option<i32>,
     pub name: String,
+    pub vault_name: Option<String>,
     pub ecdh_public_key: String,
     pub encrypted_ecdh_private_key: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl ServiceAccount {
     pub async fn get_all(pool: &PgPool, user_id: u32) -> Result<Vec<ServiceAccount>, CustomError> {
         Ok(sqlx::query_as!(
             ServiceAccount,
-            "
+            r#"
                 SELECT 
-                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                    sa.id, sa.vault_id, sa.name, v.name as "vault_name?", 
+                    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
+                    sa.updated_at, sa.created_at 
                 FROM 
-                    service_accounts
-                WHERE user_id = $1
-            ",
+                    service_accounts sa
+                LEFT JOIN
+                    vaults v
+                ON 
+                    v.id = sa.vault_id
+                WHERE 
+                    sa.user_id = $1
+            "#,
             user_id as i32
         )
         .fetch_all(pool)
@@ -34,16 +44,22 @@ impl ServiceAccount {
     ) -> Result<Vec<ServiceAccount>, CustomError> {
         Ok(sqlx::query_as!(
             ServiceAccount,
-            "
+            r#"
                 SELECT 
-                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                    sa.id, sa.vault_id, sa.name, v.name as "vault_name?", 
+                    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
+                    sa.updated_at, sa.created_at 
                 FROM 
-                    service_accounts
+                    service_accounts sa
+                LEFT OUTER JOIN
+                    vaults v
+                ON 
+                    v.id = sa.vault_id
                 WHERE 
-                    vault_id = $1
+                    sa.vault_id = $1
                 AND
-                    user_id = $2
-            ",
+                    sa.user_id = $2
+            "#,
             vault_id as i32,
             user_id as i32
         )
@@ -57,17 +73,58 @@ impl ServiceAccount {
     ) -> Result<ServiceAccount, CustomError> {
         Ok(sqlx::query_as!(
             ServiceAccount,
-            "
+            r#"
                 SELECT 
-                    id, vault_id, name, ecdh_public_key, encrypted_ecdh_private_key 
+                    sa.id, sa.vault_id, sa.name, v.name as "vault_name?", 
+                    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
+                    sa.updated_at, sa.created_at 
                 FROM 
-                    service_accounts
-                WHERE ecdh_public_key = $1
-            ",
+                    service_accounts sa
+                LEFT OUTER JOIN
+                    vaults v
+                ON 
+                    v.id = sa.vault_id
+                WHERE sa.ecdh_public_key = $1
+            "#,
             ecdh_public_key
         )
         .fetch_one(pool)
         .await?)
+    }
+
+    pub async fn delete(
+        pool: &PgPool,
+        service_account_id: u32,
+        user_id: u32,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    service_accounts
+                WHERE
+                    id = $1
+                AND
+                    user_id = $2
+            "#,
+            service_account_id as i32,
+            user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    service_account_secrets
+                WHERE
+                    service_account_id = $1
+            "#,
+            service_account_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }
 
@@ -76,6 +133,8 @@ pub struct Vault {
     pub name: String,
     pub encrypted_ecdh_private_key: String,
     pub ecdh_public_key: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl Vault {
@@ -85,7 +144,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -102,7 +161,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -122,7 +181,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key
+                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -162,26 +221,109 @@ impl UserVault {
 
 pub struct Secret {
     pub id: i32,
+    pub vault_id: i32,
     pub name: String,
+    pub name_blind_index: String,
     pub secret: String,
+    pub created_at: chrono::DateTime<chrono::Utc>,
+    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl Secret {
     pub async fn get_all(
         pool: &PgPool,
-        _user_id: u32,
+        user_id: u32,
         vault_id: u32,
     ) -> Result<Vec<Secret>, CustomError> {
         Ok(sqlx::query_as!(
             Secret,
             "
-                SELECT  id, name, secret 
+                SELECT  
+                    id, vault_id, name, name_blind_index, secret,
+                    updated_at, created_at  
                 FROM secrets WHERE vault_id = $1
+                AND
+                    vault_id 
+                IN
+                    (SELECT vault_id 
+                    FROM
+                        users_vaults
+                    WHERE
+                        user_id = $2)
             ",
-            vault_id as i32
+            vault_id as i32,
+            user_id as i32
         )
         .fetch_all(pool)
         .await?)
+    }
+
+    pub async fn get(pool: &PgPool, user_id: u32, secret_id: u32) -> Result<Secret, CustomError> {
+        Ok(sqlx::query_as!(
+            Secret,
+            "
+                SELECT  
+                    id, vault_id, name, name_blind_index, secret,
+                    updated_at, created_at  
+                FROM secrets WHERE id = $1
+                AND
+                    vault_id 
+                IN
+                    (SELECT vault_id 
+                    FROM
+                        users_vaults
+                    WHERE
+                        user_id = $2)
+            ",
+            secret_id as i32,
+            user_id as i32
+        )
+        .fetch_one(pool)
+        .await?)
+    }
+
+    pub async fn delete(pool: &PgPool, secret_id: u32, user_id: u32) -> Result<(), CustomError> {
+        let secret = Secret::get(pool, user_id, secret_id).await?;
+
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    secrets
+                WHERE
+                    id = $1
+                AND
+                    vault_id 
+                IN
+                    (SELECT vault_id 
+                    FROM
+                        users_vaults
+                    WHERE
+                        user_id = $2)
+            "#,
+            secret_id as i32,
+            user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    service_account_secrets
+                WHERE
+                    name_blind_index = $1
+                AND
+                    service_account_id
+                IN
+                    (SELECT id FROM service_accounts WHERE vault_id = $2)
+            "#,
+            secret.name_blind_index,
+            secret.vault_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }
 
@@ -189,6 +331,7 @@ pub struct ServiceAccountSecret {
     pub id: i32,
     pub service_account_id: i32,
     pub name: String,
+    pub name_blind_index: String,
     pub secret: String,
 }
 
@@ -201,7 +344,7 @@ impl ServiceAccountSecret {
             ServiceAccountSecret,
             "
                 SELECT  
-                    id, service_account_id, name, secret 
+                    id, service_account_id, name, name_blind_index, secret 
                 FROM 
                     service_account_secrets 
                 WHERE 
@@ -221,12 +364,13 @@ impl ServiceAccountSecret {
             sqlx::query!(
                 "
                     INSERT INTO service_account_secrets
-                        (service_account_id, name, secret)
+                        (service_account_id, name, name_blind_index, secret)
                     VALUES
-                        ($1, $2, $3)
+                        ($1, $2, $3, $4)
                 ",
                 secret.service_account_id as i32,
                 secret.name,
+                secret.name_blind_index,
                 secret.secret
             )
             .execute(pool)

@@ -66,7 +66,6 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
     for await (var secret of secretList) {
         const cipherName = Cipher.fromString(secret.getEncryptedName())
         const plaintextName: ByteData = await Vault.aesDecrypt(cipherName, vaultKey)
-        console.log(dec.decode(plaintextName.arr))
         const newEncryptedName = await Vault.aeadEncrypt(plaintextName.arr, 
             associatedData, aesKeyAgreement)
 
@@ -109,10 +108,14 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
     }
 }
 
+console.log(document.querySelectorAll('[id^="service-account-row-"]').length)
+
 // Configure all the drawers for each service account.
 document.querySelectorAll('[id^="service-account-row-"]').forEach(async (row) => {
 
     const serviceAccountId = parseInt(row.id.split('-')[3])
+
+    console.log('processing row' + serviceAccountId)
 
     // Detect when a user clicks a row
     row.addEventListener('click', () => {
@@ -127,7 +130,7 @@ document.querySelectorAll('[id^="service-account-row-"]').forEach(async (row) =>
     if (connectButton instanceof HTMLButtonElement) {
         connectButton.addEventListener('click', async event => {
             event.preventDefault()
-
+            connectButton.setAttribute('disabled', 'disabled')
             await handleConnect(serviceAccountId)
         })
     }
