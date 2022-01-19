@@ -246,6 +246,31 @@ impl Secret {
         .fetch_all(pool)
         .await?)
     }
+
+    pub async fn delete(pool: &PgPool, secret_id: u32, user_id: u32) -> Result<(), CustomError> {
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    secrets
+                WHERE
+                    id = $1
+                AND
+                    vault_id 
+                IN
+                    (SELECT vault_id 
+                    FROM
+                        users_vaults
+                    WHERE
+                        user_id = $2)
+            "#,
+            secret_id as i32,
+            user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
 }
 
 pub struct ServiceAccountSecret {

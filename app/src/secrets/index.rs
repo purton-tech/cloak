@@ -1,6 +1,7 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use crate::models;
+use crate::statics;
 use axum::{
     extract::{Extension, Path},
     response::Html,
@@ -41,6 +42,7 @@ markup::define! {
                             th { "Name" }
                             th { "Updated" }
                             th { "Created" }
+                            th { "Action" }
                         }
                     }
                     tbody {
@@ -57,12 +59,26 @@ markup::define! {
                                 td {
                                     relative_time[datetime=secret.created_at.to_rfc3339()] {}
                                 }
+                                td {
+                                    a[id=format!("delete-secret-controller-{}", secret.id), href="#"] {
+                                        img[src=statics::get_delete_svg(), width="18"] {}
+                                    }
+                                }
                             }
                         }
                     }
                 }
             }
             input[type="hidden", id="wrapped-vault-key", value={user_vault.encrypted_vault_key.clone()}] {}
+        }
+
+        // Generate all the details flyouts
+        @for secret in secrets {
+            @super::delete::DeleteSecretForm {
+                secret_id: secret.id as u32,
+                vault_id: user_vault.vault_id as u32,
+                secret_name: secret.name.clone()
+            }
         }
     }
 }
