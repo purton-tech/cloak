@@ -66,7 +66,6 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
     for await (var secret of secretList) {
         const cipherName = Cipher.fromString(secret.getEncryptedName())
         const plaintextName: ByteData = await Vault.aesDecrypt(cipherName, vaultKey)
-        console.log(dec.decode(plaintextName.arr))
         const newEncryptedName = await Vault.aeadEncrypt(plaintextName.arr, 
             associatedData, aesKeyAgreement)
 
