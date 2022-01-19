@@ -16,7 +16,11 @@ pub fn layout(title: &str, content: &str, side_bar: &SideBar) -> Result<Html<Str
         side_bar,
     };
 
-    Ok(Html(html.to_string().replace("sl_drawer", "sl-drawer")))
+    Ok(Html(
+        html.to_string()
+            .replace("sl_drawer", "sl-drawer")
+            .replace("relative_time", "relative-time"),
+    ))
 }
 
 markup::define! {
@@ -52,16 +56,12 @@ markup::define! {
 
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
 
-                // Only load resources from our server.
-                // style-src 'unsafe-inline' => We have some inline CSS.
-                // connect-src data: => Allow the inline svg for sl-drawer
-                // connect-src 'self' => So Web gRPC works
-                //
-                // We need unsafe-eval because iof this
-                // https://github.com/protocolbuffers/protobuf/issues/6770
+                // default-src 'self'           Only load resources from our server.
+                // style-src 'unsafe-inline'    Shoelace style inserts styling into the dom.
+                // connect-src data: =>         Allow the inline svg for sl-drawer
+                // connect-src 'self' =>        Allow connections back to the server so Web gRPC works
                 meta ["http-equiv"="Content-Security-Policy",
-                    content="default-src 'self'; script-src 'unsafe-eval';
-                        style-src 'unsafe-inline'; connect-src 'self' data:"] {}
+                    content="default-src 'self'; style-src 'unsafe-inline'; connect-src 'self' data:"] {}
 
             }
 

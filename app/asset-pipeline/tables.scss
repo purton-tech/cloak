@@ -18,6 +18,10 @@
                 padding: 0.5rem 0;
                 border-bottom: 1px solid var(--accents-2);
             }
+
+            &.clickable {
+                cursor: pointer;
+            }
         }
     }
 

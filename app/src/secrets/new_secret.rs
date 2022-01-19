@@ -13,7 +13,9 @@ use validator::Validate;
 pub struct NewSecret {
     #[validate(length(min = 1, message = "The name is mandatory"))]
     pub name: String,
-    #[validate(length(min = 1, message = "The name is mandatory"))]
+    #[validate(length(min = 1, message = "The blind index is mandatory"))]
+    pub name_blind_index: String,
+    #[validate(length(min = 1, message = "The secret is mandatory"))]
     pub secret: String,
 }
 
@@ -23,15 +25,15 @@ pub async fn new(
     Form(new_secret): Form<NewSecret>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    dbg!(&new_secret);
     sqlx::query!(
         "
             INSERT INTO 
-                secrets (vault_id, name, secret)
-            VALUES($1, $2, $3) 
+                secrets (vault_id, name, name_blind_index, secret)
+            VALUES($1, $2, $3, $4) 
         ",
         id,
         new_secret.name,
+        new_secret.name_blind_index,
         new_secret.secret,
     )
     .execute(&pool)
@@ -44,7 +46,7 @@ pub async fn new(
 markup::define! {
     NewSecretPage<'a>(user_vault: &'a models::UserVault) {
 
-        form.m_form[id="add-secret-form", style="margin-top: 2em", method = "post",
+        form.m_form[id="add-secret-form", method = "post",
             action=super::new_route(user_vault.vault_id)] {
             sl_drawer[label="Add Secret", class="add-secret"] {
                 p {
@@ -70,6 +72,8 @@ markup::define! {
                 input[type="hidden",
                     id="vault-id",
                     value=user_vault.vault_id] {}
+                input[type="hidden",
+                    id="name-blind-index", name="name_blind_index"] {}
 
                 button.a_button.auto.success[slot="footer", id="create-secret"] { "Create Secret" }
             }

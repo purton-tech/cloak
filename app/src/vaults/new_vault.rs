@@ -61,7 +61,7 @@ pub async fn new(
 markup::define! {
     VaultForm {
 
-        form.m_form[style="margin-top: 2em", method = "post", action=super::NEW] {
+        form.m_form[method = "post", action=super::NEW] {
             sl_drawer[label="Add Vault"] {
                 p {
                     "Vaults keep related secrets together.

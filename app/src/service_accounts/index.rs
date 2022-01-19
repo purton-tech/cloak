@@ -1,6 +1,7 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use crate::models;
+use crate::statics;
 use axum::{extract::Extension, response::Html};
 use sqlx::PgPool;
 
@@ -37,7 +38,8 @@ markup::define! {
                 table.m_table {
                     thead {
                         tr {
-                            th { "Name" }
+                            th { "Service Account Name" }
+                            th { "Vault" }
                             th { "Updated" }
                             th { "Created" }
                             th { "Action" }
@@ -45,11 +47,35 @@ markup::define! {
                     }
                     tbody {
                         @for service_account in service_accounts {
-                            tr[id=format!("service-account-row-{}", service_account.id), style="cursor: pointer;"] {
-                                td { {service_account.name} }
-                                td { "Updated" }
-                                td { "Created" }
-                                td { a[href="#"] { "Attach to Vault" } }
+                            tr {
+                                @if let Some(vault_name) = service_account.vault_name.clone() {
+                                    td[id=format!("service-account-row-{}", service_account.id)] {
+                                        a[href="#"]
+                                        { {service_account.name} }
+                                    }
+                                    td {
+                                        {vault_name}
+                                    }
+                                } else {
+                                    td {
+                                        {service_account.name}
+                                    }
+                                    td[id=format!("service-account-row-{}", service_account.id)] {
+                                        a[href="#"]
+                                        { "Attach to Vault" }
+                                    }
+                                }
+                                td {
+                                    relative_time[datetime=service_account.updated_at.to_rfc3339()] {}
+                                }
+                                td {
+                                    relative_time[datetime=service_account.created_at.to_rfc3339()] {}
+                                }
+                                td {
+                                    a[id=format!("delete-account-controller-{}", service_account.id), href="#"] {
+                                        img[src=statics::get_delete_svg(), width="18"] {}
+                                    }
+                                }
                             }
                         }
                     }
@@ -59,7 +85,10 @@ markup::define! {
         // Generate all the details flyouts
         @for service_account in service_accounts {
             @super::view::ViewServiceAccount{ service_account, vaults }
+            @super::delete::DeleteServiceAccountForm {
+                service_account_id: service_account.id as u32,
+                service_account_name: service_account.name.clone()
+            }
         }
-
     }
 }
