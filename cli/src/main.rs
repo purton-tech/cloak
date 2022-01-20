@@ -10,6 +10,7 @@ use p256::{
     PublicKey, SecretKey,
 };
 use std::collections::HashMap;
+use std::env;
 use std::ffi::OsString;
 use std::process::{Command, Stdio};
 
@@ -25,7 +26,7 @@ struct Cli {
     #[clap(short, long, env = "ECDH_PRIVATE_KEY")]
     ecdh_private_key: String,
 
-    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://keyvault.authn.tech"))]
+    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://cloak.software"))]
     api_host_url: String,
 
     #[clap(subcommand)]
@@ -81,19 +82,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
 
-            //let filtered_env: HashMap<String, String> = env::vars()
-            //    .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
-            //    .collect();
+            let filtered_env: HashMap<String, String> = env::vars()
+                .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
+                .collect();
 
-            //let filtered_env: HashMap<String, String> =
-            //    filtered_env.into_iter().chain(env_vars_to_inject).collect();
+            let filtered_env: HashMap<String, String> =
+                filtered_env.into_iter().chain(env_vars_to_inject).collect();
 
             Command::new(&args[0])
                 .args(&args[1..])
                 .stdin(Stdio::null())
                 .stdout(Stdio::inherit())
-                .env_clear()
-                .envs(&env_vars_to_inject)
+                .envs(&filtered_env)
                 .spawn()
                 .expect("Failed to run command");
         }

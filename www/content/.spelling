@@ -4,7 +4,14 @@
 # one word per line, to define a file override use ' - filename'
 # where filename is relative to this configuration file
 precompiled
-KeyVault
+Cloak
+Kubernetes
+Cloudflare
+cloudlared
+Pulumi
+YAML
+tunnel.yourddomain.com.
+CNAME
  - blog/_index.md
 sort_by
 class_name
@@ -18,8 +25,9 @@ SecretHub
 2021-11-08
  - developer-introduction.md
 SHA256
-keyvault
-keyvault.exe
+cloak
+cloak.exe
+2019-11-27
  - developers/_index.md
 developers.html
  - reference/01-security.md
@@ -36,3 +44,13 @@ Argon2id
  - developers/02-get-started.md
 1
 2
+ - blog/cloudflare-tunnels-for-k8-ingress.md
+cloudflare
+2022-01-20
+ - blog/cloudflare-tunnels-for-k8-ingress/index.md
+1
+2
+3
+cert.pem
+4
+2022-01-20

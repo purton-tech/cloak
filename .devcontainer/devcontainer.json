@@ -1,5 +1,5 @@
 {
-	"name": "KeyVault",
+	"name": "cloak",
 	"dockerComposeFile": [
 		"docker-compose.yml",
 		"docker-compose.dev.yml"

@@ -8,7 +8,7 @@ const AUTH_NAME="auth"
 const WWW_NAME="www"
 const ENVOY_NAME="envoy"
 
-const NAME_SPACE = 'keyvault'
+const NAME_SPACE = 'cloak'
 const DB_URL_SECRET = 'database-urls'
 const MIGRATION_DB_URL = 'migrations-database-url'
 const APP_DB_URL = 'app-database-url'
@@ -33,7 +33,7 @@ const cloudflaredPod = new kx.PodBuilder({
         command: ["cloudflared", "tunnel"],
         args: [
             `--url=http://${ENVOY_NAME}:7100`,
-            `--hostname=keyvault.authn.tech`,
+            `--hostname=tunnel.cloak.software`,
             "--origincert=/etc/cloudflared/cert.pem",
             "--no-autoupdate"
         ],

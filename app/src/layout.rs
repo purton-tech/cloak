@@ -71,7 +71,7 @@ markup::define! {
                     }
                     aside.sidenav {
                         h1 {
-                            a[href=crate::vaults::INDEX] { "KeyVault" }
+                            a[href=crate::vaults::INDEX] { "Cloak" }
                         }
                         h2 {
                             "Your Vaults"

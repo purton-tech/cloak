@@ -3,10 +3,10 @@ title = "Your First Secret"
 date = 2019-11-27
 +++
 
-### Step 1: Install KeyVault
+### Step 1: Install Cloak
 
 ```bash
-$ sudo /bin/sh -c 'wget https://github.com/ianpurton/keyvault/releases/latest/download/cli -O /usr/local/bin/keyvault && chmod +x /usr/local/bin/keyvault'
+$ sudo /bin/sh -c 'wget https://github.com/ianpurton/Cloak/releases/latest/download/cli -O /usr/local/bin/Cloak && chmod +x /usr/local/bin/Cloak'
 ```
 
 ### Step 2: Your first secret
@@ -14,14 +14,14 @@ $ sudo /bin/sh -c 'wget https://github.com/ianpurton/keyvault/releases/latest/do
 Before you begin, check to verify that no secrets exists at `secret/hello`.
 
 ```bash
-$ keyvault kv get /secret/hello
+$ Cloak kv get /secret/hello
 No value found at secret/data/hello
 ```
 
 You can write a new version of the secret with:
 
 ```bash$ 
-keyvault kv put secret/hello foo=world
+Cloak kv put secret/hello foo=world
 
 Key              Value
 ---              -----
