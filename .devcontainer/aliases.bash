@@ -30,8 +30,5 @@ alias ml='diesel migration list'
 alias mg='diesel migration generate'
 alias db='psql $DATABASE_URL'
 
-# Call Debug Keyvault
-alias cloak='/vscode/target/debug/cli'
-
 # Leave a line below or the files will cat together
 

@@ -26,7 +26,7 @@ struct Cli {
     #[clap(short, long, env = "ECDH_PRIVATE_KEY")]
     ecdh_private_key: String,
 
-    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://keyvault.authn.tech"))]
+    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://cloak.software"))]
     api_host_url: String,
 
     #[clap(subcommand)]

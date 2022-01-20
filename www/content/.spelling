@@ -4,7 +4,7 @@
 # one word per line, to define a file override use ' - filename'
 # where filename is relative to this configuration file
 precompiled
-KeyVault
+Cloak
 Kubernetes
 Cloudflare
 cloudlared
@@ -25,8 +25,8 @@ SecretHub
 2021-11-08
  - developer-introduction.md
 SHA256
-keyvault
-keyvault.exe
+cloak
+cloak.exe
 2019-11-27
  - developers/_index.md
 developers.html

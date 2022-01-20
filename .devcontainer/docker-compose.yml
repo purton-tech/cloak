@@ -7,7 +7,7 @@ services:
     environment:
       POSTGRES_PASSWORD: testpassword
       POSTGRES_USER: postgres
-      POSTGRES_DB: keyvault
+      POSTGRES_DB: cloak
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -31,7 +31,7 @@ services:
     environment:
       AUTH_TYPE: encrypted
       # The following is used by the migrations and also for SQLX at compile time.
-      DATABASE_URL: postgresql://postgres:testpassword@db:5432/keyvault
+      DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak
       SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
       FORWARD_URL: development
       FORWARD_PORT: 7101
@@ -68,9 +68,9 @@ services:
 
     environment:
       # The following is used by the migrations and also for SQLX at compile time.
-      DATABASE_URL: postgresql://postgres:testpassword@db:5432/keyvault
+      DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak
       # A less privelaged role for basic INSERTS, SELECT etc.
-      APP_DATABASE_URL: postgresql://keyvault:testpassword@db:5432/keyvault
+      APP_DATABASE_URL: postgresql://cloak:testpassword@db:5432/cloak
       VAULT_SERVER_URL: http://localhost:7103
       VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103
 
