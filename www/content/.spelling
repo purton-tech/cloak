@@ -5,6 +5,13 @@
 # where filename is relative to this configuration file
 precompiled
 KeyVault
+Kubernetes
+Cloudflare
+cloudlared
+Pulumi
+YAML
+tunnel.yourddomain.com.
+CNAME
  - blog/_index.md
 sort_by
 class_name
@@ -20,6 +27,7 @@ SecretHub
 SHA256
 keyvault
 keyvault.exe
+2019-11-27
  - developers/_index.md
 developers.html
  - reference/01-security.md
@@ -36,3 +44,13 @@ Argon2id
  - developers/02-get-started.md
 1
 2
+ - blog/cloudflare-tunnels-for-k8-ingress.md
+cloudflare
+2022-01-20
+ - blog/cloudflare-tunnels-for-k8-ingress/index.md
+1
+2
+3
+cert.pem
+4
+2022-01-20
