@@ -1,0 +1,12 @@
+<svg viewBox="0 0 120 120" class="parent" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .small { 
+        font: normal 100px sans-serif; 
+    }
+    .parent {
+        background: rgba(255,107,74);
+    }
+  </style>
+  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" class="small">C</text>    
+
+</svg>
