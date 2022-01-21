@@ -12,21 +12,21 @@
       "assets": ["infra/Pulumi.prod.yaml"],
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
     }],
-    ["@codedependant/semantic-release-docker", {
-      "dockerImage": "cloak-server",
-      "dockerProject": "purtontech"
+    ["@semantic-release-plus/docker", {
+        "name": "purtontech/cloak-server:latest",
+        "skipLogin": true
     }],
-    ["@codedependant/semantic-release-docker", {
-      "dockerImage": "cloak-db-migrations",
-      "dockerProject": "purtontech"
+    ["@semantic-release-plus/docker", {
+        "name": "purtontech/cloak-db-migrations:latest",
+        "skipLogin": true
     }],
-    ["@codedependant/semantic-release-docker", {
-      "dockerImage": "cloak-envoy",
-      "dockerProject": "purtontech"
+    ["@semantic-release-plus/docker", {
+        "name": "purtontech/cloak-envoy:latest",
+        "skipLogin": true
     }],
-    ["@codedependant/semantic-release-docker", {
-      "dockerImage": "cloak-webiste",
-      "dockerProject": "purtontech"
+    ["@semantic-release-plus/docker", {
+        "name": "purtontech/cloak-website:latest",
+        "skipLogin": true
     }]
   ]
 }
