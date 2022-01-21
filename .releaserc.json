@@ -11,6 +11,20 @@
     ["@semantic-release/git", {
       "assets": ["infra/Pulumi.prod.yaml"],
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-    }]
+    }],
+    [
+      "@eclass/semantic-release-docker",
+      {
+        "baseImageName": "cloak-server",
+        "registries": [
+          {
+            "url": "docker.io",
+            "imageName": "docker.io/purtontech/cloak-server",
+            "user": "DOCKERHUB_USERNAME",
+            "password": "DOCKERHUB_TOKEN"
+          }
+        ]
+      }
+    ]
   ]
 }

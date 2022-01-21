@@ -35,14 +35,17 @@ jobs:
     # Earthly with caching https://docs.earthly.dev/docs/guides/shared-cache
     - name: Run build using Readonly Cache
       if: github.ref != 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --remote-cache=ianpurton/vault:cache +all
+      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-earthly:cache +all
       
     - name: Run build and Deploy Containers
       if: github.ref == 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --remote-cache=ianpurton/vault:cache --push +all
+      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-earthly:cache --push +all
 
     - name: Update the Release Config
       run: cd infra && ./update-config.sh
 
     - name: Semantic Release
-      run: npm install @semantic-release/git -D && npx semantic-release
+      run: | 
+        npm i -D @eclass/semantic-release-docker 
+        npm i -D @semantic-release/git
+        npx semantic-release
