@@ -12,61 +12,21 @@
       "assets": ["infra/Pulumi.prod.yaml"],
       "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
     }],
-    [
-      "@eclass/semantic-release-docker",
-      {
-        "baseImageName": "cloak-db-migrations",
-        "registries": [
-          {
-            "url": "docker.io",
-            "imageName": "docker.io/purtontech/cloak-db-migrations",
-            "user": "DOCKERHUB_USERNAME",
-            "password": "DOCKERHUB_TOKEN"
-          }
-        ]
-      }
-    ],
-    [
-      "@eclass/semantic-release-docker",
-      {
-        "baseImageName": "cloak-server",
-        "registries": [
-          {
-            "url": "docker.io",
-            "imageName": "docker.io/purtontech/cloak-server",
-            "user": "DOCKERHUB_USERNAME",
-            "password": "DOCKERHUB_TOKEN"
-          }
-        ]
-      }
-    ],
-    [
-      "@eclass/semantic-release-docker",
-      {
-        "baseImageName": "cloak-envoy",
-        "registries": [
-          {
-            "url": "docker.io",
-            "imageName": "docker.io/purtontech/cloak-envoy",
-            "user": "DOCKERHUB_USERNAME",
-            "password": "DOCKERHUB_TOKEN"
-          }
-        ]
-      }
-    ],
-    [
-      "@eclass/semantic-release-docker",
-      {
-        "baseImageName": "cloak-website",
-        "registries": [
-          {
-            "url": "docker.io",
-            "imageName": "docker.io/purtontech/cloak-website",
-            "user": "DOCKERHUB_USERNAME",
-            "password": "DOCKERHUB_TOKEN"
-          }
-        ]
-      }
-    ]
+    ["@codedependant/semantic-release-docker", {
+      "dockerImage": "cloak-server",
+      "dockerProject": "purtontech"
+    }],
+    ["@codedependant/semantic-release-docker", {
+      "dockerImage": "cloak-db-migrations",
+      "dockerProject": "purtontech"
+    }],
+    ["@codedependant/semantic-release-docker", {
+      "dockerImage": "cloak-envoy",
+      "dockerProject": "purtontech"
+    }],
+    ["@codedependant/semantic-release-docker", {
+      "dockerImage": "cloak-webiste",
+      "dockerProject": "purtontech"
+    }]
   ]
 }

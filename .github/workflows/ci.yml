@@ -46,6 +46,6 @@ jobs:
 
     - name: Semantic Release
       run: | 
-        npm i -D @eclass/semantic-release-docker 
+        npm i -D @codedependant/semantic-release-docker
         npm i -D @semantic-release/git
         npx semantic-release
