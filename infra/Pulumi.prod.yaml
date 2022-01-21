@@ -1,4 +1,5 @@
 config:
+  keyvault:version: v1.1.1
   keyvault:cloak-server: sha256:da2f91756196690db8324e0fc3c3b208c843d370efb0490747b14b15325174fd
   keyvault:cloak-envoy: sha256:811fe29d4934acc68ed75f70dbbf6b155a9493b4926537816749ea20c3cbe826
   keyvault:cloak-db-migrations: sha256:405a65e0fa035ad173dc954041998a6a54b51711b584ecaed9c1eb14924ddcf2
