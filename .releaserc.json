@@ -25,15 +25,15 @@
         "skipLogin": true
     }],
     ["@semantic-release/exec", {
-      "verifyCmd": "./update-config.sh",
+      "publishCmd": "./update-config.sh",
       "execCwd": "./infra"
     }],
     ["@semantic-release/exec", {
-      "verifyCmd": "./update-version.sh ${nextRelease.version}",
+      "publishCmd": "./update-version.sh ${nextRelease.version}",
       "execCwd": "./infra"
     }],
     ["@semantic-release/exec", {
-      "verifyCmd": "./update-git.sh ${nextRelease.version}",
+      "publishCmd": "./update-git.sh ${nextRelease.version}",
       "execCwd": "./infra"
     }]
   ]
