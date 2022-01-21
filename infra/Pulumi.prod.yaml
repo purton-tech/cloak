@@ -1,7 +1,7 @@
 config:
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:38655a3c3ff4946e39ffbbbf7149723828188d9f1350755a731cc9b58983a6db/
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:38655a3c3ff4946e39ffbbbf7149723828188d9f1350755a731cc9b58983a6db/
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:38655a3c3ff4946e39ffbbbf7149723828188d9f1350755a731cc9b58983a6db/
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:38655a3c3ff4946e39ffbbbf7149723828188d9f1350755a731cc9b58983a6db/
+loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
+loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
+loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
+loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
     secure: AAABAFnoTpfMg3QrjakcPdI6+nvu3KAKTX8y2CzzXMyPgIfLF/uKrYD7wuxdv82414SE5lYZYWH6KHjIP+vF5L4D9OKlNVTSiDqVCATyCu3/UtCz/Vitkwn9ppCCzugJ
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:38655a3c3ff4946e39ffbbbf7149723828188d9f1350755a731cc9b58983a6db/
+loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
