@@ -1,3 +1,4 @@
+#!/bin/bash 
 containers=("purtontech/cloak-server" "purtontech/cloak-db-migrations" "purtontech/cloak-envoy" "purtontech/cloak-website")
 
 for i in "${containers[@]}"
