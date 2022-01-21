@@ -1,4 +1,4 @@
-containers=( "purtontech/cloak-server" "purtontech/cloak-db-migrations" "purtontech/cloak-envoy" "purtontech/cloak-website")
+containers=( "purtontech/cloak-server:latest" "purtontech/cloak-db-migrations:latest" "purtontech/cloak-envoy:latest" "purtontech/cloak-website:latest")
 
 for i in "${containers[@]}"
 do
