@@ -25,7 +25,8 @@
         "skipLogin": true
     }],
     ["@semantic-release/exec", {
-      "publishCmd": "./infra/update-config.sh"
+      "publishCmd": "./update-config.sh",
+      "execCwd": "./infra"
     }],
     ["@semantic-release/git", {
       "assets": ["infra/Pulumi.prod.yaml"],
