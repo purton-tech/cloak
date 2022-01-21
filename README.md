@@ -1,17 +1,18 @@
 ## Tech Stack and Mono Repo Structure
 
-| Folder | Description |
-| ---- | ---- | 
-| `.devcontainer` | Version controlled [Development Environment](https://code.visualstudio.com/docs/remote/containers)|
-| `/app` | Web and gRPC Server. Written in Rust using [Axum](https://github.com/tokio-rs/axumtomni) and [Tonic](https://github.com/hyperium/tonic)|
-| `/app/asset-pipeline` | [Parcel](https://parceljs.org/) builder for [Typescript](https://www.typescriptlang.org/) and [SCSS](https://sass-lang.com/) assets.|
-| `/cli` | Command Line Interface. Written in Rust.|
-| `/infra` | Infrastructure as Code using [Pulumi](https://www.pulumi.com/).|
-| `/protos` | [gRPC](https://grpc.io/) schema for the API.|
-| `/migrations` | Database migrations for building the Postgres Database.|
-| `/www` | The website. Built with [Zola](https://www.getzola.org) static site generator.|
-| `Earthfile` |[Earthly](https://earthly.dev) Make file for CICD|
-| `.releaserc.json` -|[Semantic Releases](https://github.com/semantic-release/semantic-release)|
+| Folder | Description | Docker Container |
+| ---- | ---- | ---- | 
+| `.devcontainer` | Version controlled [Development Environment](https://code.visualstudio.com/docs/remote/containers)||
+| `.github` | Continuous integration pipeline calls out to [Earthly](https://earthly.dev)||
+| `/app` | Web and gRPC Server. Written in Rust using [Axum](https://github.com/tokio-rs/axumtomni) and [Tonic](https://github.com/hyperium/tonic)|purtontech/cloak-server|
+| `/app/asset-pipeline` | [Parcel](https://parceljs.org/) builder for [Typescript](https://www.typescriptlang.org/) and [SCSS](https://sass-lang.com/) assets.||
+| `/cli` | Command Line Interface. Written in Rust.||
+| `/infra` | Infrastructure as Code using [Pulumi](https://www.pulumi.com/).||
+| `/protos` | [gRPC](https://grpc.io/) schema for the API.||
+| `/migrations` | Database migrations for building the Postgres Database.|purtontech/cloak-db-migrations|
+| `/www` | The website. Built with [Zola](https://www.getzola.org) static site generator.|purtontech/cloak-website|
+| `Earthfile` |[Earthly](https://earthly.dev) Builds our containers and executables||
+| `.releaserc.json`|[Semantic Releases](https://github.com/semantic-release/semantic-release)||
 
 ## Alternatives
 

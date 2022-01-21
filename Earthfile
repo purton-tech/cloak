@@ -17,10 +17,10 @@ ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
 ARG NGINX=nginx:latest
 
 # This file builds the following containers
-ARG APP_IMAGE_NAME=ianpurton/vault:app
-ARG INIT_IMAGE_NAME=ianpurton/vault:init
-ARG ENVOY_IMAGE_NAME=ianpurton/vault:envoy
-ARG WWW_IMAGE_NAME=ianpurton/vault:www
+ARG APP_IMAGE_NAME=purtontech/cloak-server:latest
+ARG INIT_IMAGE_NAME=purtontech/cloak-db-migrations:latest
+ARG ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
+ARG WWW_IMAGE_NAME=purtontech/cloak-website:latest
 
 
 WORKDIR /build
