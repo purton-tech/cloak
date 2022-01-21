@@ -1,7 +1,7 @@
 config:
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
+  keyvault:cloak-server: sha256:17bdd9a0369a06925400dcf8437ea633daf5aa5ca4b7ef985f9d7f6f4ade7ce5
+  keyvault:cloak-envoy: sha256:2388dcce97b1f422118799dda5b195364e0b995dfacd4fd6f2f44cf3b11014f1
+  keyvault:cloak-db-migrations: sha256:23f174ba7eb9418028a212330193ca1f628a6d8889f55091cdbc31533b230b52
+  keyvault:secret_key:
     secure: AAABAFnoTpfMg3QrjakcPdI6+nvu3KAKTX8y2CzzXMyPgIfLF/uKrYD7wuxdv82414SE5lYZYWH6KHjIP+vF5L4D9OKlNVTSiDqVCATyCu3/UtCz/Vitkwn9ppCCzugJ
-loak-website:latest/s/key/cloak-website:latest.*$/key/cloak-website:latest: -website@sha256:4b2b0a709a0ca49d73532ed75830aec2333dc8aa0dd850d0d592b38f29988ad4/
+  keyvault:cloak-website: sha256:0841231921eaeb4ae6012deb5ffa16ef0c56fa5071a9b3436a043368dcef4d24
