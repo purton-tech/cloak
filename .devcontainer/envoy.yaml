@@ -149,13 +149,14 @@ static_resources:
                       response_handle:headers():add("X-DNS-Prefetch-Control", "off");
                       response_handle:headers():add("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
                       response_handle:headers():add("Permissions-Policy",
-                                                    "camera (), "..
-                                                    "microphone (), "..
-                                                    "geolocation (), "..
-                                                    "encrypted-media (), "..
-                                                    "payment (), "..
-                                                    "speaker (), "..
-                                                    "usb ()");
+                                                    "accelerometer=(), "..
+                                                    "camera=(), "..
+                                                    "geolocation=(), "..
+                                                    "gyroscope=(), "..
+                                                    "magnetometer=(), "..
+                                                    "microphone=(), "..
+                                                    "payment=(), "..
+                                                    "usb=()");
                       response_handle:headers():remove("X-Powered-By");
                     end
               inline_code: |
@@ -205,13 +206,14 @@ static_resources:
                   end
                   if not response_handle:headers():get("Feature-Policy") then
                     response_handle:headers():add("Permissions-Policy",
-                                                  "camera (), "..
-                                                  "microphone (), "..
-                                                  "geolocation (), "..
-                                                  "encrypted-media (), "..
-                                                  "payment (), "..
-                                                  "speaker (), "..
-                                                  "usb ()");
+                                                  "accelerometer=(), "..
+                                                  "camera=(), "..
+                                                  "geolocation=(), "..
+                                                  "gyroscope=(), "..
+                                                  "magnetometer=(), "..
+                                                  "microphone=(), "..
+                                                  "payment=(), "..
+                                                  "usb=()");
                   end
                   if response_handle:headers():get("X-Powered-By") then
                     response_handle:headers():remove("X-Powered-By");
