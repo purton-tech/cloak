@@ -41,11 +41,9 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache --push +all
 
-    - name: Update the Release Config
-      run: cd infra && ./update-config.sh
-
     - name: Semantic Release
       run: | 
+        npm i -D @semantic-release/exec
         npm i -D @semantic-release-plus/docker
         npm i -D @semantic-release/git
         npx semantic-release
