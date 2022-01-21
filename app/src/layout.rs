@@ -55,14 +55,6 @@ markup::define! {
                 script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
 
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
-
-                // default-src 'self'           Only load resources from our server.
-                // style-src 'unsafe-inline'    Shoelace style inserts styling into the dom.
-                // connect-src data: =>         Allow the inline svg for sl-drawer
-                // connect-src 'self' =>        Allow connections back to the server so Web gRPC works
-                meta ["http-equiv"="Content-Security-Policy",
-                    content="default-src 'self'; style-src 'unsafe-inline'; connect-src 'self' data:"] {}
-
             }
 
             body {
