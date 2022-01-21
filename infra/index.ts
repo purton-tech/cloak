@@ -13,14 +13,18 @@ const DB_URL_SECRET = 'database-urls'
 const MIGRATION_DB_URL = 'migrations-database-url'
 const APP_DB_URL = 'app-database-url'
 const AUTH_DB_URL = 'auth-database-url'
-const DOCKER_PATH='ianpurton/vault'
 const config = new pulumi.Config();
+
+const ENVOY_IMAGE=`purtontech/cloak-envoy:${config.require('version')}@${config.require('cloak-envoy')}`
+const APP_IMAGE=`purtontech/cloak-server:${config.require('version')}@${config.require('cloak-server')}`
+const MIGRATIONS_IMAGE=`purtontech/cloak-db-migrations:${config.require('version')}@${config.require('cloak-db-migrations')}`
+const WWW_IMAGE=`purtontech/cloak-website:${config.require('version')}@${config.require('cloak-website')}`
 
 const envoyPod = new kx.PodBuilder({
     imagePullSecrets: [{ name: 'image-pull' }],
     containers: [{
         name: "envoy",
-        image: `${DOCKER_PATH}:envoy@${config.require('envoy')}`,
+        image: ENVOY_IMAGE,
         ports: { http: 7100 }
     }]
 })
@@ -57,7 +61,7 @@ const appPod = new kx.PodBuilder({
     imagePullSecrets: [{ name: 'image-pull' }],
     containers: [{
         name: APP_NAME,
-        image: `${DOCKER_PATH}:app@${config.require('app')}`,
+        image: APP_IMAGE,
         ports: { http: 7103 },
         env: [
             { name: "APP_DATABASE_URL", 
@@ -72,7 +76,7 @@ const appPod = new kx.PodBuilder({
     }],
     initContainers: [{
         name: "server-init",
-        image: `${DOCKER_PATH}:init@${config.require('init')}`,
+        image: MIGRATIONS_IMAGE,
         imagePullPolicy: 'Always',
         env: [
             { name: "DATABASE_URL", 
@@ -91,7 +95,7 @@ const wwwPod = new kx.PodBuilder({
     imagePullSecrets: [{ name: 'image-pull' }],
     containers: [{
         name: WWW_NAME,
-        image: `${DOCKER_PATH}:www@${config.require('www')}`,
+        image: WWW_IMAGE,
         ports: { http: 80 }
     }]
 })
