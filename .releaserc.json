@@ -15,11 +15,53 @@
     [
       "@eclass/semantic-release-docker",
       {
+        "baseImageName": "cloak-db-migrations",
+        "registries": [
+          {
+            "url": "docker.io",
+            "imageName": "docker.io/purtontech/cloak-db-migrations",
+            "user": "DOCKERHUB_USERNAME",
+            "password": "DOCKERHUB_TOKEN"
+          }
+        ]
+      }
+    ],
+    [
+      "@eclass/semantic-release-docker",
+      {
         "baseImageName": "cloak-server",
         "registries": [
           {
             "url": "docker.io",
             "imageName": "docker.io/purtontech/cloak-server",
+            "user": "DOCKERHUB_USERNAME",
+            "password": "DOCKERHUB_TOKEN"
+          }
+        ]
+      }
+    ],
+    [
+      "@eclass/semantic-release-docker",
+      {
+        "baseImageName": "cloak-envoy",
+        "registries": [
+          {
+            "url": "docker.io",
+            "imageName": "docker.io/purtontech/cloak-envoy",
+            "user": "DOCKERHUB_USERNAME",
+            "password": "DOCKERHUB_TOKEN"
+          }
+        ]
+      }
+    ],
+    [
+      "@eclass/semantic-release-docker",
+      {
+        "baseImageName": "cloak-website",
+        "registries": [
+          {
+            "url": "docker.io",
+            "imageName": "docker.io/purtontech/cloak-website",
             "user": "DOCKERHUB_USERNAME",
             "password": "DOCKERHUB_TOKEN"
           }
