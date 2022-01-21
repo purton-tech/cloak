@@ -32,9 +32,9 @@
       "verifyCmd": "./update-version.sh ${nextRelease.version}",
       "execCwd": "./infra"
     }],
-    ["@semantic-release/git", {
-      "assets": ["infra/Pulumi.prod.yaml"],
-      "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+    ["@semantic-release/exec", {
+      "verifyCmd": "./update-git.sh ${nextRelease.version}",
+      "execCwd": "./infra"
     }]
   ]
 }
