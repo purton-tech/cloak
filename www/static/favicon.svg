@@ -4,7 +4,7 @@
         font: normal 100px sans-serif; 
     }
     .parent {
-        background: rgba(255,107,74);
+        background: #f54444;
     }
   </style>
   <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" class="small">C</text>    
