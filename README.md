@@ -2,7 +2,7 @@
 
 | Folder | Description | Docker Container |
 | ---- | ---- | ---- | 
-| `.devcontainer` | Version controlled [Development Environment](https://code.visualstudio.com/docs/remote/containers)||
+| `.devcontainer` | Version controlled [Development Environment](https://code.visualstudio.com/docs/remote/containers)|purtontech/cloak-envoy|
 | `.github` | Continuous integration pipeline calls out to [Earthly](https://earthly.dev)||
 | `/app` | Web and gRPC Server. Written in Rust using [Axum](https://github.com/tokio-rs/axumtomni) and [Tonic](https://github.com/hyperium/tonic)|purtontech/cloak-server|
 | `/app/asset-pipeline` | [Parcel](https://parceljs.org/) builder for [Typescript](https://www.typescriptlang.org/) and [SCSS](https://sass-lang.com/) assets.||
