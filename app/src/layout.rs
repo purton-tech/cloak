@@ -18,7 +18,7 @@ pub fn layout(title: &str, content: &str, side_bar: &SideBar) -> Result<Html<Str
 
     Ok(Html(
         html.to_string()
-            .replace("sl_drawer", "sl-drawer")
+            .replace("side_drawer", "side-drawer")
             .replace("relative_time", "relative-time"),
     ))
 }

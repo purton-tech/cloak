@@ -62,31 +62,35 @@ markup::define! {
     VaultForm {
 
         form.m_form[method = "post", action=super::NEW] {
-            sl_drawer[label="Add Vault"] {
-                p {
-                    "Vaults keep related secrets together.
-                    For example you could have a vault called My Project with all
-                    the secrets related to your project."
+            side_drawer[label="Add Vault"] {
+                template[slot="body"] {
+                    p {
+                        "Vaults keep related secrets together.
+                        For example you could have a vault called My Project with all
+                        the secrets related to your project."
+                    }
+
+                    fieldset {
+                        label[for="name"] { "Name *" }
+                        input[type="text", required="", name="name"] {}
+                        span.a_help_text { "Give your vault a name" }
+
+                        label[for="encrypted_vault_key"] { "Wrapped AES Key" }
+                        textarea[rows="4", required="", readonly="", name="encrypted_vault_key", id="new-vault-key"] {}
+                        span.a_help_text { "The key for this vault" }
+
+                        label[for="public_key"] { "ECDH Public Key" }
+                        input[id="public-key", type="text", required="", name="public_key"] {}
+
+                        label[for="encrypted_private_key"] { "Wrapped ECDH Private Key" }
+                        textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
+                        span.a_help_text { "The key for this service account" }
+                    }
                 }
 
-                fieldset {
-                    label[for="name"] { "Name *" }
-                    input[type="text", required="", name="name"] {}
-                    span.a_help_text { "Give your vault a name" }
-
-                    label[for="kry"] { "Wrapped AES Key" }
-                    textarea[rows="4", required="", readonly="", name="encrypted_vault_key", id="new-vault-key"] {}
-                    span.a_help_text { "The key for this vault" }
-
-                    label[for="secret"] { "ECDH Public Key" }
-                    input[id="public-key", type="text", required="", name="public_key"] {}
-
-                    label[for="kry"] { "Wrapped ECDH Private Key" }
-                    textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
-                    span.a_help_text { "The key for this service account" }
+                template[slot="footer"] {
+                    button.a_button.auto.success[slot="footer", type = "submit"] { "Create Vault" }
                 }
-
-                button.a_button.auto.success[slot="footer", type = "submit"] { "Create Vault" }
             }
         }
 

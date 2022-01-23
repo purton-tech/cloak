@@ -1,4 +1,4 @@
-import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
+import { SideDrawer } from '../../asset-pipeline/side-drawer'
 import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import * as grpcWeb from 'grpc-web';
@@ -10,8 +10,8 @@ if (newSecretButton) {
     newSecretButton.addEventListener('click', async event => {
 
         let element = newSecretButton.previousElementSibling.firstChild
-        if (element instanceof SlDrawer) {
-            element.show()
+        if (element instanceof SideDrawer) {
+            element.open = true
         }
     })
 }

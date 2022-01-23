@@ -139,7 +139,7 @@ static_resources:
                 app_headers.lua:
                   inline_string: |
                     function envoy_on_response(response_handle)
-                      csp = "default-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' data:";
+                      csp = "default-src 'self'; style-src 'self'; connect-src 'self'";
                       response_handle:headers():add("Content-Security-Policy", csp);
                       response_handle:headers():add("X-Frame-Options", "deny");
                       response_handle:headers():add("X-XSS-Protection", "1; mode=block");

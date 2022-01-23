@@ -1,4 +1,4 @@
-import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
+import { SideDrawer } from '../../asset-pipeline/side-drawer'
 import * as grpcWeb from 'grpc-web';
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, ServiceAccountSecrets,CreateSecretsResponse } from '../../asset-pipeline/api_pb';
@@ -120,8 +120,8 @@ document.querySelectorAll('[id^="service-account-row-"]').forEach(async (row) =>
     // Detect when a user clicks a row
     row.addEventListener('click', () => {
         const drawer = document.getElementById('view-service-account-row-' + serviceAccountId)
-        if (drawer instanceof SlDrawer) {
-            drawer.show()
+        if (drawer instanceof SideDrawer) {
+            drawer.open = true
         }
     })
 

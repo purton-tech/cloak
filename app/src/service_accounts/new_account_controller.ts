@@ -1,4 +1,4 @@
-import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
+import { SideDrawer } from '../../asset-pipeline/side-drawer'
 import { Vault, Cipher } from '../../asset-pipeline/vault'
 
 let newAccountButton = document.getElementById('new-account')
@@ -7,8 +7,8 @@ if (newAccountButton) {
     newAccountButton.addEventListener('click', async event => {
 
         let element = newAccountButton.previousElementSibling.firstChild
-        if (element instanceof SlDrawer) {
-            element.show()
+        if (element instanceof SideDrawer) {
+            element.open = true
 
             // We create a key pair wrapped with the users key.
             // Only the user that creates a service account can view the keypair
