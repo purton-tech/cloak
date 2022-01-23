@@ -6,7 +6,6 @@ let newVaultButton = document.getElementById('new-vault')
 if(newVaultButton) {
     newVaultButton.addEventListener('click', async event => {
         let element = newVaultButton.previousElementSibling.firstChild
-        console.log(element)
         if (element instanceof SideDrawer) {
             element.open = true
     
