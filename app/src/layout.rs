@@ -54,6 +54,9 @@ markup::define! {
 
                 script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
 
+
+                link [ rel="icon", type="image/svg+xml", href=crate::statics::get_favicon_svg()] {}
+
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
             }
 
