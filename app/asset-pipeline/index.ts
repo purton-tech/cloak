@@ -1,9 +1,7 @@
 import './index.scss'
 
 // Web components
-import '@shoelace-style/shoelace/dist/themes/light.css';
-import '@shoelace-style/shoelace/dist/components/drawer/drawer.js';
-
+import './side-drawer'
 import '@github/time-elements/dist/relative-time-element';
 
 // Front end enhancement

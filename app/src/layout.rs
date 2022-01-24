@@ -18,7 +18,7 @@ pub fn layout(title: &str, content: &str, side_bar: &SideBar) -> Result<Html<Str
 
     Ok(Html(
         html.to_string()
-            .replace("sl_drawer", "sl-drawer")
+            .replace("side_drawer", "side-drawer")
             .replace("relative_time", "relative-time"),
     ))
 }
@@ -53,6 +53,9 @@ markup::define! {
                 title { {title} }
 
                 script [ src = crate::statics::get_index_js(), type="text/javascript", async=""] {}
+
+
+                link [ rel="icon", type="image/svg+xml", href=crate::statics::get_favicon_svg()] {}
 
                 link [ rel = "stylesheet", type="text/css" , href = crate::statics::get_index_css()] {}
             }

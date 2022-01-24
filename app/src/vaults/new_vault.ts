@@ -1,4 +1,4 @@
-import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
+import { SideDrawer } from '../../asset-pipeline/side-drawer'
 import { Vault } from '../../asset-pipeline/vault'
 
 let newVaultButton = document.getElementById('new-vault')
@@ -6,8 +6,8 @@ let newVaultButton = document.getElementById('new-vault')
 if(newVaultButton) {
     newVaultButton.addEventListener('click', async event => {
         let element = newVaultButton.previousElementSibling.firstChild
-        if (element instanceof SlDrawer) {
-            element.show()
+        if (element instanceof SideDrawer) {
+            element.open = true
     
             let wrappedKey = await Vault.newWrappedKey()
             document.getElementById('new-vault-key').innerText = wrappedKey.string

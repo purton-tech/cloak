@@ -20,8 +20,8 @@ use dotenv::dotenv;
 
 /// A fictional versioning CLI
 #[derive(Parser)]
-#[clap(name = "git")]
-#[clap(about = "A fictional versioning CLI")]
+#[clap(name = "cloak")]
+#[clap(about = "Secrets automation")]
 struct Cli {
     #[clap(short, long, env = "ECDH_PRIVATE_KEY")]
     ecdh_private_key: String,

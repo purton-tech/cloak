@@ -1,5 +1,4 @@
-import SlDrawer from '@shoelace-style/shoelace/dist/components/drawer/drawer.js'
-
+import { SideDrawer } from '../../asset-pipeline/side-drawer'
 
 // Configure all the drawers for each service account.
 document.querySelectorAll('[id^="delete-secret-controller-"]').forEach(async (row) => {
@@ -8,8 +7,8 @@ document.querySelectorAll('[id^="delete-secret-controller-"]').forEach(async (ro
     // Detect when a user clicks a row
     row.addEventListener('click', () => {
         const drawer = document.getElementById('delete-secret-drawer-' + secretId)
-        if (drawer instanceof SlDrawer) {
-            drawer.show()
+        if (drawer instanceof SideDrawer) {
+            drawer.open = true
         }
     })
 })
