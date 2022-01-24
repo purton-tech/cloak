@@ -31,12 +31,15 @@ markup::define! {
     DeleteSecretForm(secret_id: u32, vault_id: u32, secret_name: String) {
 
         form.m_form[method="post", action=super::delete_route(*vault_id)] {
-            sl_drawer[label=format!("Delete Secret ({})?", secret_name),
+            side_drawer[label=format!("Delete Secret ({})?", secret_name),
                 id=format!("delete-secret-drawer-{}", secret_id)] {
 
-                input[type="hidden", name="secret_id", value=secret_id.to_string()] {}
-
-                button.a_button.auto.danger[slot="footer", type = "submit"] { "Delete Secret" }
+                template[slot="body"] {
+                    input[type="hidden", name="secret_id", value=secret_id.to_string()] {}
+                }
+                template[slot="footer"] {
+                    button.a_button.auto.danger[type = "submit"] { "Delete Secret" }
+                }
             }
         }
 

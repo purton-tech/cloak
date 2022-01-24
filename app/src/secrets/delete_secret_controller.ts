@@ -8,7 +8,7 @@ document.querySelectorAll('[id^="delete-secret-controller-"]').forEach(async (ro
     row.addEventListener('click', () => {
         const drawer = document.getElementById('delete-secret-drawer-' + secretId)
         if (drawer instanceof SideDrawer) {
-            drawer.open= true
+            drawer.open = true
         }
     })
 })

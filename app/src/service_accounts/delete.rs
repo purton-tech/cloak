@@ -33,12 +33,16 @@ markup::define! {
     DeleteServiceAccountForm(service_account_id: u32, service_account_name: String) {
 
         form.m_form[method="post", action=super::DELETE] {
-            sl_drawer[label=format!("Delete Service Account ({})?", service_account_name),
+            side_drawer[label=format!("Delete Service Account ({})?", service_account_name),
                 id=format!("delete-account-drawer-{}", service_account_id)] {
 
-                input[type="hidden", name="service_account_id", value=service_account_id.to_string()] {}
+                template[slot="body"] {
+                    input[type="hidden", name="service_account_id", value=service_account_id.to_string()] {}
+                }
 
-                button.a_button.auto.danger[slot="footer", type = "submit"] { "Delete Service Account" }
+                template[slot="footer"] {
+                    button.a_button.auto.danger[slot="footer", type = "submit"] { "Delete Service Account" }
+                }
             }
         }
 

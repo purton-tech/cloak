@@ -1,10 +1,15 @@
 const template = document.createElement('template');
 
 template.innerHTML = `
-<div class="drawer drawer--end drawer--fixed drawer--has-footer" part="base">
+<div class="drawer" part="base">
     <div part="overlay" class="drawer__overlay" tabindex="-1">
     </div>
     <div part="panel" class="drawer__panel" role="dialog" aria-modal="true"  tabindex="0">
+
+        <header part="header" class="drawer__header">
+            <span part="title" class="drawer__title" id="title">Title</span>
+            <a hre="#" class="drawer__close" name="x" library="system">X</a>
+        </header>
         <div class="drawer__body">
         </div>
         <footer part="footer" class="drawer__footer">
@@ -19,16 +24,41 @@ export class SideDrawer extends HTMLElement {
     constructor() {
         super();
         const body = this.querySelector("template[slot='body']").cloneNode(true)
+        const footer = this.querySelector("template[slot='footer']").cloneNode(true)
         const templateNode = template.cloneNode(true)
 
-        if(templateNode instanceof HTMLTemplateElement && body instanceof HTMLTemplateElement) {
-
-            const drawerBody = templateNode.content.querySelector(".drawer__body")
+        if(templateNode instanceof HTMLTemplateElement && body instanceof HTMLTemplateElement
+            && footer instanceof HTMLTemplateElement) {
+            const templateDocument = templateNode.content
+            const drawerBody = templateDocument.querySelector(".drawer__body")
             drawerBody.appendChild(body.content)
-    
-            this.appendChild(templateNode.content)
+            const drawerFooter = templateDocument.querySelector(".drawer__footer")
+            drawerFooter.appendChild(footer.content)
 
+            const thiz = this
+
+            const closeButton = templateDocument.querySelector(".drawer__close")
+            closeButton.addEventListener("click", function() {
+                thiz.open = false
+            });
+
+            const overlay = templateDocument.querySelector(".drawer__overlay")
+            overlay.addEventListener("click", function() {
+                thiz.open = false
+            });
+
+            overlay.addEventListener('keydown', (event : Event) => {
+                console.log(event)
+                if(event instanceof KeyboardEvent) {
+                    if (event.key === 'Escape') {
+                        this.open = false
+                    }
+                }
+              }, false);
+    
+            this.appendChild(templateDocument)
         }
+
     }
 
     static get observedAttributes() {
@@ -47,8 +77,11 @@ export class SideDrawer extends HTMLElement {
         if (oldVal !== newVal) {
             switch (name) {
                 case 'open':
-                    this.open = new Boolean(newVal);
-                    if(this.open) {
+                    var val = false
+                    if(newVal == 'true') {
+                        val = true
+                    }
+                    if(val == true) {
                         this.querySelector('.drawer').classList.remove('drawer--open')
                         this.querySelector('.drawer').classList.add('drawer--open')
                     } else {

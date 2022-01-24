@@ -45,27 +45,31 @@ markup::define! {
     ServiceAccountForm {
 
         form.m_form[id="add-secret-form", method = "post", action=super::NEW] {
-            sl_drawer[label="Add Service Accounts", class="add-secret"] {
-                p {
-                    "To allow applications to access secrets without human intervention,
-                    We support service accounts. A service account is a non-human account 
-                    that is tied to one or more vaults."
+            side_drawer[label="Add Service Accounts", class="add-secret"] {
+                template[slot="body"] {
+                    p {
+                        "To allow applications to access secrets without human intervention,
+                        We support service accounts. A service account is a non-human account 
+                        that is tied to one or more vaults."
+                    }
+
+                    fieldset {
+                        label[for="name"] { "Name" }
+                        input[id="secret-name", type="text", required="", name="name"] {}
+
+                        label[for="secret"] { "ECDH Public Key" }
+                        input[id="public-key", type="text", required="", name="public_key"] {}
+
+                        label[for="kry"] { "Wrapped ECDH Private Key" }
+                        textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
+                        span.a_help_text { "The key for this service account" }
+
+                    }
                 }
 
-                fieldset {
-                    label[for="name"] { "Name" }
-                    input[id="secret-name", type="text", required="", name="name"] {}
-
-                    label[for="secret"] { "ECDH Public Key" }
-                    input[id="public-key", type="text", required="", name="public_key"] {}
-
-                    label[for="kry"] { "Wrapped ECDH Private Key" }
-                    textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
-                    span.a_help_text { "The key for this service account" }
-
+                template[slot="footer"] {
+                    button.a_button.auto.success[type = "submit"] { "Create Service Account" }
                 }
-
-                button.a_button.auto.success[slot="footer", type = "submit"] { "Create Service Account" }
             }
         }
 

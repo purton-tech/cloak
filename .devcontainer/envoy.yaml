@@ -28,6 +28,9 @@ static_resources:
                   envoy.filters.http.ext_authz:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
+                  envoy.filters.http.lua:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                    name: app_headers.lua
 
               # This will catch all incoming grpc requests (based on the header) and 
               # send them to our api.
@@ -139,7 +142,7 @@ static_resources:
                 app_headers.lua:
                   inline_string: |
                     function envoy_on_response(response_handle)
-                      csp = "default-src 'self'; style-src 'self'; connect-src 'self'";
+                      csp = "default-src 'none'; script-src 'self'; img-src 'self'; style-src 'self'; connect-src 'self'";
                       response_handle:headers():add("Content-Security-Policy", csp);
                       response_handle:headers():add("X-Frame-Options", "deny");
                       response_handle:headers():add("X-XSS-Protection", "1; mode=block");
@@ -161,27 +164,9 @@ static_resources:
                     end
               inline_code: |
                 function envoy_on_response(response_handle)
-                  function hasFrameAncestors(rh)
-                    s = rh:headers():get("Content-Security-Policy");
-                    delimiter = ";";
-                    defined = false;
-                    for match in (s..delimiter):gmatch("(.-)"..delimiter) do
-                      match = match:gsub("%s+", "");
-                      if match:sub(1, 15)=="frame-ancestors" then
-                        return true;
-                      end
-                    end
-                    return false;
-                  end
+                  csp = "default-src 'none'; style-src 'self'; img-src 'self'";
                   if not response_handle:headers():get("Content-Security-Policy") then
-                    csp = "frame-ancestors none;";
-                    response_handle:headers():add("Content-Security-Policy", csp);
-                  elseif response_handle:headers():get("Content-Security-Policy") then
-                    if not hasFrameAncestors(response_handle) then
-                      csp = response_handle:headers():get("Content-Security-Policy");
-                      csp = csp .. ";frame-ancestors none;";
-                      response_handle:headers():replace("Content-Security-Policy", csp);
-                    end
+                      response_handle:headers():add("Content-Security-Policy", csp);
                   end
                   if not response_handle:headers():get("X-Frame-Options") then
                     response_handle:headers():add("X-Frame-Options", "deny");

@@ -89,7 +89,7 @@ markup::define! {
                 }
 
                 template[slot="footer"] {
-                    button.a_button.auto.success[slot="footer", type = "submit"] { "Create Vault" }
+                    button.a_button.auto.success[type = "submit"] { "Create Vault" }
                 }
             }
         }
