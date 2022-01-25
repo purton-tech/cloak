@@ -22,12 +22,6 @@
         <ul>
           <li><a class="menu-item" href="/blog/">Blog</a></li>
           <li><a class="menu-item" href="/developers/">Developers</a></li>
-          {% set intro_page = get_page(path="developer-introduction.md") %}
-          {% set dev_section = get_section(path="developers/_index.md") %}
-          <li><a class="menu-item" href="/developers/">{{ intro_page.title }}</a></li>
-          {% for page in dev_section.pages %}
-          <li><a class="menu-item" href="{{ page.path | safe }}">{{ page.title }}</a></li>
-          {% endfor %}
           <li><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></li>
           <li><a class="menu-item" href="/auth/sign_in">Sign In</a></li>
         </ul>
