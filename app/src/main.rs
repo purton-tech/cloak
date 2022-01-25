@@ -7,6 +7,7 @@ mod layout;
 mod models;
 mod secrets;
 mod service_accounts;
+mod team;
 mod vaults;
 
 use axum::AddExtensionLayer;
@@ -32,6 +33,7 @@ async fn main() {
     let axum_make_service = axum::Router::new()
         .merge(vaults::routes())
         .merge(secrets::routes())
+        .merge(team::routes())
         .merge(service_accounts::routes())
         .merge(statics::asset_pipeline_routes())
         .merge(statics::image_routes())

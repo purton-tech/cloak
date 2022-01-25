@@ -5,6 +5,7 @@ use axum::response::Html;
 pub enum SideBar {
     Vaults,
     ServiceAccounts,
+    Team,
 }
 
 // page_title and content can be anything that can be rendered. A string, a
@@ -77,9 +78,12 @@ markup::define! {
                                 link: crate::vaults::INDEX,
                                 svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
 
-
                             { SvgSideMenuItem { side_bar: SideBar::ServiceAccounts, name: "Service Accounts",
                                 link: crate::service_accounts::INDEX,
+                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+
+                            { SvgSideMenuItem { side_bar: SideBar::Team, name: "Team",
+                                link: crate::team::INDEX,
                                 svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
                         }
                     }
