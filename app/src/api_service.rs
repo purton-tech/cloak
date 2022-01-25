@@ -22,7 +22,7 @@ impl app::vault::vault_server::Vault for VaultService {
             models::ServiceAccount::get_by_ecdh_public_key(&self.pool, req.ecdh_public_key).await?;
 
         if let Some(vault_id) = service_account.vault_id {
-            let vault = models::Vault::get_dangerous(&self.pool, vault_id as u32).await?;
+            let vault = models::vault::Vault::get_dangerous(&self.pool, vault_id as u32).await?;
 
             let secrets =
                 models::ServiceAccountSecret::get_all(&self.pool, service_account.id as u32)
@@ -64,7 +64,7 @@ impl app::vault::vault_server::Vault for VaultService {
         let secrets =
             models::Secret::get_all(&self.pool, authenticated_user.user_id, req.vault_id).await?;
         let vault =
-            models::Vault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
+            models::vault::Vault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
         let user_vault =
             models::UserVault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
         let service_accounts = models::ServiceAccount::get_by_vault(

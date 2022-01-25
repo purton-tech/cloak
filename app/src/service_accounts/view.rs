@@ -41,7 +41,7 @@ pub async fn connect(
 markup::define! {
     ViewServiceAccount<'a>(
         service_account: &'a crate::models::ServiceAccount,
-        vaults: &'a Vec<models::Vault>) {
+        vaults: &'a Vec<models::vault::Vault>) {
 
         form.m_form {
             side_drawer[label=format!("View {}", service_account.name),

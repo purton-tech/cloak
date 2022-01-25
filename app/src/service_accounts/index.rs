@@ -10,7 +10,7 @@ pub async fn index(
     Extension(pool): Extension<PgPool>,
 ) -> Result<Html<String>, CustomError> {
     let service_accounts = models::ServiceAccount::get_all(&pool, authentication.user_id).await?;
-    let vaults = models::Vault::get_all(&pool, authentication.user_id).await?;
+    let vaults = models::vault::Vault::get_all(&pool, authentication.user_id).await?;
 
     let page = ServiceAccountsPage {
         service_accounts,
@@ -25,7 +25,8 @@ pub async fn index(
 }
 
 markup::define! {
-    ServiceAccountsPage(service_accounts: Vec<models::ServiceAccount>, vaults: Vec<models::Vault>) {
+    ServiceAccountsPage(service_accounts: Vec<models::ServiceAccount>,
+        vaults: Vec<models::vault::Vault>) {
         div.m_card {
             div.header {
                 span { "Service Accounts" }
