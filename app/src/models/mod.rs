@@ -1,3 +1,4 @@
+pub mod organisation;
 pub mod vault;
 
 use crate::errors::CustomError;

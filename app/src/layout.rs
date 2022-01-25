@@ -20,6 +20,7 @@ pub fn layout(title: &str, content: &str, side_bar: &SideBar) -> Result<Html<Str
     Ok(Html(
         html.to_string()
             .replace("side_drawer", "side-drawer")
+            .replace("invite_user", "invite-user")
             .replace("relative_time", "relative-time"),
     ))
 }
