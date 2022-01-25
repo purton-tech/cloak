@@ -48,6 +48,10 @@ side-drawer {
             transform: translateX(100%);
             transition: all 0.3s ease-in-out;
 
+            &:focus {
+                outline: none;
+            }
+
             > .drawer__header {
                 display: flex;
 
@@ -58,6 +62,7 @@ side-drawer {
                     padding: var(--header-spacing);
                 }
                 > .drawer__close {
+                    cursor: pointer;
                     flex: 0 0 auto;
                     display: flex;
                     align-items: center;
