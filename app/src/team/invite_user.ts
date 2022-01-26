@@ -15,7 +15,6 @@ if (newSecretButton) {
 
         let element = newSecretButton.previousElementSibling.firstChild
         if (element instanceof InviteUser) {
-            console.log('here')
             element.open = true
         }
     })
