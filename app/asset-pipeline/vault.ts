@@ -10,7 +10,34 @@ const ECDH_OPTIONS = {
     namedCurve: "P-256"
 };
 
+const UNPROTECTED_SYMMETRIC_KEY = 'unprotected_symmetric_key'
+const UNPROTECTED_ECDSA_PRIVATE_KEY = 'unprotected_ecdsa_private_key'
+const DB_NAME = 'keyval'
+
+// All client side cryptography comes through this class.
 export class Vault {
+
+    // Use the ECDSA private key to sign data.
+    // We can verify signature with openssl as we generate in DER format.
+    // openssl dgst -SHA384 -verify key.pem -signature signature.bin proto.bin
+    public static async sign(bytesToSign: ByteData): Promise<ByteData> {
+
+        const db = await this.openIndexedDB()
+        const ecdsaKey = await db.get(DB_NAME, UNPROTECTED_ECDSA_PRIVATE_KEY) as CryptoKey
+        db.close()
+
+        let signature = await window.crypto.subtle.sign(
+            {
+                name: "ECDSA",
+                hash: { name: "SHA-384" },
+            },
+            ecdsaKey,
+            bytesToSign.arr
+        );
+
+        return new ByteData(signature)
+    }
+
 
     public static async blindIndex(text: string, id: number) : Promise<ByteData> {
         let enc = new TextEncoder();
@@ -79,7 +106,7 @@ export class Vault {
     public static async generateUserWrappedECDHKeyPair() {
 
         const db = await this.openIndexedDB()
-        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
         db.close()
 
         return await this.generateWrappedECDHKeyPair(key)
@@ -104,7 +131,7 @@ export class Vault {
     public static async encrypt(data: Uint8Array): Promise<Cipher> {
 
         const db = await this.openIndexedDB()
-        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
         db.close()
 
         return await this.aesEncrypt(data, key)
@@ -113,7 +140,7 @@ export class Vault {
     public static async decrypt(cipher: Cipher): Promise<ByteData> {
 
         const db = await this.openIndexedDB()
-        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
         db.close()
 
         return await this.aesDecrypt(cipher, key)
@@ -234,6 +261,11 @@ export class ByteData {
         for (var bytes = [], c = 0; c < hex.length; c += 2)
             bytes.push(parseInt(hex.substr(c, 2), 16));
         return new this(bytes)
+    }
+
+    static fromText(text: string) {
+        const enc = new TextEncoder()
+        return new this(enc.encode(text))
     }
 }
 

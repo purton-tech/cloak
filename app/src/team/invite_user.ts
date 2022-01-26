@@ -1,4 +1,5 @@
 import { SideDrawer } from '../../asset-pipeline/side-drawer'
+import { Vault, ByteData } from '../../asset-pipeline/vault'
 
 class InviteUser extends SideDrawer {
 
@@ -33,7 +34,19 @@ class InviteUser extends SideDrawer {
     }
 
     private generateInvite() {
-        this.inviteText.value = "hello"
+        this.emailInput.reportValidity()
+        if(this.emailInput.validity.valid == true) {
+
+            const email = encodeURIComponent(this.emailInput.value.toLowerCase())
+            const date = new Date().getTime()
+            const url = `${location.protocol}//${location.host}/invite/${email}/${date}/`
+
+            const data = ByteData.fromText(url)
+            const sigPromise = Vault.sign(data)
+            sigPromise.then(data => {
+                this.inviteText.value = url + data.b64
+            })
+        }
 
     }
 }
