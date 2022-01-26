@@ -118,7 +118,7 @@ const authPod = new kx.PodBuilder({
                 }
             },
             { name: "SECURE_COOKIE", value: 'true' },
-            { name: "REDIRECT_URL", value: '/app/vaults' },
+            { name: "REDIRECT_URL", value: '/app/post_registration' },
             { name: "FORWARD_URL", value: '127.0.0.1' }, 
             { name: "FORWARD_PORT", value: '8080' },
             { name: "SKIP_AUTH_FOR", value: '/$$,/images/*,/static/*,/contact' },

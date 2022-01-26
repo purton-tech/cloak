@@ -5,6 +5,7 @@ mod errors;
 mod hybrid;
 mod layout;
 mod models;
+mod registration_handler;
 mod secrets;
 mod service_accounts;
 mod team;
@@ -35,6 +36,7 @@ async fn main() {
         .merge(secrets::routes())
         .merge(team::routes())
         .merge(service_accounts::routes())
+        .merge(registration_handler::routes())
         .merge(statics::asset_pipeline_routes())
         .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())

@@ -34,6 +34,25 @@ impl Organisation {
         .await?)
     }
 
+    pub async fn create(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            "
+                INSERT INTO 
+                    organisations (created_by_user_id)
+                VALUES($1) 
+            ",
+            authenticated_user.user_id as i32
+        )
+        .execute(pool)
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        Ok(())
+    }
+
     pub async fn get_users(
         pool: &PgPool,
         authenticated_user: &Authentication,

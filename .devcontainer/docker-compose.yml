@@ -35,7 +35,7 @@ services:
       SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
       FORWARD_URL: development
       FORWARD_PORT: 7101
-      REDIRECT_URL: /app/vaults
+      REDIRECT_URL: /app/post_registration
       SKIP_AUTH_FOR: /$$,/static/*
       ENABLE_EMAIL_OTP: 'true'
 
