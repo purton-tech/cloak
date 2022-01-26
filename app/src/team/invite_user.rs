@@ -15,7 +15,8 @@ markup::define! {
                 }
 
                 template[slot="footer"] {
-                    button.a_button.auto.success[id="create-secret"] { "Create Secret" }
+                    button.a_button.auto.success { "Create Invitation" }
+                    button.a_button.auto.danger { "Cancel" }
                 }
             }
         }

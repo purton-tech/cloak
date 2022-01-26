@@ -80,6 +80,9 @@ side-drawer, invite-user {
             > .drawer__footer {
                 text-align: right;
                 padding: var(--footer-spacing);
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
             }
         }
     }
