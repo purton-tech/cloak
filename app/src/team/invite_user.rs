@@ -11,6 +11,12 @@ markup::define! {
                     fieldset {
                         label[for="email"] { "Email" }
                         input[type="email", required="", name="name"] {}
+
+                        label[for="invite"] { "Invite" }
+                        textarea[name="invite"] {
+
+                        }
+
                     }
                 }
 

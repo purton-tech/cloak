@@ -3,11 +3,13 @@ import { SideDrawer } from '../../asset-pipeline/side-drawer'
 class InviteUser extends SideDrawer {
 
     private emailInput : HTMLInputElement
+    private inviteText : HTMLTextAreaElement
 
     constructor() {
         super()
 
         this.emailInput = this.querySelector("input[type='email']")
+        this.inviteText = this.querySelector("textarea[name='invite']")
 
         this.querySelector('button.danger').addEventListener('click', event => {
             event.preventDefault()
@@ -25,16 +27,13 @@ class InviteUser extends SideDrawer {
         let newSecretButton = document.getElementById('invite-user')
         if (newSecretButton) {
             newSecretButton.addEventListener('click', async event => {
-
-                let element = newSecretButton.previousElementSibling.firstChild
-                if (element instanceof InviteUser) {
-                    element.open = true
-                }
+                this.open = true
             })
         }
     }
 
     private generateInvite() {
+        this.inviteText.value = "hello"
 
     }
 }
