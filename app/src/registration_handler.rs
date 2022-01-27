@@ -27,5 +27,5 @@ pub async fn post_registration(
         organisation::Organisation::create(&pool, &authenticated_user).await?;
     }
 
-    Ok(Redirect::to(REDIRECT_URL.parse().unwrap()))
+    Ok(Redirect::to(REDIRECT_URL.parse()?))
 }

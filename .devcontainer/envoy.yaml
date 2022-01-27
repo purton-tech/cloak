@@ -209,7 +209,7 @@ static_resources:
   clusters:
   # The authentication service hand /auth for UI and ext_authz
   - name: ext-authn
-    connect_timeout: 0.25s
+    connect_timeout: 1.25s
     type: strict_dns
     lb_policy: round_robin
     load_assignment:

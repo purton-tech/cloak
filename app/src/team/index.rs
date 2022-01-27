@@ -12,18 +12,23 @@ pub async fn index(
 
     let users = organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
 
-    let page = TeamPage { users };
+    let page = TeamPage {
+        users,
+        organisation_id: org.id,
+    };
 
-    crate::layout::layout("Home", &page.to_string(), &crate::layout::SideBar::Team)
+    crate::layout::layout("Team", &page.to_string(), &crate::layout::SideBar::Team)
 }
 
 markup::define! {
-    TeamPage(users: Vec<organisation::User>) {
+    TeamPage(users: Vec<organisation::User>, organisation_id: i32) {
         div.m_card {
             div.header {
                 span { "Team" }
 
-                @super::invite_user::InviteUserPage {}
+                @super::invite_user::InviteUserPage {
+                    organisation_id: *organisation_id
+                }
 
                 button.a_button.mini.primary[id="invite-user"] { "New User" }
             }
