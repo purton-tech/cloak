@@ -39,17 +39,21 @@ class InviteUser extends SideDrawer {
         this.emailInput.reportValidity()
         if(this.emailInput.validity.valid == true) {
 
-            const email = encodeURIComponent(this.emailInput.value.toLowerCase())
+            const email = this.emailInput.value.toLowerCase()
             const date = new Date().getTime()
-            const url = `${location.protocol}//${location.host}/app/team/invite/${this.organisationId}?email=${email}&time=${date}`
-
-            const data = ByteData.fromText(url)
+            const urlToSign = this.generateUrl(email, date)
+            const data = ByteData.fromText(urlToSign)
             const sigPromise = Vault.sign(data)
+            const urlToSend = this.generateUrl(encodeURIComponent(email), date)
             sigPromise.then(data => {
-                this.inviteText.value = url + '&sig=' + encodeURIComponent(data.b64)
+                this.inviteText.value = urlToSend + '&sig=' + encodeURIComponent(data.b64)
             })
         }
 
+    }
+
+    private generateUrl(email : String, time : number) {
+        return `${location.protocol}//${location.host}/app/team/invite/${this.organisationId}?email=${email}&time=${time}`
     }
 }
 
