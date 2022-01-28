@@ -9,6 +9,7 @@ use tonic::{Code, Status};
 pub enum CustomError {
     FaultySetup(String),
     Database(String),
+    InvalidInput(String),
     //Unauthorized(String),
 }
 
@@ -21,6 +22,7 @@ impl fmt::Display for CustomError {
             CustomError::Database(ref cause) => {
                 write!(f, "Database Error: {}", cause)
             }
+            CustomError::InvalidInput(ref cause) => write!(f, "Invalid Input: {}", cause),
         }
     }
 }
@@ -31,6 +33,7 @@ impl From<CustomError> for Status {
         match error {
             CustomError::Database(cause) => Status::new(Code::Internal, cause),
             CustomError::FaultySetup(cause) => Status::new(Code::Internal, cause),
+            CustomError::InvalidInput(cause) => Status::new(Code::Internal, cause),
         }
     }
 }

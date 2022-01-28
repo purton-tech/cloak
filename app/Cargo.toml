@@ -23,7 +23,6 @@ futures = "0.3"
 # HTML generation
 markup = "0"
 
-
 # gRPC dependencies
 tonic = "0"
 prost = "0"
@@ -31,6 +30,10 @@ prost = "0"
 # Access the database
 sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "postgres", "macros", "json" , "chrono" ] }
 chrono = { version = "0", features = ["serde"] }
+
+# Elliptic Curve Digital Signature Algorithm
+p256 = { version = "0.10", default-features = false, features = ["ecdsa", "pem"] } 
+base64 = "0" # So we encode DER public key to base64
 
 [build-dependencies]
 sha1 = "0.6"  # Use by build.rs for cache busting.

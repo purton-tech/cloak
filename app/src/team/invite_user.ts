@@ -6,6 +6,7 @@ class InviteUser extends SideDrawer {
     private emailInput : HTMLInputElement
     private inviteText : HTMLTextAreaElement
     private organisationId: number
+    private userId: number
 
     constructor() {
         super()
@@ -13,6 +14,7 @@ class InviteUser extends SideDrawer {
         this.emailInput = this.querySelector("input[type='email']")
         this.inviteText = this.querySelector("textarea[name='invite']")
         this.organisationId = parseInt(this.getAttribute("organisation"))
+        this.userId = parseInt(this.getAttribute("user"))
 
         this.querySelector('button.danger').addEventListener('click', event => {
             event.preventDefault()
@@ -53,7 +55,9 @@ class InviteUser extends SideDrawer {
     }
 
     private generateUrl(email : String, time : number) {
-        return `${location.protocol}//${location.host}/app/team/invite/${this.organisationId}?email=${email}&time=${time}`
+        return `${location.protocol}//${location.host}/app/team/invite/`
+            + `${this.organisationId}?id=${this.userId}`
+            + `&email=${email}&time=${time}`
     }
 }
 

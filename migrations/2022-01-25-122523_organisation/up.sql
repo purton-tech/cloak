@@ -10,8 +10,13 @@ CREATE TABLE organisation_users (
     organisation_id INT NOT NULL
 );
 
-INSERT INTO organisations (created_by_user_id)
-    SELECT id AS created_by_user_id FROM users;
-
-INSERT INTO organisation_users (user_id, organisation_id, is_admin)
-    SELECT created_by_user_id AS user_id, id AS organisation_id, true FROM organisations;
+-- Reset the database, we changed the key protocol.
+DELETE FROM organisation_users;
+DELETE FROM organisations;
+DELETE FROM secrets;
+DELETE FROM service_account_secrets;
+DELETE FROM service_accounts;
+DELETE FROM sessions;
+DELETE FROM users;
+DELETE FROM users_vaults;
+DELETE FROM vaults;

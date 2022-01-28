@@ -15,19 +15,25 @@ pub async fn index(
     let page = TeamPage {
         users,
         organisation_id: org.id,
+        authentication,
     };
 
     crate::layout::layout("Team", &page.to_string(), &crate::layout::SideBar::Team)
 }
 
 markup::define! {
-    TeamPage(users: Vec<organisation::User>, organisation_id: i32) {
+    TeamPage(
+        users: Vec<organisation::User>,
+        organisation_id: i32,
+        authentication: Authentication) {
+
         div.m_card {
             div.header {
                 span { "Team" }
 
                 @super::invite_user::InviteUserPage {
-                    organisation_id: *organisation_id
+                    organisation_id: *organisation_id,
+                    user_id: authentication.user_id
                 }
 
                 button.a_button.mini.primary[id="invite-user"] { "New User" }

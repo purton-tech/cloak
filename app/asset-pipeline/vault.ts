@@ -29,13 +29,13 @@ export class Vault {
         let signature = await window.crypto.subtle.sign(
             {
                 name: "ECDSA",
-                hash: { name: "SHA-384" },
+                hash: { name: "SHA-256" },
             },
             ecdsaKey,
             bytesToSign.arr
         );
 
-        return new ByteData(signature)
+        return this.toDER(new ByteData(signature))
     }
 
 
@@ -191,6 +191,47 @@ export class Vault {
             },
         });
     }
+    // Copied from https://stackoverflow.com/questions/39554165/ecdsa-signatures-between-node-js-and-webcrypto-appear-to-be-incompatible
+    // It generated hex, we could write a more efficient one that jsut works with bytes.
+    private static toDER(signature: ByteData): ByteData {
+
+        // Extract r & s and format it in ASN1 format.
+        var signHex = Array.prototype.map.call(signature.arr, function (x) { 
+            return ('00' + x.toString(16)).slice(-2); }).join(''),
+            r = signHex.substring(0, signHex.length/2),
+            s = signHex.substring(signHex.length/2),
+            rPre = true,
+            sPre = true;
+
+        while (r.indexOf('00') === 0) {
+            r = r.substring(2);
+            rPre = false;
+        }
+
+        if (rPre && parseInt(r.substring(0, 2), 16) > 127) {
+            r = '00' + r;
+        }
+
+        while (s.indexOf('00') === 0) {
+            s = s.substring(2);
+            sPre = false;
+        }
+
+        if (sPre && parseInt(s.substring(0, 2), 16) > 127) {
+            s = '00' + s;
+        }
+
+        const payload = '02' + this.lengthOfHex(r) + r + '02' + this.lengthOfHex(s) + s
+        const der = '30' + this.lengthOfHex(payload) + payload
+
+        return ByteData.fromHex(der)
+    }
+
+    // Auxs
+    private static lengthOfHex(hex) {
+        return ('00' + (hex.length / 2).toString(16)).slice(-2).toString();
+    }
+
 }
 
 
