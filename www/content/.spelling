@@ -12,6 +12,7 @@ Pulumi
 YAML
 tunnel.yourddomain.com.
 CNAME
+LUA
  - blog/_index.md
 sort_by
 class_name
@@ -54,3 +55,8 @@ cloudflare
 cert.pem
 4
 2022-01-20
+ - blog/add-security-headers-to-your-web-app-with-envoy/index.md
+2022-01-24
+3rd
+ - pages/privacy.md
+2022-01-25

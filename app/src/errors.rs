@@ -9,6 +9,7 @@ use tonic::{Code, Status};
 pub enum CustomError {
     FaultySetup(String),
     Database(String),
+    InvalidInput(String),
     //Unauthorized(String),
 }
 
@@ -21,6 +22,7 @@ impl fmt::Display for CustomError {
             CustomError::Database(ref cause) => {
                 write!(f, "Database Error: {}", cause)
             }
+            CustomError::InvalidInput(ref cause) => write!(f, "Invalid Input: {}", cause),
         }
     }
 }
@@ -31,11 +33,12 @@ impl From<CustomError> for Status {
         match error {
             CustomError::Database(cause) => Status::new(Code::Internal, cause),
             CustomError::FaultySetup(cause) => Status::new(Code::Internal, cause),
+            CustomError::InvalidInput(cause) => Status::new(Code::Internal, cause),
         }
     }
 }
 
-// So that errors get prinbted to the browser?
+// So that errors get printed to the browser?
 impl IntoResponse for CustomError {
     fn into_response(self) -> Response {
         (StatusCode::UNPROCESSABLE_ENTITY, self).into_response()
@@ -46,5 +49,12 @@ impl IntoResponse for CustomError {
 impl From<sqlx::Error> for CustomError {
     fn from(err: sqlx::Error) -> CustomError {
         CustomError::Database(err.to_string())
+    }
+}
+
+// Any errors from sqlx get converted to CustomError
+impl From<axum::http::uri::InvalidUri> for CustomError {
+    fn from(err: axum::http::uri::InvalidUri) -> CustomError {
+        CustomError::FaultySetup(err.to_string())
     }
 }

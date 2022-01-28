@@ -55,7 +55,7 @@ pub async fn new(
     .await
     .map_err(|e| CustomError::Database(e.to_string()))?;
 
-    Ok(Redirect::to(super::INDEX.parse().unwrap()))
+    Ok(Redirect::to(super::INDEX.parse()?))
 }
 
 markup::define! {

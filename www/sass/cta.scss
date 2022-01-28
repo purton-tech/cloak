@@ -8,7 +8,7 @@
         margin-left: auto;
         margin-right: auto;
         max-width: var(--content-width);
-        padding: var(--content-padding);
+        padding: 1rem;
         text-align: center;
 
         > div.image {
@@ -25,15 +25,13 @@
         > div.text {
             grid-area: text;
             > p {
-                font-size: 0.8rem;
+                font-size: 1rem;
                 color: white;
             }
         }
 
         > h1 {
             grid-area: headline;
-            font-size: 3.75rem;
-            line-height: 1.25;
             margin: 0;
         }
 
@@ -60,6 +58,7 @@
     @include for-tablet-landscape-up {
 
         > div {
+            padding: var(--content-padding);
             text-align: left;
             display: grid;
             align-items: start;
@@ -86,6 +85,11 @@
                     width: auto;
                     height: 450px;
                 }
+            }
+
+            > h1 {
+                font-size: 3.75rem;
+                line-height: 1.25;
             }
 
             > div.footer {

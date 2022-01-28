@@ -77,10 +77,12 @@ name = "app"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "base64",
  "chrono",
  "futures",
  "hyper",
  "markup",
+ "p256",
  "pin-project",
  "prost 0.9.0",
  "serde",
@@ -454,6 +456,7 @@ checksum = "d0d69ae62e0ce582d56380743515fefaf1a8c70cec685d9677636d7e30ae9dc9"
 dependencies = [
  "der",
  "elliptic-curve",
+ "rfc6979",
  "signature",
 ]
 
@@ -1135,6 +1138,7 @@ dependencies = [
  "ecdsa",
  "elliptic-curve",
  "sec1",
+ "sha2",
 ]
 
 [[package]]
@@ -1536,6 +1540,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "rfc6979"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96ef608575f6392792f9ecf7890c00086591d29a83910939d430753f7c050525"
+dependencies = [
+ "crypto-bigint",
+ "hmac",
+ "zeroize",
+]
+
+[[package]]
 name = "ring"
 version = "0.16.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1731,6 +1746,7 @@ version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "02658e48d89f2bec991f9a78e69cfa4c316f8d6a6c4ec12fae1aeb263d486788"
 dependencies = [
+ "digest",
  "rand_core",
 ]
 

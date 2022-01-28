@@ -10,7 +10,34 @@ const ECDH_OPTIONS = {
     namedCurve: "P-256"
 };
 
+const UNPROTECTED_SYMMETRIC_KEY = 'unprotected_symmetric_key'
+const UNPROTECTED_ECDSA_PRIVATE_KEY = 'unprotected_ecdsa_private_key'
+const DB_NAME = 'keyval'
+
+// All client side cryptography comes through this class.
 export class Vault {
+
+    // Use the ECDSA private key to sign data.
+    // We can verify signature with openssl as we generate in DER format.
+    // openssl dgst -SHA384 -verify key.pem -signature signature.bin proto.bin
+    public static async sign(bytesToSign: ByteData): Promise<ByteData> {
+
+        const db = await this.openIndexedDB()
+        const ecdsaKey = await db.get(DB_NAME, UNPROTECTED_ECDSA_PRIVATE_KEY) as CryptoKey
+        db.close()
+
+        let signature = await window.crypto.subtle.sign(
+            {
+                name: "ECDSA",
+                hash: { name: "SHA-256" },
+            },
+            ecdsaKey,
+            bytesToSign.arr
+        );
+
+        return this.toDER(new ByteData(signature))
+    }
+
 
     public static async blindIndex(text: string, id: number) : Promise<ByteData> {
         let enc = new TextEncoder();
@@ -79,7 +106,7 @@ export class Vault {
     public static async generateUserWrappedECDHKeyPair() {
 
         const db = await this.openIndexedDB()
-        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
         db.close()
 
         return await this.generateWrappedECDHKeyPair(key)
@@ -104,7 +131,7 @@ export class Vault {
     public static async encrypt(data: Uint8Array): Promise<Cipher> {
 
         const db = await this.openIndexedDB()
-        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
         db.close()
 
         return await this.aesEncrypt(data, key)
@@ -113,7 +140,7 @@ export class Vault {
     public static async decrypt(cipher: Cipher): Promise<ByteData> {
 
         const db = await this.openIndexedDB()
-        const key = await db.get('keyval', 'unprotected_symmetric_key') as CryptoKey
+        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
         db.close()
 
         return await this.aesDecrypt(cipher, key)
@@ -164,6 +191,47 @@ export class Vault {
             },
         });
     }
+    // Copied from https://stackoverflow.com/questions/39554165/ecdsa-signatures-between-node-js-and-webcrypto-appear-to-be-incompatible
+    // It generated hex, we could write a more efficient one that jsut works with bytes.
+    private static toDER(signature: ByteData): ByteData {
+
+        // Extract r & s and format it in ASN1 format.
+        var signHex = Array.prototype.map.call(signature.arr, function (x) { 
+            return ('00' + x.toString(16)).slice(-2); }).join(''),
+            r = signHex.substring(0, signHex.length/2),
+            s = signHex.substring(signHex.length/2),
+            rPre = true,
+            sPre = true;
+
+        while (r.indexOf('00') === 0) {
+            r = r.substring(2);
+            rPre = false;
+        }
+
+        if (rPre && parseInt(r.substring(0, 2), 16) > 127) {
+            r = '00' + r;
+        }
+
+        while (s.indexOf('00') === 0) {
+            s = s.substring(2);
+            sPre = false;
+        }
+
+        if (sPre && parseInt(s.substring(0, 2), 16) > 127) {
+            s = '00' + s;
+        }
+
+        const payload = '02' + this.lengthOfHex(r) + r + '02' + this.lengthOfHex(s) + s
+        const der = '30' + this.lengthOfHex(payload) + payload
+
+        return ByteData.fromHex(der)
+    }
+
+    // Auxs
+    private static lengthOfHex(hex) {
+        return ('00' + (hex.length / 2).toString(16)).slice(-2).toString();
+    }
+
 }
 
 
@@ -234,6 +302,11 @@ export class ByteData {
         for (var bytes = [], c = 0; c < hex.length; c += 2)
             bytes.push(parseInt(hex.substr(c, 2), 16));
         return new this(bytes)
+    }
+
+    static fromText(text: string) {
+        const enc = new TextEncoder()
+        return new this(enc.encode(text))
     }
 }
 

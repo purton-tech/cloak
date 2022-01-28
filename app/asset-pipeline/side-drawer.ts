@@ -22,9 +22,10 @@ template.innerHTML = `
 export class SideDrawer extends HTMLElement {
 
     constructor() {
-        super();
+        super()
         const body = this.querySelector("template[slot='body']").cloneNode(true)
         const footer = this.querySelector("template[slot='footer']").cloneNode(true)
+        const title = this.attributes.getNamedItem('label').value
         const templateNode = template.cloneNode(true)
 
         if(templateNode instanceof HTMLTemplateElement && body instanceof HTMLTemplateElement
@@ -34,6 +35,9 @@ export class SideDrawer extends HTMLElement {
             drawerBody.appendChild(body.content)
             const drawerFooter = templateDocument.querySelector(".drawer__footer")
             drawerFooter.appendChild(footer.content)
+
+            const templateTitle = templateDocument.querySelector(".drawer__title")
+            templateTitle.innerHTML = title
 
             const thiz = this
 

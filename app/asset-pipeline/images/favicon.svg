@@ -2,9 +2,10 @@
   <style>
     .small { 
         font: normal 100px sans-serif; 
+        fill: white;
     }
     .parent {
-        background: rgba(255,107,74);
+        background: #031b4d;
     }
   </style>
   <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" class="small">C</text>    

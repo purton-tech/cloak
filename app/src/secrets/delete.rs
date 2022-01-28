@@ -22,9 +22,7 @@ pub async fn delete(
 ) -> Result<impl IntoResponse, CustomError> {
     models::Secret::delete(&pool, delete_secret.secret_id, authentication.user_id).await?;
 
-    Ok(Redirect::to(
-        super::secret_route(vault_id as i32).parse().unwrap(),
-    ))
+    Ok(Redirect::to(super::secret_route(vault_id as i32).parse()?))
 }
 
 markup::define! {

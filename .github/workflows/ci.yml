@@ -41,6 +41,10 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache --push +all
 
+    # If this is a release
+    #   create release notes
+    #   set the docker version
+    #   
     - name: Semantic Release
       run: | 
         npm i -D @semantic-release/exec
