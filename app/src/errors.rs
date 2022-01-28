@@ -41,7 +41,13 @@ impl From<CustomError> for Status {
 // So that errors get printed to the browser?
 impl IntoResponse for CustomError {
     fn into_response(self) -> Response {
-        (StatusCode::UNPROCESSABLE_ENTITY, self).into_response()
+        let (status, error_message) = match self {
+            CustomError::Database(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
+            CustomError::FaultySetup(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
+            CustomError::InvalidInput(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
+        };
+
+        format!("status = {}, message = {}", status, error_message).into_response()
     }
 }
 
