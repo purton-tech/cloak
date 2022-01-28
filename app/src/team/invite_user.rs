@@ -1,3 +1,4 @@
+use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use crate::models::{organisation, user};
 use axum::{
@@ -26,7 +27,7 @@ pub async fn invite(
     Path(org): Path<u32>,
     Query(params): Query<Params>,
     Extension(pool): Extension<PgPool>,
-    //authentication: Authentication,
+    authentication: Authentication,
     request: Request<Body>, // Request<Body> Has to be the last extractor
 ) -> Result<impl IntoResponse, CustomError> {
     let request_uri = (
@@ -68,7 +69,10 @@ pub async fn invite(
                     let signature = Signature::from_der(&sig_der)
                         .map_err(|e| CustomError::InvalidInput(e.to_string()))?;
 
-                    dbg!(verify_key.verify(url.as_bytes(), &signature).is_ok());
+                    if verify_key.verify(url.as_bytes(), &signature).is_ok() {
+                        // All details are correct add the user to the team.
+                        organisation::Organisation::add_user(&pool, &authentication, org).await?;
+                    }
                 }
             }
         }
