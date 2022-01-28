@@ -14,6 +14,7 @@ use p256::{
 };
 use serde::Deserialize;
 use sqlx::PgPool;
+use std::time::{SystemTime, UNIX_EPOCH};
 
 #[derive(Debug, Deserialize)]
 pub struct Params {
@@ -70,8 +71,15 @@ pub async fn invite(
                         .map_err(|e| CustomError::InvalidInput(e.to_string()))?;
 
                     if verify_key.verify(url.as_bytes(), &signature).is_ok() {
-                        // All details are correct add the user to the team.
-                        organisation::Organisation::add_user(&pool, &authentication, org).await?;
+                        let start = SystemTime::now();
+                        let since_the_epoch = start
+                            .duration_since(UNIX_EPOCH)
+                            .expect("Time went backwards");
+                        if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {
+                            // All details are correct add the user to the team.
+                            organisation::Organisation::add_user(&pool, &authentication, org)
+                                .await?;
+                        }
                     }
                 }
             }

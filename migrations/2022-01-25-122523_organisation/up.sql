@@ -6,8 +6,9 @@ CREATE TABLE organisations (
 
 CREATE TABLE organisation_users (
     user_id INT NOT NULL, 
+    organisation_id INT NOT NULL,
     is_admin BOOLEAN NOT NULL DEFAULT false,
-    organisation_id INT NOT NULL
+    PRIMARY KEY (user_id, organisation_id)
 );
 
 -- Reset the database, we changed the key protocol.
