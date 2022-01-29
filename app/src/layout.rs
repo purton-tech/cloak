@@ -11,8 +11,18 @@ pub enum SideBar {
 // page_title and content can be anything that can be rendered. A string, a
 // template, a number, etc.
 pub fn layout(title: &str, content: &str, side_bar: &SideBar) -> Result<Html<String>, CustomError> {
+    layout_with_header(title, content, "", side_bar)
+}
+
+pub fn layout_with_header(
+    title: &str,
+    content: &str,
+    header: &str,
+    side_bar: &SideBar,
+) -> Result<Html<String>, CustomError> {
     let html = ApplicationLayout {
         content,
+        header,
         title,
         side_bar,
     };
@@ -42,7 +52,7 @@ markup::define! {
         }
     }
 
-    ApplicationLayout<'a>(content: &'a str, title: &'a str, side_bar: &'a SideBar)
+    ApplicationLayout<'a>(content: &'a str, header: &'a str, title: &'a str, side_bar: &'a SideBar)
     {
         @markup::doctype()
 
@@ -65,6 +75,7 @@ markup::define! {
             body {
                 div.l_application {
                     header {
+                        {markup::raw(header)}
                     }
                     aside.sidenav {
                         h1 {

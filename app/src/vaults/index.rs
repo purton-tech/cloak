@@ -13,18 +13,38 @@ pub async fn index(
 
     let page = VaultsPage { vaults };
 
-    crate::layout::layout("Home", &page.to_string(), &crate::layout::SideBar::Vaults)
+    let header = VaultHeader {};
+
+    crate::layout::layout_with_header(
+        "Vaults",
+        &page.to_string(),
+        &header.to_string(),
+        &crate::layout::SideBar::Vaults,
+    )
 }
 
 markup::define! {
+    VaultHeader {
+        @super::new_vault::VaultForm {}
+        button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
+    }
     VaultsPage(vaults: Vec<models::vault::Vault>) {
+
+        @for vault in vaults {
+            div.m_card."vault-card" {
+                div.body {
+                    h4.title { {vault.name} }
+                    .created {
+                        "Created "
+                        relative_time[datetime=vault.created_at.to_rfc3339()] {}
+                    }
+                }
+            }
+        }
+
         div.m_card {
             div.header {
                 span { "Vaults" }
-
-                @super::new_vault::VaultForm {}
-
-                button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
             }
             div.body {
                 table.m_table {
