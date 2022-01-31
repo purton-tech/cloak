@@ -28,9 +28,6 @@ static_resources:
                   envoy.filters.http.ext_authz:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
-                  envoy.filters.http.lua:
-                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
-                    name: app_headers.lua
 
               # This will catch all incoming grpc requests (based on the header) and 
               # send them to our api.
