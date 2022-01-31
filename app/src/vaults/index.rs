@@ -38,6 +38,10 @@ markup::define! {
                         "Created "
                         relative_time[datetime=vault.created_at.to_rfc3339()] {}
                     }
+                    @super::members::MembersDrawer {}
+                    button."open-members-drawer" {
+                        {"Members"}
+                    }
                 }
             }
         }

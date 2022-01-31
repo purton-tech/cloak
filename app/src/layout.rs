@@ -31,6 +31,7 @@ pub fn layout_with_header(
         html.to_string()
             .replace("side_drawer", "side-drawer")
             .replace("invite_user", "invite-user")
+            .replace("members_drawer", "members-drawer")
             .replace("relative_time", "relative-time"),
     ))
 }

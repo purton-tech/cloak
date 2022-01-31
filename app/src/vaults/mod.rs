@@ -1,4 +1,5 @@
 mod index;
+mod members;
 mod new_vault;
 
 use axum::{
