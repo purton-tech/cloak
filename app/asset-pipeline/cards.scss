@@ -4,6 +4,13 @@
     border: 1px solid var(--accents-2);
     border-radius: 5px;
 
+    &.clickable {
+        cursor: pointer;
+        &:hover {
+            box-shadow: var(--shadow-medium);
+        }
+    }
+
     > .body {
         padding: 1em;
     }

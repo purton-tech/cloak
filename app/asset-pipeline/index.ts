@@ -2,6 +2,7 @@ import './index.scss'
 
 // Web components
 import './side-drawer'
+import './cards'
 import '@github/time-elements/dist/relative-time-element';
 
 // Front end enhancement
