@@ -25,9 +25,6 @@ static_resources:
               - match: { prefix: "/auth" }
                 route: { cluster: ext-authn }
                 typed_per_filter_config:
-                  envoy.filters.http.ext_authz:
-                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
-                    disabled: true
 
               # This will catch all incoming grpc requests (based on the header) and 
               # send them to our api.
