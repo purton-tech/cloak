@@ -4,9 +4,8 @@ const openers = document.querySelectorAll(".open-members-drawer");
 
 openers.forEach(function(opener) {
     opener.addEventListener('click', event => {
-        event.preventDefault()
+        event.stopPropagation()
         let element = opener.previousElementSibling.firstChild
-        console.log(element)
         if(element instanceof SideDrawer) {
             element.open = true
         }

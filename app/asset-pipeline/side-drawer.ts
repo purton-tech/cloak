@@ -43,11 +43,13 @@ export class SideDrawer extends HTMLElement {
 
             const closeButton = templateDocument.querySelector(".drawer__close")
             closeButton.addEventListener("click", function() {
+                event.stopPropagation()
                 thiz.open = false
             });
 
             const overlay = templateDocument.querySelector(".drawer__overlay")
             overlay.addEventListener("click", function() {
+                event.stopPropagation()
                 thiz.open = false
             });
 
