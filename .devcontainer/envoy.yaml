@@ -83,7 +83,7 @@ static_resources:
                 typed_per_filter_config:
                   envoy.filters.http.lua:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
-                    name: app_headers.lua
+                    name: security_headers.lua
 
               # Paths that don't need authentication
 
@@ -94,9 +94,6 @@ static_resources:
                   envoy.filters.http.ext_authz:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
-                  envoy.filters.http.lua:
-                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
-                    disabled: true
                     
               # Everything else passes in to here. The marketing pages
               - match: { prefix: "/" }
@@ -105,6 +102,12 @@ static_resources:
                   envoy.filters.http.ext_authz:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
+                  envoy.filters.http.lua:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                    name: security_headers.lua
+                  envoy.filters.http.lua:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                    name: cache_control.lua
      
           http_filters:
           # Convert incoming gRPC web request to proper gRPC
@@ -136,7 +139,12 @@ static_resources:
               "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
 
               source_codes:
-                app_headers.lua:
+                cache_control.lua:
+                  inline_string: |
+                    function envoy_on_response(response_handle)
+                      response_handle:headers():add("Cache-Control", "none");
+                    end
+                security_headers.lua:
                   inline_string: |
                     function envoy_on_response(response_handle)
                       csp = "default-src 'none'; script-src 'self'; img-src 'self'; style-src 'self'; connect-src 'self'";
@@ -161,45 +169,6 @@ static_resources:
                     end
               inline_code: |
                 function envoy_on_response(response_handle)
-                  csp = "default-src 'none'; style-src 'self'; img-src 'self'";
-                  if not response_handle:headers():get("Content-Security-Policy") then
-                      response_handle:headers():add("Content-Security-Policy", csp);
-                  end
-                  if not response_handle:headers():get("X-Frame-Options") then
-                    response_handle:headers():add("X-Frame-Options", "deny");
-                  end
-                  if not response_handle:headers():get("X-XSS-Protection") then
-                    response_handle:headers():add("X-XSS-Protection", "1; mode=block");
-                  end
-                  if not response_handle:headers():get("X-Content-Type-Options") then
-                    response_handle:headers():add("X-Content-Type-Options", "nosniff");
-                  end
-                  if not response_handle:headers():get("Referrer-Policy") then
-                    response_handle:headers():add("Referrer-Policy", "no-referrer");
-                  end
-                  if not response_handle:headers():get("X-Download-Options") then
-                    response_handle:headers():add("X-Download-Options", "noopen");
-                  end
-                  if not response_handle:headers():get("X-DNS-Prefetch-Control") then
-                    response_handle:headers():add("X-DNS-Prefetch-Control", "off");
-                  end
-                  if not response_handle:headers():get("Strict-Transport-Security") then
-                    response_handle:headers():add("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
-                  end
-                  if not response_handle:headers():get("Feature-Policy") then
-                    response_handle:headers():add("Permissions-Policy",
-                                                  "accelerometer=(), "..
-                                                  "camera=(), "..
-                                                  "geolocation=(), "..
-                                                  "gyroscope=(), "..
-                                                  "magnetometer=(), "..
-                                                  "microphone=(), "..
-                                                  "payment=(), "..
-                                                  "usb=()");
-                  end
-                  if response_handle:headers():get("X-Powered-By") then
-                    response_handle:headers():remove("X-Powered-By");
-                  end
                 end
           - name: envoy.filters.http.router
 
