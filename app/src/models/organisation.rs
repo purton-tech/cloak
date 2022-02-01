@@ -34,7 +34,7 @@ impl Organisation {
         .await?)
     }
 
-    pub async fn add_user(
+    pub async fn add_user_dangerous(
         pool: &PgPool,
         authenticated_user: &Authentication,
         organisation_id: u32,
@@ -90,7 +90,7 @@ impl Organisation {
     }
 
     // This method is for internal use only.
-    pub async fn get_unsafe(
+    pub async fn get_dangerous(
         pool: &PgPool,
         user_id: u32,
         organisation_id: u32,

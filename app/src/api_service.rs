@@ -16,17 +16,20 @@ impl app::vault::vault_server::Vault for VaultService {
     ) -> Result<Response<GetServiceAccountResponse>, Status> {
         let req = request.into_inner();
 
-        dbg!(&req);
-
-        let service_account =
-            models::ServiceAccount::get_by_ecdh_public_key(&self.pool, req.ecdh_public_key).await?;
+        let service_account = models::service_account::ServiceAccount::get_by_ecdh_public_key(
+            &self.pool,
+            req.ecdh_public_key,
+        )
+        .await?;
 
         if let Some(vault_id) = service_account.vault_id {
             let vault = models::vault::Vault::get_dangerous(&self.pool, vault_id as u32).await?;
 
-            let secrets =
-                models::ServiceAccountSecret::get_all(&self.pool, service_account.id as u32)
-                    .await?;
+            let secrets = models::service_account_secret::ServiceAccountSecret::get_all_dangerous(
+                &self.pool,
+                service_account.id as u32,
+            )
+            .await?;
 
             let secrets = secrets
                 .into_iter()
@@ -62,15 +65,16 @@ impl app::vault::vault_server::Vault for VaultService {
         dbg!(&authenticated_user);
 
         let secrets =
-            models::Secret::get_all(&self.pool, authenticated_user.user_id, req.vault_id).await?;
+            models::secret::Secret::get_all(&self.pool, &authenticated_user, req.vault_id).await?;
         let vault =
             models::vault::Vault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
         let user_vault =
-            models::UserVault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
-        let service_accounts = models::ServiceAccount::get_by_vault(
+            models::user_vault::UserVault::get(&self.pool, &authenticated_user, req.vault_id)
+                .await?;
+        let service_accounts = models::service_account::ServiceAccount::get_by_vault(
             &self.pool,
             req.vault_id,
-            authenticated_user.user_id,
+            &authenticated_user,
         )
         .await?;
 
@@ -109,15 +113,16 @@ impl app::vault::vault_server::Vault for VaultService {
     ) -> Result<Response<CreateSecretsResponse>, Status> {
         dbg!(&request);
 
-        let _authenticated_user = authenticate(&request).await?;
+        let authenticated_user = authenticate(&request).await?;
 
         let req = request.into_inner();
 
-        let mut secrets: Vec<models::ServiceAccountSecret> = Default::default();
+        let mut secrets: Vec<models::service_account_secret::ServiceAccountSecret> =
+            Default::default();
 
         for account_secret in req.account_secrets {
             for secret in account_secret.secrets {
-                secrets.push(models::ServiceAccountSecret {
+                secrets.push(models::service_account_secret::ServiceAccountSecret {
                     id: 0,
                     service_account_id: account_secret.service_account_id as i32,
                     name: secret.encrypted_name,
@@ -127,7 +132,12 @@ impl app::vault::vault_server::Vault for VaultService {
             }
         }
 
-        models::ServiceAccountSecret::create(&self.pool, secrets).await?;
+        models::service_account_secret::ServiceAccountSecret::create(
+            &self.pool,
+            &authenticated_user,
+            secrets,
+        )
+        .await?;
 
         let response = CreateSecretsResponse {};
 

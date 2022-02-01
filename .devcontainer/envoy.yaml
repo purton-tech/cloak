@@ -148,7 +148,7 @@ static_resources:
 
                       response_handle:headers():add("Cache-Control", "none");
 
-                      csp = "default-src 'none'; img-src 'self'; style-src 'self'; connect-src 'self'";
+                      csp = "default-src 'none'; img-src 'self'; style-src 'self'";
                       response_handle:headers():add("Content-Security-Policy", csp);
                       response_handle:headers():add("X-Frame-Options", "deny");
                       response_handle:headers():add("X-XSS-Protection", "1; mode=block");

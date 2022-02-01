@@ -1,13 +1,12 @@
 markup::define! {
-    MembersDrawer {
+    MembersDrawer(vault_name: String) {
 
         form.m_form[method = "post", action=super::NEW] {
-            members_drawer[label="Add Vault"] {
+            members_drawer[label=format!("Members of {}", vault_name)] {
                 template[slot="body"] {
                     p {
-                        "Vaults keep related secrets together.
-                        For example you could have a vault called My Project with all
-                        the secrets related to your project."
+                        "Members of a vault can add and remove secrets. "
+                        " They can also create Service Accounts for this Vault"
                     }
                 }
 

@@ -37,7 +37,9 @@ markup::define! {
                         "Created "
                         relative_time[datetime=vault.created_at.to_rfc3339()] {}
                     }
-                    @super::members::MembersDrawer {}
+                    @super::members::MembersDrawer {
+                        vault_name: vault.name.clone()
+                    }
                     button."open-members-drawer" {
                         {"Members"}
                     }

@@ -40,7 +40,7 @@ pub async fn connect(
 
 markup::define! {
     ViewServiceAccount<'a>(
-        service_account: &'a crate::models::ServiceAccount,
+        service_account: &'a crate::models::service_account::ServiceAccount,
         vaults: &'a Vec<models::vault::Vault>) {
 
         form.m_form {

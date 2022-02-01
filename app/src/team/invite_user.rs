@@ -50,7 +50,7 @@ pub async fn invite(
             // We need to know, does the user who created the link have authorizatiion
             // to invite users?
             if let Ok(org_user) =
-                organisation::Organisation::get_unsafe(&pool, params.id, org).await
+                organisation::Organisation::get_dangerous(&pool, params.id, org).await
             {
                 // Is the user doing the inviations an ad in for the org they want to invite
                 // the user to?
@@ -77,8 +77,12 @@ pub async fn invite(
                             .expect("Time went backwards");
                         if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {
                             // All details are correct add the user to the team.
-                            organisation::Organisation::add_user(&pool, &authentication, org)
-                                .await?;
+                            organisation::Organisation::add_user_dangerous(
+                                &pool,
+                                &authentication,
+                                org,
+                            )
+                            .await?;
                         }
                     }
                 }

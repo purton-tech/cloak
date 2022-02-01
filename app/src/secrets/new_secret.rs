@@ -44,7 +44,7 @@ pub async fn new(
 }
 
 markup::define! {
-    NewSecretPage<'a>(user_vault: &'a models::UserVault) {
+    NewSecretPage<'a>(user_vault: &'a models::user_vault::UserVault) {
 
         form.m_form[id="add-secret-form", method = "post",
             action=super::new_route(user_vault.vault_id)] {

@@ -9,7 +9,8 @@ pub async fn index(
     authentication: Authentication,
     Extension(pool): Extension<PgPool>,
 ) -> Result<Html<String>, CustomError> {
-    let service_accounts = models::ServiceAccount::get_all(&pool, authentication.user_id).await?;
+    let service_accounts =
+        models::service_account::ServiceAccount::get_all(&pool, &authentication).await?;
     let vaults = models::vault::Vault::get_all(&pool, authentication.user_id).await?;
 
     let page = ServiceAccountsPage {
@@ -25,7 +26,7 @@ pub async fn index(
 }
 
 markup::define! {
-    ServiceAccountsPage(service_accounts: Vec<models::ServiceAccount>,
+    ServiceAccountsPage(service_accounts: Vec<models::service_account::ServiceAccount>,
         vaults: Vec<models::vault::Vault>) {
         div.m_card {
             div.header {

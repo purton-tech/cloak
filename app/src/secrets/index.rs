@@ -9,13 +9,17 @@ use axum::{
 use sqlx::PgPool;
 
 pub async fn index(
-    Path(id): Path<u32>,
+    Path(idor_vault_id): Path<u32>,
     Extension(pool): Extension<PgPool>,
     authentication: Authentication,
 ) -> Result<Html<String>, CustomError> {
-    let secrets = models::Secret::get_all(&pool, authentication.user_id, id).await?;
+    let secrets = models::secret::Secret::get_all(&pool, &authentication, idor_vault_id).await?;
 
-    let user_vault = models::UserVault::get(&pool, authentication.user_id, id).await?;
+    let user_vault =
+        models::user_vault::UserVault::get(&pool, &authentication, idor_vault_id).await?;
+
+    let _members =
+        models::user_vault::UserVault::get_users(&pool, &authentication, idor_vault_id).await?;
 
     let page = SecretsPage {
         user_vault: &user_vault,
@@ -26,7 +30,7 @@ pub async fn index(
 }
 
 markup::define! {
-    SecretsPage<'a>(user_vault: &'a models::UserVault, secrets: Vec<models::Secret>) {
+    SecretsPage<'a>(user_vault: &'a models::user_vault::UserVault, secrets: Vec<models::secret::Secret>) {
         div.m_card[id="secrets-table-controller"] {
             div.header {
                 span { "Secrets" }
