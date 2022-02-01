@@ -11,7 +11,7 @@ pub async fn index(
 ) -> Result<Html<String>, CustomError> {
     let service_accounts =
         models::service_account::ServiceAccount::get_all(&pool, &authentication).await?;
-    let vaults = models::vault::Vault::get_all(&pool, authentication.user_id).await?;
+    let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
 
     let page = ServiceAccountsPage {
         service_accounts,

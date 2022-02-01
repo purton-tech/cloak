@@ -1,3 +1,4 @@
+use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use sqlx::PgPool;
 
@@ -29,7 +30,11 @@ impl Vault {
         .await?)
     }
 
-    pub async fn get(pool: &PgPool, user_id: u32, vault_id: u32) -> Result<Vault, CustomError> {
+    pub async fn get(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+        idor_vault_id: u32,
+    ) -> Result<Vault, CustomError> {
         Ok(sqlx::query_as!(
             Vault,
             "
@@ -42,14 +47,17 @@ impl Vault {
                 AND
                     user_id = $2
             ",
-            vault_id as i32,
-            user_id as i32
+            idor_vault_id as i32,
+            authenticated_user.user_id as i32
         )
         .fetch_one(pool)
         .await?)
     }
 
-    pub async fn get_all(pool: &PgPool, user_id: u32) -> Result<Vec<Vault>, CustomError> {
+    pub async fn get_all(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+    ) -> Result<Vec<Vault>, CustomError> {
         Ok(sqlx::query_as!(
             Vault,
             "
@@ -60,7 +68,7 @@ impl Vault {
                 WHERE
                     user_id = $1
             ",
-            user_id as i32
+            authenticated_user.user_id as i32
         )
         .fetch_all(pool)
         .await?)

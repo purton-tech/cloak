@@ -8,7 +8,7 @@ pub async fn index(
     authentication: Authentication,
     Extension(pool): Extension<PgPool>,
 ) -> Result<Html<String>, CustomError> {
-    let vaults = models::vault::Vault::get_all(&pool, authentication.user_id).await?;
+    let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
 
     let page = VaultsPage { vaults };
 

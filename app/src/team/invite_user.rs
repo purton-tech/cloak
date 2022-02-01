@@ -55,7 +55,7 @@ pub async fn invite(
                 // Is the user doing the inviations an ad in for the org they want to invite
                 // the user to?
                 if org_user.is_admin {
-                    let user = user::User::get(&pool, params.id).await?;
+                    let user = user::User::get_dangerous(&pool, params.id).await?;
 
                     // Now we can do the public key check
                     let user_key_der = base64::decode(user.ecdsa_public_key)

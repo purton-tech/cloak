@@ -67,7 +67,7 @@ impl app::vault::vault_server::Vault for VaultService {
         let secrets =
             models::secret::Secret::get_all(&self.pool, &authenticated_user, req.vault_id).await?;
         let vault =
-            models::vault::Vault::get(&self.pool, authenticated_user.user_id, req.vault_id).await?;
+            models::vault::Vault::get(&self.pool, &authenticated_user, req.vault_id).await?;
         let user_vault =
             models::user_vault::UserVault::get(&self.pool, &authenticated_user, req.vault_id)
                 .await?;

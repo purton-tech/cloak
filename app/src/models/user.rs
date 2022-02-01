@@ -8,7 +8,7 @@ pub struct User {
 }
 
 impl User {
-    pub async fn get(pool: &PgPool, user_id: u32) -> Result<User, CustomError> {
+    pub async fn get_dangerous(pool: &PgPool, user_id: u32) -> Result<User, CustomError> {
         Ok(sqlx::query_as!(
             User,
             "
