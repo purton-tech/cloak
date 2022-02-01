@@ -13,7 +13,7 @@
 
         flex-direction: row;
         width: 100%;
-        padding: var(--content-padding);
+        padding: var(--mobile-content-padding);
 
         > aside {
             display: none;
@@ -42,7 +42,9 @@
         }
 
         
-        @include for-tablet-landscape-up {
+        @include for-tablet-portrait-up {
+
+            padding: var(--content-padding);
 
             > aside {
                 display: block;

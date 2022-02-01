@@ -1,3 +1,5 @@
+@import "responsive-mixin";
+
 .l_blog {
 
     > div {
@@ -5,12 +7,21 @@
         margin-left: auto;
         margin-right: auto;
         max-width: var(--article-width);
-        padding: var(--content-padding);
+        padding: var(--mobile-content-padding);
     }
 
     .summary {
         border: 1px solid var(--accents-3);
         padding: 2em;
         margin-bottom: 2em;
+    }
+}
+
+@include for-tablet-portrait-up {
+    .l_blog {
+
+        > div {
+            padding: var(--content-padding);
+        }
     }
 }
