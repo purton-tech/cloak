@@ -25,6 +25,12 @@ static_resources:
               - match: { prefix: "/auth" }
                 route: { cluster: ext-authn }
                 typed_per_filter_config:
+                  envoy.filters.http.lua:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                    disabled: true
+                  envoy.filters.http.ext_authz:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
+                    disabled: true
 
               # This will catch all incoming grpc requests (based on the header) and 
               # send them to our api.
@@ -91,6 +97,9 @@ static_resources:
                   envoy.filters.http.ext_authz:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthzPerRoute
                     disabled: true
+                  envoy.filters.http.lua:
+                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
+                    disabled: true
                     
               # Everything else passes in to here. The marketing pages
               - match: { prefix: "/" }
@@ -101,10 +110,7 @@ static_resources:
                     disabled: true
                   envoy.filters.http.lua:
                     "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
-                    name: security_headers.lua
-                  envoy.filters.http.lua:
-                    "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.LuaPerRoute
-                    name: cache_control.lua
+                    name: zola_headers.lua
      
           http_filters:
           # Convert incoming gRPC web request to proper gRPC
@@ -136,14 +142,38 @@ static_resources:
               "@type": type.googleapis.com/envoy.extensions.filters.http.lua.v3.Lua
 
               source_codes:
-                cache_control.lua:
+                zola_headers.lua:
                   inline_string: |
                     function envoy_on_response(response_handle)
+
                       response_handle:headers():add("Cache-Control", "none");
+
+                      csp = "default-src 'none'; img-src 'self'; style-src 'self'; connect-src 'self'";
+                      response_handle:headers():add("Content-Security-Policy", csp);
+                      response_handle:headers():add("X-Frame-Options", "deny");
+                      response_handle:headers():add("X-XSS-Protection", "1; mode=block");
+                      response_handle:headers():add("X-Content-Type-Options", "nosniff");
+                      response_handle:headers():add("Referrer-Policy", "no-referrer");
+                      response_handle:headers():add("X-Download-Options", "noopen");
+                      response_handle:headers():add("X-DNS-Prefetch-Control", "off");
+                      response_handle:headers():add("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+                      response_handle:headers():add("Permissions-Policy",
+                                                    "accelerometer=(), "..
+                                                    "camera=(), "..
+                                                    "geolocation=(), "..
+                                                    "gyroscope=(), "..
+                                                    "magnetometer=(), "..
+                                                    "microphone=(), "..
+                                                    "payment=(), "..
+                                                    "usb=()");
+                      response_handle:headers():remove("X-Powered-By");
                     end
                 security_headers.lua:
                   inline_string: |
                     function envoy_on_response(response_handle)
+
+                      response_handle:headers():add("Cache-Control", "none");
+
                       csp = "default-src 'none'; script-src 'self'; img-src 'self'; style-src 'self'; connect-src 'self'";
                       response_handle:headers():add("Content-Security-Policy", csp);
                       response_handle:headers():add("X-Frame-Options", "deny");
