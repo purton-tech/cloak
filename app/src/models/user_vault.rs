@@ -40,10 +40,9 @@ impl UserVault {
     // Given an authenticated user fetch all the users for a vault.
     // We need to make sure the user actually has access to the vault as the
     // vault_id coud have been tampered with.
-    pub async fn get_users(
+    pub async fn get_users_dangerous(
         pool: &PgPool,
-        authenticated_user: &Authentication,
-        idor_vault_id: u32,
+        vault_id: u32,
     ) -> Result<Vec<UserDetails>, CustomError> {
         Ok(sqlx::query_as!(
             UserDetails,
@@ -53,13 +52,9 @@ impl UserVault {
                 FROM users_vaults uv
                 LEFT JOIN users u ON u.id = uv.user_id
                 WHERE 
-                    uv.user_id = $1 AND uv.vault_id = $2
-                AND
-                    -- Make sure the user has access to this vault
-                    $1 IN (SELECT user_id FROM users_vaults WHERE vault_id = $2)
+                    uv.vault_id = $1
             ",
-            authenticated_user.user_id as i32,
-            idor_vault_id as i32
+            vault_id as i32
         )
         .fetch_all(pool)
         .await?)

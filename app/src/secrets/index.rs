@@ -18,9 +18,6 @@ pub async fn index(
     let user_vault =
         models::user_vault::UserVault::get(&pool, &authentication, idor_vault_id).await?;
 
-    let _members =
-        models::user_vault::UserVault::get_users(&pool, &authentication, idor_vault_id).await?;
-
     let page = SecretsPage {
         user_vault: &user_vault,
         secrets,

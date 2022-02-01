@@ -73,4 +73,23 @@ impl Vault {
         .fetch_all(pool)
         .await?)
     }
+
+    pub async fn get_all_with_members(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+    ) -> Result<Vec<(Vault, Vec<super::user_vault::UserDetails>)>, CustomError> {
+        let vaults = Vault::get_all(pool, authenticated_user).await?;
+
+        let mut vaults_and_members: Vec<(Vault, Vec<super::user_vault::UserDetails>)> = Vec::new();
+
+        for vault in vaults {
+            let vault_id = vault.id;
+            vaults_and_members.push((
+                vault,
+                super::user_vault::UserVault::get_users_dangerous(pool, vault_id as u32).await?,
+            ))
+        }
+
+        Ok(vaults_and_members)
+    }
 }
