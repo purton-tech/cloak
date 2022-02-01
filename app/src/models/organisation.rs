@@ -118,7 +118,7 @@ impl Organisation {
     pub async fn get_users(
         pool: &PgPool,
         authenticated_user: &Authentication,
-        organisation_id: i32,
+        idor_organisation_id: i32,
     ) -> Result<Vec<User>, CustomError> {
         Ok(sqlx::query_as!(
             User,
@@ -135,7 +135,7 @@ impl Organisation {
                     $1 IN (SELECT user_id FROM organisation_users WHERE organisation_id = $2)
             ",
             authenticated_user.user_id as i32,
-            organisation_id
+            idor_organisation_id
         )
         .fetch_all(pool)
         .await?)
