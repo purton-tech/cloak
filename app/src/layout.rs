@@ -20,11 +20,22 @@ pub fn layout_with_header(
     header: &str,
     side_bar: &SideBar,
 ) -> Result<Html<String>, CustomError> {
+    vault_layout(title, content, header, side_bar, None)
+}
+
+pub fn vault_layout(
+    title: &str,
+    content: &str,
+    header: &str,
+    side_bar: &SideBar,
+    vault: Option<u32>,
+) -> Result<Html<String>, CustomError> {
     let html = ApplicationLayout {
         content,
         header,
         title,
         side_bar,
+        vault,
     };
 
     Ok(Html(
@@ -53,7 +64,13 @@ markup::define! {
         }
     }
 
-    ApplicationLayout<'a>(content: &'a str, header: &'a str, title: &'a str, side_bar: &'a SideBar)
+    ApplicationLayout<'a>(
+        content: &'a str,
+        header: &'a str,
+        title: &'a str,
+        side_bar: &'a SideBar,
+        vault: Option<u32>
+    )
     {
         @markup::doctype()
 
@@ -90,6 +107,15 @@ markup::define! {
                             { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Vaults",
                                 link: crate::vaults::INDEX,
                                 svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+
+                            @if let Some(vault_id) = vault {
+                                { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Secrets",
+                                    link: &crate::secrets::secret_route(*vault_id as i32),
+                                    svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Members",
+                                    link: &crate::members::member_route(*vault_id as i32),
+                                    svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                            }
 
                             { SvgSideMenuItem { side_bar: SideBar::ServiceAccounts, name: "Service Accounts",
                                 link: crate::service_accounts::INDEX,

@@ -23,7 +23,13 @@ pub async fn index(
         secrets,
     };
 
-    crate::layout::layout("Home", &page.to_string(), &crate::layout::SideBar::Vaults)
+    crate::layout::vault_layout(
+        "Home",
+        &page.to_string(),
+        "",
+        &crate::layout::SideBar::Vaults,
+        Some(idor_vault_id),
+    )
 }
 
 markup::define! {
