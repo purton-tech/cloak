@@ -17,6 +17,12 @@ class MembersDrawer extends SideDrawer {
 
     constructor() {
         super()
+
+        this.querySelector("button[id='add-user-button']").addEventListener('click', event => {
+            event.preventDefault()
+            console.log('click')
+            return false
+        })
     }
 }
 

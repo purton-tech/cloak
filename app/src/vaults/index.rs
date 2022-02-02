@@ -10,7 +10,12 @@ pub async fn index(
 ) -> Result<Html<String>, CustomError> {
     let vaults = models::vault::Vault::get_all_with_members(&pool, &authentication).await?;
 
-    let page = VaultsPage { vaults };
+    let org = models::organisation::Organisation::get_primary_org(&pool, &authentication).await?;
+
+    let team =
+        models::organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
+
+    let page = VaultsPage { vaults, team };
 
     let header = VaultHeader {};
 
@@ -27,7 +32,9 @@ markup::define! {
         @super::new_vault::VaultForm {}
         button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
     }
-    VaultsPage(vaults: Vec<(models::vault::Vault, Vec<models::user_vault::UserDetails>)>) {
+    VaultsPage(
+        vaults: Vec<(models::vault::Vault, Vec<models::user_vault::UserDetails>)>,
+        team: Vec<models::organisation::User>) {
 
         @for vault in vaults {
             .m_card."vault-card".clickable[href=crate::secrets::secret_route(vault.0.id)] {
@@ -39,7 +46,8 @@ markup::define! {
                     }
                     @super::members::MembersDrawer {
                         vault_name: vault.0.name.clone(),
-                        members: &vault.1
+                        members: &vault.1,
+                        team
                     }
                     button."open-members-drawer" {
                         {"Members"}
