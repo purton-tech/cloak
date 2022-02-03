@@ -27,7 +27,7 @@ pub async fn new(
     let vault = models::vault::NewVault {
         name: new_vault.name,
         encrypted_vault_key: new_vault.encrypted_vault_key,
-        public_key: new_vault.public_key,
+        ecdh_public_key: new_vault.public_key,
     };
 
     models::vault::Vault::create(&pool, &authentication, vault).await?;

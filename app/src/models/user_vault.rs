@@ -6,6 +6,7 @@ pub struct UserVault {
     pub vault_id: i32,
     pub user_id: i32,
     pub encrypted_vault_key: String,
+    pub ecdh_public_key: String,
 }
 
 pub struct UserDetails {
@@ -25,7 +26,7 @@ impl UserVault {
             UserVault,
             "
                 SELECT 
-                    vault_id, user_id, encrypted_vault_key  
+                    vault_id, user_id, encrypted_vault_key, ecdh_public_key 
                 FROM users_vaults 
                 WHERE 
                     user_id = $1 AND vault_id = $2

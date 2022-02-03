@@ -12,7 +12,39 @@ pub struct Secret {
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
+pub struct NewSecret {
+    pub idor_vault_id: i32,
+    pub name: String,
+    pub name_blind_index: String,
+    pub secret: String,
+}
+
 impl Secret {
+    pub async fn create(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+        new_secret: NewSecret,
+    ) -> Result<(), CustomError> {
+        // This will blow up if the user doesn't have access to the vault
+        super::vault::Vault::get(pool, authenticated_user, new_secret.idor_vault_id as u32).await?;
+
+        sqlx::query!(
+            "
+                INSERT INTO 
+                    secrets (vault_id, name, name_blind_index, secret)
+                VALUES($1, $2, $3, $4) 
+            ",
+            new_secret.idor_vault_id,
+            new_secret.name,
+            new_secret.name_blind_index,
+            new_secret.secret,
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn get_all(
         pool: &PgPool,
         authenticated_user: &Authentication,

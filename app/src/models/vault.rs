@@ -12,14 +12,14 @@ pub struct Vault {
 pub struct NewVault {
     pub name: String,
     pub encrypted_vault_key: String,
-    pub public_key: String,
+    pub ecdh_public_key: String,
 }
 
 impl Vault {
     pub async fn create(
         pool: &PgPool,
         authenticated_user: &Authentication,
-        vault: NewVault,
+        new_vault: NewVault,
     ) -> Result<(), CustomError> {
         let vault = sqlx::query!(
             "
@@ -29,7 +29,7 @@ impl Vault {
                 RETURNING id
             ",
             authenticated_user.user_id as i32,
-            vault.name,
+            new_vault.name,
         )
         .fetch_one(pool)
         .await?;
@@ -37,11 +37,13 @@ impl Vault {
         sqlx::query!(
             "
                 INSERT INTO 
-                    users_vaults (user_id, vault_id)
-                VALUES($1, $2) 
+                    users_vaults (user_id, vault_id, ecdh_public_key, encrypted_vault_key)
+                VALUES($1, $2, $3, $4) 
             ",
             authenticated_user.user_id as i32,
             vault.id,
+            new_vault.ecdh_public_key,
+            new_vault.encrypted_vault_key
         )
         .execute(pool)
         .await?;
