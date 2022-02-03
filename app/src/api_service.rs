@@ -23,7 +23,7 @@ impl app::vault::vault_server::Vault for VaultService {
         .await?;
 
         if let Some(vault_id) = service_account.vault_id {
-            let vault = models::vault::Vault::get_dangerous(&self.pool, vault_id as u32).await?;
+            let _vault = models::vault::Vault::get_dangerous(&self.pool, vault_id as u32).await?;
 
             let secrets = models::service_account_secret::ServiceAccountSecret::get_all_dangerous(
                 &self.pool,
@@ -42,7 +42,7 @@ impl app::vault::vault_server::Vault for VaultService {
 
             let response = GetServiceAccountResponse {
                 service_account_id: service_account.id as u32,
-                vault_public_ecdh_key: vault.ecdh_public_key,
+                vault_public_ecdh_key: "vault.ecdh_public_key".to_string(),
                 secrets,
             };
 
@@ -98,8 +98,8 @@ impl app::vault::vault_server::Vault for VaultService {
         let response = GetVaultResponse {
             name: vault.name,
             encrypted_vault_key: user_vault.encrypted_vault_key,
-            vault_public_ecdh_key: vault.ecdh_public_key,
-            encrypted_vault_private_ecdh_key: vault.encrypted_ecdh_private_key,
+            vault_public_ecdh_key: "vault.ecdh_public_key".to_string(),
+            encrypted_vault_private_ecdh_key: "vault.encrypted_ecdh_private_key".to_string(),
             secrets,
             service_accounts,
         };

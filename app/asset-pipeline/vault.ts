@@ -12,10 +12,40 @@ const ECDH_OPTIONS = {
 
 const UNPROTECTED_SYMMETRIC_KEY = 'unprotected_symmetric_key'
 const UNPROTECTED_ECDSA_PRIVATE_KEY = 'unprotected_ecdsa_private_key'
+const ECDH_PUBLIC_KEY = 'ecdh_public_key'
 const DB_NAME = 'keyval'
 
 // All client side cryptography comes through this class.
 export class Vault {
+
+    public static async createKey(): Promise<CryptoKey> {
+
+        const newAesKey = await self.crypto.subtle.generateKey(
+            AES_OPTIONS,
+            true,
+            ['decrypt', 'encrypt'])
+        return newAesKey
+    }
+
+    public static async getECDHPublicKey(): Promise<CryptoKey> {
+        const db = await this.openIndexedDB()
+        const key = await db.get(DB_NAME, ECDH_PUBLIC_KEY) as CryptoKey
+        db.close()
+
+        return key
+    }
+
+    public static async wrapKeyForRecipient(key: CryptoKey, publicKey: CryptoKey): 
+        Promise<{ wrappedAesKey: Cipher, publicKey: ByteData }> {
+        const keyPair = await self.crypto.subtle.generateKey(ECDH_OPTIONS, true, ['deriveKey', 'deriveBits'])
+
+        const aesKey = await this.deriveSecretKey(keyPair.privateKey, publicKey)
+
+        const symKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', aesKey))
+        const protectedSymKey = await this.encrypt(symKeyData.arr);
+        const publicKeyData = new ByteData(await self.crypto.subtle.exportKey('spki', keyPair.publicKey));
+        return { wrappedAesKey: protectedSymKey, publicKey: publicKeyData }
+    }
 
     // Use the ECDSA private key to sign data.
     // We can verify signature with openssl as we generate in DER format.
@@ -39,7 +69,7 @@ export class Vault {
     }
 
 
-    public static async blindIndex(text: string, id: number) : Promise<ByteData> {
+    public static async blindIndex(text: string, id: number): Promise<ByteData> {
         let enc = new TextEncoder();
         const data = enc.encode(text + ':' + id)
         const hash: ArrayBuffer = await crypto.subtle.digest('SHA-256', data)
@@ -93,12 +123,12 @@ export class Vault {
             },
             privateKey,
             AES_OPTIONS,
-            false,
+            true,
             ["encrypt", "decrypt"]
         );
     }
 
-    public static async importPublicECDHKey(key: ByteData) : Promise<CryptoKey> {
+    public static async importPublicECDHKey(key: ByteData): Promise<CryptoKey> {
         return await self.crypto.subtle.importKey('spki', key.arr.buffer,
             ECDH_OPTIONS, false, [])
     }
@@ -146,7 +176,7 @@ export class Vault {
         return await this.aesDecrypt(cipher, key)
     }
 
-    public static async aesEncrypt(data: Uint8Array, key: CryptoKey) : Promise<Cipher> {
+    public static async aesEncrypt(data: Uint8Array, key: CryptoKey): Promise<Cipher> {
 
         const encOptions = {
             name: 'AES-GCM',
@@ -159,8 +189,8 @@ export class Vault {
         return new Cipher(ivData, cipher)
     }
 
-    public static async aeadEncrypt(plaintext: Uint8Array, 
-        data: Uint8Array, key: CryptoKey) : Promise<Cipher> {
+    public static async aeadEncrypt(plaintext: Uint8Array,
+        data: Uint8Array, key: CryptoKey): Promise<Cipher> {
 
         const encOptions = {
             name: 'AES-GCM',
@@ -196,10 +226,11 @@ export class Vault {
     private static toDER(signature: ByteData): ByteData {
 
         // Extract r & s and format it in ASN1 format.
-        var signHex = Array.prototype.map.call(signature.arr, function (x) { 
-            return ('00' + x.toString(16)).slice(-2); }).join(''),
-            r = signHex.substring(0, signHex.length/2),
-            s = signHex.substring(signHex.length/2),
+        var signHex = Array.prototype.map.call(signature.arr, function (x) {
+            return ('00' + x.toString(16)).slice(-2);
+        }).join(''),
+            r = signHex.substring(0, signHex.length / 2),
+            s = signHex.substring(signHex.length / 2),
             rPre = true,
             sPre = true;
 
@@ -261,21 +292,21 @@ export class ByteData {
         }
         return btoa(binary);
     }
-    
+
     addNewLines(str: string) {
         var finalString = '';
-        while(str.length > 0) {
+        while (str.length > 0) {
             finalString += str.substring(0, 64) + '\n';
             str = str.substring(64);
         }
-    
+
         return finalString;
     }
-    
+
     toPem(type: string) {
         var b64WithLines = this.addNewLines(this.b64);
         var pem = "-----BEGIN " + type + " KEY-----\n" + b64WithLines + "-----END " + type + " KEY-----";
-        
+
         return pem;
     }
 

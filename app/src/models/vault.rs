@@ -5,20 +5,57 @@ use sqlx::PgPool;
 pub struct Vault {
     pub id: i32,
     pub name: String,
-    pub encrypted_ecdh_private_key: String,
-    pub ecdh_public_key: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
+pub struct NewVault {
+    pub name: String,
+    pub encrypted_vault_key: String,
+    pub public_key: String,
+}
+
 impl Vault {
+    pub async fn create(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+        vault: NewVault,
+    ) -> Result<(), CustomError> {
+        let vault = sqlx::query!(
+            "
+                INSERT INTO 
+                    vaults (user_id, name)
+                VALUES($1, $2) 
+                RETURNING id
+            ",
+            authenticated_user.user_id as i32,
+            vault.name,
+        )
+        .fetch_one(pool)
+        .await?;
+
+        sqlx::query!(
+            "
+                INSERT INTO 
+                    users_vaults (user_id, vault_id)
+                VALUES($1, $2) 
+            ",
+            authenticated_user.user_id as i32,
+            vault.id,
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
     // Only call this if you are sure the user has access.
     pub async fn get_dangerous(pool: &PgPool, vault_id: u32) -> Result<Vault, CustomError> {
         Ok(sqlx::query_as!(
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
+                    id, name, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -39,7 +76,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
+                    id, name, updated_at, created_at
                 FROM 
                     vaults
                 WHERE
@@ -62,7 +99,7 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, encrypted_ecdh_private_key, ecdh_public_key, updated_at, created_at
+                    id, name, updated_at, created_at
                 FROM 
                     vaults
                 WHERE

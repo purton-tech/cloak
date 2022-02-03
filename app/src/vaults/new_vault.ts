@@ -1,39 +1,36 @@
 import { SideDrawer } from '../../asset-pipeline/side-drawer'
 import { Vault } from '../../asset-pipeline/vault'
 
-let newVaultButton = document.getElementById('new-vault')
+class NewVault extends SideDrawer {
 
-if(newVaultButton) {
-    newVaultButton.addEventListener('click', async event => {
-        let element = newVaultButton.previousElementSibling.firstChild
-        if (element instanceof SideDrawer) {
-            element.open = true
+    constructor() {
+        super()
 
-            // Alice wants to create a vault that Bob can access.
-            // Alice creates a new Symmetric vault key.
-            // Alice Creates new Asymmetric Keys for the vault
-            // Encrypt the Vault key, with an ECDH agreement between the Alice and the Vault as she currently has the Vault p
-            // Encrypt the Asymmetric Private key with the users master key
-
-            // For a user to recontrstruct a key
-            // 
+        let newVaultButton = document.getElementById('new-vault')
+        newVaultButton.addEventListener('click', async event => {
+            let element = newVaultButton.previousElementSibling.firstChild
+            if (element instanceof SideDrawer) {
+                element.open = true
     
-            // Get a completely new AES key and wrap it with the users master key
-            let wrappedKey = await Vault.newWrappedKey()
-            document.getElementById('new-vault-key').innerText = wrappedKey.string
-
-            // Unwrap it again. Just in case.
-            let vaultKey = await Vault.unwrapKey(wrappedKey)
-
-            const keyPairDH = await Vault.generateWrappedECDHKeyPair(vaultKey);
-            const publicKeyField = document.getElementById('public-key')
-            const privateKeyField = document.getElementById('private-key')
-
-            if(publicKeyField instanceof HTMLInputElement &&
-                privateKeyField instanceof HTMLTextAreaElement) {
-                publicKeyField.value = keyPairDH.publicKey.b64
-                privateKeyField.innerText = keyPairDH.privateKey.string
+                // Geneate a new ECDH key pair
+                // Make a key agreement and get a wrapped AES key
+                // Store wrapped key and public ECDH key.
+                const aesKey = await Vault.createKey()
+                const recipientPublicKey = await Vault.getECDHPublicKey()
+                const { wrappedAesKey, publicKey } = await Vault.wrapKeyForRecipient(aesKey, recipientPublicKey)
+        
+                const wrappedKeyField = this.querySelector('[id="new-vault-key"]')
+    
+                const publicKeyField = this.querySelector('[id="public-key"]')
+    
+                if(publicKeyField instanceof HTMLInputElement &&
+                    wrappedKeyField instanceof HTMLTextAreaElement) {
+                    publicKeyField.value = publicKey.b64
+                    wrappedKeyField.innerText = wrappedAesKey.string
+                }
             }
-        }
-    })
+        })
+    }
 }
+
+customElements.define('new-vault', NewVault);

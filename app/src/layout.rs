@@ -43,6 +43,8 @@ pub fn vault_layout(
             .replace("side_drawer", "side-drawer")
             .replace("invite_user", "invite-user")
             .replace("add_member", "add-member")
+            .replace("<new_vault", "<new-vault")
+            .replace("</new_vault", "</new-vault")
             .replace("relative_time", "relative-time"),
     ))
 }
