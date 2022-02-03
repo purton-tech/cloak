@@ -2,6 +2,7 @@
 
 /* Responsive navigation no js */
 div.m_navbar {
+  z-index: 1000;
   width: 100%;
   background-color: var(--background);
   display: flex;

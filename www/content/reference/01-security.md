@@ -15,6 +15,39 @@ date = 2022-01-01
 
 A **Vault** is a placeholder for secrets.
 
+## Vault Creation
+
+Alice wants to create a vault that Bob can access later. Bob has not yet registered so he will be added later. When a user registers with Cloak, we create an ECDH key pair encrypted with a key derived from their password.
+
+* An ECDH keypair is generated. (ecdh_keypair)
+* Alice creates a new AES key for the vault which will be used to encrypt secrets. (aes_key)
+* Alice already has an ECDH key pair, which she got during registration. (alice_ecdh_keypair)
+* Alice encrypts the (aes_key) key, with an ECDH agreement between (alice_ecdh_keypair) and (ecdh_keypair).
+* We store the wrapped (aes_key) in the database as well as the (ecdh_keypair) public key.
+
+Alice wishes to add a secret to the vault.
+
+* Alice retrieves her wrapped (aes_key) for the vault.
+* Alice decrypts the AES Vault key, with an ECDH agreement between (alice_ecdh_keypair) and the (ecdh_keypair) public key.
+* She encrypts the secret with the now unwrapped (aes_key)
+* The secret is stored in the database
+
+Later on Bob has registered and Alice wishes to give him access to the Vault.
+
+* Bob already has an ECDH key pair, which she got during registration. (bob_ecdh_keypair)
+* Alice retrieves her wrapped (aes_key) for the vault.
+* Alice decrypts the AES Vault key, with an ECDH agreement between (alice_ecdh_keypair) and the (ecdh_keypair) public key.
+* An ECDH keypair is generated. (ecdh_keypair)
+* She creates a key agreement between (ecdh_keypair) and (bob_ecdh_keypair) with which she encrypts (aes_key).
+* We store the wrapped (aes_key) in the database as well as the (ecdh_keypair) public key.
+
+Bob wants to see the secret
+
+* Bob retrieves the ECDH key pair, which he got during registration. (bob_ecdh_keypair)
+* Bob retreives the wrapped (aes_key) and the public key of the (ecdh_keypair)
+* Bob uses a key agreement between (bob_ecdh_keypair) and (ecdh_keypair) to decrypt the AES key.
+* He can now use the unwrapped (aes_key) to decrypt the secret.
+
 ## Secrets and Service Accounts
 
 In the simple case where you have one vault with several secrets and one service account, the following procedures are followed.
@@ -25,7 +58,7 @@ Note, all these actions happen client side.
 * When you add a service account to a vault all the secrets in the vault are copied and encrypted with the service accounts asymmetric public key.
 * Any subsequent secrets added to a vault will be encrypted for each service account that has access to that vault.
 * The command line tool has the public and private asymmetric encryption keys for a service account.
-* The command line tool requests decrypts secrets in memory and injects them into the environment for your process.
+* The command line tool decrypts secrets in memory and injects them into the environment for your process.
 
 ## Managing web user keys in the browser
 

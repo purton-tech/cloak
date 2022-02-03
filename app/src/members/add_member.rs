@@ -10,7 +10,6 @@ markup::define! {
                         "Invite people into your team."
                     }
 
-
                     table.m_table {
                         thead {
                             tr {
@@ -25,7 +24,7 @@ markup::define! {
                                         {user.email}
                                     }
                                     td {
-                                        input[type="checkbox"] {}
+                                        input[type="checkbox", value=format!("{}", user.id)] {}
                                     }
                                 }
                             }
@@ -34,7 +33,7 @@ markup::define! {
                 }
 
                 template[slot="footer"] {
-                    button.a_button.auto.success { "Create Invitation" }
+                    button.a_button.auto.success { "Update Members" }
                     button.a_button.auto.danger { "Cancel" }
                 }
             }

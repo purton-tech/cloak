@@ -10,8 +10,8 @@ service Vault {
     // the public ecdh address of the service account.
     rpc GetServiceAccount(GetServiceAccountRequest) returns (GetServiceAccountResponse);
 
-    // These methods are called by the front end. The user will need
-    // to be logged as as they are authenticated by authn-proxy
+    // These methods are called by the front end. Authentication is
+    // provided by barricade.
 
     // Get a vault and all the secrets inside as well as connected service accounts
     rpc GetVault(GetVaultRequest) returns (GetVaultResponse);
