@@ -26,7 +26,7 @@ pub async fn index(
     let page = MembersPage {
         _vault_name: "vaults".to_string(),
         members: &members,
-        _team: team,
+        team: &team,
     };
 
     crate::layout::vault_layout(
@@ -42,12 +42,14 @@ markup::define! {
     MembersPage<'a>(
         _vault_name: String,
         members: &'a Vec<models::user_vault::UserDetails>,
-        _team: Vec<models::organisation::User>)
+        team: &'a Vec<models::organisation::User>)
     {
         div.m_card {
             div.header {
                 span { "Members" }
-                @super::add_member::AddMemberDrawer {}
+                @super::add_member::AddMemberDrawer {
+                    team: *team
+                }
                 button.a_button.mini.primary[id="add-member"] { "Add Member" }
             }
             div.body {
