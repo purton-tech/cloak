@@ -8,14 +8,9 @@ pub async fn index(
     authentication: Authentication,
     Extension(pool): Extension<PgPool>,
 ) -> Result<Html<String>, CustomError> {
-    let vaults = models::vault::Vault::get_all_with_members(&pool, &authentication).await?;
+    let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
 
-    let org = models::organisation::Organisation::get_primary_org(&pool, &authentication).await?;
-
-    let team =
-        models::organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
-
-    let page = VaultsPage { vaults, team };
+    let page = VaultsPage { vaults };
 
     let header = VaultHeader {};
 
@@ -33,24 +28,15 @@ markup::define! {
         button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
     }
     VaultsPage(
-        vaults: Vec<(models::vault::Vault, Vec<models::user_vault::UserDetails>)>,
-        team: Vec<models::organisation::User>) {
+        vaults: Vec<models::vault::Vault>) {
 
         @for vault in vaults {
-            .m_card."vault-card".clickable[href=crate::secrets::secret_route(vault.0.id)] {
+            .m_card."vault-card".clickable[href=crate::secrets::secret_route(vault.id)] {
                 .body {
-                    h4.title { {vault.0.name} }
+                    h4.title { {vault.name} }
                     .created {
                         "Created "
-                        relative_time[datetime=vault.0.created_at.to_rfc3339()] {}
-                    }
-                    @super::members::MembersDrawer {
-                        vault_name: vault.0.name.clone(),
-                        members: &vault.1,
-                        team
-                    }
-                    button."open-members-drawer" {
-                        {"Members"}
+                        relative_time[datetime=vault.created_at.to_rfc3339()] {}
                     }
                 }
             }

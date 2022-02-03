@@ -37,7 +37,6 @@ impl UserVault {
         .await?)
     }
 
-    // Given an authenticated user fetch all the users for a vault.
     // We need to make sure the user actually has access to the vault as the
     // vault_id coud have been tampered with.
     pub async fn get_users_dangerous(
