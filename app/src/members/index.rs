@@ -47,6 +47,8 @@ markup::define! {
         div.m_card {
             div.header {
                 span { "Members" }
+                @super::add_member::AddMemberDrawer {}
+                button.a_button.mini.primary[id="add-member"] { "Add Member" }
             }
             div.body {
                 table.m_table {

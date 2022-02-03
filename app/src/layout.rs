@@ -42,7 +42,7 @@ pub fn vault_layout(
         html.to_string()
             .replace("side_drawer", "side-drawer")
             .replace("invite_user", "invite-user")
-            .replace("members_drawer", "members-drawer")
+            .replace("add_member", "add-member")
             .replace("relative_time", "relative-time"),
     ))
 }

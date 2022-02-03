@@ -1,3 +1,4 @@
+mod add_member;
 mod index;
 
 use axum::{routing::get, Router};
