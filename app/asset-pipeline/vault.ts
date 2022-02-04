@@ -5,13 +5,14 @@ const AES_OPTIONS = {
     length: 256
 };
 
-const ECDH_OPTIONS = {
+export const ECDH_OPTIONS = {
     name: "ECDH",
     namedCurve: "P-256"
 };
 
 const UNPROTECTED_SYMMETRIC_KEY = 'unprotected_symmetric_key'
 const UNPROTECTED_ECDSA_PRIVATE_KEY = 'unprotected_ecdsa_private_key'
+const UNPROTECTED_ECDH_PRIVATE_KEY = 'unprotected_ecdh_private_key'
 const ECDH_PUBLIC_KEY = 'ecdh_public_key'
 const DB_NAME = 'keyval'
 
@@ -35,16 +36,34 @@ export class Vault {
         return key
     }
 
-    public static async wrapKeyForRecipient(key: CryptoKey, publicKey: CryptoKey): 
+    public static async asymmetricKeyWrap(aesKey: CryptoKey, publicKey: CryptoKey): 
         Promise<{ wrappedAesKey: Cipher, publicKey: ByteData }> {
+
+        // Generate a new random ECDH key pair.
         const keyPair = await self.crypto.subtle.generateKey(ECDH_OPTIONS, true, ['deriveKey', 'deriveBits'])
 
-        const aesKey = await this.deriveSecretKey(keyPair.privateKey, publicKey)
+        const derivedAesKey = await this.deriveSecretKey(keyPair.privateKey, publicKey)
 
-        const symKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', aesKey))
-        const protectedSymKey = await this.encrypt(symKeyData.arr);
+        // Use the derived AES key to wrap the aesKey
+        const aesKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', aesKey))
+        const aesKeyWrapped = await this.aesEncrypt(aesKeyData.arr, derivedAesKey)
+
         const publicKeyData = new ByteData(await self.crypto.subtle.exportKey('spki', keyPair.publicKey));
-        return { wrappedAesKey: protectedSymKey, publicKey: publicKeyData }
+        return { wrappedAesKey: aesKeyWrapped, publicKey: publicKeyData }
+    }
+
+    public static async asymmetricKeyUnWrap(wrappedAesKey: Cipher, publicKeyData: ByteData): Promise<CryptoKey> {
+        const db = await this.openIndexedDB()
+        const ecdhPrivateKey = await db.get(DB_NAME, UNPROTECTED_ECDH_PRIVATE_KEY) as CryptoKey
+        db.close()
+
+        const publicKey = await this.importPublicECDHKey(publicKeyData)
+
+        const aesKey = await this.deriveSecretKey(ecdhPrivateKey, publicKey)
+
+        const unwrappedKey = await this.unwrapAesKey(wrappedAesKey, aesKey)
+
+        return unwrappedKey
     }
 
     // Use the ECDSA private key to sign data.
@@ -94,6 +113,15 @@ export class Vault {
 
         return await self.crypto.subtle.importKey(
             'raw', byteData.arr.buffer, AES_OPTIONS, false, ['decrypt', 'encrypt']);
+
+    }
+
+    public static async unwrapAesKey(cipher: Cipher, key: CryptoKey): Promise<CryptoKey> {
+
+        const byteData = await this.aesDecrypt(cipher, key)
+
+        return await self.crypto.subtle.importKey(
+            'raw', byteData.arr.buffer, AES_OPTIONS, true, ['decrypt', 'encrypt']);
 
     }
 

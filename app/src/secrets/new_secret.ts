@@ -4,69 +4,84 @@ import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import * as grpcWeb from 'grpc-web';
 import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api_pb';
 
-let newSecretButton = document.getElementById('new-secret')
 
-if (newSecretButton) {
-    newSecretButton.addEventListener('click', async event => {
+class NewSecret extends SideDrawer {
 
-        let element = newSecretButton.previousElementSibling.firstChild
-        if (element instanceof SideDrawer) {
-            element.open = true
-        }
-    })
-}
+    private secretNameInput: HTMLInputElement
+    private secretValueInput: HTMLInputElement
+    private blindIndexInput: HTMLInputElement
+    private secretForm: HTMLFormElement
+    private vaultIdInput: HTMLInputElement
 
-let createSecretButton = document.getElementById('create-secret')
+    constructor() {
+        super()
 
-if (createSecretButton) {
-    createSecretButton.addEventListener('click', async event => {
-        event.preventDefault()
+        // Attach to the button
+        const newVaultButton = document.getElementById('new-secret')
+        newVaultButton.addEventListener('click', async event => {
+            this.open = true
+        })
 
-        const secretNameInput = document.getElementById('secret-name')
-        const secretValueInput = document.getElementById('secret-value')
-        const blindIndexInput = document.getElementById('name-blind-index')
-        const secretForm = document.getElementById('add-secret-form')
-        const vaultKeyInput = document.getElementById('vault-key')
-        const vaultIdInput = document.getElementById('vault-id')
+        // So you want to create a secret
+        const createSecretButton = this.querySelector('#create-secret')
+        createSecretButton.addEventListener('click', async event => {
+            event.preventDefault()
+            this.createSecret()
+        })
+    }
 
-        if (secretNameInput instanceof HTMLInputElement &&
-            secretValueInput instanceof HTMLInputElement &&
-            blindIndexInput instanceof HTMLInputElement &&
-            vaultKeyInput instanceof HTMLInputElement &&
-            vaultIdInput instanceof HTMLInputElement &&
-            secretForm instanceof HTMLFormElement) {
-            const enc = new TextEncoder(); // always utf-8
-            const vaultId = parseInt(vaultIdInput.value)
+    async createSecret() {
 
-            if (secretForm.checkValidity()) {
-                try {
-                    const vaultCipher = Cipher.fromString(vaultKeyInput.value)
-                    const vaultKey = await Vault.unwrapKey(vaultCipher)
-                    const plaintextName = secretNameInput.value
-                    const plaintextValue = secretValueInput.value
+        this.secretNameInput = document.getElementById('secret-name') as HTMLInputElement
+        this.secretValueInput = document.getElementById('secret-value') as HTMLInputElement
+        this.blindIndexInput = document.getElementById('name-blind-index') as HTMLInputElement
+        this.secretForm = document.getElementById('add-secret-form') as HTMLFormElement
+        this.vaultIdInput = document.getElementById('vault-id') as HTMLInputElement
 
-                    const nameCipher = await Vault.aesEncrypt(
-                        enc.encode(plaintextName), 
-                        vaultKey)
+        const enc = new TextEncoder(); // always utf-8
+        const vaultId = parseInt(this.vaultIdInput.value)
 
-                    const valueCipher = await Vault.aesEncrypt(
-                        enc.encode(plaintextValue), 
-                        vaultKey)
+        if (this.secretForm.checkValidity()) {
+            try {
+                const plaintextName = this.secretNameInput.value
+                const plaintextValue = this.secretValueInput.value
 
-                    await encryptSecretToConnectedServiceAccounts(
-                        vaultKey, vaultId,
-                        plaintextName, plaintextValue, secretForm, secretNameInput, secretValueInput,
-                        blindIndexInput,
-                        nameCipher, valueCipher)
-                } catch (err) {
-                    if (err instanceof Error) {
-                        console.log(err.message)
-                    }
+                /**const nameCipher = await Vault.aesEncrypt(
+                    enc.encode(plaintextName), 
+                    vaultKey)
+
+                const valueCipher = await Vault.aesEncrypt(
+                    enc.encode(plaintextValue), 
+                    vaultKey)**/
+
+                //await encryptSecretToConnectedServiceAccounts(
+                //    vaultKey, vaultId,
+                //    plaintextName, plaintextValue, this.secretForm, this.secretNameInput, this.secretValueInput,
+                //    this.blindIndexInput,
+                //    nameCipher, valueCipher)
+                const vaultKey = this.decryptVaultKey()
+            } catch (err) {
+                if (err instanceof Error) {
+                    console.log(err.message)
                 }
             }
         }
-    })
+    }
+
+    async decryptVaultKey(): Promise<CryptoKey> {
+        const encryptedVaultKeyInput = document.getElementById('encrypted-vault-key') as HTMLInputElement
+        const ecdhPublicKeyInput = document.getElementById('ecdh-public-key') as HTMLInputElement
+        const ecdhPublicKeyByteData = ByteData.fromB64(ecdhPublicKeyInput.value)
+        const vaultCipher = Cipher.fromString(encryptedVaultKeyInput.value)
+        //const aesKey = await Vault.asymmetricKeyUnWrap(vaultCipher, ecdhPublicKeyByteData)
+        //console.log(aesKey)
+        //let decryptedVaultKey = await Vault.unwrapAesKey(vaultCipher, aesKey)
+        //return decryptedVaultKey
+        return null
+    }
 }
+
+customElements.define('new-secret', NewSecret);
 
 async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaultId: number,
     secretName: string, secretValue: string, secretForm : HTMLFormElement,

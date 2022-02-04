@@ -11,6 +11,10 @@ CREATE TABLE organisation_users (
     PRIMARY KEY (user_id, organisation_id)
 );
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON organisations TO cloak;
+GRANT USAGE, SELECT ON organisations_id_seq TO cloak;
+GRANT SELECT, INSERT, UPDATE, DELETE ON organisation_users TO cloak;
+
 -- Reset the database, we changed the key protocol.
 DELETE FROM organisation_users;
 DELETE FROM organisations;

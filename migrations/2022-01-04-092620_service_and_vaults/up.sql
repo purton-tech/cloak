@@ -24,5 +24,11 @@ DELETE FROM service_accounts;
 ALTER TABLE vaults ADD COLUMN encrypted_ecdh_private_key VARCHAR NOT NULL;
 ALTER TABLE vaults ADD COLUMN ecdh_public_key VARCHAR NOT NULL;
 
+-- Give access
+GRANT SELECT, INSERT, UPDATE, DELETE ON service_accounts TO cloak;
+GRANT USAGE, SELECT ON service_accounts_id_seq TO cloak;
+GRANT SELECT, INSERT, UPDATE, DELETE ON service_account_secrets TO cloak;
+GRANT USAGE, SELECT ON service_account_secrets_id_seq TO cloak;
+
 -- Manage the updated_at column
 SELECT updated_at('service_accounts');

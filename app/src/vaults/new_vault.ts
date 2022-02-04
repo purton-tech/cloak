@@ -1,5 +1,5 @@
 import { SideDrawer } from '../../asset-pipeline/side-drawer'
-import { Vault } from '../../asset-pipeline/vault'
+import { ByteData, Vault , ECDH_OPTIONS} from '../../asset-pipeline/vault'
 
 class NewVault extends SideDrawer {
 
@@ -16,8 +16,16 @@ class NewVault extends SideDrawer {
                 // Make a key agreement and get a wrapped AES key
                 // Store wrapped key and public ECDH key.
                 const aesKey = await Vault.createKey()
+                // In this case we encode they key to ourself
                 const recipientPublicKey = await Vault.getECDHPublicKey()
-                const { wrappedAesKey, publicKey } = await Vault.wrapKeyForRecipient(aesKey, recipientPublicKey)
+
+                const { wrappedAesKey, publicKey } = await Vault.asymmetricKeyWrap(aesKey, recipientPublicKey)
+
+                // Unwrap
+                const aesKey2 = await Vault.asymmetricKeyUnWrap(wrappedAesKey, publicKey)
+
+                console.log(new ByteData(await self.crypto.subtle.exportKey('raw', aesKey)).b64)
+                console.log(new ByteData(await self.crypto.subtle.exportKey('raw', aesKey2)).b64)
         
                 const wrappedKeyField = this.querySelector('[id="new-vault-key"]')
     
