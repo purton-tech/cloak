@@ -27,7 +27,7 @@ services:
 
   # Our external authentication micro service.
   auth:
-    image: purtontech/barricade:1.0.8
+    image: purtontech/barricade:1.0.10
     environment:
       AUTH_TYPE: encrypted
       # The following is used by the migrations and also for SQLX at compile time.

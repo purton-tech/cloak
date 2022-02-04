@@ -1,5 +1,5 @@
 import { SideDrawer } from '../../asset-pipeline/side-drawer'
-import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
+import { Vault, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import * as grpcWeb from 'grpc-web';
 import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api_pb';

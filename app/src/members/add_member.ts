@@ -1,5 +1,5 @@
 import { SideDrawer } from '../../asset-pipeline/side-drawer'
-import { Vault, ByteData } from '../../asset-pipeline/vault'
+import { Vault, ByteData } from '../../asset-pipeline/cryptography/vault'
 
 class AddMember extends SideDrawer {
 

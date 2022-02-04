@@ -1,4 +1,10 @@
 import { openDB } from 'idb';
+export { Cipher } from './cipher'
+export { ByteData } from './byte_data'
+export { ECDHKeyPair } from './ecdh_keypair'
+export { AESKey } from './aes_key'
+import { Cipher } from './cipher'
+import { ByteData } from './byte_data'
 
 const AES_OPTIONS = {
     name: "AES-GCM",
@@ -12,8 +18,6 @@ export const ECDH_OPTIONS = {
 
 const UNPROTECTED_SYMMETRIC_KEY = 'unprotected_symmetric_key'
 const UNPROTECTED_ECDSA_PRIVATE_KEY = 'unprotected_ecdsa_private_key'
-const UNPROTECTED_ECDH_PRIVATE_KEY = 'unprotected_ecdh_private_key'
-const ECDH_PUBLIC_KEY = 'ecdh_public_key'
 const DB_NAME = 'keyval'
 
 // All client side cryptography comes through this class.
@@ -28,52 +32,12 @@ export class Vault {
         return newAesKey
     }
 
-    public static async getECDHPublicKey(): Promise<CryptoKey> {
-        const db = await this.openIndexedDB()
-        const key = await db.get(DB_NAME, ECDH_PUBLIC_KEY) as CryptoKey
-        db.close()
-
-        return key
-    }
-
-    public static async asymmetricKeyWrap(aesKey: CryptoKey, publicKey: CryptoKey): 
-        Promise<{ wrappedAesKey: Cipher, publicKey: ByteData }> {
-
-        // Generate a new random ECDH key pair.
-        const keyPair = await self.crypto.subtle.generateKey(ECDH_OPTIONS, true, ['deriveKey', 'deriveBits'])
-
-        const derivedAesKey = await this.deriveSecretKey(keyPair.privateKey, publicKey)
-
-        // Use the derived AES key to wrap the aesKey
-        const aesKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', aesKey))
-        const aesKeyWrapped = await this.aesEncrypt(aesKeyData.arr, derivedAesKey)
-
-        const publicKeyData = new ByteData(await self.crypto.subtle.exportKey('spki', keyPair.publicKey));
-        return { wrappedAesKey: aesKeyWrapped, publicKey: publicKeyData }
-    }
-
-    public static async asymmetricKeyUnWrap(wrappedAesKey: Cipher, publicKeyData: ByteData): Promise<CryptoKey> {
-        const db = await this.openIndexedDB()
-        const ecdhPrivateKey = await db.get(DB_NAME, UNPROTECTED_ECDH_PRIVATE_KEY) as CryptoKey
-        db.close()
-
-        const publicKey = await this.importPublicECDHKey(publicKeyData)
-
-        const aesKey = await this.deriveSecretKey(ecdhPrivateKey, publicKey)
-
-        const unwrappedKey = await this.unwrapAesKey(wrappedAesKey, aesKey)
-
-        return unwrappedKey
-    }
-
     // Use the ECDSA private key to sign data.
     // We can verify signature with openssl as we generate in DER format.
     // openssl dgst -SHA384 -verify key.pem -signature signature.bin proto.bin
     public static async sign(bytesToSign: ByteData): Promise<ByteData> {
 
-        const db = await this.openIndexedDB()
-        const ecdsaKey = await db.get(DB_NAME, UNPROTECTED_ECDSA_PRIVATE_KEY) as CryptoKey
-        db.close()
+        const ecdsaKey = await this.getKeyFromIndexDB(UNPROTECTED_ECDSA_PRIVATE_KEY)
 
         let signature = await window.crypto.subtle.sign(
             {
@@ -161,11 +125,9 @@ export class Vault {
             ECDH_OPTIONS, false, [])
     }
 
-    public static async generateUserWrappedECDHKeyPair() {
+    public static async generateUserWrappedECDHKeyPair2() {
 
-        const db = await this.openIndexedDB()
-        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
-        db.close()
+        const key = await this.getKeyFromIndexDB(UNPROTECTED_SYMMETRIC_KEY)
 
         return await this.generateWrappedECDHKeyPair(key)
     }
@@ -187,19 +149,13 @@ export class Vault {
     }
 
     public static async encrypt(data: Uint8Array): Promise<Cipher> {
-
-        const db = await this.openIndexedDB()
-        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
-        db.close()
+        const key = await this.getKeyFromIndexDB(UNPROTECTED_SYMMETRIC_KEY)
 
         return await this.aesEncrypt(data, key)
     }
 
     public static async decrypt(cipher: Cipher): Promise<ByteData> {
-
-        const db = await this.openIndexedDB()
-        const key = await db.get(DB_NAME, UNPROTECTED_SYMMETRIC_KEY) as CryptoKey
-        db.close()
+        const key = await this.getKeyFromIndexDB(UNPROTECTED_SYMMETRIC_KEY)
 
         return await this.aesDecrypt(cipher, key)
     }
@@ -242,13 +198,27 @@ export class Vault {
         return new ByteData(await self.crypto.subtle.decrypt(decOptions, key, cipher.ct.arr.buffer));
     }
 
-    private static async openIndexedDB() {
-        return await openDB('Vault', 1, {
+    public static async getKeyFromIndexDB(name: string) : Promise<CryptoKey> {
+        const db = await openDB('Vault', 1, {
             upgrade(db) {
                 db.createObjectStore("keyval");
             },
-        });
+        })
+        const key = await db.get(DB_NAME, name) as CryptoKey
+        db.close()
+        return key
     }
+
+    public static async storeKeyInIndexDB(name: string, key: CryptoKey) {
+        const db = await openDB('Vault', 1, {
+            upgrade(db) {
+                db.createObjectStore("keyval");
+            },
+        })
+        await db.put(DB_NAME, key, name) 
+        db.close()
+    }
+    
     // Copied from https://stackoverflow.com/questions/39554165/ecdsa-signatures-between-node-js-and-webcrypto-appear-to-be-incompatible
     // It generated hex, we could write a more efficient one that jsut works with bytes.
     private static toDER(signature: ByteData): ByteData {
@@ -291,106 +261,4 @@ export class Vault {
         return ('00' + (hex.length / 2).toString(16)).slice(-2).toString();
     }
 
-}
-
-
-export class ByteData {
-
-    arr: Uint8Array
-    b64: string
-    hex: string
-
-    constructor(buf) {
-        if (!arguments.length) {
-            this.arr = null;
-            this.b64 = null;
-            return;
-        }
-
-        this.arr = new Uint8Array(buf);
-        this.b64 = this.toB64(buf);
-        this.hex = this.toHex(buf);
-    }
-
-    toB64(buf) {
-        let binary = '';
-        const bytes = new Uint8Array(buf);
-        for (let i = 0; i < bytes.byteLength; i++) {
-            binary += String.fromCharCode(bytes[i]);
-        }
-        return btoa(binary);
-    }
-
-    addNewLines(str: string) {
-        var finalString = '';
-        while (str.length > 0) {
-            finalString += str.substring(0, 64) + '\n';
-            str = str.substring(64);
-        }
-
-        return finalString;
-    }
-
-    toPem(type: string) {
-        var b64WithLines = this.addNewLines(this.b64);
-        var pem = "-----BEGIN " + type + " KEY-----\n" + b64WithLines + "-----END " + type + " KEY-----";
-
-        return pem;
-    }
-
-    toHex(bytes: Uint8Array) {
-        for (var hex = [], i = 0; i < bytes.length; i++) {
-            var current = bytes[i] < 0 ? bytes[i] + 256 : bytes[i];
-            hex.push((current >>> 4).toString(16));
-            hex.push((current & 0xF).toString(16));
-        }
-        return hex.join("");
-    }
-
-    static fromB64(base64: string): ByteData {
-        var binary_string = atob(base64);
-        var len = binary_string.length;
-        var bytes = new Uint8Array(len);
-        for (var i = 0; i < len; i++) {
-            bytes[i] = binary_string.charCodeAt(i);
-        }
-        return new this(bytes)
-    }
-
-    static fromHex(hex: string) {
-        for (var bytes = [], c = 0; c < hex.length; c += 2)
-            bytes.push(parseInt(hex.substr(c, 2), 16));
-        return new this(bytes)
-    }
-
-    static fromText(text: string) {
-        const enc = new TextEncoder()
-        return new this(enc.encode(text))
-    }
-}
-
-export class Cipher {
-
-    iv: ByteData
-    ct: ByteData
-    string: string
-
-    constructor(iv: ByteData, ct: ByteData) {
-        if (!arguments.length) {
-            this.iv = null;
-            this.ct = null;
-            this.string = null;
-            return;
-        }
-
-        this.iv = iv;
-        this.ct = ct;
-        this.string = iv.b64 + '|' + ct.b64;
-    }
-
-    static fromString(string: string): Cipher {
-        const iv = ByteData.fromB64(string.split('|')[0])
-        const ct = ByteData.fromB64(string.split('|')[1])
-        return new this(iv, ct)
-    }
 }

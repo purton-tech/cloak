@@ -1,4 +1,4 @@
-import { Vault, Cipher } from '../../asset-pipeline/vault'
+import { Vault, Cipher } from '../../asset-pipeline/cryptography/vault'
 
 const component = document.getElementById('secrets-table-controller');
 

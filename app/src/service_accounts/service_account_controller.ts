@@ -2,7 +2,7 @@ import { SideDrawer } from '../../asset-pipeline/side-drawer'
 import * as grpcWeb from 'grpc-web';
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, ServiceAccountSecrets,CreateSecretsResponse } from '../../asset-pipeline/api_pb';
-import { Vault, Cipher, ByteData } from '../../asset-pipeline/vault'
+import { Vault, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
 
 async function handleConnect(serviceAccountId: number) {
 
