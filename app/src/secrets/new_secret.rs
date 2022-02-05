@@ -65,7 +65,7 @@ markup::define! {
                         id="encrypted-vault-key",
                         value=user_vault.encrypted_vault_key.clone()] {}
                     input[type="hidden",
-                        id="ecdh-public-key",
+                        id="user-vault-ecdh-public-key",
                         value=user_vault.ecdh_public_key.clone()] {}
                     input[type="hidden",
                         id="vault-id",

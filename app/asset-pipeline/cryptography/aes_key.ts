@@ -39,9 +39,31 @@ export class AESKey {
         return new Cipher(ivData, cipher)
     }
 
-    // Encrypt this key with another key.
+    // Encrypt the given payload
+    async decrypt(cipher: Cipher) : Promise<ByteData> {
+        const decOptions = {
+            name: 'AES-GCM',
+            iv: cipher.iv.arr.buffer
+        };
+        return new ByteData(await self.crypto.subtle.decrypt(decOptions, this.privateKey, cipher.ct.arr.buffer));
+    }
+
+    // Wrap an AES key
     async wrap(key: AESKey) : Promise<Cipher> {
-        const symKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', this.privateKey))
-        return key.encrypt(symKeyData)
+        const symKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', key.privateKey))
+        return this.encrypt(symKeyData)
+    }
+
+    // Unwrap an AES key
+    async unwrap(cipher: Cipher) : Promise<AESKey> {
+        const symKeyData = await this.decrypt(cipher)
+
+        const key =  await self.crypto.subtle.importKey(
+            'raw', symKeyData.arr.buffer, AES_OPTIONS, true, ['decrypt', 'encrypt']);
+        return new AESKey(key)
+    }
+
+    async export() : Promise<ByteData> {
+        return new ByteData(await self.crypto.subtle.exportKey('raw', this.privateKey))
     }
 }

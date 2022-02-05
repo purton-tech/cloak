@@ -13,17 +13,13 @@ class NewVault extends SideDrawer {
             if (element instanceof SideDrawer) {
                 element.open = true
     
-                // Geneate a new ECDH key pair
-                //const ecdhKeyPair = await generateECDHKeyPair()
-                let throwawayKeyPair = await ECDHKeyPair.fromRandom();
                 let aliceECDHKeyPair = await ECDHKeyPair.fromBarricade();
-
-                const derivedAesKey = await 
-                    throwawayKeyPair.deriveSecretFromPublicKey(aliceECDHKeyPair.publicKey)
-
-                // Create a new Symmteric key and wrap it with the derived key
                 const aesVaultKey = await AESKey.fromRandom()
-                const aesVaultKeyWrapped: Cipher = await aesVaultKey.wrap(derivedAesKey)
+
+                const { wrappedKey, publicKey } = await aliceECDHKeyPair.publicKey.wrapKey(aesVaultKey)
+
+                // As a check try to unwrap it. This will blow up if the logic doesn't work
+                await aliceECDHKeyPair.privateKey.unwrapKey(wrappedKey, publicKey)
 
                 const wrappedKeyField = this.querySelector('[id="new-vault-key"]')
     
@@ -33,10 +29,9 @@ class NewVault extends SideDrawer {
                 if(publicKeyField instanceof HTMLInputElement &&
                     wrappedKeyField instanceof HTMLTextAreaElement) {
                     
-                    const throwawayKeyPairExport = 
-                        await throwawayKeyPair.publicKey.export()
+                    const throwawayKeyPairExport = await publicKey.export()
                     publicKeyField.value = throwawayKeyPairExport.b64
-                    wrappedKeyField.innerText = aesVaultKeyWrapped.string
+                    wrappedKeyField.innerText = wrappedKey.string
                 }
             }
         })

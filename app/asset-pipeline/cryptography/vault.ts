@@ -1,7 +1,7 @@
 import { openDB } from 'idb';
 export { Cipher } from './cipher'
 export { ByteData } from './byte_data'
-export { ECDHKeyPair } from './ecdh_keypair'
+export { ECDHKeyPair, ECDHPublicKey, ECDHPrivateKey } from './ecdh_keypair'
 export { AESKey } from './aes_key'
 import { Cipher } from './cipher'
 import { ByteData } from './byte_data'

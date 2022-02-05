@@ -1,10 +1,18 @@
 import { SideDrawer } from '../../asset-pipeline/side-drawer'
-import { Vault, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
+import { Vault, Cipher, ByteData, AESKey, ECDHKeyPair, ECDHPublicKey } from '../../asset-pipeline/cryptography/vault'
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import * as grpcWeb from 'grpc-web';
 import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api_pb';
 
 
+/**
+ * Alice creates a new secret for a vault.
+ * 
+ * - We retrieve the User Vault. 
+ * - Alices creates an ECDH agreement between her private key and the User Vault public key.
+ * - Alice can now decrypt the Vault encryption key using the derived key.
+ * - Alice can use the Vault encryption key to encrypt the secrets.
+ */
 class NewSecret extends SideDrawer {
 
     private secretNameInput: HTMLInputElement
@@ -46,20 +54,16 @@ class NewSecret extends SideDrawer {
                 const plaintextName = this.secretNameInput.value
                 const plaintextValue = this.secretValueInput.value
 
-                /**const nameCipher = await Vault.aesEncrypt(
-                    enc.encode(plaintextName), 
-                    vaultKey)
+                const vaultKey = await this.decryptSymmetricVaultKey()
 
-                const valueCipher = await Vault.aesEncrypt(
-                    enc.encode(plaintextValue), 
-                    vaultKey)**/
+                const cipherName = await vaultKey.encrypt(new ByteData(enc.encode(plaintextName)))
+                const cipherValue = await vaultKey.encrypt(new ByteData(enc.encode(plaintextValue)))
+                const nameBlindIndex = await Vault.blindIndex(plaintextName, vaultId)
 
-                //await encryptSecretToConnectedServiceAccounts(
-                //    vaultKey, vaultId,
-                //    plaintextName, plaintextValue, this.secretForm, this.secretNameInput, this.secretValueInput,
-                //    this.blindIndexInput,
-                //    nameCipher, valueCipher)
-                const vaultKey = this.decryptVaultKey()
+                await this.sendSecretsToServiceAccounts()
+
+                await this.submitForm(cipherName, cipherValue, nameBlindIndex)
+
             } catch (err) {
                 if (err instanceof Error) {
                     console.log(err.message)
@@ -68,16 +72,36 @@ class NewSecret extends SideDrawer {
         }
     }
 
-    async decryptVaultKey(): Promise<CryptoKey> {
-        const encryptedVaultKeyInput = document.getElementById('encrypted-vault-key') as HTMLInputElement
-        const ecdhPublicKeyInput = document.getElementById('ecdh-public-key') as HTMLInputElement
-        const ecdhPublicKeyByteData = ByteData.fromB64(ecdhPublicKeyInput.value)
-        const vaultCipher = Cipher.fromString(encryptedVaultKeyInput.value)
-        //const aesKey = await Vault.asymmetricKeyUnWrap(vaultCipher, ecdhPublicKeyByteData)
-        //console.log(aesKey)
-        //let decryptedVaultKey = await Vault.unwrapAesKey(vaultCipher, aesKey)
-        //return decryptedVaultKey
-        return null
+    async submitForm(nameCipher: Cipher, valueCipher: Cipher, nameBlindIndex: ByteData) {
+        this.secretNameInput.value = nameCipher.string
+        this.secretValueInput.value = valueCipher.string
+        this.blindIndexInput.value = nameBlindIndex.b64
+        this.secretForm.submit()
+    }
+
+    async sendSecretsToServiceAccounts() {
+        // For each service account public key
+        // generate a temporary ECDH keypair
+        // derive the secret between the keypair and the service account
+        // Send to the server.
+    }
+
+    // Generate an agreement with the current user
+    async decryptSymmetricVaultKey(): Promise<AESKey> {
+        const ecdhPublicKeyInput = this.querySelector('#user-vault-ecdh-public-key') as HTMLInputElement
+        const encryptedVaultKeyInput = this.querySelector('#encrypted-vault-key') as HTMLInputElement
+        const vaultKeyCipher = Cipher.fromString(encryptedVaultKeyInput.value)
+
+        console.log('here1')
+
+        const ecdhPublicKey = await ECDHPublicKey.import(ByteData.fromB64(ecdhPublicKeyInput.value))
+
+        console.log((await ecdhPublicKey.export()).b64)
+        const aliceECDHKeyPair = await ECDHKeyPair.fromBarricade()
+        console.log((await aliceECDHKeyPair.publicKey.export()).b64)
+        console.log(vaultKeyCipher)
+
+        return await aliceECDHKeyPair.privateKey.unwrapKey(vaultKeyCipher, ecdhPublicKey)
     }
 }
 
