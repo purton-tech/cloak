@@ -1,4 +1,4 @@
-import { SideDrawer } from '../../asset-pipeline/side-drawer'
+import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 import { Vault, Cipher, ByteData, AESKey, ECDHKeyPair, ECDHPublicKey } from '../../asset-pipeline/cryptography/vault'
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import * as grpcWeb from 'grpc-web';

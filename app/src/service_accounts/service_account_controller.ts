@@ -1,4 +1,4 @@
-import { SideDrawer } from '../../asset-pipeline/side-drawer'
+import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 import * as grpcWeb from 'grpc-web';
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, ServiceAccountSecrets,CreateSecretsResponse } from '../../asset-pipeline/api_pb';

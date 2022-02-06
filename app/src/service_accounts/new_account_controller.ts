@@ -1,4 +1,4 @@
-import { SideDrawer } from '../../asset-pipeline/side-drawer'
+import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 import { Vault, Cipher } from '../../asset-pipeline/cryptography/vault'
 
 let newAccountButton = document.getElementById('new-account')

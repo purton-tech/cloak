@@ -1,4 +1,4 @@
-import { SideDrawer } from '../../asset-pipeline/side-drawer'
+import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 import { Vault, ByteData } from '../../asset-pipeline/cryptography/vault'
 
 class InviteUser extends SideDrawer {

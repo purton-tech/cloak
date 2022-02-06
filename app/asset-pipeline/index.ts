@@ -1,7 +1,7 @@
-import './index.scss'
+import './scss/index.scss'
 
 // Web components
-import './side-drawer'
+import './web-components/side-drawer'
 import './cards'
 import '@github/time-elements/dist/relative-time-element';
 
