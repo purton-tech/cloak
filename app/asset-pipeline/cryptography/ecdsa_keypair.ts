@@ -15,7 +15,6 @@ export class ECDSAKeyPair {
     public publicKey: ECDSAPublicKey
 
     static async fromBarricade() : Promise<ECDSAKeyPair> {
-
         const ecdsaPrivateKey = await DB.getKeyFromIndexDB(UNPROTECTED_ECDSA_PRIVATE_KEY)
         const ecdsaPublicKey = await DB.getKeyFromIndexDB(ECDSA_PUBLIC_KEY)
         return new this(new ECDSAPublicKey(ecdsaPublicKey), new ECDSAPrivateKey(ecdsaPrivateKey))
@@ -51,10 +50,13 @@ export class ECDSASignature {
 
     private signature: ByteData
 
+    constructor(signature: ByteData) {
+        this.signature = signature
+    }
     
     // Copied from https://stackoverflow.com/questions/39554165/ecdsa-signatures-between-node-js-and-webcrypto-appear-to-be-incompatible
     // It generated hex, we could write a more efficient one that jsut works with bytes.
-    private toDER(): ByteData {
+    toDER(): ByteData {
 
         // Extract r & s and format it in ASN1 format.
         var signHex = Array.prototype.map.call(this.signature.arr, function (x) {
@@ -100,5 +102,22 @@ export class ECDSAPrivateKey {
 
     constructor(privateKey: CryptoKey) {
         this.privateKey = privateKey
+    }
+    
+    // Use the ECDSA private key to sign data.
+    // We can verify signature with openssl as we generate in DER format.
+    // openssl dgst -SHA384 -verify key.pem -signature signature.bin proto.bin
+    public async sign(bytesToSign: ByteData): Promise<ECDSASignature> {
+
+        let signature = await window.crypto.subtle.sign(
+            {
+                name: "ECDSA",
+                hash: { name: "SHA-256" },
+            },
+            this.privateKey,
+            bytesToSign.arr
+        );
+
+        return new ECDSASignature(new ByteData(signature))
     }
 }
