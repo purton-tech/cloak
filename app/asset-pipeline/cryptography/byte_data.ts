@@ -52,6 +52,11 @@ export class ByteData {
         return hex.join("");
     }
 
+    toText() {
+        const dec = new TextDecoder()
+        return dec.decode(this.arr)
+    }
+
     static fromB64(base64: string): ByteData {
         var binary_string = atob(base64);
         var len = binary_string.length;

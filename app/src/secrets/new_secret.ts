@@ -131,11 +131,11 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
                 console.log('Error code: ' + err.code + ' "' + err.message + '"');
             } else {
                 const cipher = Cipher.fromString(vault.getEncryptedVaultPrivateEcdhKey())
-                const vaultECDHPrivateKey = await Vault.unwrapECDHKeyPair(cipher, vaultKey)
+                const ecdhKeyPair = await ECDHKeyPair.fromBarricade()
                 const nameBlindIndex = await Vault.blindIndex(secretName, vaultId)
 
                 const createServiceRequest = await deriveServiceAccountSecrets(
-                    vault.getServiceAccountsList(), vaultECDHPrivateKey, 
+                    vault.getServiceAccountsList(), ecdhKeyPair, 
                     secretName, secretValue, nameBlindIndex.b64)
 
                 vaultClient.createSecrets(createServiceRequest,
@@ -160,7 +160,7 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
     )
 }
 
-async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], vaultECDHPrivateKey: CryptoKey,
+async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], vaultECDHPrivateKey: ECDHKeyPair,
     plaintextName: string, plaintextValue: string, blindIndex: string)  : Promise<CreateSecretsRequest> {
 
     const createSecretsRequest = new CreateSecretsRequest()
@@ -170,21 +170,20 @@ async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], va
         // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
         const serviceAccountECDHPublicKeyData = 
             ByteData.fromB64(serviceAccount.getPublicEcdhKey())
-        const serviceAccountECDHPublicKey: CryptoKey = 
-            await Vault.importPublicECDHKey(serviceAccountECDHPublicKeyData)
-        const aesKeyAgreement: CryptoKey = 
-            await Vault.deriveSecretKey(vaultECDHPrivateKey, serviceAccountECDHPublicKey)
+        const serviceAccountECDHPublicKey: ECDHPublicKey = 
+            await ECDHPublicKey.import(serviceAccountECDHPublicKeyData)
+        const aesKeyAgreement: AESKey = 
+            await vaultECDHPrivateKey.privateKey.deriveSecretFromPublicKey(serviceAccountECDHPublicKey)
     
         // Associated Data
-        const associatedData = new Uint8Array(4)
-        const view = new DataView(associatedData.buffer)
+        const associatedData = new ByteData(new Uint8Array(4))
+        const view = new DataView(associatedData.arr.buffer)
         view.setUint32(0, serviceAccount.getServiceAccountId(), true /* littleEndian */);
     
-        const enc = new TextEncoder(); // always utf-8
-        const newEncryptedName = await Vault.aeadEncrypt(enc.encode(plaintextName), 
-            associatedData, aesKeyAgreement)
-        const newEncryptedValue = await Vault.aeadEncrypt(enc.encode(plaintextValue), 
-            associatedData, aesKeyAgreement)
+        const newEncryptedName = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextName), 
+            associatedData)
+        const newEncryptedValue = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextValue), 
+            associatedData)
     
         const secret = new Secret()
         secret.setEncryptedSecretValue(newEncryptedValue.string)

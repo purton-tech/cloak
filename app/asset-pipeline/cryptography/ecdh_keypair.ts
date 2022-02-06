@@ -55,10 +55,20 @@ export class ECDHPublicKey {
     // we be able to decrypt
     async wrapKey(key: AESKey) : Promise<{ wrappedKey: Cipher, publicKey: ECDHPublicKey }> {
         let ephemeralKeyPair = await ECDHKeyPair.fromRandom();
-        const derivedAESKey = await ephemeralKeyPair.privateKey.deriveSecretFromPublicKey(this)
+        const derivedAESKey = await ephemeralKeyPair.privateKey.deriveAESKey(this)
         const wrappedKey: Cipher = await derivedAESKey.wrap(key)
 
         return { wrappedKey: wrappedKey, publicKey: ephemeralKeyPair.publicKey }
+    }
+    
+    // Encrypt a key that only the private key that corresponds to this public key
+    // we be able to decrypt
+    async wrapMessage(message: ByteData) : Promise<{ wrappedMessage: Cipher, publicKey: ECDHPublicKey }> {
+        let ephemeralKeyPair = await ECDHKeyPair.fromRandom();
+        const derivedAESKey = await ephemeralKeyPair.privateKey.deriveAESKey(this)
+        const wrappedMessage: Cipher = await derivedAESKey.encrypt(message)
+
+        return { wrappedMessage: wrappedMessage, publicKey: ephemeralKeyPair.publicKey }
     }
 
     static async import(spkiKey: ByteData) : Promise<ECDHPublicKey> {
@@ -79,11 +89,17 @@ export class ECDHPrivateKey {
 
     // Unwrap a key that was encrypted using an ECDH key agreement with a public key
     async unwrapKey(cipher: Cipher, publicKey: ECDHPublicKey) : Promise<AESKey> {
-        const derivedAESKey = await this.deriveSecretFromPublicKey(publicKey)
+        const derivedAESKey = await this.deriveAESKey(publicKey)
         return await derivedAESKey.unwrap(cipher)
     }
 
-    async deriveSecretFromPublicKey(publicKey: ECDHPublicKey) : Promise<AESKey> {
+    // Unwrap a key that was encrypted using an ECDH key agreement with a public key
+    async unwrapMessage(cipher: Cipher, publicKey: ECDHPublicKey) : Promise<ByteData> {
+        const derivedAESKey = await this.deriveAESKey(publicKey)
+        return await derivedAESKey.decrypt(cipher)
+    }
+
+    async deriveAESKey(publicKey: ECDHPublicKey) : Promise<AESKey> {
         const aesKey = await window.crypto.subtle.deriveKey(
             {
                 name: "ECDH",

@@ -48,6 +48,33 @@ export class AESKey {
         return new ByteData(await self.crypto.subtle.decrypt(decOptions, this.privateKey, cipher.ct.arr.buffer));
     }
 
+    // Encrypt the given payload
+    async aeadEncrypt(plaintext: ByteData, data: ByteData) : Promise<Cipher> {
+
+        const encOptions = {
+            name: 'AES-GCM',
+            iv: new Uint8Array(12),
+            additionalData: data
+        };
+        self.crypto.getRandomValues(encOptions.iv);
+        const ivData = new ByteData(encOptions.iv.buffer);
+        const cipher = new ByteData(
+            await self.crypto.subtle.encrypt(encOptions, this.privateKey, plaintext.arr))
+
+        return new Cipher(ivData, cipher)
+    }
+
+    // Encrypt the given payload
+    async aeadDecrypt(cipher: Cipher, data: ByteData) : Promise<ByteData> {
+        const decOptions = {
+            name: 'AES-GCM',
+            iv: cipher.iv.arr.buffer,
+            additionalData: data
+        };
+        return new ByteData(await self.crypto.subtle.decrypt(
+            decOptions, this.privateKey, cipher.ct.arr.buffer));
+    }
+
     // Wrap an AES key
     async wrap(key: AESKey) : Promise<Cipher> {
         const symKeyData = new ByteData(await self.crypto.subtle.exportKey('raw', key.privateKey))

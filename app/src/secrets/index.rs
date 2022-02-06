@@ -56,9 +56,8 @@ markup::define! {
                         @for secret in secrets {
                             tr {
                                 td {
-                                    span[class="cipher"] {
-                                        {secret.name}
-                                    }
+                                    ecdh_cipher[cipher=secret.name.clone(),
+                                        "ecdh-public-key"=user_vault.ecdh_public_key.clone()] {}
                                 }
                                 td {
                                     relative_time[datetime=secret.updated_at.to_rfc3339()] {}
@@ -76,7 +75,6 @@ markup::define! {
                     }
                 }
             }
-            input[type="hidden", id="wrapped-vault-key", value={user_vault.encrypted_vault_key.clone()}] {}
         }
 
         // Generate all the details flyouts
