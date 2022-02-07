@@ -97,9 +97,8 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let response = GetVaultResponse {
             name: vault.name,
-            encrypted_vault_key: user_vault.encrypted_vault_key,
-            vault_public_ecdh_key: "vault.ecdh_public_key".to_string(),
-            encrypted_vault_private_ecdh_key: "vault.encrypted_ecdh_private_key".to_string(),
+            user_vault_encrypted_vault_key: user_vault.encrypted_vault_key,
+            user_vault_public_ecdh_key: user_vault.ecdh_public_key,
             secrets,
             service_accounts,
         };
@@ -115,12 +114,13 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let authenticated_user = authenticate(&request).await?;
 
-        let req = request.into_inner();
+        let service_account = request.into_inner();
 
         let mut secrets: Vec<models::service_account_secret::ServiceAccountSecret> =
             Default::default();
 
-        for account_secret in req.account_secrets {
+        for account_secret in service_account.account_secrets {
+            let ecdh_public_key = account_secret.public_ecdh_key.clone();
             for secret in account_secret.secrets {
                 secrets.push(models::service_account_secret::ServiceAccountSecret {
                     id: 0,
@@ -128,6 +128,7 @@ impl app::vault::vault_server::Vault for VaultService {
                     name: secret.encrypted_name,
                     name_blind_index: secret.name_blind_index,
                     secret: secret.encrypted_secret_value,
+                    ecdh_public_key: ecdh_public_key.clone(),
                 })
             }
         }

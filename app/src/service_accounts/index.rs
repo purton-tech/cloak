@@ -86,7 +86,7 @@ markup::define! {
         }
         // Generate all the details flyouts
         @for service_account in service_accounts {
-            @super::view::ViewServiceAccount{ service_account, vaults }
+            @super::connect_account::ConnectServiceAccountDrawer{ service_account, vaults }
             @super::delete::DeleteServiceAccountForm {
                 service_account_id: service_account.id as u32,
                 service_account_name: service_account.name.clone()

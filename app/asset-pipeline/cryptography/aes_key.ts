@@ -59,7 +59,7 @@ export class AESKey {
         const encOptions = {
             name: 'AES-GCM',
             iv: new Uint8Array(12),
-            additionalData: data
+            additionalData: data.arr
         };
         self.crypto.getRandomValues(encOptions.iv);
         const ivData = new ByteData(encOptions.iv.buffer);
@@ -74,7 +74,7 @@ export class AESKey {
         const decOptions = {
             name: 'AES-GCM',
             iv: cipher.iv.arr.buffer,
-            additionalData: data
+            additionalData: data.arr
         };
         return new ByteData(await self.crypto.subtle.decrypt(
             decOptions, this.privateKey, cipher.ct.arr.buffer));

@@ -2,7 +2,7 @@ import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 import * as grpcWeb from 'grpc-web';
 import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
 import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, ServiceAccountSecrets,CreateSecretsResponse } from '../../asset-pipeline/api_pb';
-import { Vault, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
+import { Vault, AESKey, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
 
 async function handleConnect(serviceAccountId: number) {
 
@@ -44,7 +44,8 @@ async function transferSecretsToServiceAccount(vault: GetVaultResponse,
 
     // Decrypt the vault key.
     const vaultCipher = Cipher.fromString(vault.getEncryptedVaultKey())
-    const vaultKey = await Vault.unwrapKey(vaultCipher)
+    const userAesKey = await AESKey.fromBarricade()
+    const vaultKey = await userAesKey.unwrap(vaultCipher)
 
     // Decrypt the ECDH key
     const ECDHPrivateKey = await Vault.unwrapECDHKey(encryptedECDHPrivateKey)

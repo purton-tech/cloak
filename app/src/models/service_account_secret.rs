@@ -8,6 +8,7 @@ pub struct ServiceAccountSecret {
     pub name: String,
     pub name_blind_index: String,
     pub secret: String,
+    pub ecdh_public_key: String,
 }
 
 impl ServiceAccountSecret {
@@ -20,7 +21,7 @@ impl ServiceAccountSecret {
             ServiceAccountSecret,
             "
                 SELECT  
-                    id, service_account_id, name, name_blind_index, secret 
+                    id, service_account_id, name, name_blind_index, secret, ecdh_public_key 
                 FROM 
                     service_account_secrets 
                 WHERE 
@@ -54,15 +55,16 @@ impl ServiceAccountSecret {
             for secret in &idor_secrets {
                 sqlx::query!(
                     "
-                            INSERT INTO service_account_secrets
-                                (service_account_id, name, name_blind_index, secret)
-                            VALUES
-                                ($1, $2, $3, $4)
-                        ",
+                        INSERT INTO service_account_secrets
+                            (service_account_id, name, name_blind_index, secret, ecdh_public_key)
+                        VALUES
+                            ($1, $2, $3, $4, $5)
+                    ",
                     sa_secret.service_account_id,
                     secret.name,
                     secret.name_blind_index,
-                    secret.secret
+                    secret.secret,
+                    secret.ecdh_public_key
                 )
                 .execute(pool)
                 .await?;

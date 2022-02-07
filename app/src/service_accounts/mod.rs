@@ -1,3 +1,4 @@
+mod connect_account;
 mod delete;
 mod index;
 mod new_account;
