@@ -101,11 +101,12 @@ impl Vault {
             Vault,
             "
                 SELECT 
-                    id, name, updated_at, created_at
+                    v.id, v.name, v.updated_at, v.created_at
                 FROM 
-                    vaults
+                    vaults v
+                LEFT JOIN users_vaults uv ON uv.vault_id = v.id
                 WHERE
-                    user_id = $1
+                    uv.user_id = $1
             ",
             authenticated_user.user_id as i32
         )
