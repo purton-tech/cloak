@@ -63,7 +63,7 @@ services:
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
       - target:/vscode/target # Set target as a volume for performance. 
-      - node_modules:/vscode/app/node_modules # Set target as a volume for performance. 
+      - node_modules:/vscode/app/asset-pipeline/node_modules # Set target as a volume for performance. 
       - infra_node_modules:/vscode/infra/node_modules # Set target as a volume for performance. 
 
     environment:

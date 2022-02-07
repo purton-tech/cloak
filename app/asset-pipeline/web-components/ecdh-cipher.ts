@@ -2,7 +2,7 @@ import { ECDHKeyPair, ECDHPublicKey } from '../cryptography/ecdh_keypair'
 import { Cipher } from '../cryptography/cipher'
 import { ByteData } from '../cryptography/byte_data'
 
-// <ecdh-cipher cipher="", ecdh-public-key=""><ecdh-cipher>
+// <ecdh-cipher cipher="", ecdh-public-key="", wrapped-aes-key=""><ecdh-cipher>
 // Create a key agreement betweent he users ECDH key and the public key
 // Use the result to decrpyt the cipher
 export class ECDHCipher extends HTMLElement {
