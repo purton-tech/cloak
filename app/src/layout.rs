@@ -122,7 +122,7 @@ markup::define! {
                                     link: &crate::secrets::secret_route(*vault_id as i32),
                                     svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
                                 { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Members",
-                                    link: &crate::members::member_route(*vault_id as i32),
+                                    link: &crate::members::member_route(*vault_id),
                                     svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
                             }
 

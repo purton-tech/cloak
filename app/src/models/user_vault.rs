@@ -2,6 +2,7 @@ use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use sqlx::PgPool;
 
+#[derive(Debug)]
 pub struct UserVault {
     pub vault_id: i32,
     pub user_id: i32,
@@ -16,6 +17,29 @@ pub struct UserDetails {
 }
 
 impl UserVault {
+    pub async fn add_user_vault(
+        pool: &PgPool,
+        _authenticated_user: &Authentication,
+        user_vault: &UserVault,
+        idor_vault_id: u32,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            "
+                INSERT INTO 
+                    users_vaults (user_id, vault_id, ecdh_public_key, encrypted_vault_key)
+                VALUES($1, $2, $3, $4) 
+            ",
+            user_vault.user_id as i32,
+            idor_vault_id as i32,
+            user_vault.ecdh_public_key,
+            user_vault.encrypted_vault_key
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
     // With an authenticated user get one of their vaults.
     pub async fn get(
         pool: &PgPool,

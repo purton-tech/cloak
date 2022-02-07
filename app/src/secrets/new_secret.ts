@@ -86,17 +86,12 @@ class NewSecret extends SideDrawer {
         // Send to the server.
     }
 
-    // Generate an agreement with the current user
-    async decryptSymmetricVaultKey(): Promise<AESKey> {
+    private async decryptSymmetricVaultKey(): Promise<AESKey> {
         const ecdhPublicKeyInput = this.querySelector('#user-vault-ecdh-public-key') as HTMLInputElement
         const encryptedVaultKeyInput = this.querySelector('#encrypted-vault-key') as HTMLInputElement
         const vaultKeyCipher = Cipher.fromString(encryptedVaultKeyInput.value)
-
         const ecdhPublicKey = await ECDHPublicKey.import(ByteData.fromB64(ecdhPublicKeyInput.value))
-
-        const aliceECDHKeyPair = await ECDHKeyPair.fromBarricade()
-
-        return await aliceECDHKeyPair.privateKey.unwrapKey(vaultKeyCipher, ecdhPublicKey)
+        return await Vault.decryptVaultKey(vaultKeyCipher, ecdhPublicKey)
     }
 }
 
@@ -125,7 +120,6 @@ async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaul
             if (err) {
                 console.log('Error code: ' + err.code + ' "' + err.message + '"');
             } else {
-                const cipher = Cipher.fromString(vault.getEncryptedVaultPrivateEcdhKey())
                 const ecdhKeyPair = await ECDHKeyPair.fromBarricade()
                 const nameBlindIndex = await Vault.blindIndex(secretName, vaultId)
 

@@ -23,10 +23,14 @@ pub async fn index(
     let team =
         models::organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
 
+    let user_vault =
+        models::user_vault::UserVault::get(&pool, &authentication, idor_vault_id).await?;
+
     let page = MembersPage {
         _vault_name: "vaults".to_string(),
         members: &members,
         team: &team,
+        user_vault: &user_vault,
     };
 
     crate::layout::vault_layout(
@@ -41,6 +45,7 @@ pub async fn index(
 markup::define! {
     MembersPage<'a>(
         _vault_name: String,
+        user_vault: &'a models::user_vault::UserVault,
         members: &'a Vec<models::user_vault::UserDetails>,
         team: &'a Vec<models::organisation::User>)
     {
@@ -48,6 +53,7 @@ markup::define! {
             div.header {
                 span { "Members" }
                 @super::add_member::AddMemberDrawer {
+                    user_vault: *user_vault,
                     team: *team
                 }
                 button.a_button.mini.primary[id="add-member"] { "Add Member" }

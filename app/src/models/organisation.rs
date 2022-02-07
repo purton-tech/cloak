@@ -10,6 +10,7 @@ pub struct Organisation {
 pub struct User {
     pub id: i32,
     pub email: String,
+    pub ecdh_public_key: String,
     pub is_admin: bool,
 }
 
@@ -99,7 +100,7 @@ impl Organisation {
             User,
             "
                 SELECT 
-                    u.id, u.email, ou.is_admin
+                    u.id, u.email, u.ecdh_public_key, ou.is_admin
                 FROM 
                     organisation_users ou
                 LEFT JOIN users u ON u.id = ou.user_id
@@ -124,7 +125,7 @@ impl Organisation {
             User,
             "
                 SELECT 
-                    u.id, u.email, ou.is_admin
+                    u.id, u.email, u.ecdh_public_key, ou.is_admin
                 FROM 
                     organisation_users ou
                 LEFT JOIN users u ON u.id = ou.user_id
