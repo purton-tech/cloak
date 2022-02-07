@@ -57,6 +57,7 @@ markup::define! {
                             tr {
                                 td {
                                     ecdh_cipher[cipher=secret.name.clone(),
+                                        "wrapped-aes-key"=user_vault.encrypted_vault_key.clone(),
                                         "ecdh-public-key"=user_vault.ecdh_public_key.clone()] {}
                                 }
                                 td {

@@ -92,14 +92,9 @@ class NewSecret extends SideDrawer {
         const encryptedVaultKeyInput = this.querySelector('#encrypted-vault-key') as HTMLInputElement
         const vaultKeyCipher = Cipher.fromString(encryptedVaultKeyInput.value)
 
-        console.log('here1')
-
         const ecdhPublicKey = await ECDHPublicKey.import(ByteData.fromB64(ecdhPublicKeyInput.value))
 
-        console.log((await ecdhPublicKey.export()).b64)
         const aliceECDHKeyPair = await ECDHKeyPair.fromBarricade()
-        console.log((await aliceECDHKeyPair.publicKey.export()).b64)
-        console.log(vaultKeyCipher)
 
         return await aliceECDHKeyPair.privateKey.unwrapKey(vaultKeyCipher, ecdhPublicKey)
     }
@@ -173,7 +168,7 @@ async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], va
         const serviceAccountECDHPublicKey: ECDHPublicKey = 
             await ECDHPublicKey.import(serviceAccountECDHPublicKeyData)
         const aesKeyAgreement: AESKey = 
-            await vaultECDHPrivateKey.privateKey.deriveSecretFromPublicKey(serviceAccountECDHPublicKey)
+            await vaultECDHPrivateKey.privateKey.deriveAESKey(serviceAccountECDHPublicKey)
     
         // Associated Data
         const associatedData = new ByteData(new Uint8Array(4))

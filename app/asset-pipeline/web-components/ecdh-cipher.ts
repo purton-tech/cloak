@@ -12,12 +12,18 @@ export class ECDHCipher extends HTMLElement {
         const cipher = Cipher.fromString(this.attributes.getNamedItem('cipher').value)
         const ecdhPublicKey = ByteData.fromB64(
             this.attributes.getNamedItem('ecdh-public-key').value)
+        const wrappedAesKey = Cipher.fromString(
+            this.attributes.getNamedItem('wrapped-aes-key').value)
 
+        // With the users ECDH key create a key form a key agreement
+        // This key can then unwrap the wrapped key.
+        // The unwrapped key can decrypt the cipher
         ECDHKeyPair.fromBarricade().then(keypair => {
             ECDHPublicKey.import(ecdhPublicKey).then(ecdhPublicKey => {
-                keypair.privateKey.unwrapMessage(cipher, ecdhPublicKey).then(plaintext => {
-                    this.innerText = plaintext.toText()
-                    console.log('here')
+                keypair.privateKey.unwrapKey(wrappedAesKey, ecdhPublicKey).then(vaultKey => {
+                    vaultKey.decrypt(cipher).then(plaintext => {
+                        this.innerText = plaintext.toText()
+                    })
                 })
             })
         })
