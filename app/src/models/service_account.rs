@@ -13,7 +13,36 @@ pub struct ServiceAccount {
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
+pub struct NewAccount {
+    pub name: String,
+    pub ecdh_public_key: String,
+    pub encrypted_ecdh_private_key: String,
+}
+
 impl ServiceAccount {
+    pub async fn create(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+        new_account: NewAccount,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            "
+                INSERT INTO 
+                    service_accounts (user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
+                VALUES($1, $2, $3, $4) 
+            ",
+            authenticated_user.user_id as i32,
+            new_account.name,
+            new_account.ecdh_public_key,
+            new_account.encrypted_ecdh_private_key
+        )
+        .execute(pool)
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        Ok(())
+    }
+
     pub async fn get_all(
         pool: &PgPool,
         authenticated_user: &Authentication,

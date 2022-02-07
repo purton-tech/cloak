@@ -99,6 +99,10 @@ export class ECDHPrivateKey {
         return await derivedAESKey.decrypt(cipher)
     }
 
+    async export() : Promise<ByteData> {
+        return new ByteData(await self.crypto.subtle.exportKey('pkcs8', this.privateKey))
+    }
+
     async deriveAESKey(publicKey: ECDHPublicKey) : Promise<AESKey> {
         const aesKey = await window.crypto.subtle.deriveKey(
             {

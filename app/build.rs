@@ -17,7 +17,7 @@ fn main() {
     let mut data = String::new();
 
     data.push_str(&generate_file_routes(
-        "./asset-pipeline/dist/",
+        "./dist/",
         "asset_pipeline_routes",
         "/static/assets",
     ));
@@ -27,10 +27,7 @@ fn main() {
         "/static/images",
     ));
 
-    data.push_str(&generate_get_methods(
-        "./asset-pipeline/dist/",
-        "/static/assets",
-    ));
+    data.push_str(&generate_get_methods("./dist/", "/static/assets"));
     data.push_str(&generate_get_methods(
         "./asset-pipeline/images/",
         "/static/images",

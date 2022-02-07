@@ -48,5 +48,5 @@ RUN sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certif
     
 # all the volumes configured in the docker-compose.yml
 RUN sudo mkdir -p /vscode/target && sudo chown $USERNAME:$USERNAME /vscode/target
-RUN sudo mkdir -p /vscode/app/asset-pipeline/node_modules && sudo chown $USERNAME:$USERNAME /vscode/app/asset-pipeline/node_modules
+RUN sudo mkdir -p /vscode/app/node_modules && sudo chown $USERNAME:$USERNAME /vscode/app/node_modules
 RUN sudo mkdir -p /vscode/infra/node_modules && sudo chown $USERNAME:$USERNAME /vscode/infra/node_modules

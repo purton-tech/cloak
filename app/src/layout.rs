@@ -45,6 +45,8 @@ pub fn vault_layout(
             .replace("add_member", "add-member")
             .replace("<new_vault", "<new-vault")
             .replace("</new_vault", "</new-vault")
+            .replace("</new_account", "</new-account")
+            .replace("<new_account", "<new-account")
             .replace("<new_secret", "<new-secret")
             .replace("</new_secret", "</new-secret")
             .replace("ecdh_cipher", "ecdh-cipher")

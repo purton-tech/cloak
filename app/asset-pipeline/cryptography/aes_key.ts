@@ -16,6 +16,11 @@ export class AESKey {
         this.privateKey = privateKey
     }
 
+    static async fromBarricade() : Promise<AESKey> {
+        const key = await DB.getKeyFromIndexDB(UNPROTECTED_SYMMETRIC_KEY)
+        return new this(key)
+    }
+
     static async fromRandom() : Promise<AESKey> {
         const newAesKey = await self.crypto.subtle.generateKey(
             AES_OPTIONS,
