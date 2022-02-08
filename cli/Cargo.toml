@@ -23,5 +23,8 @@ p256 = { version = "0.10", default-features = false, features = ["ecdh", "pem"] 
 base64 = "0" # So we encode DER public key to base64
 aes-gcm = "0.9.4"
 
+# OK, I wanted a pretty table
+cli-table = "0"
+
 [build-dependencies]
 rust-grpc-web = { git = "https://github.com/elliptic-email/rust-grpc-web" }
