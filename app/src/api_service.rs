@@ -33,16 +33,16 @@ impl app::vault::vault_server::Vault for VaultService {
 
             let secrets = secrets
                 .into_iter()
-                .map(|secret| Secret {
+                .map(|secret| ServiceAccountSecret {
                     encrypted_name: secret.name,
                     name_blind_index: secret.name_blind_index,
                     encrypted_secret_value: secret.secret,
+                    ecdh_public_key: secret.ecdh_public_key,
                 })
                 .collect();
 
             let response = GetServiceAccountResponse {
                 service_account_id: service_account.id as u32,
-                vault_public_ecdh_key: "vault.ecdh_public_key".to_string(),
                 secrets,
             };
 

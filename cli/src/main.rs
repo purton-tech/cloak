@@ -40,6 +40,7 @@ pub enum Commands {
     #[clap(external_subcommand)]
     Run(Vec<OsString>),
     Info,
+    Secrets,
 }
 
 #[tokio::main]
@@ -49,8 +50,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let args = Cli::parse();
     let config = config::Config::configure(&args)?;
 
-    // cargo run -- printenv
-    // cargo run -- echo $HOSTNAME
+    // cargo run -- --api-host-url=http://envoy:7100 run printenv
+    // cargo run -- info
+    // cargo run -- --api-host-url=http://envoy:7100 secrets
     match &args.command {
         Commands::Run(args) => {
             println!("Calling out to {:?} with {:?}", &args[0], &args[1..]);
@@ -75,6 +77,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Info => {
             println!("Public Key {:?}", config.public_key_der_base64);
         }
+        Commands::Secrets => {
+            let env_vars_to_inject = get_secrets(&config).await?;
+            for (key, value) in env_vars_to_inject.into_iter() {
+                println!("{} = {}", key, value);
+            }
+        }
     }
 
     Ok(())
@@ -90,19 +98,19 @@ async fn get_secrets(
         })
         .await?;
 
-    let vault_key_der = base64::decode(response.vault_public_ecdh_key).unwrap();
-
-    let vault_public_key = PublicKey::from_public_key_der(&vault_key_der).unwrap();
-
-    let shared_secret = ecdh::diffie_hellman(
-        config.secret_key.to_nonzero_scalar(),
-        vault_public_key.as_affine(),
-    );
-
     let aad = transform_u32_to_array_of_u8(response.service_account_id);
 
     let mut env_vars_to_inject: HashMap<String, String> = Default::default();
     for secret in response.secrets {
+        let key_der = base64::decode(secret.ecdh_public_key).unwrap();
+
+        let public_key = PublicKey::from_public_key_der(&key_der).unwrap();
+
+        let shared_secret = ecdh::diffie_hellman(
+            config.secret_key.to_nonzero_scalar(),
+            public_key.as_affine(),
+        );
+
         let plaintext_name = decrypt_secret(secret.encrypted_name, &aad, &shared_secret)?;
         let plaintext_value = decrypt_secret(secret.encrypted_secret_value, &aad, &shared_secret)?;
         env_vars_to_inject.insert(plaintext_name, plaintext_value);

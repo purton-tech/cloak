@@ -42,10 +42,16 @@ message GetServiceAccountRequest {
     string ecdh_public_key = 1;
 }
 
+message ServiceAccountSecret {
+    string encrypted_name = 1;
+    string name_blind_index = 2;
+    string encrypted_secret_value = 3;
+    string ecdh_public_key = 4;
+}
+
 message GetServiceAccountResponse {
     uint32 service_account_id = 1;
-    string vault_public_ecdh_key = 2;
-    repeated Secret secrets = 3;
+    repeated ServiceAccountSecret secrets = 3;
 }
 
 message GetVaultRequest {
