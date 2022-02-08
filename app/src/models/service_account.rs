@@ -19,7 +19,40 @@ pub struct NewAccount {
     pub encrypted_ecdh_private_key: String,
 }
 
+pub struct ConnectAccount {
+    pub vault_id: u32,
+    pub service_account_id: u32,
+}
+
 impl ServiceAccount {
+    pub async fn connect(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+        connect_account: ConnectAccount,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            "
+                UPDATE service_accounts 
+                SET 
+                    vault_id = $1
+                WHERE 
+                    id = $2
+                AND 
+                    -- Make sure the user has access to the vault
+                    $1 IN (SELECT vault_id from users_vaults WHERE user_id = $3)
+                AND user_id = $3
+            ",
+            connect_account.vault_id as i32,
+            connect_account.service_account_id as i32,
+            authenticated_user.user_id as i32
+        )
+        .execute(pool)
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        Ok(())
+    }
+
     pub async fn create(
         pool: &PgPool,
         authenticated_user: &Authentication,

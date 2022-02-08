@@ -18,6 +18,6 @@ pub fn routes() -> Router {
     Router::new()
         .route(INDEX, get(index::index))
         .route(NEW, post(new_account::new))
-        .route(CONNECT, post(view::connect))
+        .route(CONNECT, post(connect_account::connect))
         .route(DELETE, post(delete::delete))
 }

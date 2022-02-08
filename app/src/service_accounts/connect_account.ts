@@ -12,8 +12,6 @@ class ConnectAccount extends SideDrawer {
 
         const serviceAccountId = parseInt(this.getAttribute('service-account-id'))
 
-        console.log(serviceAccountId)
-
         let newAccountButton = document.getElementById('service-account-row-' + serviceAccountId)
         newAccountButton.addEventListener('click', async event => {
             this.open = true

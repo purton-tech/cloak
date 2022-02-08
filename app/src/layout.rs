@@ -49,6 +49,8 @@ pub fn vault_layout(
             .replace("<new_account", "<new-account")
             .replace("</connect_account", "</connect-account")
             .replace("<connect_account", "<connect-account")
+            .replace("</view_account", "</view-account")
+            .replace("<view_account", "<view-account")
             .replace("<new_secret", "<new-secret")
             .replace("</new_secret", "</new-secret")
             .replace("ecdh_cipher", "ecdh-cipher")

@@ -1,11 +1,34 @@
+use crate::authentication::Authentication;
+use crate::errors::CustomError;
 use crate::models;
+use axum::{
+    extract::{Extension, Form},
+    response::{IntoResponse, Redirect},
+};
 use serde::Deserialize;
+use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct ConnectServiceAccount {
     pub vault_id: u32,
     pub service_account_id: u32,
+}
+
+pub async fn connect(
+    authenticated_user: Authentication,
+    Form(connect_form): Form<ConnectServiceAccount>,
+    Extension(pool): Extension<PgPool>,
+) -> Result<impl IntoResponse, CustomError> {
+    let connect_account = models::service_account::ConnectAccount {
+        vault_id: connect_form.vault_id,
+        service_account_id: connect_form.service_account_id,
+    };
+
+    models::service_account::ServiceAccount::connect(&pool, &authenticated_user, connect_account)
+        .await?;
+
+    Ok(Redirect::to(super::INDEX.parse().unwrap()))
 }
 
 markup::define! {
