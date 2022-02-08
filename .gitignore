@@ -7,3 +7,4 @@ api_pb.js
 ApiServiceClientPb.ts
 tmp
 .env
+*.pem
