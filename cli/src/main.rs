@@ -5,6 +5,7 @@ pub mod vault {
 mod config;
 
 use clap::{Parser, Subcommand};
+use cli_table::WithTitle;
 use p256::ecdh::SharedSecret;
 use p256::{elliptic_curve::ecdh, pkcs8::DecodePublicKey, PublicKey};
 use std::collections::HashMap;
@@ -14,6 +15,7 @@ use std::process::{Command, Stdio};
 
 use aes_gcm::aead::{generic_array::GenericArray, Aead, NewAead, Payload};
 use aes_gcm::Aes256Gcm;
+use cli_table::{print_stdout, Table};
 use dotenv::dotenv;
 
 /// A fictional versioning CLI
@@ -78,14 +80,24 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Public Key {:?}", config.public_key_der_base64);
         }
         Commands::Secrets => {
-            let env_vars_to_inject = get_secrets(&config).await?;
-            for (key, value) in env_vars_to_inject.into_iter() {
-                println!("{} = {}", key, value);
+            let secrets: HashMap<String, String> = get_secrets(&config).await?;
+            let mut table: Vec<SecretRow> = Default::default();
+            for (name, value) in secrets.into_iter() {
+                table.push(SecretRow { name, value })
             }
+            print_stdout(table.with_title())?;
         }
     }
 
     Ok(())
+}
+
+#[derive(Table)]
+struct SecretRow {
+    #[table(title = "Name")]
+    name: String,
+    #[table(title = "Value")]
+    value: String,
 }
 
 async fn get_secrets(
