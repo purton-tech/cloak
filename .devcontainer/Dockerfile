@@ -38,7 +38,8 @@ RUN sudo apt update \
     && sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
 
 # Install secrets management
-RUN sudo /bin/sh -c 'wget https://github.com/ianpurton/keyvault/releases/latest/download/cli -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak'
+ARG CLOAK_VERSION=1.1.0
+RUN sudo /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cli -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak"
 
 # Install Doppler
 RUN sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gnupg \
