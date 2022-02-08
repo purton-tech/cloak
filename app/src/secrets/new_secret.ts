@@ -46,7 +46,6 @@ class NewSecret extends SideDrawer {
         this.secretForm = document.getElementById('add-secret-form') as HTMLFormElement
         this.vaultIdInput = document.getElementById('vault-id') as HTMLInputElement
 
-        const enc = new TextEncoder(); // always utf-8
         const vaultId = parseInt(this.vaultIdInput.value)
 
         if (this.secretForm.checkValidity()) {
@@ -56,13 +55,12 @@ class NewSecret extends SideDrawer {
 
                 const vaultKey = await this.decryptSymmetricVaultKey()
 
-                const cipherName = await vaultKey.encrypt(new ByteData(enc.encode(plaintextName)))
-                const cipherValue = await vaultKey.encrypt(new ByteData(enc.encode(plaintextValue)))
+                const cipherName = await vaultKey.encrypt(ByteData.fromText(plaintextName))
+                const cipherValue = await vaultKey.encrypt(ByteData.fromText(plaintextValue))
                 const nameBlindIndex = await Vault.blindIndex(plaintextName, vaultId)
 
-                await this.sendSecretsToServiceAccounts()
-
-                await this.submitForm(cipherName, cipherValue, nameBlindIndex)
+                await this.sendSecretsToServiceAccounts(vaultId, 
+                    plaintextName, plaintextValue, cipherName, cipherValue, nameBlindIndex)
 
             } catch (err) {
                 if (err instanceof Error) {
@@ -79,11 +77,97 @@ class NewSecret extends SideDrawer {
         this.secretForm.submit()
     }
 
-    async sendSecretsToServiceAccounts() {
-        // For each service account public key
-        // generate a temporary ECDH keypair
-        // derive the secret between the keypair and the service account
-        // Send to the server.
+    async sendSecretsToServiceAccounts(vaultId : number, plaintextName : string, 
+        plaintextValue : string, cipherName : Cipher, cipherValue : Cipher,
+        nameBlindIndex : ByteData) {
+
+        const request = new GetVaultRequest();
+        request.setVaultId(vaultId)
+        // Call back to the server and get the vault details including the
+        // connected service accounts
+        this.getVaultClient().getVault(request,
+    
+            // Important, Envoy will pick this up then authorise our request
+            { 'authentication-type': 'cookie' },
+    
+            async (err: grpcWeb.RpcError, vault: GetVaultResponse) => {
+                if (err) {
+                    console.log('Error code: ' + err.code + ' "' + err.message + '"');
+                } else {
+    
+                    const createServiceRequest = await this.deriveServiceAccountSecrets(
+                        vault.getServiceAccountsList(), 
+                        plaintextName, plaintextValue, nameBlindIndex.b64)
+    
+                    this.getVaultClient().createSecrets(createServiceRequest,
+    
+                        // Important, Envoy will pick this up then authorise our request
+                        { 'authentication-type': 'cookie' },
+                        
+                        async (err: grpcWeb.RpcError, vault: CreateSecretsResponse) => {
+                            if (err) {
+                                console.log('Error code: ' + err.code + ' "' + err.message + '"');
+                            } else {
+                                await this.submitForm(cipherName, cipherValue, nameBlindIndex)
+                            }
+                        }
+                    )
+                }
+            }
+        )
+    }
+
+
+    async deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[],
+        plaintextName: string, plaintextValue: string, blindIndex: string)  : Promise<CreateSecretsRequest> {
+
+        const createSecretsRequest = new CreateSecretsRequest()
+
+        const etherealKeyPair = await ECDHKeyPair.fromRandom()
+        const etherealPublicKeyData = await etherealKeyPair.publicKey.export()
+        const etherealPublicKeyBase64 = etherealPublicKeyData.b64
+
+        for(var index = 0; index < serviceAccounts.length; index ++) {
+            const serviceAccount = serviceAccounts[index]
+            // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
+            const serviceAccountECDHPublicKeyData = 
+                ByteData.fromB64(serviceAccount.getPublicEcdhKey())
+            const serviceAccountECDHPublicKey: ECDHPublicKey = 
+                await ECDHPublicKey.import(serviceAccountECDHPublicKeyData)
+            const aesKeyAgreement: AESKey = 
+                await etherealKeyPair.privateKey.deriveAESKey(serviceAccountECDHPublicKey)
+        
+            // Associated Data
+            const associatedData = new ByteData(new Uint8Array(4))
+            const view = new DataView(associatedData.arr.buffer)
+            view.setUint32(0, serviceAccount.getServiceAccountId(), true /* littleEndian */);
+        
+            const newEncryptedName = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextName), 
+                associatedData)
+            const newEncryptedValue = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextValue), 
+                associatedData)
+        
+            const secret = new Secret()
+            secret.setEncryptedSecretValue(newEncryptedValue.string)
+            secret.setNameBlindIndex(blindIndex)
+            secret.setEncryptedName(newEncryptedName.string)
+        
+            const serviceAccountSecrets = new ServiceAccountSecrets()
+            serviceAccountSecrets.setServiceAccountId(serviceAccount.getServiceAccountId())
+            serviceAccountSecrets.addSecrets(secret)
+            serviceAccountSecrets.setPublicEcdhKey(etherealPublicKeyBase64)
+
+            createSecretsRequest.addAccountSecrets(serviceAccountSecrets)
+
+            console.log(createSecretsRequest.getAccountSecretsList().length)
+        }
+
+        return createSecretsRequest
+    }
+
+    private getVaultClient() : VaultClient {
+        return new VaultClient(window.location.protocol
+            + '//' + window.location.host, null, null)
     }
 
     private async decryptSymmetricVaultKey(): Promise<AESKey> {
@@ -96,97 +180,3 @@ class NewSecret extends SideDrawer {
 }
 
 customElements.define('new-secret', NewSecret);
-
-async function encryptSecretToConnectedServiceAccounts(vaultKey: CryptoKey, vaultId: number,
-    secretName: string, secretValue: string, secretForm : HTMLFormElement,
-    secretNameInput : HTMLInputElement, secretValueInput : HTMLInputElement,
-    blindIndexInput : HTMLInputElement,
-    nameCipher: Cipher, valueCipher: Cipher) {
-
-    const vaultClient = new VaultClient(window.location.protocol
-        + '//' + window.location.host, null, null);
-
-    const request = new GetVaultRequest();
-    request.setVaultId(vaultId)
-
-    // Call back to the server and get the vault details including the
-    // connected service accounts
-    vaultClient.getVault(request,
-
-        // Important, Envoy will pick this up then authorise our request
-        { 'authentication-type': 'cookie' },
-
-        async (err: grpcWeb.RpcError, vault: GetVaultResponse) => {
-            if (err) {
-                console.log('Error code: ' + err.code + ' "' + err.message + '"');
-            } else {
-                const ecdhKeyPair = await ECDHKeyPair.fromBarricade()
-                const nameBlindIndex = await Vault.blindIndex(secretName, vaultId)
-
-                const createServiceRequest = await deriveServiceAccountSecrets(
-                    vault.getServiceAccountsList(), ecdhKeyPair, 
-                    secretName, secretValue, nameBlindIndex.b64)
-
-                vaultClient.createSecrets(createServiceRequest,
-
-                    // Important, Envoy will pick this up then authorise our request
-                    { 'authentication-type': 'cookie' },
-                    
-                    async (err: grpcWeb.RpcError, vault: CreateSecretsResponse) => {
-                        if (err) {
-                            console.log('Error code: ' + err.code + ' "' + err.message + '"');
-                        } else {
-
-                            secretNameInput.value = nameCipher.string
-                            secretValueInput.value = valueCipher.string
-                            blindIndexInput.value = nameBlindIndex.b64
-                            secretForm.submit()
-                        }
-                    }
-                )
-            }
-        }
-    )
-}
-
-async function deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[], vaultECDHPrivateKey: ECDHKeyPair,
-    plaintextName: string, plaintextValue: string, blindIndex: string)  : Promise<CreateSecretsRequest> {
-
-    const createSecretsRequest = new CreateSecretsRequest()
-
-    for(var index = 0; index < serviceAccounts.length; index ++) {
-        const serviceAccount = serviceAccounts[index]
-        // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
-        const serviceAccountECDHPublicKeyData = 
-            ByteData.fromB64(serviceAccount.getPublicEcdhKey())
-        const serviceAccountECDHPublicKey: ECDHPublicKey = 
-            await ECDHPublicKey.import(serviceAccountECDHPublicKeyData)
-        const aesKeyAgreement: AESKey = 
-            await vaultECDHPrivateKey.privateKey.deriveAESKey(serviceAccountECDHPublicKey)
-    
-        // Associated Data
-        const associatedData = new ByteData(new Uint8Array(4))
-        const view = new DataView(associatedData.arr.buffer)
-        view.setUint32(0, serviceAccount.getServiceAccountId(), true /* littleEndian */);
-    
-        const newEncryptedName = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextName), 
-            associatedData)
-        const newEncryptedValue = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextValue), 
-            associatedData)
-    
-        const secret = new Secret()
-        secret.setEncryptedSecretValue(newEncryptedValue.string)
-        secret.setNameBlindIndex(blindIndex)
-        secret.setEncryptedName(newEncryptedName.string)
-    
-        const serviceAccountSecrets = new ServiceAccountSecrets()
-        serviceAccountSecrets.setServiceAccountId(serviceAccount.getServiceAccountId())
-        serviceAccountSecrets.addSecrets(secret)
-
-        createSecretsRequest.addAccountSecrets(serviceAccountSecrets)
-
-        console.log(createSecretsRequest.getAccountSecretsList().length)
-    }
-
-    return createSecretsRequest
-}
