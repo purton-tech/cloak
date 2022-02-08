@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
+use crate::models;
 use axum::{
     extract::{Extension, Form},
     response::{IntoResponse, Redirect},
@@ -16,8 +17,6 @@ pub struct NewVault {
     pub encrypted_vault_key: String,
     #[validate(length(min = 1, message = "Where did the vault key go?"))]
     pub public_key: String,
-    #[validate(length(min = 1, message = "Where did the vault key go?"))]
-    pub encrypted_private_key: String,
 }
 
 pub async fn new(
@@ -25,35 +24,13 @@ pub async fn new(
     Form(new_vault): Form<NewVault>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let vault = sqlx::query!(
-        "
-            INSERT INTO 
-                vaults (user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
-            VALUES($1, $2, $3, $4) 
-            RETURNING id
-        ",
-        authentication.user_id as i32,
-        new_vault.name,
-        new_vault.public_key,
-        new_vault.encrypted_private_key
-    )
-    .fetch_one(&pool)
-    .await
-    .map_err(|e| CustomError::Database(e.to_string()))?;
+    let vault = models::vault::NewVault {
+        name: new_vault.name,
+        encrypted_vault_key: new_vault.encrypted_vault_key,
+        ecdh_public_key: new_vault.public_key,
+    };
 
-    sqlx::query!(
-        "
-            INSERT INTO 
-                users_vaults (user_id, vault_id, encrypted_vault_key)
-            VALUES($1, $2, $3) 
-        ",
-        authentication.user_id as i32,
-        vault.id,
-        new_vault.encrypted_vault_key
-    )
-    .execute(&pool)
-    .await
-    .map_err(|e| CustomError::Database(e.to_string()))?;
+    models::vault::Vault::create(&pool, &authentication, vault).await?;
 
     Ok(Redirect::to(super::INDEX.parse()?))
 }
@@ -62,7 +39,7 @@ markup::define! {
     VaultForm {
 
         form.m_form[method = "post", action=super::NEW] {
-            side_drawer[label="Add Vault"] {
+            new_vault[label="Add Vault"] {
                 template[slot="body"] {
                     p {
                         "Vaults keep related secrets together.
@@ -81,10 +58,6 @@ markup::define! {
 
                         label[for="public_key"] { "ECDH Public Key" }
                         input[id="public-key", type="text", required="", name="public_key"] {}
-
-                        label[for="encrypted_private_key"] { "Wrapped ECDH Private Key" }
-                        textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
-                        span.a_help_text { "The key for this service account" }
                     }
                 }
 

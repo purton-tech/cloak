@@ -1,4 +1,4 @@
-import { SideDrawer } from '../../asset-pipeline/side-drawer'
+import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 
 // Configure all the drawers for each service account.
 document.querySelectorAll('[id^="delete-account-controller-"]').forEach(async (row) => {

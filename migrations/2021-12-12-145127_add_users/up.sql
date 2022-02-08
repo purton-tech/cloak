@@ -25,11 +25,6 @@ GRANT SELECT, INSERT, UPDATE, DELETE
     ON ALL TABLES
     IN SCHEMA public
     TO cloak;
--- Enable this for all new tables.
-ALTER DEFAULT PRIVILEGES
-    GRANT SELECT, INSERT, UPDATE, DELETE
-    ON TABLES
-    TO cloak;
 -- Allow our user to use SEQUENCES.
 -- It's required to insert data with auto-incrementing primary keys for instance.
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO cloak;

@@ -10,6 +10,7 @@ pub struct Organisation {
 pub struct User {
     pub id: i32,
     pub email: String,
+    pub ecdh_public_key: String,
     pub is_admin: bool,
 }
 
@@ -34,7 +35,7 @@ impl Organisation {
         .await?)
     }
 
-    pub async fn add_user(
+    pub async fn add_user_dangerous(
         pool: &PgPool,
         authenticated_user: &Authentication,
         organisation_id: u32,
@@ -90,7 +91,7 @@ impl Organisation {
     }
 
     // This method is for internal use only.
-    pub async fn get_unsafe(
+    pub async fn get_dangerous(
         pool: &PgPool,
         user_id: u32,
         organisation_id: u32,
@@ -99,7 +100,7 @@ impl Organisation {
             User,
             "
                 SELECT 
-                    u.id, u.email, ou.is_admin
+                    u.id, u.email, u.ecdh_public_key, ou.is_admin
                 FROM 
                     organisation_users ou
                 LEFT JOIN users u ON u.id = ou.user_id
@@ -118,13 +119,13 @@ impl Organisation {
     pub async fn get_users(
         pool: &PgPool,
         authenticated_user: &Authentication,
-        organisation_id: i32,
+        idor_organisation_id: i32,
     ) -> Result<Vec<User>, CustomError> {
         Ok(sqlx::query_as!(
             User,
             "
                 SELECT 
-                    u.id, u.email, ou.is_admin
+                    u.id, u.email, u.ecdh_public_key, ou.is_admin
                 FROM 
                     organisation_users ou
                 LEFT JOIN users u ON u.id = ou.user_id
@@ -135,7 +136,7 @@ impl Organisation {
                     $1 IN (SELECT user_id FROM organisation_users WHERE organisation_id = $2)
             ",
             authenticated_user.user_id as i32,
-            organisation_id
+            idor_organisation_id
         )
         .fetch_all(pool)
         .await?)

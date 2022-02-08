@@ -1,27 +1,41 @@
-import { SideDrawer } from '../../asset-pipeline/side-drawer'
-import { Vault } from '../../asset-pipeline/vault'
+import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
+import { ECDHKeyPair, AESKey } from '../../asset-pipeline/cryptography/vault'
 
-let newVaultButton = document.getElementById('new-vault')
 
-if(newVaultButton) {
-    newVaultButton.addEventListener('click', async event => {
-        let element = newVaultButton.previousElementSibling.firstChild
-        if (element instanceof SideDrawer) {
-            element.open = true
+class NewVault extends SideDrawer {
+
+    constructor() {
+        super()
+
+        let newVaultButton = document.getElementById('new-vault')
+        newVaultButton.addEventListener('click', async event => {
+            let element = newVaultButton.previousElementSibling.firstChild
+            if (element instanceof SideDrawer) {
+                element.open = true
     
-            let wrappedKey = await Vault.newWrappedKey()
-            document.getElementById('new-vault-key').innerText = wrappedKey.string
+                let aliceECDHKeyPair = await ECDHKeyPair.fromBarricade();
+                const aesVaultKey = await AESKey.fromRandom()
 
-            let vaultKey = await Vault.unwrapKey(wrappedKey)
-            const keyPairDH = await Vault.generateWrappedECDHKeyPair(vaultKey);
-            const publicKeyField = document.getElementById('public-key')
-            const privateKeyField = document.getElementById('private-key')
+                const { wrappedKey, publicKey } = await aliceECDHKeyPair.publicKey.wrapKey(aesVaultKey)
 
-            if(publicKeyField instanceof HTMLInputElement &&
-                privateKeyField instanceof HTMLTextAreaElement) {
-                publicKeyField.value = keyPairDH.publicKey.b64
-                privateKeyField.innerText = keyPairDH.privateKey.string
+                // As a check try to unwrap it. This will blow up if the logic doesn't work
+                await aliceECDHKeyPair.privateKey.unwrapKey(wrappedKey, publicKey)
+
+                const wrappedKeyField = this.querySelector('[id="new-vault-key"]')
+    
+                const publicKeyField = this.querySelector('[id="public-key"]')
+
+    
+                if(publicKeyField instanceof HTMLInputElement &&
+                    wrappedKeyField instanceof HTMLTextAreaElement) {
+                    
+                    const throwawayKeyPairExport = await publicKey.export()
+                    publicKeyField.value = throwawayKeyPairExport.b64
+                    wrappedKeyField.innerText = wrappedKey.string
+                }
             }
-        }
-    })
+        })
+    }
 }
+
+customElements.define('new-vault', NewVault);

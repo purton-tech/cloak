@@ -20,7 +20,7 @@ pub async fn delete(
     Form(delete_secret): Form<DeleteSecret>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    models::Secret::delete(&pool, delete_secret.secret_id, authentication.user_id).await?;
+    models::secret::Secret::delete(&pool, delete_secret.secret_id, &authentication).await?;
 
     Ok(Redirect::to(super::secret_route(vault_id as i32).parse()?))
 }

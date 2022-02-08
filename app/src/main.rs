@@ -4,6 +4,7 @@ mod config;
 mod errors;
 mod hybrid;
 mod layout;
+mod members;
 mod models;
 mod registration_handler;
 mod secrets;
@@ -35,6 +36,7 @@ async fn main() {
         .merge(vaults::routes())
         .merge(secrets::routes())
         .merge(team::routes())
+        .merge(members::routes())
         .merge(service_accounts::routes())
         .merge(registration_handler::routes())
         .merge(statics::asset_pipeline_routes())

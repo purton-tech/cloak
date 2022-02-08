@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
+use crate::models;
 use axum::{
     extract::{Extension, Form},
     response::{IntoResponse, Redirect},
@@ -19,24 +20,18 @@ pub struct NewServiceAccount {
 }
 
 pub async fn new(
-    authentication: Authentication,
+    authenticated_user: Authentication,
     Form(new_service_account): Form<NewServiceAccount>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    sqlx::query!(
-        "
-            INSERT INTO 
-                service_accounts (user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
-            VALUES($1, $2, $3, $4) 
-        ",
-        authentication.user_id as i32,
-        new_service_account.name,
-        new_service_account.public_key,
-        new_service_account.encrypted_private_key
-    )
-    .execute(&pool)
-    .await
-    .map_err(|e| CustomError::Database(e.to_string()))?;
+    let new_account = models::service_account::NewAccount {
+        name: new_service_account.name,
+        ecdh_public_key: new_service_account.public_key,
+        encrypted_ecdh_private_key: new_service_account.encrypted_private_key,
+    };
+
+    models::service_account::ServiceAccount::create(&pool, &authenticated_user, new_account)
+        .await?;
 
     Ok(Redirect::to(super::INDEX.parse().unwrap()))
 }
@@ -44,8 +39,8 @@ pub async fn new(
 markup::define! {
     ServiceAccountForm {
 
-        form.m_form[id="add-secret-form", method = "post", action=super::NEW] {
-            side_drawer[label="Add Service Accounts", class="add-secret"] {
+        form.m_form[method = "post", action=super::NEW] {
+            new_account[label="Add Service Accounts"] {
                 template[slot="body"] {
                     p {
                         "To allow applications to access secrets without human intervention,

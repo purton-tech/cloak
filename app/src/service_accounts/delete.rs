@@ -16,13 +16,13 @@ pub struct DeleteServiceAccount {
 
 pub async fn delete(
     authentication: Authentication,
-    Form(delete_service_account): Form<DeleteServiceAccount>,
+    Form(idor_delete_service_account): Form<DeleteServiceAccount>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    models::ServiceAccount::delete(
+    models::service_account::ServiceAccount::delete(
         &pool,
-        delete_service_account.service_account_id,
-        authentication.user_id,
+        idor_delete_service_account.service_account_id,
+        &authentication,
     )
     .await?;
 

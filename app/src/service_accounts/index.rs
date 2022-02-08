@@ -9,8 +9,9 @@ pub async fn index(
     authentication: Authentication,
     Extension(pool): Extension<PgPool>,
 ) -> Result<Html<String>, CustomError> {
-    let service_accounts = models::ServiceAccount::get_all(&pool, authentication.user_id).await?;
-    let vaults = models::vault::Vault::get_all(&pool, authentication.user_id).await?;
+    let service_accounts =
+        models::service_account::ServiceAccount::get_all(&pool, &authentication).await?;
+    let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
 
     let page = ServiceAccountsPage {
         service_accounts,
@@ -25,7 +26,7 @@ pub async fn index(
 }
 
 markup::define! {
-    ServiceAccountsPage(service_accounts: Vec<models::ServiceAccount>,
+    ServiceAccountsPage(service_accounts: Vec<models::service_account::ServiceAccount>,
         vaults: Vec<models::vault::Vault>) {
         div.m_card {
             div.header {
@@ -50,7 +51,7 @@ markup::define! {
                         @for service_account in service_accounts {
                             tr {
                                 @if let Some(vault_name) = service_account.vault_name.clone() {
-                                    td[id=format!("service-account-row-{}", service_account.id)] {
+                                    td[id=format!("service-account-view-{}", service_account.id)] {
                                         a[href="#"]
                                         { {service_account.name} }
                                     }
@@ -85,7 +86,11 @@ markup::define! {
         }
         // Generate all the details flyouts
         @for service_account in service_accounts {
-            @super::view::ViewServiceAccount{ service_account, vaults }
+            @if service_account.vault_id.is_none() {
+                @super::connect_account::ConnectServiceAccountDrawer{ service_account, vaults }
+            } else {
+                @super::view::ViewServiceAccount{ service_account }
+            }
             @super::delete::DeleteServiceAccountForm {
                 service_account_id: service_account.id as u32,
                 service_account_name: service_account.name.clone()

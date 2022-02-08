@@ -21,34 +21,28 @@ pub struct NewSecret {
 
 pub async fn new(
     Path(id): Path<i32>,
-    _authentication: Authentication,
+    authentication: Authentication,
     Form(new_secret): Form<NewSecret>,
     Extension(pool): Extension<PgPool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    sqlx::query!(
-        "
-            INSERT INTO 
-                secrets (vault_id, name, name_blind_index, secret)
-            VALUES($1, $2, $3, $4) 
-        ",
-        id,
-        new_secret.name,
-        new_secret.name_blind_index,
-        new_secret.secret,
-    )
-    .execute(&pool)
-    .await
-    .map_err(|e| CustomError::Database(e.to_string()))?;
+    let new_secret = models::secret::NewSecret {
+        name: new_secret.name,
+        secret: new_secret.secret,
+        idor_vault_id: id,
+        name_blind_index: new_secret.name_blind_index,
+    };
+
+    models::secret::Secret::create(&pool, &authentication, new_secret).await?;
 
     Ok(Redirect::to(super::secret_route(id).parse()?))
 }
 
 markup::define! {
-    NewSecretPage<'a>(user_vault: &'a models::UserVault) {
+    NewSecretPage<'a>(user_vault: &'a models::user_vault::UserVault) {
 
         form.m_form[id="add-secret-form", method = "post",
             action=super::new_route(user_vault.vault_id)] {
-            side_drawer[label="Add Secret", class="add-secret"] {
+            new_secret[label="Add Secret", class="add-secret"] {
                 template[slot="body"] {
                     p {
                         "Folders keep related secrets together.
@@ -68,8 +62,11 @@ markup::define! {
                     // Store the encrypted vault key here, then we can use it in the client to
                     // encrypt the secrets we create.
                     input[type="hidden",
-                        id="vault-key",
+                        id="encrypted-vault-key",
                         value=user_vault.encrypted_vault_key.clone()] {}
+                    input[type="hidden",
+                        id="user-vault-ecdh-public-key",
+                        value=user_vault.ecdh_public_key.clone()] {}
                     input[type="hidden",
                         id="vault-id",
                         value=user_vault.vault_id] {}

@@ -10,8 +10,8 @@ service Vault {
     // the public ecdh address of the service account.
     rpc GetServiceAccount(GetServiceAccountRequest) returns (GetServiceAccountResponse);
 
-    // These methods are called by the front end. The user will need
-    // to be logged as as they are authenticated by authn-proxy
+    // These methods are called by the front end. Authentication is
+    // provided by barricade.
 
     // Get a vault and all the secrets inside as well as connected service accounts
     rpc GetVault(GetVaultRequest) returns (GetVaultResponse);
@@ -33,16 +33,25 @@ message ServiceAccount {
 message ServiceAccountSecrets {
     uint32 service_account_id = 1;
     repeated Secret secrets = 2;
+    // The ECDH ethereal public key that was used as part of
+    // the key agreement to encrypt these secrets
+    string public_ecdh_key = 3;
 }
 
 message GetServiceAccountRequest {
     string ecdh_public_key = 1;
 }
 
+message ServiceAccountSecret {
+    string encrypted_name = 1;
+    string name_blind_index = 2;
+    string encrypted_secret_value = 3;
+    string ecdh_public_key = 4;
+}
+
 message GetServiceAccountResponse {
     uint32 service_account_id = 1;
-    string vault_public_ecdh_key = 2;
-    repeated Secret secrets = 3;
+    repeated ServiceAccountSecret secrets = 3;
 }
 
 message GetVaultRequest {
@@ -51,11 +60,14 @@ message GetVaultRequest {
 
 message GetVaultResponse {
     string name = 1;
-    string encrypted_vault_key = 2;
-    string vault_public_ecdh_key = 3;
-    string encrypted_vault_private_ecdh_key = 4;
-    repeated Secret secrets = 5;
-    repeated ServiceAccount service_accounts = 6;
+    // The users encrypted copy of the vault key
+    string user_vault_encrypted_vault_key = 2;
+    // The users public ECDH key for the vault so the can
+    // use a key agreement to decrypt thew vault key
+    string user_vault_public_ecdh_key = 3;
+    // All of the secrets encrypted with the vault key
+    repeated Secret secrets = 4;
+    repeated ServiceAccount service_accounts = 5;
 }
 
 message CreateSecretsRequest {

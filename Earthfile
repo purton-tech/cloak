@@ -95,7 +95,7 @@ init-container:
     FROM ianpurton/rust-diesel:latest
     COPY --dir migrations .
     CMD diesel migration run
-    SAVE IMAGE --push $INIT_IMAGE_NAME
+    SAVE IMAGE $INIT_IMAGE_NAME
 
 app-container:
     FROM scratch
@@ -103,7 +103,7 @@ app-container:
     COPY --dir +npm-build/dist dist
     COPY --dir $APP_FOLDER/asset-pipeline/images asset-pipeline/images
     ENTRYPOINT ["./rust-exe"]
-    SAVE IMAGE --push $APP_IMAGE_NAME
+    SAVE IMAGE $APP_IMAGE_NAME
 
 envoy-container:
     FROM $ENVOY_PROXY
@@ -112,7 +112,7 @@ envoy-container:
     RUN sed -i '0,/development/{s/development/www/}' /etc/envoy/envoy.yaml
     # The second development entry in our cluster list is the app
     RUN sed -i '0,/development/{s/development/app/}' /etc/envoy/envoy.yaml
-    SAVE IMAGE --push $ENVOY_IMAGE_NAME
+    SAVE IMAGE $ENVOY_IMAGE_NAME
 
 zola-generate:
     ARG ZOLA_VERSION=0.15.3
@@ -128,7 +128,7 @@ zola-generate:
 www-container:
     FROM $NGINX
     COPY +zola-generate/public /usr/share/nginx/html/
-    SAVE IMAGE --push $WWW_IMAGE_NAME
+    SAVE IMAGE $WWW_IMAGE_NAME
 
 # Run the full stack and test it with selenium.
 # To reproduce the tests locally run the following from the terminal

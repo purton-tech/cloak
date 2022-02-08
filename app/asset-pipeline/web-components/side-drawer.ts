@@ -42,12 +42,14 @@ export class SideDrawer extends HTMLElement {
             const thiz = this
 
             const closeButton = templateDocument.querySelector(".drawer__close")
-            closeButton.addEventListener("click", function() {
+            closeButton.addEventListener("click", function(e) {
+                e.stopPropagation()
                 thiz.open = false
             });
 
             const overlay = templateDocument.querySelector(".drawer__overlay")
-            overlay.addEventListener("click", function() {
+            overlay.addEventListener("click", function(e) {
+                e.stopPropagation()
                 thiz.open = false
             });
 
@@ -59,6 +61,12 @@ export class SideDrawer extends HTMLElement {
                     }
                 }
               }, false);
+
+            // Catch all clicks in the panel so they don't propogate up to the document
+            const panel = templateDocument.querySelector(".drawer__panel")
+            panel.addEventListener("click", function(e) {
+                e.stopPropagation()
+            });
     
             this.appendChild(templateDocument)
         }

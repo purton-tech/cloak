@@ -1,5 +1,5 @@
-import { SideDrawer } from '../../asset-pipeline/side-drawer'
-import { Vault, ByteData } from '../../asset-pipeline/vault'
+import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
+import { Vault, ByteData, ECDSAKeyPair } from '../../asset-pipeline/cryptography/vault'
 
 class InviteUser extends SideDrawer {
 
@@ -37,7 +37,7 @@ class InviteUser extends SideDrawer {
         }
     }
 
-    private generateInvite() {
+    private async generateInvite() {
         this.emailInput.reportValidity()
         if(this.emailInput.validity.valid == true) {
 
@@ -45,10 +45,13 @@ class InviteUser extends SideDrawer {
             const date = new Date().getTime()
             const urlToSign = this.generateUrl(email, date)
             const data = ByteData.fromText(urlToSign)
-            const sigPromise = Vault.sign(data)
+
+            const aliceECDSAKeyPair = await ECDSAKeyPair.fromBarricade()
+            
+            const sigPromise = aliceECDSAKeyPair.privateKey.sign(data)
             const urlToSend = this.generateUrl(encodeURIComponent(email), date)
-            sigPromise.then(data => {
-                this.inviteText.value = urlToSend + '&sig=' + encodeURIComponent(data.b64)
+            sigPromise.then(signature => {
+                this.inviteText.value = urlToSend + '&sig=' + encodeURIComponent(signature.toDER().b64)
             })
         }
 

@@ -9,24 +9,31 @@ use axum::{
 use sqlx::PgPool;
 
 pub async fn index(
-    Path(id): Path<u32>,
+    Path(idor_vault_id): Path<u32>,
     Extension(pool): Extension<PgPool>,
     authentication: Authentication,
 ) -> Result<Html<String>, CustomError> {
-    let secrets = models::Secret::get_all(&pool, authentication.user_id, id).await?;
+    let secrets = models::secret::Secret::get_all(&pool, &authentication, idor_vault_id).await?;
 
-    let user_vault = models::UserVault::get(&pool, authentication.user_id, id).await?;
+    let user_vault =
+        models::user_vault::UserVault::get(&pool, &authentication, idor_vault_id).await?;
 
     let page = SecretsPage {
         user_vault: &user_vault,
         secrets,
     };
 
-    crate::layout::layout("Home", &page.to_string(), &crate::layout::SideBar::Vaults)
+    crate::layout::vault_layout(
+        "Home",
+        &page.to_string(),
+        "",
+        &crate::layout::SideBar::Vaults,
+        Some(idor_vault_id),
+    )
 }
 
 markup::define! {
-    SecretsPage<'a>(user_vault: &'a models::UserVault, secrets: Vec<models::Secret>) {
+    SecretsPage<'a>(user_vault: &'a models::user_vault::UserVault, secrets: Vec<models::secret::Secret>) {
         div.m_card[id="secrets-table-controller"] {
             div.header {
                 span { "Secrets" }
@@ -49,9 +56,9 @@ markup::define! {
                         @for secret in secrets {
                             tr {
                                 td {
-                                    span[class="cipher"] {
-                                        {secret.name}
-                                    }
+                                    ecdh_cipher[cipher=secret.name.clone(),
+                                        "wrapped-aes-key"=user_vault.encrypted_vault_key.clone(),
+                                        "ecdh-public-key"=user_vault.ecdh_public_key.clone()] {}
                                 }
                                 td {
                                     relative_time[datetime=secret.updated_at.to_rfc3339()] {}
@@ -69,7 +76,6 @@ markup::define! {
                     }
                 }
             }
-            input[type="hidden", id="wrapped-vault-key", value={user_vault.encrypted_vault_key.clone()}] {}
         }
 
         // Generate all the details flyouts
