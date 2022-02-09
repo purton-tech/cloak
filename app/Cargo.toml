@@ -39,3 +39,7 @@ base64 = "0" # So we encode DER public key to base64
 sha1 = "0.6"  # Use by build.rs for cache busting.
 tonic-build = "0"
 
+#[dev-dependencies]
+# WebDriver Library for UI testing.
+thirtyfour = { version = "0", default-features = false, features = [ "reqwest-rustls-tls", "tokio-runtime" ] }
+tokio = { version = "1", features = ["macros"] }
