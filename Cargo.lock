@@ -85,6 +85,7 @@ dependencies = [
  "p256",
  "pin-project",
  "prost",
+ "rand",
  "serde",
  "sha1",
  "sqlx",
