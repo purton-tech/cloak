@@ -1,13 +1,13 @@
 use rand::Rng;
 use sqlx::PgPool;
 use std::env;
+use std::path::Path;
 use thirtyfour::prelude::*; // Or `Aes128Gcm`
 
 #[derive(Clone, Debug)]
 pub struct Config {
     pub webdriver_url: String,
     pub host: String,
-    pub secret_key: Vec<u8>,
     // The database
     pub db_pool: PgPool,
     pub headless: bool,
@@ -19,7 +19,7 @@ impl Config {
             env::var("WEB_DRIVER_URL").unwrap()
         } else {
             // Default to selenium in our dev container
-            "http://selenium:4444/wd/hub".into()
+            "http://selenium:4444".into()
         };
 
         let headless = env::var("ENABLE_HEADLESS").is_ok();
@@ -27,16 +27,14 @@ impl Config {
         let host = if env::var("WEB_DRIVER_DESTINATION_HOST").is_ok() {
             env::var("WEB_DRIVER_DESTINATION_HOST").unwrap()
         } else {
-            "http://development:9095".into()
+            "http://envoy:7100".into()
         };
 
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL not set");
         let db_pool = PgPool::connect(&database_url).await.unwrap();
 
-        let hex = env::var("SECRET_KEY").expect("SECRET_KEY not set");
         Config {
             webdriver_url,
-            secret_key: hex_to_bytes(&hex).expect("SECRET_KEY could not parse"),
             host,
             db_pool,
             headless,
@@ -48,7 +46,7 @@ impl Config {
         caps.add_chrome_arg("--no-sandbox")?;
         caps.add_chrome_arg("--disable-gpu")?;
         // We need the below otherwise window.crypto.subtle is not defined
-        caps.add_chrome_arg("--unsafely-treat-insecure-origin-as-secure=http://development:9095")?;
+        caps.add_chrome_arg("--unsafely-treat-insecure-origin-as-secure=http://envoy:7100")?;
 
         if self.headless {
             caps.set_headless()?;
@@ -87,7 +85,27 @@ pub async fn register_random_user(driver: &WebDriver) -> WebDriverResult<String>
         .click()
         .await?;
 
+    driver
+        .screenshot(Path::new("../tmp/20-registration.png"))
+        .await?;
+
+    // OTP Code
+    // Wait for page to load as code might not be in database yet.
+    let _result = driver.find_element(By::Id("code")).await;
+
+    driver
+        .screenshot(Path::new("../tmp/30-post-registration.png"))
+        .await?;
+
     Ok(email)
+}
+
+pub async fn force_otp(config: &Config) -> Result<(), sqlx::Error> {
+    sqlx::query!("UPDATE sessions SET otp_code_confirmed = true",)
+        .execute(&config.db_pool)
+        .await?;
+
+    Ok(())
 }
 
 pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, std::num::ParseIntError> {

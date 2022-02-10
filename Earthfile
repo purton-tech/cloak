@@ -37,7 +37,7 @@ all:
     BUILD +app-container
     BUILD +envoy-container
     BUILD +www-container
-    #BUILD +integration-test
+    BUILD +integration-test
 
 npm-deps:
     COPY $APP_FOLDER/package.json $APP_FOLDER/package.json
@@ -110,6 +110,7 @@ envoy-container:
     COPY .devcontainer/envoy.yaml /etc/envoy/envoy.yaml
     # Update the first entry in our config to point at the marketing pages
     RUN sed -i '0,/development/{s/development/www/}' /etc/envoy/envoy.yaml
+    RUN sed -i '0,/7104/{s/7104/80/}' /etc/envoy/envoy.yaml
     # The second development entry in our cluster list is the app
     RUN sed -i '0,/development/{s/development/app/}' /etc/envoy/envoy.yaml
     SAVE IMAGE $ENVOY_IMAGE_NAME
@@ -130,39 +131,42 @@ www-container:
     COPY +zola-generate/public /usr/share/nginx/html/
     SAVE IMAGE $WWW_IMAGE_NAME
 
-# Run the full stack and test it with selenium.
-# To reproduce the tests locally run the following from the terminal
-# docker-compose -f docker-compose.earthly.yml -f docker-compose.yml -p earthly up db auth selenium
-# and the following in a devcontainer
-# WEB_DRIVER_URL=http://host.docker.internal:4444/wd/hub WEB_DRIVER_DESTINATION_HOST=http://auth:9090 cargo test signup
 integration-test:
     FROM +build
-    COPY --dir $WEBAPP_FOLDER/tests $WEBAPP_FOLDER/
+    COPY --dir $APP_FOLDER/tests $APP_FOLDER/
     COPY --dir migrations .
-    COPY --dir docs/ccsds-examples ./ccsds-examples
     COPY .devcontainer/docker-compose.yml ./ 
     COPY .devcontainer/docker-compose.earthly.yml ./ 
-    COPY .devcontainer/Dockerfile.postgres ./ 
-    ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/cream
-    ARG WEB_APP_DATABASE_URL=postgresql://web_application:testpassword@host.docker.internal:5432/cream
-    ARG WEB_DRIVER_URL='http://localhost:4444/wd/hub' 
-    ARG WEB_DRIVER_DESTINATION_HOST='http://auth:9090' 
+    ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/cloak
+    ARG APP_DATABASE_URL=postgresql://cloak:testpassword@db:5432/cloak
+    # We expose selenium to localhost
+    ARG WEB_DRIVER_URL='http://localhost:4444' 
+    # The selenium container will connect to the envoy container
+    ARG WEB_DRIVER_DESTINATION_HOST='http://envoy:7100' 
     USER root
     WITH DOCKER \
-        --compose docker-compose.earthly.yml \
         --compose docker-compose.yml \
+        --compose docker-compose.earthly.yml \
         --service db \
         --service auth \
         --service selenium \
-        --load webui:latest=+web-app-container
+        # Bring up the containers we have built
+        --load $APP_IMAGE_NAME=+app-container \
+        --load $WWW_IMAGE_NAME=+www-container \
+        --load $ENVOY_IMAGE_NAME=+envoy-container
 
-        RUN docker run -d --rm --network=host -e WEB_APP_DATABASE_URL=$WEB_APP_DATABASE_URL webui:latest \
-            && diesel migration run \
+        RUN diesel migration run \
+            && docker run -d --rm --network=build_default -e APP_DATABASE_URL=$APP_DATABASE_URL --name app $APP_IMAGE_NAME \
+            && docker run -d --rm --network=build_default --name www $WWW_IMAGE_NAME \
+            && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
             && sleep 5 \
             && docker ps \
-            && curl localhost:9091 \
+            && docker logs -t app \
+            && docker logs -t build_auth_1 \
+            #&& curl localhost:7100 \
             # Make a directory for the screenshots or the build fails
             && mkdir tmp \
-            && cargo test --release --target x86_64-unknown-linux-musl -- --nocapture
+            && cargo test --release --target x86_64-unknown-linux-musl -- --nocapture \
+            && docker stop app www envoy
     END
     SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
