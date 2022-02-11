@@ -46,8 +46,8 @@ impl ServiceAccountSecret {
                     FROM service_accounts 
                     WHERE user_id = $1 AND id = $2
                 ",
-                sa_secret.service_account_id,
-                authenticated_user.user_id as i32
+                authenticated_user.user_id as i32,
+                sa_secret.service_account_id
             )
             .fetch_one(pool)
             .await?;
