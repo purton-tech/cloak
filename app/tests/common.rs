@@ -44,6 +44,7 @@ impl Config {
         let mut caps = DesiredCapabilities::chrome();
         caps.add_chrome_arg("--no-sandbox")?;
         caps.add_chrome_arg("--disable-gpu")?;
+        caps.add_chrome_arg("--start-maximized")?;
         // We need the below otherwise window.crypto.subtle is not defined
         caps.add_chrome_arg("--unsafely-treat-insecure-origin-as-secure=http://envoy:7100")?;
 

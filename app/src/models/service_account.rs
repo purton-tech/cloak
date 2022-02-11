@@ -164,6 +164,32 @@ impl ServiceAccount {
         .await?)
     }
 
+    pub async fn get_dangerous(
+        pool: &PgPool,
+        service_account_id: u32,
+    ) -> Result<ServiceAccount, CustomError> {
+        Ok(sqlx::query_as!(
+            ServiceAccount,
+            r#"
+                SELECT
+                    sa.id, sa.vault_id, sa.name, v.name as "vault_name?", 
+                    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
+                    sa.updated_at, sa.created_at 
+                FROM 
+                    service_accounts sa
+                LEFT OUTER JOIN
+                    vaults v
+                ON 
+                    v.id = sa.vault_id
+                WHERE
+                    sa.id = $1
+            "#,
+            service_account_id as i32
+        )
+        .fetch_one(pool)
+        .await?)
+    }
+
     pub async fn delete(
         pool: &PgPool,
         service_account_id: u32,
