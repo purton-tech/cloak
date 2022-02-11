@@ -38,37 +38,45 @@ impl ServiceAccountSecret {
         authenticated_user: &Authentication,
         idor_secrets: Vec<ServiceAccountSecret>,
     ) -> Result<(), CustomError> {
-        if let Some(sa_secret) = &idor_secrets.get(0) {
-            // If the user doesn't have access to the service account this will fail
+        for secret in &idor_secrets {
+            // Is the service account attached to one of the users vaults
+            // If not, this will blow up.
             sqlx::query!(
                 "
-                    SELECT id 
-                    FROM service_accounts 
-                    WHERE user_id = $1 AND id = $2
-                ",
+                        SELECT sa.id 
+                        FROM service_accounts sa
+                        LEFT JOIN vaults v ON v.id = sa.vault_id
+                        WHERE 
+                            -- Only vaults the user has access to.
+                            v.id IN (
+                                SELECT user_id 
+                                FROM users_vaults 
+                                WHERE user_id = $1)
+                        AND
+                            sa.id = $2
+                    ",
                 authenticated_user.user_id as i32,
-                sa_secret.service_account_id
+                secret.service_account_id,
             )
             .fetch_one(pool)
             .await?;
 
-            for secret in &idor_secrets {
-                sqlx::query!(
-                    "
+            // If yes, save the secret
+            sqlx::query!(
+                "
                         INSERT INTO service_account_secrets
                             (service_account_id, name, name_blind_index, secret, ecdh_public_key)
                         VALUES
                             ($1, $2, $3, $4, $5)
                     ",
-                    sa_secret.service_account_id,
-                    secret.name,
-                    secret.name_blind_index,
-                    secret.secret,
-                    secret.ecdh_public_key
-                )
-                .execute(pool)
-                .await?;
-            }
+                secret.service_account_id,
+                secret.name,
+                secret.name_blind_index,
+                secret.secret,
+                secret.ecdh_public_key
+            )
+            .execute(pool)
+            .await?;
         }
 
         Ok(())

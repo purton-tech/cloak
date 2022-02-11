@@ -123,8 +123,14 @@ impl ServiceAccount {
                     v.id = sa.vault_id
                 WHERE 
                     sa.vault_id = $1
+                -- Make sure the user actually as access to this vault
                 AND
-                    sa.user_id = $2
+                    $2 IN
+                        (SELECT user_id 
+                        FROM
+                            users_vaults
+                        WHERE
+                            vault_id = $1)
             "#,
             vault_id as i32,
             authenticated_user.user_id as i32
