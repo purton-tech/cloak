@@ -1,7 +1,6 @@
 use rand::Rng;
 use sqlx::PgPool;
 use std::env;
-use std::path::Path;
 use thirtyfour::prelude::*; // Or `Aes128Gcm`
 
 #[derive(Clone, Debug)]
@@ -85,17 +84,9 @@ pub async fn register_random_user(driver: &WebDriver) -> WebDriverResult<String>
         .click()
         .await?;
 
-    driver
-        .screenshot(Path::new("../tmp/20-registration.png"))
-        .await?;
-
     // OTP Code
     // Wait for page to load as code might not be in database yet.
-    let _result = driver.find_element(By::Id("code")).await;
-
-    driver
-        .screenshot(Path::new("../tmp/30-post-registration.png"))
-        .await?;
+    driver.find_element(By::Id("code")).await?;
 
     Ok(email)
 }

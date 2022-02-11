@@ -33,7 +33,6 @@ services:
       # The following is used by the migrations and also for SQLX at compile time.
       DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak
       SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
-      SKIP_AUTH_FOR: /$$,/static/*
       REDIRECT_URL: /app/post_registration
       ENABLE_EMAIL_OTP: 'true'
 

@@ -1,5 +1,4 @@
 pub mod common;
-use std::path::Path;
 
 use thirtyfour::prelude::*;
 
@@ -14,12 +13,8 @@ async fn single_user() -> WebDriverResult<()> {
 
     driver.get(&config.host).await?;
 
-    driver
-        .screenshot(Path::new("../tmp/10-home-page.png"))
-        .await?;
-
-    let _result = register_user(&driver, &config).await;
-    /***if result.is_ok() {
+    let result = register_user(&driver, &config).await;
+    if result.is_ok() {
         let result = create_a_vault(&driver).await;
 
         let ten_seconds = std::time::Duration::from_secs(5);
@@ -32,11 +27,11 @@ async fn single_user() -> WebDriverResult<()> {
         // Always explicitly close the browser. There are no async destructors.
         driver.quit().await?;
         result?;
-    }**/
+    }
     Ok(())
 }
 
-async fn _create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
+async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
     let new_vault_button = driver.find_element(By::Id("new-vault")).await?;
     new_vault_button.click().await?;
 

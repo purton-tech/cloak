@@ -149,24 +149,28 @@ integration-test:
         --compose docker-compose.earthly.yml \
         --service db \
         --service auth \
+        --service smtp \
         --service selenium \
+        --pull selenium/video:ffmpeg-4.3.1-20220208 \
         # Bring up the containers we have built
         --load $APP_IMAGE_NAME=+app-container \
         --load $WWW_IMAGE_NAME=+www-container \
         --load $ENVOY_IMAGE_NAME=+envoy-container
 
         RUN diesel migration run \
-            && docker run -d --rm --network=build_default -e APP_DATABASE_URL=$APP_DATABASE_URL --name app $APP_IMAGE_NAME \
+            && docker run -d -p 7103:7103 --rm --network=build_default -e APP_DATABASE_URL=$APP_DATABASE_URL --name app $APP_IMAGE_NAME \
             && docker run -d --rm --network=build_default --name www $WWW_IMAGE_NAME \
             && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
-            && sleep 5 \
-            && docker ps \
-            && docker logs -t app \
-            && docker logs -t build_auth_1 \
+            ## Compile but don't run the tests
+            && cargo test --no-run --release --target x86_64-unknown-linux-musl \
+            # Record our selenium session
+            && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
+            #&& docker ps \
+            #&& docker logs -t app \
+            #&& docker logs -t build_auth_1 \
+            #&& curl localhost:7101/config_dump \
             #&& curl localhost:7100 \
-            # Make a directory for the screenshots or the build fails
-            && mkdir tmp \
             && cargo test --release --target x86_64-unknown-linux-musl -- --nocapture \
-            && docker stop app www envoy
+            && docker stop app www envoy video
     END
     SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
