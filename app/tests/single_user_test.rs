@@ -56,8 +56,6 @@ async fn single_user() -> WebDriverResult<()> {
     if result.is_ok() {
         result?;
     } else {
-        let five_secs = std::time::Duration::from_secs(5);
-        std::thread::sleep(five_secs);
         driver.quit().await?;
         result?;
         return Ok(());
@@ -67,6 +65,8 @@ async fn single_user() -> WebDriverResult<()> {
     if result.is_ok() {
         result?;
     } else {
+        let five_secs = std::time::Duration::from_secs(5);
+        std::thread::sleep(five_secs);
         driver.quit().await?;
         result?;
         return Ok(());
@@ -105,10 +105,10 @@ async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
     select.select_by_exact_text("My Vault").await?;
 
     // Connect this account
-    let submit_button = driver
-        .find_element(By::Css(".a_button.auto.success"))
+    let connect_button = driver
+        .find_element(By::XPath("//button[text()='Connect to Vault']"))
         .await?;
-    submit_button.click().await?;
+    connect_button.click().await?;
 
     Ok(())
 }
@@ -134,13 +134,11 @@ async fn add_secrets(
         .await?;
     submit_button.click().await?;
 
+    // Make sure the drawer is gone
+    let pause = std::time::Duration::from_millis(500);
+    std::thread::sleep(pause);
+
     let ecdh_cipher = driver.find_element(By::Css(selector)).await?;
-    ecdh_cipher
-        .wait_until()
-        .conditions(vec![thirtyfour::query::conditions::element_is_displayed(
-            true,
-        )])
-        .await?;
     assert_eq!(ecdh_cipher.text().await?, name);
 
     Ok(())

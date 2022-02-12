@@ -26,6 +26,7 @@ class ConnectAccount extends SideDrawer {
     async handleConnect(serviceAccountId: number) {
         const vaultSelect = document.getElementById('vault-select-' + serviceAccountId)
         const ecdhKey = document.getElementById('service-account-public-key-' + serviceAccountId)
+
     
         if (vaultSelect instanceof HTMLSelectElement && vaultSelect.selectedIndex != 0
             && ecdhKey instanceof HTMLInputElement) {
@@ -53,6 +54,10 @@ class ConnectAccount extends SideDrawer {
                     }
                 }
             )
+        } else {
+            console.log("Didn't find needed element")
+            console.log('vault select = ' + vaultSelect)
+            console.log('ecdhKey  = ' + ecdhKey)
         }
     }
 
