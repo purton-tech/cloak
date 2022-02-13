@@ -100,6 +100,84 @@ pub async fn force_otp(config: &Config) -> Result<(), sqlx::Error> {
     Ok(())
 }
 
+pub async fn count_service_account_secrets(
+    config: &Config,
+    email: &str,
+) -> Result<i64, sqlx::Error> {
+    let vault_id = sqlx::query!(
+        "
+            SELECT 
+                id
+            FROM 
+                vaults 
+            WHERE
+                user_id IN
+                    (SELECT id FROM users WHERE email=$1)
+        ",
+        email
+    )
+    .fetch_one(&config.db_pool)
+    .await?;
+
+    dbg!(&vault_id);
+
+    let count = sqlx::query!(
+        "
+            SELECT 
+                count(*)
+            FROM 
+                service_account_secrets 
+            WHERE
+                service_account_id IN (SELECT id FROM service_accounts WHERE vault_id = $1)
+        ",
+        vault_id.id
+    )
+    .fetch_one(&config.db_pool)
+    .await?;
+
+    if let Some(count) = count.count {
+        return Ok(count);
+    }
+
+    Err(sqlx::Error::Protocol("Failed".to_string()))
+}
+
+pub async fn count_secrets(config: &Config, email: &str) -> Result<i64, sqlx::Error> {
+    let user = sqlx::query!(
+        "
+            SELECT 
+                id
+            FROM 
+                users 
+            WHERE
+                email = $1
+        ",
+        email
+    )
+    .fetch_one(&config.db_pool)
+    .await?;
+
+    let count = sqlx::query!(
+        "
+            SELECT 
+                count(*)
+            FROM 
+                secrets 
+            WHERE
+                vault_id IN (SELECT vault_id FROM users_vaults WHERE USER_ID = $1)
+        ",
+        user.id
+    )
+    .fetch_one(&config.db_pool)
+    .await?;
+
+    if let Some(count) = count.count {
+        return Ok(count);
+    }
+
+    Err(sqlx::Error::Protocol("Failed".to_string()))
+}
+
 pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, std::num::ParseIntError> {
     (0..hex.len())
         .step_by(2)

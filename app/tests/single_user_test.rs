@@ -13,14 +13,7 @@ async fn single_user() -> WebDriverResult<()> {
 
     driver.get(&config.host).await?;
 
-    let result = register_user(&driver, &config).await;
-    if result.is_ok() {
-        result?;
-    } else {
-        driver.quit().await?;
-        result?;
-        return Ok(());
-    }
+    let email = register_user(&driver, &config).await?;
 
     let result = create_a_vault(&driver).await;
     if result.is_ok() {
@@ -61,6 +54,12 @@ async fn single_user() -> WebDriverResult<()> {
         return Ok(());
     }
 
+    let count = common::count_secrets(&config, &email)
+        .await
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+    assert_eq!(count, 2);
+
     let result = add_service_account(&driver).await;
     if result.is_ok() {
         result?;
@@ -71,6 +70,12 @@ async fn single_user() -> WebDriverResult<()> {
         result?;
         return Ok(());
     }
+
+    let count = common::count_service_account_secrets(&config, &email)
+        .await
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+    assert_eq!(count, 2);
 
     let five_secs = std::time::Duration::from_secs(5);
     std::thread::sleep(five_secs);
@@ -109,6 +114,9 @@ async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
         .find_element(By::XPath("//button[text()='Connect to Vault']"))
         .await?;
     connect_button.click().await?;
+
+    let attach_link = driver.find_element(By::LinkText("My Dev Machine")).await?;
+    attach_link.click().await?;
 
     Ok(())
 }
@@ -163,8 +171,8 @@ async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
     Ok(())
 }
 
-async fn register_user(driver: &WebDriver, config: &common::Config) -> WebDriverResult<()> {
-    let _email = common::register_random_user(driver).await?;
+async fn register_user(driver: &WebDriver, config: &common::Config) -> WebDriverResult<String> {
+    let email = common::register_random_user(driver).await?;
 
     common::force_otp(config)
         .await
@@ -172,5 +180,5 @@ async fn register_user(driver: &WebDriver, config: &common::Config) -> WebDriver
 
     driver.get(format!("{}/auth/decrypt", config.host)).await?;
 
-    Ok(())
+    Ok(email)
 }
