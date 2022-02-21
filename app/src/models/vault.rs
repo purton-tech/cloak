@@ -84,7 +84,13 @@ impl Vault {
                 WHERE
                     id = $1 
                 AND
-                    user_id = $2
+                    $1 
+                IN
+                    (SELECT vault_id 
+                    FROM
+                        users_vaults
+                    WHERE
+                        user_id = $2)
             ",
             idor_vault_id as i32,
             authenticated_user.user_id as i32

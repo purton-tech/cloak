@@ -41,6 +41,12 @@ jobs:
       if: github.ref == 'refs/heads/main'
       run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache --push +all
 
+    # Upload the video of our selenium session
+    - uses: actions/upload-artifact@v2
+      with:
+        name: integration-testing-screen-recording
+        path: tmp/earthly/chrome-video.mp4
+
     # If this is a release
     #   create release notes
     #   set the docker version

@@ -27,16 +27,13 @@ services:
 
   # Our external authentication micro service.
   auth:
-    image: purtontech/barricade:1.0.11
+    image: purtontech/barricade:1.0.12
     environment:
       AUTH_TYPE: encrypted
       # The following is used by the migrations and also for SQLX at compile time.
       DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak
       SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
-      FORWARD_URL: development
-      FORWARD_PORT: 7101
       REDIRECT_URL: /app/post_registration
-      SKIP_AUTH_FOR: /$$,/static/*
       ENABLE_EMAIL_OTP: 'true'
 
       # Send all email to mailhog
@@ -50,6 +47,18 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Integration testing using a headless chrome browser
+  selenium:
+    image: selenium/standalone-chrome:4.1.1-20220121
+    shm_size: 2gb
+    environment:
+      VNC_NO_PASSWORD: 1
+    ports:
+      # VNC
+      - 7105:5900
+      # No VNC
+      - 7106:7900
 
   development:
     build: 

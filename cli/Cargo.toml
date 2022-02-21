@@ -12,16 +12,16 @@ tokio = { version = "1", default-features = false, features = ["macros", "rt", "
 tonic = "0"
 prost = "0"
 # We use request to make grpc-web requests
-reqwest = { version = "0.11", default-features = false, features = ["rustls-tls"]  }
+reqwest = { version = "0", default-features = false, features = ["rustls-tls"]  }
 
 # Command line parser
 clap = { version = "3.0.0-rc.9", features = ["derive", "env"] }
 dotenv = "0.15.0"
 
 # Elliptic Curve Diffie Helman
-p256 = { version = "0.10", default-features = false, features = ["ecdh", "pem"] } 
+p256 = { version = "0", default-features = false, features = ["ecdh", "pem"] } 
 base64 = "0" # So we encode DER public key to base64
-aes-gcm = "0.9.4"
+aes-gcm = "0"
 
 # OK, I wanted a pretty table
 cli-table = "0"

@@ -4,7 +4,7 @@ import { Vault, ByteData, ECDSAKeyPair } from '../../asset-pipeline/cryptography
 class InviteUser extends SideDrawer {
 
     private emailInput : HTMLInputElement
-    private inviteText : HTMLTextAreaElement
+    private inviteText : HTMLParamElement
     private organisationId: number
     private userId: number
 
@@ -12,7 +12,7 @@ class InviteUser extends SideDrawer {
         super()
 
         this.emailInput = this.querySelector("input[type='email']")
-        this.inviteText = this.querySelector("textarea[name='invite']")
+        this.inviteText = this.querySelector("p#invite")
         this.organisationId = parseInt(this.getAttribute("organisation"))
         this.userId = parseInt(this.getAttribute("user"))
 
@@ -51,7 +51,7 @@ class InviteUser extends SideDrawer {
             const sigPromise = aliceECDSAKeyPair.privateKey.sign(data)
             const urlToSend = this.generateUrl(encodeURIComponent(email), date)
             sigPromise.then(signature => {
-                this.inviteText.value = urlToSend + '&sig=' + encodeURIComponent(signature.toDER().b64)
+                this.inviteText.innerText = urlToSend + '&sig=' + encodeURIComponent(signature.toDER().b64)
             })
         }
 
