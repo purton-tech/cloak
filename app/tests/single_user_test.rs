@@ -77,6 +77,42 @@ async fn single_user() -> WebDriverResult<()> {
 
     assert_eq!(count, 2);
 
+    let result = select_first_vault(&driver).await;
+    if result.is_ok() {
+        result?;
+    } else {
+        driver.quit().await?;
+        result?;
+        return Ok(());
+    }
+
+    let result = add_secrets(
+        &driver,
+        "WITH_SERVICE_ACCOUNT",
+        "1234-5679",
+        "tbody > tr:last-child > td:first-child > ecdh-cipher",
+    )
+    .await;
+    if result.is_ok() {
+        result?;
+    } else {
+        driver.quit().await?;
+        result?;
+        return Ok(());
+    }
+
+    let count = common::count_secrets(&config, &email)
+        .await
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+    assert_eq!(count, 3);
+
+    let count = common::count_service_account_secrets(&config, &email)
+        .await
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+
+    assert_eq!(count, 3);
+
     let five_secs = std::time::Duration::from_secs(5);
     std::thread::sleep(five_secs);
 
@@ -117,6 +153,9 @@ async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
 
     let attach_link = driver.find_element(By::LinkText("My Dev Machine")).await?;
     attach_link.click().await?;
+
+    let close_link = driver.find_element(By::LinkText("X")).await?;
+    close_link.click().await?;
 
     Ok(())
 }
@@ -164,6 +203,16 @@ async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
         .find_element(By::Css(".a_button.auto.success"))
         .await?;
     submit_button.click().await?;
+
+    let vault_card = driver.find_element(By::Css(".vault-card")).await?;
+    vault_card.click().await?;
+
+    Ok(())
+}
+
+async fn select_first_vault(driver: &WebDriver) -> WebDriverResult<()> {
+    let vault_menu_link = driver.find_element(By::LinkText("Vaults")).await?;
+    vault_menu_link.click().await?;
 
     let vault_card = driver.find_element(By::Css(".vault-card")).await?;
     vault_card.click().await?;
