@@ -113,7 +113,7 @@ markup::define! {
                         input[type="email", required="", name="name"] {}
 
                         label[for="invite"] { "Invite" }
-                        textarea[name="invite", rows="7", readonly="readonly"] {
+                        p[id="invite"] {
 
                         }
 
