@@ -171,6 +171,13 @@ integration-test:
             #&& curl localhost:7101/config_dump \
             #&& curl localhost:7100 \
             && cargo test --release --target x86_64-unknown-linux-musl -- --nocapture \
-            && docker stop app www envoy video
+            && docker stop app www envoy video \
+            # Force to command to always be succesful so the artifact is saved. 
+            || echo fail > fail
     END
     SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
+
+    # If we failed in selenium a fail file will have been created
+    IF [ -f fail ]
+        RUN echo "Selenium has failed." && exit 1
+    END
