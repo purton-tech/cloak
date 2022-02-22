@@ -16,7 +16,7 @@ $ export CLOAK_VERSION=1.1.0
 $ sudo /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cli -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak"
 ```
 
-### Step 2: Create a  Secet
+### Step 2: Create a  Secret
 
 ### Step 3: Encrypt your cloak key
 

@@ -6,8 +6,7 @@
     <h1>Secure encrypted secrets automation for developers</h1>
     <div class="text">
       <p>A central source of truth for your application secrets. 
-        The only solution on the market with full end to end encryption
-        and fully open source for maximum transparency.</p>
+        The only open source solution on the market with full end to end encryption.</p>
     </div>
     <div class="buttons"><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></div>
     <div class="image"><img alt="Cream" src="central-source-of-truth.svg"></img></div>
@@ -18,11 +17,13 @@
   <div class="column">
     <h2>Manage related secrets in Vaults</h2>
     <p>
-      Vaults help you collect secrets by projects or environments.
-      A central place for secrets gives you the power to change a secret across entire projects
-      in an efficient way.
+      Vaults help you collect secrets by projects or environments. A central repository 
+      for encrypted secrets is a cybersecurity best practice.
     </p>
-    <p>Vaults can be shared with team members removing the need for one person to be responsible for secrets management.</p>
+    <p>
+      Vault makes it easy to share secrets with your team and audit secrets usage.
+      The Cloak user interface manages end to end encryption and decryption in the browser. 
+    </p>
   </div>
   <div class="column">
     <img alt="Cream" src="secrets-screenshot.png"></img>
@@ -34,23 +35,29 @@
     <img alt="Cream" src="service-account-screenshot.png"></img>
   </div>
   <div class="column">
-    <h2>End 2 End Encryption with Service Accounts</h2>
+    <h2>Manage access with Service Accounts</h2>
     <p>
-      Vaults help you collect secrets by projects or environments.
-      A central place for secrets gives you the power to change a secret across entire projects
-      in an efficient way.
+      Service accounts let team members or applications access secrets from Vaults. 
+      The user interface generates a private key which only the user can see. 
+      Deploy the key to your local development environment or your infrastructure.
     </p>
-    <p>Vaults can be shared with team members removing the need for one person to be responsible for secrets management.</p>
+    <p>Revoking a service account removes access to the secrets. </p>
   </div>
 </section>
 
 <section class="row">
   <div class="column">
-    <h2>Load secrets into your app the moment it starts</h2>
-    <p>Cloak injects your secrets into your app as environment variables.</p>
+    <h2>The Cloak CLI gives developers easy access to secrets</h2>
+    <p>Cloak injects your secrets into your application as environment variables.</p>
+    <p>The CLI tool has a minimal footprint and runs as well on a laptop as in a docker container.</p>
   </div>
   <div class="column">
     <img alt="Cream" src="cli-screenshot.png"></img>
   </div>
+</section>
+
+<section class="m_footer_cta">
+  <h3>Start managing your secrets today for free</h3>
+  <p><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></p>
 </section>
 {% endblock content %}
