@@ -28,7 +28,7 @@ Coming soon.
 
 ## Step 2. Verify the checksum (Optional)
 
-Coming soo.
+Coming soon.
 
 ## Step 3. Test the installation
 

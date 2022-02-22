@@ -13,7 +13,7 @@ Service accounts allow developers or systems to access secrets. Create a service
 
 ![Creating a service account](/developers/attach-service-account.png)
 
-### Step 3: Access ther service accounts private key
+### Step 3: Access their service accounts private key
 
 Cut and paste the service account private key into a file called cloak.pem in the folder from which you will use the cloak cli.
 

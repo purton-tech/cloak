@@ -31,6 +31,7 @@ SHA256
 cloak
 cloak.exe
 2019-11-27
+github
  - developers/_index.md
 developers.html
  - reference/01-security.md
@@ -53,6 +54,7 @@ temporary_ecdh_keypair
 1
 2
 env
+2022-03-01
  - blog/cloudflare-tunnels-for-k8-ingress.md
 cloudflare
 2022-01-20
@@ -70,3 +72,12 @@ cert.pem
 2022-01-25
  - reference/managing-keys-in-the-browser.md
 2022-02-03
+ - developers/03-cli.md
+2022-02-22
+cloak.pem
+cli
+ - developers/04-injecting-secrets.md
+2022-02-21
+ - developers/05-encrypting-key.md
+2022-02-20
+pem
