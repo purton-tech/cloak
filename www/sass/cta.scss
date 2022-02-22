@@ -63,12 +63,12 @@
             text-align: left;
             display: grid;
             align-items: start;
-            grid-gap: 0 40px;
+            grid-gap: 0 4em;
             grid-template:  "headline pic"
                             "text     pic"
                             "buttons  pic"
                             "more     more"
-                            / 2fr 1fr;
+                            / 1fr 1fr;
 
             > div.text {
                 // Fix i.e. 11 or it overflows into the image
@@ -89,7 +89,7 @@
             }
 
             > h1 {
-                font-size: 3.75rem;
+                font-size: 3rem;
                 line-height: 1.25;
             }
 
