@@ -30,22 +30,9 @@ RUN sudo apt-get update --allow-releaseinfo-change && curl -sL https://aka.ms/In
 # k9s
 RUN curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Linux_x86_64.tar.gz | tar xvz -C /tmp && sudo mv /tmp/k9s /usr/bin
 
-# Proto compiler and web grpc.
-RUN sudo apt update \
-    && sudo apt install -y protobuf-compiler \
-    && sudo curl -OL https://github.com/grpc/grpc-web/releases/download/1.3.0/protoc-gen-grpc-web-1.3.0-linux-x86_64  \
-    && sudo mv protoc-gen-grpc-web* /usr/local/bin/protoc-gen-grpc-web \
-    && sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
-
 # Install secrets management
 ARG CLOAK_VERSION=1.1.0
 RUN sudo /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cli -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak"
-
-# Install Doppler
-RUN sudo apt-get update && sudo apt-get install -y apt-transport-https ca-certificates curl gnupg \
-    && curl -sLf --retry 3 --tlsv1.2 --proto "=https" 'https://packages.doppler.com/public/cli/gpg.DE2A7741A397C129.key' | sudo apt-key add - \
-    && echo "deb https://packages.doppler.com/public/cli/deb/debian any-version main" | sudo tee /etc/apt/sources.list.d/doppler-cli.list \
-    && sudo apt-get update && sudo apt-get install doppler
     
 # all the volumes configured in the docker-compose.yml
 RUN sudo mkdir -p /vscode/target && sudo chown $USERNAME:$USERNAME /vscode/target
