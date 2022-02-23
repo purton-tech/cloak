@@ -26,6 +26,8 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
 
     let email = common::register_user(driver, config).await?;
 
+    dbg!(&email);
+
     common::create_a_vault(driver).await?;
 
     common::add_secrets(

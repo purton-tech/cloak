@@ -2,8 +2,8 @@ target
 node_modules
 dist
 .parcel-cache
-api_pb.d.ts
-api_pb.js
+api.client.ts
+api.ts
 ApiServiceClientPb.ts
 tmp
 .env

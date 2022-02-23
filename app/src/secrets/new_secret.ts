@@ -1,8 +1,9 @@
 import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 import { Vault, Cipher, ByteData, AESKey, ECDHKeyPair, ECDHPublicKey } from '../../asset-pipeline/cryptography/vault'
-import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
-import * as grpcWeb from 'grpc-web';
-import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api_pb';
+import { VaultClient } from '../../asset-pipeline/api.client';
+import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
+import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
+import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api';
 
 
 /**
@@ -81,57 +82,39 @@ class NewSecret extends SideDrawer {
         plaintextValue : string, cipherName : Cipher, cipherValue : Cipher,
         nameBlindIndex : ByteData) {
 
-        const request = new GetVaultRequest();
-        request.setVaultId(vaultId)
         // Call back to the server and get the vault details including the
         // connected service accounts
-        this.getVaultClient().getVault(request,
-    
-            // Important, Envoy will pick this up then authorise our request
-            { 'authentication-type': 'cookie' },
-    
-            async (err: grpcWeb.RpcError, vault: GetVaultResponse) => {
-                if (err) {
-                    console.log('Error code: ' + err.code + ' "' + err.message + '"');
-                } else {
-    
-                    const createServiceRequest = await this.deriveServiceAccountSecrets(
-                        vault.getServiceAccountsList(), 
-                        plaintextName, plaintextValue, nameBlindIndex.b64)
-    
-                    this.getVaultClient().createSecrets(createServiceRequest,
-    
-                        // Important, Envoy will pick this up then authorise our request
-                        { 'authentication-type': 'cookie' },
-                        
-                        async (err: grpcWeb.RpcError, vault: CreateSecretsResponse) => {
-                            if (err) {
-                                console.log('Error code: ' + err.code + ' "' + err.message + '"');
-                            } else {
-                                await this.submitForm(cipherName, cipherValue, nameBlindIndex)
-                            }
-                        }
-                    )
-                }
-            }
+        const call = this.getVaultClient().getVault({
+                vaultId: vaultId
+            }, this.getRpcOptions()
         )
-    }
 
+        const vault = await call.response
+        const createServiceRequest = await this.deriveServiceAccountSecrets(
+            vault.serviceAccounts, 
+            plaintextName, plaintextValue, nameBlindIndex.b64)
+        
+        const createCall = this.getVaultClient().createSecrets(createServiceRequest, this.getRpcOptions())
+        await createCall.response
+        await this.submitForm(cipherName, cipherValue, nameBlindIndex)
+    }
 
     async deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[],
         plaintextName: string, plaintextValue: string, blindIndex: string)  : Promise<CreateSecretsRequest> {
-
-        const createSecretsRequest = new CreateSecretsRequest()
 
         const etherealKeyPair = await ECDHKeyPair.fromRandom()
         const etherealPublicKeyData = await etherealKeyPair.publicKey.export()
         const etherealPublicKeyBase64 = etherealPublicKeyData.b64
 
+        const createSecretsRequest : CreateSecretsRequest = {
+            accountSecrets: []
+        }
+
         for(var index = 0; index < serviceAccounts.length; index ++) {
             const serviceAccount = serviceAccounts[index]
             // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
             const serviceAccountECDHPublicKeyData = 
-                ByteData.fromB64(serviceAccount.getPublicEcdhKey())
+                ByteData.fromB64(serviceAccount.publicEcdhKey)
             const serviceAccountECDHPublicKey: ECDHPublicKey = 
                 await ECDHPublicKey.import(serviceAccountECDHPublicKeyData)
             const aesKeyAgreement: AESKey = 
@@ -140,34 +123,50 @@ class NewSecret extends SideDrawer {
             // Associated Data
             const associatedData = new ByteData(new Uint8Array(4))
             const view = new DataView(associatedData.arr.buffer)
-            view.setUint32(0, serviceAccount.getServiceAccountId(), true /* littleEndian */);
+            view.setUint32(0, serviceAccount.serviceAccountId, true /* littleEndian */);
         
             const newEncryptedName = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextName), 
                 associatedData)
             const newEncryptedValue = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextValue), 
                 associatedData)
         
-            const secret = new Secret()
-            secret.setEncryptedSecretValue(newEncryptedValue.string)
-            secret.setNameBlindIndex(blindIndex)
-            secret.setEncryptedName(newEncryptedName.string)
+            const secret : Secret = {
+                encryptedName: newEncryptedName.string,
+                encryptedSecretValue: newEncryptedValue.string,
+                nameBlindIndex: blindIndex
+            }
         
-            const serviceAccountSecrets = new ServiceAccountSecrets()
-            serviceAccountSecrets.setServiceAccountId(serviceAccount.getServiceAccountId())
-            serviceAccountSecrets.addSecrets(secret)
-            serviceAccountSecrets.setPublicEcdhKey(etherealPublicKeyBase64)
+            const serviceAccountSecrets : ServiceAccountSecrets = {
+                serviceAccountId: serviceAccount.serviceAccountId,
+                secrets: [
+                    secret
+                ],
+                publicEcdhKey: etherealPublicKeyBase64
+            }
 
-            createSecretsRequest.addAccountSecrets(serviceAccountSecrets)
-
-            console.log(createSecretsRequest.getAccountSecretsList().length)
+            createSecretsRequest.accountSecrets.push(serviceAccountSecrets)
         }
+
+        console.log(createSecretsRequest.accountSecrets.length)
 
         return createSecretsRequest
     }
 
-    private getVaultClient() : VaultClient {
-        return new VaultClient(window.location.protocol
-            + '//' + window.location.host, null, null)
+    private getVaultClient(): VaultClient {
+        let transport = new GrpcWebFetchTransport({
+            baseUrl: window.location.protocol + '//' + window.location.host
+        });
+        return new VaultClient(transport)
+    }
+
+    private getRpcOptions() : RpcOptions {
+        const meta = {}
+        meta['authentication-type'] = 'cookie';
+
+        let options: RpcOptions = {
+            meta: meta
+        }
+        return options
     }
 
     private async decryptSymmetricVaultKey(): Promise<AESKey> {

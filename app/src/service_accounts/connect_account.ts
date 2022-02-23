@@ -1,8 +1,9 @@
 import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
 import { Vault, ECDHPublicKey, ECDHKeyPair, AESKey, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
-import { VaultClient } from '../../asset-pipeline/ApiServiceClientPb';
-import * as grpcWeb from 'grpc-web';
-import { GetVaultRequest, GetVaultResponse, Secret, ServiceAccountSecrets, CreateSecretsRequest, CreateSecretsResponse } from '../../asset-pipeline/api_pb';
+import { VaultClient } from '../../asset-pipeline/api.client';
+import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
+import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
+import { GetVaultResponse, Secret } from '../../asset-pipeline/api';
 
 
 class ConnectAccount extends SideDrawer {
@@ -27,33 +28,27 @@ class ConnectAccount extends SideDrawer {
         const vaultSelect = document.getElementById('vault-select-' + serviceAccountId)
         const ecdhKey = document.getElementById('service-account-public-key-' + serviceAccountId)
 
-    
+
         if (vaultSelect instanceof HTMLSelectElement && vaultSelect.selectedIndex != 0
             && ecdhKey instanceof HTMLInputElement) {
-    
-            const vaultClient = this.getVaultClient() 
-    
-            const request = new GetVaultRequest();
+
+            const vaultClient = this.getVaultClient()
+
             const vaultId = parseInt(vaultSelect.options[vaultSelect.selectedIndex].value)
-            request.setVaultId(vaultId)
 
             const serviceAccountECDHPublicKey = await ECDHPublicKey.import(ByteData.fromB64(ecdhKey.value))
-    
+
             // Call back to the server
-            vaultClient.getVault(request,
-    
-                // Important, Envoy will pick this up then authorise our request
-                { 'authentication-type': 'cookie' },
-    
-                async (err: grpcWeb.RpcError, vault: GetVaultResponse) => {
-                    if (err) {
-                        console.log('Error code: ' + err.code + ' "' + err.message + '"');
-                    } else {
-                        await this.transferSecretsToServiceAccount(vault, serviceAccountId, 
-                            vaultId, serviceAccountECDHPublicKey)
-                    }
-                }
+            const call = vaultClient.getVault(
+                {
+                    vaultId: vaultId
+                },
+                this.getRpcOptions()
             )
+            const vault : GetVaultResponse = await call.response
+
+            await this.transferSecretsToServiceAccount(vault, serviceAccountId, 
+                vaultId, serviceAccountECDHPublicKey)
         } else {
             console.log("Didn't find needed element")
             console.log('vault select = ' + vaultSelect)
@@ -61,88 +56,95 @@ class ConnectAccount extends SideDrawer {
         }
     }
 
-    async transferSecretsToServiceAccount(vault: GetVaultResponse, serviceAccountId: number, 
-        vaultId: number, serviceAccountECDHPublicKey : ECDHPublicKey) {
+    async transferSecretsToServiceAccount(vault: GetVaultResponse, serviceAccountId: number,
+        vaultId: number, serviceAccountECDHPublicKey: ECDHPublicKey) {
         console.log(vault)
 
-        const wrappedVaultKey = Cipher.fromString(vault.getUserVaultEncryptedVaultKey())
-        const ecdhUserPublicKey = await ECDHPublicKey.import(ByteData.fromB64(vault.getUserVaultPublicEcdhKey()))
+        const wrappedVaultKey = Cipher.fromString(vault.userVaultEncryptedVaultKey)
+        const ecdhUserPublicKey = await ECDHPublicKey.import(ByteData.fromB64(vault.userVaultPublicEcdhKey))
         const vaultKey = await Vault.decryptVaultKey(wrappedVaultKey, ecdhUserPublicKey)
 
         //
         const etherealKeyPair = await ECDHKeyPair.fromRandom()
         const aesKey = await etherealKeyPair.privateKey.deriveAESKey(serviceAccountECDHPublicKey)
 
-        const rencryptedSecrets = await this.decryptAndRencryptSecrets(vault, 
+        const rencryptedSecrets = await this.decryptAndRencryptSecrets(vault,
             vaultKey, aesKey, serviceAccountId)
 
         // Send the encrypted payload back to the server
-        const request = new CreateSecretsRequest()
-        const serviceAccountSecrets = new ServiceAccountSecrets()
-        serviceAccountSecrets.setServiceAccountId(serviceAccountId)
-        serviceAccountSecrets.setSecretsList(rencryptedSecrets)
         const publicKeyExport = await etherealKeyPair.publicKey.export()
-        serviceAccountSecrets.setPublicEcdhKey(publicKeyExport.b64)
-        request.addAccountSecrets(serviceAccountSecrets)
 
         const connectForm = document.getElementById('service-account-form-' + serviceAccountId)
         const connectFormVaultId = document.getElementById('service-account-form-vault-id-' + serviceAccountId)
-    
-        const vaultClient = this.getVaultClient() 
+
+        const vaultClient = this.getVaultClient()
 
         if (connectForm instanceof HTMLFormElement && connectFormVaultId instanceof HTMLInputElement) {
-        
-            const call = vaultClient.createSecrets(request,
 
-                // Important, Envoy will pick this up then authorise our request
-                { 'authentication-type': 'cookie' },
-
-                async (err: grpcWeb.RpcError, serviceAccount: CreateSecretsResponse) => {
-                    if (err) {
-                        console.log('Error code: ' + err.code + ' "' + err.message + '"');
-                    } else {
-                        // Assuming that all worked, connect the account to the vault
-                        connectFormVaultId.value = '' + vaultId
-                        connectForm.submit()
+            const call = vaultClient.createSecrets({
+                accountSecrets: [
+                    {
+                        publicEcdhKey: publicKeyExport.b64,
+                        serviceAccountId: serviceAccountId,
+                        secrets: rencryptedSecrets
                     }
-                }
-            )
+                ]
+            }, this.getRpcOptions())
+            const response = await call.response
+
+            // Assuming that all worked, connect the account to the vault
+            connectFormVaultId.value = '' + vaultId
+            connectForm.submit()
         }
     }
 
-    async decryptAndRencryptSecrets(vault: GetVaultResponse, vaultKey: AESKey, 
-        agreementKey: AESKey, serviceAccountId: number) : Promise<Secret[]> {
+    async decryptAndRencryptSecrets(vault: GetVaultResponse, vaultKey: AESKey,
+        agreementKey: AESKey, serviceAccountId: number): Promise<Secret[]> {
 
         const associatedData = this.getAssociatedData(serviceAccountId)
 
+        var secretList : Array<Secret> = []
+
         // Process the secrets - re-encrypt them with the agreement key.
-        const secretList = vault.getSecretsList()
-        for await (var secret of secretList) {
-            const cipherName = Cipher.fromString(secret.getEncryptedName())
+        for await (var secret of vault.secrets) {
+            const cipherName = Cipher.fromString(secret.encryptedName)
             const plaintextName: ByteData = await vaultKey.decrypt(cipherName)
             const newEncryptedName = await agreementKey.aeadEncrypt(plaintextName, associatedData)
 
-            secret.setEncryptedName(newEncryptedName.string)
-            const cipherValue = Cipher.fromString(secret.getEncryptedSecretValue())
+            secret.encryptedName = newEncryptedName.string
+            const cipherValue = Cipher.fromString(secret.encryptedSecretValue)
             const plaintextValue: ByteData = await vaultKey.decrypt(cipherValue)
 
             const newEncryptedValue = await agreementKey.aeadEncrypt(plaintextValue, associatedData)
-            secret.setEncryptedSecretValue(newEncryptedValue.string)
-        }
+            secret.encryptedSecretValue = newEncryptedValue.string
 
+            secretList.push(secret)
+        }
         return secretList
     }
 
-    private getAssociatedData(serviceAccountId: number) : ByteData {
+    private getAssociatedData(serviceAccountId: number): ByteData {
         const associatedData = new Uint8Array(4)
         const view = new DataView(associatedData.buffer)
         view.setUint32(0, serviceAccountId, true /* littleEndian */);
         return new ByteData(associatedData)
     }
 
-    private getVaultClient() : VaultClient {
-        return new VaultClient(window.location.protocol
-            + '//' + window.location.host, null, null)
+    private getVaultClient(): VaultClient {
+        let transport = new GrpcWebFetchTransport({
+            baseUrl: window.location.protocol + '//' + window.location.host
+        });
+        return new VaultClient(transport)
+    }
+
+    private getRpcOptions() : RpcOptions {
+        const meta = {}
+        meta['authentication-type'] = 'cookie';
+
+        let options: RpcOptions = {
+            meta: meta
+        }
+        return options
     }
 }
 
