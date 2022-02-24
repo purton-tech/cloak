@@ -45,6 +45,8 @@ pub fn vault_layout(
             .replace("add_member", "add-member")
             .replace("<new_vault", "<new-vault")
             .replace("</new_vault", "</new-vault")
+            .replace("<snack_bar", "<snack-bar")
+            .replace("</snack_bar", "</snack-bar")
             .replace("</new_account", "</new-account")
             .replace("<new_account", "<new-account")
             .replace("</connect_account", "</connect-account")
@@ -145,6 +147,7 @@ markup::define! {
                         }
                     }
                 }
+                snack_bar {}
             }
         }
     }

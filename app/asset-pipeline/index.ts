@@ -3,6 +3,7 @@ import './scss/index.scss'
 // Web components
 import './web-components/side-drawer'
 import './web-components/ecdh-cipher'
+import './web-components/snack-bar'
 import './cards'
 import '@github/time-elements/dist/relative-time-element';
 

@@ -201,6 +201,21 @@ impl Vault {
         .execute(pool)
         .await?;
 
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    secrets
+                WHERE
+                    vault_id = $1
+                AND
+                    $2 IN (SELECT user_id FROM users_vaults WHERE vault_id = $1)
+            "#,
+            vault_id as i32,
+            authenticated_user.user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
         Ok(())
     }
 }
