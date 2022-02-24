@@ -163,4 +163,44 @@ impl Vault {
 
         Ok(summary_vaults)
     }
+
+    pub async fn delete(
+        pool: &PgPool,
+        vault_id: u32,
+        authenticated_user: &Authentication,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    vaults
+                WHERE
+                    id = $1
+                AND
+                    $2 IN (SELECT user_id FROM users_vaults WHERE vault_id = $1)
+            "#,
+            vault_id as i32,
+            authenticated_user.user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        sqlx::query!(
+            r#"
+                UPDATE
+                    service_accounts
+                SET
+                    vault_id = NULL
+                WHERE
+                    vault_id = $1
+                AND
+                    $2 IN (SELECT user_id FROM users_vaults WHERE vault_id = $1)
+            "#,
+            vault_id as i32,
+            authenticated_user.user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
 }

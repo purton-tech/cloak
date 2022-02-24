@@ -25,7 +25,7 @@ pub async fn index(
 markup::define! {
     VaultHeader {
         @super::new_vault::VaultForm {}
-        button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
+        button.a_button.mini.primary[id="new-vault"] { "Create A New Vault" }
     }
     VaultsPage(
         vaults: Vec<models::vault::VaultSummary>) {
@@ -53,9 +53,19 @@ markup::define! {
                         }
                     }
                     div.settings {
-                        button { "Settings" }
+                        button.a_button.ghost.danger[id=format!("delete-vault-{}", vault.id), href="#"] {
+                            { "Delete "}
+                        }
                     }
                 }
+            }
+        }
+
+        // Generate all the delete vault flyouts
+        @for vault in vaults {
+            @super::delete_vault::DeleteVaultForm {
+                vault_id: vault.id as u32,
+                vault_name: vault.name.clone()
             }
         }
     }
