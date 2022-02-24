@@ -75,6 +75,11 @@ img {
 @import './buttons';
 @import './tables';
 @import './forms';
+@import './utilities';
+
+// Extra scss specific to some areas of the UI.
+@import '../../src/vaults/vaults';
+
 
 // Web components
 @import '../web-components/side-drawer';

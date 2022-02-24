@@ -32,11 +32,28 @@ markup::define! {
 
         @for vault in vaults {
             .m_card."vault-card".clickable[href=crate::secrets::secret_route(vault.id)] {
-                .body {
-                    h4.title { {vault.name} }
-                    .created {
-                        "Created "
-                        relative_time[datetime=vault.created_at.to_rfc3339()] {}
+                .body."m-vault-card-body" {
+                    div {
+                        h4.title { {vault.name} }
+                        .created {
+                            "Created "
+                            relative_time[datetime=vault.created_at.to_rfc3339()] {}
+                        }
+                    }
+                    div {
+                        h4.title { "Team Members" }
+                        p {
+                            "5 "
+                        }
+                    }
+                    div {
+                        h4.title { "Secrets" }
+                        p {
+                            "5 "
+                        }
+                    }
+                    div.settings {
+                        button { "Settings" }
                     }
                 }
             }
