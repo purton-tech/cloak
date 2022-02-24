@@ -27,7 +27,7 @@ pub async fn index(
 
 markup::define! {
     ServiceAccountsPage(service_accounts: Vec<models::service_account::ServiceAccount>,
-        vaults: Vec<models::vault::Vault>) {
+        vaults: Vec<models::vault::VaultSummary>) {
         div.m_card {
             div.header {
                 span { "Service Accounts" }

@@ -34,7 +34,7 @@ pub async fn connect(
 markup::define! {
     ConnectServiceAccountDrawer<'a>(
         service_account: &'a crate::models::service_account::ServiceAccount,
-        vaults: &'a Vec<models::vault::Vault>) {
+        vaults: &'a Vec<models::vault::VaultSummary>) {
 
         connect_account[label=format!("View {}", service_account.name),
             "service-account-id"=format!("{}", service_account.id)] {

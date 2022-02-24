@@ -28,7 +28,7 @@ markup::define! {
         button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
     }
     VaultsPage(
-        vaults: Vec<models::vault::Vault>) {
+        vaults: Vec<models::vault::VaultSummary>) {
 
         @for vault in vaults {
             .m_card."vault-card".clickable[href=crate::secrets::secret_route(vault.id)] {
@@ -43,13 +43,13 @@ markup::define! {
                     div {
                         h4.title { "Team Members" }
                         p {
-                            "5 "
+                            {format!("{}", vault.user_count)}
                         }
                     }
                     div {
                         h4.title { "Secrets" }
                         p {
-                            "5 "
+                            {format!("{}", vault.secrets_count)}
                         }
                     }
                     div.settings {
