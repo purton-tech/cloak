@@ -26,13 +26,23 @@ pub async fn delete(
 }
 
 markup::define! {
-    DeleteSecretForm(secret_id: u32, vault_id: u32, secret_name: String) {
+    DeleteSecretForm<'a>(
+        secret_id: u32,
+        vault_id: u32,
+        secret_name: String,
+        user_vault: &'a models::user_vault::UserVault) {
 
         form.m_form[method="post", action=super::delete_route(*vault_id)] {
-            side_drawer[label=format!("Delete Secret ({})?", secret_name),
+            side_drawer[label="Delete Secret?",
                 id=format!("delete-secret-drawer-{}", secret_id)] {
 
                 template[slot="body"] {
+                    p {
+                        "Are you sure you want to delete the secret "
+                        ecdh_cipher[cipher=secret_name.clone(),
+                            "wrapped-aes-key"=user_vault.encrypted_vault_key.clone(),
+                            "ecdh-public-key"=user_vault.ecdh_public_key.clone()] {}
+                    }
                     input[type="hidden", name="secret_id", value=secret_id.to_string()] {}
                 }
                 template[slot="footer"] {
