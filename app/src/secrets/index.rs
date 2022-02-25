@@ -27,7 +27,7 @@ pub async fn index(
         "Home",
         &page.to_string(),
         "",
-        &crate::layout::SideBar::Vaults,
+        &crate::layout::SideBar::Secrets,
         Some(idor_vault_id),
     )
 }

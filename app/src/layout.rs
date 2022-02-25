@@ -5,6 +5,8 @@ use hyper::{Body, StatusCode};
 #[derive(PartialEq, Eq)]
 pub enum SideBar {
     Vaults,
+    Secrets,
+    Members,
     ServiceAccounts,
     Team,
 }
@@ -127,9 +129,6 @@ markup::define! {
                         h1 {
                             a[href=crate::vaults::INDEX] { "Cloak" }
                         }
-                        h2 {
-                            "Your Vaults"
-                        }
                         ul {
 
                             { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Vaults",
@@ -137,21 +136,21 @@ markup::define! {
                                 svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
 
                             @if let Some(vault_id) = vault {
-                                { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Secrets",
+                                { SvgSideMenuItem { side_bar: SideBar::Secrets, name: "Secrets",
                                     link: &crate::secrets::secret_route(*vault_id as i32),
-                                    svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
-                                { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Members",
+                                    svg: &crate::statics::get_secrets_svg(), selected_sidebar: side_bar  } }
+                                { SvgSideMenuItem { side_bar: SideBar::Members, name: "Members",
                                     link: &crate::members::member_route(*vault_id),
-                                    svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                    svg: &crate::statics::get_users_svg(), selected_sidebar: side_bar  } }
                             }
 
                             { SvgSideMenuItem { side_bar: SideBar::ServiceAccounts, name: "Service Accounts",
                                 link: crate::service_accounts::INDEX,
-                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_accounts_svg(), selected_sidebar: side_bar  } }
 
                             { SvgSideMenuItem { side_bar: SideBar::Team, name: "Team",
                                 link: crate::team::INDEX,
-                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_users_svg(), selected_sidebar: side_bar  } }
                         }
                     }
                     main.container {
