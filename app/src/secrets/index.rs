@@ -58,7 +58,7 @@ markup::define! {
         .empty_page {
             div {
                 h2 { "No Secrets Created"}
-                h3 { "Create your first secret and add it too the vault"}
+                h3 { "Create your first secret and add it to the vault"}
                 @super::new_secret::NewSecretPage { user_vault }
                 button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
             }
@@ -107,7 +107,7 @@ markup::define! {
 
         // Generate all the details flyouts
         @for secret in secrets {
-            @super::delete::DeleteSecretForm {
+            @super::delete_secret::DeleteSecretForm {
                 secret_id: secret.id as u32,
                 vault_id: user_vault.vault_id as u32,
                 secret_name: secret.name.clone(),

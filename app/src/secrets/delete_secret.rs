@@ -3,7 +3,7 @@ use crate::errors::CustomError;
 use crate::models;
 use axum::{
     extract::{Extension, Form, Path},
-    response::{IntoResponse, Redirect},
+    response::IntoResponse,
 };
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -22,7 +22,7 @@ pub async fn delete(
 ) -> Result<impl IntoResponse, CustomError> {
     models::secret::Secret::delete(&pool, delete_secret.secret_id, &authentication).await?;
 
-    Ok(Redirect::to(super::secret_route(vault_id as i32).parse()?))
+    crate::layout::redirect_and_snackbar(&super::secret_route(vault_id as i32), "Secret Deleted")
 }
 
 markup::define! {

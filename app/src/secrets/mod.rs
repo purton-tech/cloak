@@ -1,4 +1,4 @@
-mod delete;
+mod delete_secret;
 mod index;
 mod new_secret;
 
@@ -15,7 +15,7 @@ pub fn routes() -> Router {
     Router::new()
         .route(INDEX, get(index::index))
         .route(NEW, post(new_secret::new))
-        .route(DELETE, post(delete::delete))
+        .route(DELETE, post(delete_secret::delete))
 }
 
 pub fn secret_route(vault_id: i32) -> String {
