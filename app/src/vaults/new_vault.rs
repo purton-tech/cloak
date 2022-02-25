@@ -52,12 +52,9 @@ markup::define! {
                         input[type="text", required="", name="name"] {}
                         span.a_help_text { "Give your vault a name" }
 
-                        label[for="encrypted_vault_key"] { "Wrapped AES Key" }
-                        textarea[rows="4", required="", readonly="", name="encrypted_vault_key", id="new-vault-key"] {}
-                        span.a_help_text { "The key for this vault" }
+                        input[required="", type="hidden", name="encrypted_vault_key", id="new-vault-key"] {}
 
-                        label[for="public_key"] { "ECDH Public Key" }
-                        input[id="public-key", type="text", required="", name="public_key"] {}
+                        input[id="public-key", type="hidden", required="", name="public_key"] {}
                     }
                 }
 

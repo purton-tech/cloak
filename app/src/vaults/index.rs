@@ -10,22 +10,40 @@ pub async fn index(
 ) -> Result<Html<String>, CustomError> {
     let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
 
-    let page = VaultsPage { vaults };
-
-    let header = VaultHeader {};
-
-    crate::layout::layout_with_header(
-        "Vaults",
-        &page.to_string(),
-        &header.to_string(),
-        &crate::layout::SideBar::Vaults,
-    )
+    if vaults.is_empty() {
+        let empty_page = EmptyVaultPage {};
+        crate::layout::layout_with_header(
+            "Vaults",
+            &empty_page.to_string(),
+            "",
+            &crate::layout::SideBar::Vaults,
+        )
+    } else {
+        let header = VaultHeader {};
+        let page = VaultsPage { vaults };
+        crate::layout::layout_with_header(
+            "Vaults",
+            &page.to_string(),
+            &header.to_string(),
+            &crate::layout::SideBar::Vaults,
+        )
+    }
 }
 
 markup::define! {
     VaultHeader {
         @super::new_vault::VaultForm {}
         button.a_button.mini.primary[id="new-vault"] { "Create A New Vault" }
+    }
+    EmptyVaultPage {
+        .empty_page {
+            div {
+                h2 { "No Vaults Created"}
+                h3 { "Create your first vault to get started with Cloak"}
+                @super::new_vault::VaultForm {}
+                button.a_button.mini.primary[id="new-vault"] { "Create A New Vault" }
+            }
+        }
     }
     VaultsPage(
         vaults: Vec<models::vault::VaultSummary>) {
