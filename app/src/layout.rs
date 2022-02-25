@@ -1,11 +1,26 @@
 use crate::errors::CustomError;
-use axum::response::Html;
+use axum::{http::Response, response::Html};
+use hyper::{Body, StatusCode};
 
 #[derive(PartialEq, Eq)]
 pub enum SideBar {
     Vaults,
     ServiceAccounts,
     Team,
+}
+
+pub fn redirect_and_snackbar(
+    url: &str,
+    message: &'static str,
+) -> Result<Response<Body>, CustomError> {
+    let builder = Response::builder()
+        .status(StatusCode::SEE_OTHER)
+        .header("location", url)
+        .header("set-cookie", format!("flash_aargh={}; Max-Age=6", message))
+        .body(Body::empty());
+    let response =
+        builder.map_err(|_| CustomError::FaultySetup("Could not build redirect".to_string()))?;
+    Ok(response)
 }
 
 // page_title and content can be anything that can be rendered. A string, a

@@ -3,7 +3,7 @@ use crate::errors::CustomError;
 use crate::models;
 use axum::{
     extract::{Extension, Form},
-    response::{IntoResponse, Redirect},
+    response::IntoResponse,
 };
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -25,9 +25,11 @@ pub async fn delete(
 
     if vault.name == idor_delete_vault.name {
         models::vault::Vault::delete(&pool, idor_delete_vault.vault_id, &authentication).await?;
+    } else {
+        return crate::layout::redirect_and_snackbar(super::INDEX, "Name did not match");
     }
 
-    Ok(Redirect::to(super::INDEX.parse().unwrap()))
+    crate::layout::redirect_and_snackbar(super::INDEX, "Vault Deleted")
 }
 
 markup::define! {

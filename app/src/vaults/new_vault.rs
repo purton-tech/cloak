@@ -3,7 +3,7 @@ use crate::errors::CustomError;
 use crate::models;
 use axum::{
     extract::{Extension, Form},
-    response::{IntoResponse, Redirect},
+    response::IntoResponse,
 };
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -32,7 +32,7 @@ pub async fn new(
 
     models::vault::Vault::create(&pool, &authentication, vault).await?;
 
-    Ok(Redirect::to(super::INDEX.parse()?))
+    crate::layout::redirect_and_snackbar(super::INDEX, "Vault Created")
 }
 
 markup::define! {
