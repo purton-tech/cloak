@@ -29,6 +29,11 @@
       min-width: min-content;
       cursor: pointer;
   }
+
+  &.close {
+    animation: 0.5s ease-out 0s 1 slideOut;
+    transform: translate(-50%, 200%);
+  }
 }
 @keyframes slideInFromBottom {
   0% {
@@ -36,6 +41,14 @@
   }
   100% {
     transform: translate(-50%, 0);
+  }
+}
+@keyframes slideOut {
+  0% {
+    transform: translate(-50%, 0);
+  }
+  100% {
+    transform: translate(-50%, 200%);
   }
 }
 @media (min-width: 640px) {
