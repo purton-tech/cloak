@@ -82,7 +82,7 @@ markup::define! {
                                     }
                                 }
                                 td {
-                                    a[href="#"] {
+                                    a[id=format!("delete-member-{}", member.user_id), href="#"] {
                                         img[src=statics::get_delete_svg(), width="18"] {}
                                     }
                                 }
@@ -90,6 +90,15 @@ markup::define! {
                         }
                     }
                 }
+            }
+        }
+
+
+
+        // Generate all the details flyouts
+        @for member in *members {
+            @super::delete_member::DeleteMemberForm {
+                user: member,
             }
         }
     }
