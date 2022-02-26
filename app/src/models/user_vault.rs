@@ -56,8 +56,8 @@ impl UserVault {
                     user_id =$2
                 AND vault_id IN (SELECT vault_id FROM users_vaults WHERE user_id = $3)
             ",
-            idor_user_id as i32,
             idor_vault_id as i32,
+            idor_user_id as i32,
             authenticated_user.user_id as i32
         )
         .execute(pool)

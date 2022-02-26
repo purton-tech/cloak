@@ -29,10 +29,14 @@ pub async fn delete(
     )
     .await?;
 
-    crate::layout::redirect_and_snackbar(
-        &super::member_route(vault_id),
-        "Member Removed From Vault",
-    )
+    // If we remove ourself, redirect to vaults page.
+    let url = if delete_member.user_id == authentication.user_id {
+        crate::vaults::INDEX.to_string()
+    } else {
+        super::member_route(vault_id)
+    };
+
+    crate::layout::redirect_and_snackbar(&url, "Member Removed From Vault")
 }
 
 markup::define! {

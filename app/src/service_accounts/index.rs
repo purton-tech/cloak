@@ -18,7 +18,7 @@ pub async fn index(
         crate::layout::layout(
             "Service Accounts",
             &empty_page.to_string(),
-            &crate::layout::SideBar::Secrets,
+            &crate::layout::SideBar::ServiceAccounts,
         )
     } else {
         let header = ServiceAccountsHeader {};
@@ -32,7 +32,7 @@ pub async fn index(
             "Service Accounts",
             &page.to_string(),
             &header.to_string(),
-            &crate::layout::SideBar::Secrets,
+            &crate::layout::SideBar::ServiceAccounts,
         )
     }
 }
