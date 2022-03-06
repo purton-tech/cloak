@@ -55,7 +55,7 @@ markup::define! {
 
                     fieldset {
                         label[for="name"] { "Name *" }
-                        input[type="text", required="", name="name"] {}
+                        input[type="text", required="", name="name", autocomplete="off"] {}
                         span.a_help_text { "Please confirm the name of the vault you wish to delete" }
                     }
 

@@ -52,7 +52,9 @@ markup::define! {
                         input[type="text", required="", name="name"] {}
                         span.a_help_text { "Give your vault a name" }
 
-                        input[required="", type="hidden", name="encrypted_vault_key", id="new-vault-key"] {}
+                        input[required="", type="hidden",
+                            name="encrypted_vault_key",
+                            id="new-vault-key", autocomplete="off"] {}
 
                         input[id="public-key", type="hidden", required="", name="public_key"] {}
                     }
