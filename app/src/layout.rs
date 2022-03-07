@@ -77,20 +77,25 @@ pub fn vault_layout(
     ))
 }
 
+fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: bool) -> String {
+    let selected = selected_sidebar == side_bar;
+    match (selected, sub_menu) {
+        (true, true) => "selected submenu",
+        (true, false) => "selected",
+        (false, true) => "submenu",
+        (false, false) => "",
+    }
+    .to_string()
+}
+
 markup::define! {
 
     SvgSideMenuItem<'a>(side_bar: SideBar, name: &'a str, link: &'a str,
-        svg: &'a str, selected_sidebar: &'a SideBar) {
-        @if *selected_sidebar == side_bar {
-            li.selected {
-                img[alt="Satellite", width = "24px", src = svg] { }
-                a[href=link] { {name} }
-            }
-        } else {
-            li {
-                img[alt="Satellite", width = "24px", src = svg] { }
-                a[href=link] { {name} }
-            }
+        svg: &'a str, selected_sidebar: &'a SideBar, sub_menu: bool) {
+
+        li[class={get_menu_class(side_bar, selected_sidebar, *sub_menu)}] {
+            img[alt="Menu Item", width = "24px", src = svg] { }
+            a[href=link] { {name} }
         }
     }
 
@@ -133,24 +138,29 @@ markup::define! {
 
                             { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Vaults",
                                 link: crate::vaults::INDEX,
-                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_vault_svg(),
+                                selected_sidebar: side_bar, sub_menu: false  } }
 
                             @if let Some(vault_id) = vault {
                                 { SvgSideMenuItem { side_bar: SideBar::Secrets, name: "Secrets",
                                     link: &crate::secrets::secret_route(*vault_id as i32),
-                                    svg: &crate::statics::get_secrets_svg(), selected_sidebar: side_bar  } }
+                                    svg: &crate::statics::get_secrets_svg(),
+                                    selected_sidebar: side_bar, sub_menu: true  } }
                                 { SvgSideMenuItem { side_bar: SideBar::Members, name: "Members",
                                     link: &crate::members::member_route(*vault_id),
-                                    svg: &crate::statics::get_users_svg(), selected_sidebar: side_bar  } }
+                                    svg: &crate::statics::get_users_svg(),
+                                    selected_sidebar: side_bar, sub_menu: true  } }
                             }
 
                             { SvgSideMenuItem { side_bar: SideBar::ServiceAccounts, name: "Service Accounts",
                                 link: crate::service_accounts::INDEX,
-                                svg: &crate::statics::get_accounts_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_accounts_svg(),
+                                selected_sidebar: side_bar, sub_menu: false  } }
 
                             { SvgSideMenuItem { side_bar: SideBar::Team, name: "Team",
                                 link: crate::team::INDEX,
-                                svg: &crate::statics::get_users_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_users_svg(),
+                                selected_sidebar: side_bar, sub_menu: false  } }
                         }
                     }
                     main.container {
