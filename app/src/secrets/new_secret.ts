@@ -3,7 +3,7 @@ import { Vault, Cipher, ByteData, AESKey, ECDHKeyPair, ECDHPublicKey } from '../
 import { VaultClient } from '../../asset-pipeline/api.client';
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
-import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsResponse, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api';
+import { CreateSecretsRequest, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api';
 
 
 /**
@@ -17,7 +17,7 @@ import { GetVaultRequest, GetVaultResponse, CreateSecretsRequest, CreateSecretsR
 class NewSecret extends SideDrawer {
 
     private secretNameInput: HTMLInputElement
-    private secretValueInput: HTMLInputElement
+    private secretValueInput: HTMLTextAreaElement
     private blindIndexInput: HTMLInputElement
     private secretForm: HTMLFormElement
     private vaultIdInput: HTMLInputElement
@@ -42,7 +42,7 @@ class NewSecret extends SideDrawer {
     async createSecret() {
 
         this.secretNameInput = document.getElementById('secret-name') as HTMLInputElement
-        this.secretValueInput = document.getElementById('secret-value') as HTMLInputElement
+        this.secretValueInput = document.getElementById('secret-value') as HTMLTextAreaElement
         this.blindIndexInput = document.getElementById('name-blind-index') as HTMLInputElement
         this.secretForm = document.getElementById('add-secret-form') as HTMLFormElement
         this.vaultIdInput = document.getElementById('vault-id') as HTMLInputElement

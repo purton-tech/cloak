@@ -55,7 +55,7 @@ markup::define! {
                         input[id="secret-name", type="text", required="", autocomplete="off", name="name"] {}
 
                         label[for="secret"] { "Secret" }
-                        input[id="secret-value", type="text", autocomplete="off", required="", name="secret"] {}
+                        textarea[rows="10", id="secret-value", type="text", autocomplete="off", required="", name="secret"] {}
 
                     }
 
