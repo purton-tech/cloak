@@ -50,14 +50,11 @@ markup::define! {
 
                     fieldset {
                         label[for="name"] { "Name" }
-                        input[id="secret-name", type="text", required="", name="name"] {}
+                        input[id="secret-name", type="text", required="", name="name", autocomplete="off"] {}
 
-                        label[for="secret"] { "ECDH Public Key" }
-                        input[id="public-key", type="text", required="", name="public_key"] {}
+                        input[id="public-key", type="hidden", required="", name="public_key"] {}
 
-                        label[for="kry"] { "Wrapped ECDH Private Key" }
-                        textarea[rows="8", required="", readonly="", name="encrypted_private_key", id="private-key"] {}
-                        span.a_help_text { "The key for this service account" }
+                        input[rows="8", required="", type="hidden", readonly="", name="encrypted_private_key", id="private-key"] {}
 
                     }
                 }
