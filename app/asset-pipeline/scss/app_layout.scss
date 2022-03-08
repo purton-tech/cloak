@@ -86,6 +86,14 @@ body {
                     }
                 }
             }
+            > .profile {
+                width: 240px;
+                position: absolute;
+                bottom: 0;
+                display: flex;
+                justify-content: center;
+                padding: 1rem;
+            }
         }
     
         // If the hamburger gets toggles show the menu.

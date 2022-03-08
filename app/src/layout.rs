@@ -90,6 +90,26 @@ fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: bool
 
 markup::define! {
 
+    LogoutDrawer {
+
+        form.m_form[method="post", action="/auth/sign_out"] {
+            side_drawer[label="Logout ?", id="logout-drawer"] {
+
+                template[slot="body"] {
+
+                    p {
+                        "Are you sure you want to Logout?"
+                    }
+                }
+
+                template[slot="footer"] {
+                    button.a_button.auto.danger[slot="footer", type = "submit"] { "Logout" }
+                }
+            }
+        }
+
+    }
+
     SvgSideMenuItem<'a>(side_bar: SideBar, name: &'a str, link: &'a str,
         svg: &'a str, selected_sidebar: &'a SideBar, sub_menu: bool) {
 
@@ -161,6 +181,11 @@ markup::define! {
                                 link: crate::team::INDEX,
                                 svg: &crate::statics::get_users_svg(),
                                 selected_sidebar: side_bar, sub_menu: false  } }
+                        }
+                        div.profile {
+                            // This button will open the logout drawer
+                            button.a_button.ghost["data-drawer-target"="logout-drawer"] { "Logout" }
+                            @LogoutDrawer {}
                         }
                     }
                     main.container {
