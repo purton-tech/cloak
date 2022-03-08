@@ -104,7 +104,7 @@ const authPod = new kx.PodBuilder({
     imagePullSecrets: [{ name: 'image-pull' }],
     containers: [{
         name: AUTH_NAME,
-        image: 'purtontech/barricade:1.0.11',
+        image: 'purtontech/barricade:1.0.12',
         imagePullPolicy: 'Always',
         ports: { http: 9090 },
         env: [
@@ -119,10 +119,19 @@ const authPod = new kx.PodBuilder({
             },
             { name: "SECURE_COOKIE", value: 'true' },
             { name: "REDIRECT_URL", value: '/app/post_registration' },
-            { name: "FORWARD_URL", value: '127.0.0.1' }, 
-            { name: "FORWARD_PORT", value: '8080' },
-            { name: "SKIP_AUTH_FOR", value: '/$$,/images/*,/static/*,/contact' },
             { name: "SECRET_KEY", value: config.requireSecret('secret_key') },
+
+            // Configure send grid for email
+            { name: 'SMTP_HOST', value: 'smtp.sendgrid.net' },
+            { name: 'SMTP_PORT', value: '587' },
+            { name: 'SMTP_USERNAME', value: 'apikey' },
+            { name: 'SMTP_PASSWORD', value: config.requireSecret('sendgrid_api_key') },
+            { name: 'SMTP_TLS_OFF', value: 'true' },
+            { name: 'ENABLE_EMAIL_OTP', value: 'true' },
+
+            // Config for password reset.
+            { name: 'RESET_DOMAIN', value: 'https://cloak.software' },
+            { name: 'RESET_FROM_EMAIL_ADDRESS', value: 'no-reply@cloak.software' },
         ]
     }]
 })

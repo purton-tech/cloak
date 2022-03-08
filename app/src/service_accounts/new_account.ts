@@ -26,9 +26,9 @@ class NewAccount extends SideDrawer {
                 const privateKeyField = this.querySelector('#private-key')
     
                 if(publicKeyField instanceof HTMLInputElement &&
-                    privateKeyField instanceof HTMLTextAreaElement) {
+                    privateKeyField instanceof HTMLInputElement) {
                     publicKeyField.value = (await ecdhKeyPair.publicKey.export()).b64
-                    privateKeyField.innerText = wrappedECDHPrivateKey.string
+                    privateKeyField.value = wrappedECDHPrivateKey.string
                 }
             }
         })

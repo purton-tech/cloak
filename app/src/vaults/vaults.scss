@@ -1,0 +1,15 @@
+@import "../../asset-pipeline/scss/responsive-mixin";
+
+// Make a vault card
+@include for-tablet-portrait-up {
+    .m-vault-card-body {
+        display: flex;
+        justify-content: space-between;
+
+        > .settings {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+        }
+    }
+}

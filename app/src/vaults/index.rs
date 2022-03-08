@@ -10,35 +10,80 @@ pub async fn index(
 ) -> Result<Html<String>, CustomError> {
     let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
 
-    let page = VaultsPage { vaults };
-
-    let header = VaultHeader {};
-
-    crate::layout::layout_with_header(
-        "Vaults",
-        &page.to_string(),
-        &header.to_string(),
-        &crate::layout::SideBar::Vaults,
-    )
+    if vaults.is_empty() {
+        let empty_page = EmptyVaultPage {};
+        crate::layout::layout_with_header(
+            "Vaults",
+            &empty_page.to_string(),
+            "",
+            &crate::layout::SideBar::Vaults,
+        )
+    } else {
+        let header = VaultHeader {};
+        let page = VaultsPage { vaults };
+        crate::layout::layout_with_header(
+            "Vaults",
+            &page.to_string(),
+            &header.to_string(),
+            &crate::layout::SideBar::Vaults,
+        )
+    }
 }
 
 markup::define! {
     VaultHeader {
         @super::new_vault::VaultForm {}
-        button.a_button.mini.primary[id="new-vault"] { "Add Vault" }
+        button.a_button.mini.primary[id="new-vault"] { "Create A New Vault" }
+    }
+    EmptyVaultPage {
+        .empty_page {
+            div {
+                h2 { "No Vaults Created"}
+                h3 { "Create your first vault to get started with Cloak"}
+                @super::new_vault::VaultForm {}
+                button.a_button.mini.primary[id="new-vault"] { "Create A New Vault" }
+            }
+        }
     }
     VaultsPage(
-        vaults: Vec<models::vault::Vault>) {
+        vaults: Vec<models::vault::VaultSummary>) {
 
         @for vault in vaults {
             .m_card."vault-card".clickable[href=crate::secrets::secret_route(vault.id)] {
-                .body {
-                    h4.title { {vault.name} }
-                    .created {
-                        "Created "
-                        relative_time[datetime=vault.created_at.to_rfc3339()] {}
+                .body."m-vault-card-body" {
+                    div {
+                        h4.title { {vault.name} }
+                        .created {
+                            "Created "
+                            relative_time[datetime=vault.created_at.to_rfc3339()] {}
+                        }
+                    }
+                    div {
+                        h4.title { "Team Members" }
+                        p {
+                            {format!("{}", vault.user_count)}
+                        }
+                    }
+                    div {
+                        h4.title { "Secrets" }
+                        p {
+                            {format!("{}", vault.secrets_count)}
+                        }
+                    }
+                    div.settings {
+                        button.a_button.ghost.danger[id=format!("delete-vault-{}", vault.id), href="#"] {
+                            { "Delete "}
+                        }
                     }
                 }
+            }
+        }
+
+        // Generate all the delete vault flyouts
+        @for vault in vaults {
+            @super::delete_vault::DeleteVaultForm {
+                vault_id: vault.id as u32,
+                vault_name: vault.name.clone()
             }
         }
     }

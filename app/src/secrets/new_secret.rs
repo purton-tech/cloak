@@ -52,10 +52,10 @@ markup::define! {
 
                     fieldset {
                         label[for="name"] { "Name" }
-                        input[id="secret-name", type="text", required="", name="name"] {}
+                        input[id="secret-name", type="text", required="", autocomplete="off", name="name"] {}
 
                         label[for="secret"] { "Secret" }
-                        input[id="secret-value", type="text", required="", name="secret"] {}
+                        textarea[rows="10", id="secret-value", type="text", autocomplete="off", required="", name="secret"] {}
 
                     }
 

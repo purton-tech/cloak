@@ -40,6 +40,32 @@ impl UserVault {
         Ok(())
     }
 
+    pub async fn remove_user_from_vault(
+        pool: &PgPool,
+        authenticated_user: &Authentication,
+        idor_user_id: u32,
+        idor_vault_id: u32,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            "
+                DELETE FROM
+                    users_vaults
+                WHERE
+                    vault_id = $1
+                AND
+                    user_id =$2
+                AND vault_id IN (SELECT vault_id FROM users_vaults WHERE user_id = $3)
+            ",
+            idor_vault_id as i32,
+            idor_user_id as i32,
+            authenticated_user.user_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
     // With an authenticated user get one of their vaults.
     pub async fn get(
         pool: &PgPool,

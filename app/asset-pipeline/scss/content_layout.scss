@@ -7,6 +7,10 @@ body > .l_application > main {
         padding: var(--content-padding);
         height: 100%;
 
+        > div {
+            height: 100%;
+        }
+
         > h2:nth-child(1) {
             margin: 0;
             margin-left: -1rem;

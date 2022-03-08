@@ -13,28 +13,52 @@ pub async fn index(
         models::service_account::ServiceAccount::get_all(&pool, &authentication).await?;
     let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
 
-    let page = ServiceAccountsPage {
-        service_accounts,
-        vaults,
-    };
+    if service_accounts.is_empty() {
+        let empty_page = EmptyServiceAccounts {};
+        crate::layout::layout(
+            "Service Accounts",
+            &empty_page.to_string(),
+            &crate::layout::SideBar::ServiceAccounts,
+        )
+    } else {
+        let header = ServiceAccountsHeader {};
 
-    crate::layout::layout(
-        "Service Accounts",
-        &page.to_string(),
-        &crate::layout::SideBar::ServiceAccounts,
-    )
+        let page = ServiceAccountsPage {
+            service_accounts,
+            vaults,
+        };
+
+        crate::layout::layout_with_header(
+            "Service Accounts",
+            &page.to_string(),
+            &header.to_string(),
+            &crate::layout::SideBar::ServiceAccounts,
+        )
+    }
 }
 
 markup::define! {
-    ServiceAccountsPage(service_accounts: Vec<models::service_account::ServiceAccount>,
-        vaults: Vec<models::vault::Vault>) {
-        div.m_card {
-            div.header {
-                span { "Service Accounts" }
+    ServiceAccountsHeader {
+        @super::new_account::ServiceAccountForm {}
 
+        button.a_button.mini.primary[id="new-account"] { "Add Service Account" }
+    }
+    EmptyServiceAccounts {
+        .empty_page {
+            div {
+                h2 { "No Service Accounts Created"}
+                h3 { "Service accounts give you access to secrets held in vaults" }
                 @super::new_account::ServiceAccountForm {}
 
                 button.a_button.mini.primary[id="new-account"] { "Add Service Account" }
+            }
+        }
+    }
+    ServiceAccountsPage(service_accounts: Vec<models::service_account::ServiceAccount>,
+        vaults: Vec<models::vault::VaultSummary>) {
+        div.m_card {
+            div.header {
+                span { "Service Accounts" }
             }
             div.body {
                 table.m_table {

@@ -27,11 +27,11 @@ class NewVault extends SideDrawer {
 
     
                 if(publicKeyField instanceof HTMLInputElement &&
-                    wrappedKeyField instanceof HTMLTextAreaElement) {
+                    wrappedKeyField instanceof HTMLInputElement) {
                     
                     const throwawayKeyPairExport = await publicKey.export()
                     publicKeyField.value = throwawayKeyPairExport.b64
-                    wrappedKeyField.innerText = wrappedKey.string
+                    wrappedKeyField.value = wrappedKey.string
                 }
             }
         })

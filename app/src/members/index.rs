@@ -29,34 +29,41 @@ pub async fn index(
     let page = MembersPage {
         _vault_name: "vaults".to_string(),
         members: &members,
+    };
+    let header = MembersHeader {
+        _vault_name: "vaults".to_string(),
         team: &team,
         user_vault: &user_vault,
     };
 
     crate::layout::vault_layout(
-        "Home",
+        "Vault Members",
         &page.to_string(),
-        "",
-        &crate::layout::SideBar::Vaults,
+        &header.to_string(),
+        &crate::layout::SideBar::Members,
         Some(idor_vault_id),
     )
 }
 
 markup::define! {
-    MembersPage<'a>(
+    MembersHeader<'a>(
         _vault_name: String,
         user_vault: &'a models::user_vault::UserVault,
-        members: &'a Vec<models::user_vault::UserDetails>,
         team: &'a Vec<models::organisation::User>)
+    {
+        @super::add_member::AddMemberDrawer {
+            user_vault: *user_vault,
+            team: *team
+        }
+        button.a_button.mini.primary[id="add-member"] { "Add Member" }
+    }
+    MembersPage<'a>(
+        _vault_name: String,
+        members: &'a Vec<models::user_vault::UserDetails>)
     {
         div.m_card {
             div.header {
                 span { "Members" }
-                @super::add_member::AddMemberDrawer {
-                    user_vault: *user_vault,
-                    team: *team
-                }
-                button.a_button.mini.primary[id="add-member"] { "Add Member" }
             }
             div.body {
                 table.m_table {
@@ -75,7 +82,7 @@ markup::define! {
                                     }
                                 }
                                 td {
-                                    a[href="#"] {
+                                    a[id=format!("delete-member-{}", member.user_id), href="#"] {
                                         img[src=statics::get_delete_svg(), width="18"] {}
                                     }
                                 }
@@ -83,6 +90,15 @@ markup::define! {
                         }
                     }
                 }
+            }
+        }
+
+
+
+        // Generate all the details flyouts
+        @for member in *members {
+            @super::delete_member::DeleteMemberForm {
+                user: member,
             }
         }
     }

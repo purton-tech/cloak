@@ -1,11 +1,28 @@
 use crate::errors::CustomError;
-use axum::response::Html;
+use axum::{http::Response, response::Html};
+use hyper::{Body, StatusCode};
 
 #[derive(PartialEq, Eq)]
 pub enum SideBar {
     Vaults,
+    Secrets,
+    Members,
     ServiceAccounts,
     Team,
+}
+
+pub fn redirect_and_snackbar(
+    url: &str,
+    message: &'static str,
+) -> Result<Response<Body>, CustomError> {
+    let builder = Response::builder()
+        .status(StatusCode::SEE_OTHER)
+        .header("location", url)
+        .header("set-cookie", format!("flash_aargh={}; Max-Age=6", message))
+        .body(Body::empty());
+    let response =
+        builder.map_err(|_| CustomError::FaultySetup("Could not build redirect".to_string()))?;
+    Ok(response)
 }
 
 // page_title and content can be anything that can be rendered. A string, a
@@ -45,6 +62,8 @@ pub fn vault_layout(
             .replace("add_member", "add-member")
             .replace("<new_vault", "<new-vault")
             .replace("</new_vault", "</new-vault")
+            .replace("<snack_bar", "<snack-bar")
+            .replace("</snack_bar", "</snack-bar")
             .replace("</new_account", "</new-account")
             .replace("<new_account", "<new-account")
             .replace("</connect_account", "</connect-account")
@@ -58,20 +77,45 @@ pub fn vault_layout(
     ))
 }
 
+fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: bool) -> String {
+    let selected = selected_sidebar == side_bar;
+    match (selected, sub_menu) {
+        (true, true) => "selected submenu",
+        (true, false) => "selected",
+        (false, true) => "submenu",
+        (false, false) => "",
+    }
+    .to_string()
+}
+
 markup::define! {
 
+    LogoutDrawer {
+
+        form.m_form[method="post", action="/auth/sign_out"] {
+            side_drawer[label="Logout ?", id="logout-drawer"] {
+
+                template[slot="body"] {
+
+                    p {
+                        "Are you sure you want to Logout?"
+                    }
+                }
+
+                template[slot="footer"] {
+                    button.a_button.auto.danger[slot="footer", type = "submit"] { "Logout" }
+                }
+            }
+        }
+
+    }
+
     SvgSideMenuItem<'a>(side_bar: SideBar, name: &'a str, link: &'a str,
-        svg: &'a str, selected_sidebar: &'a SideBar) {
-        @if *selected_sidebar == side_bar {
-            li.selected {
-                img[alt="Satellite", width = "24px", src = svg] { }
-                a[href=link] { {name} }
-            }
-        } else {
-            li {
-                img[alt="Satellite", width = "24px", src = svg] { }
-                a[href=link] { {name} }
-            }
+        svg: &'a str, selected_sidebar: &'a SideBar, sub_menu: bool) {
+
+        li[class={get_menu_class(side_bar, selected_sidebar, *sub_menu)}] {
+            img[alt="Menu Item", width = "24px", src = svg] { }
+            a[href=link] { {name} }
         }
     }
 
@@ -110,31 +154,38 @@ markup::define! {
                         h1 {
                             a[href=crate::vaults::INDEX] { "Cloak" }
                         }
-                        h2 {
-                            "Your Vaults"
-                        }
                         ul {
 
                             { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Vaults",
                                 link: crate::vaults::INDEX,
-                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_vault_svg(),
+                                selected_sidebar: side_bar, sub_menu: false  } }
 
                             @if let Some(vault_id) = vault {
-                                { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Secrets",
+                                { SvgSideMenuItem { side_bar: SideBar::Secrets, name: "Secrets",
                                     link: &crate::secrets::secret_route(*vault_id as i32),
-                                    svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
-                                { SvgSideMenuItem { side_bar: SideBar::Vaults, name: "Members",
+                                    svg: &crate::statics::get_secrets_svg(),
+                                    selected_sidebar: side_bar, sub_menu: true  } }
+                                { SvgSideMenuItem { side_bar: SideBar::Members, name: "Members",
                                     link: &crate::members::member_route(*vault_id),
-                                    svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                    svg: &crate::statics::get_users_svg(),
+                                    selected_sidebar: side_bar, sub_menu: true  } }
                             }
 
                             { SvgSideMenuItem { side_bar: SideBar::ServiceAccounts, name: "Service Accounts",
                                 link: crate::service_accounts::INDEX,
-                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_accounts_svg(),
+                                selected_sidebar: side_bar, sub_menu: false  } }
 
                             { SvgSideMenuItem { side_bar: SideBar::Team, name: "Team",
                                 link: crate::team::INDEX,
-                                svg: &crate::statics::get_vault_svg(), selected_sidebar: side_bar  } }
+                                svg: &crate::statics::get_users_svg(),
+                                selected_sidebar: side_bar, sub_menu: false  } }
+                        }
+                        div.profile {
+                            // This button will open the logout drawer
+                            button.a_button.ghost["data-drawer-target"="logout-drawer"] { "Logout" }
+                            @LogoutDrawer {}
                         }
                     }
                     main.container {
@@ -145,6 +196,7 @@ markup::define! {
                         }
                     }
                 }
+                snack_bar {}
             }
         }
     }
