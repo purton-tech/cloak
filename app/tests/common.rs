@@ -67,7 +67,9 @@ pub async fn add_secrets(
     let name_field = driver.find_element(By::Css("input[name='name']")).await?;
     name_field.send_keys(name).await?;
 
-    let secret_field = driver.find_element(By::Css("input[name='secret']")).await?;
+    let secret_field = driver
+        .find_element(By::Css("textarea[name='secret']"))
+        .await?;
     secret_field.send_keys(value).await?;
 
     // Wait for it to open
