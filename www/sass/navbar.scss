@@ -107,6 +107,21 @@ div.m_navbar {
         color: var(--accents-1);
         font-size: 1.4rem;
       }
+
+      &.sub-menu-item {
+        border-top: none;
+        padding-top: 0.5em;
+        padding-bottom: 0.5em;
+
+        > a {
+          font-size: 0.9rem;
+          padding-left: 1rem;
+        }
+
+        &:last {
+          padding-bottom: 1rem;
+        }
+      }
     }
 
     > li.developer-docs {
@@ -130,6 +145,10 @@ div.m_navbar {
 
         li.selected {
           border-bottom: 1px solid var(--foreground);
+        }
+
+        li.sub-menu-item {
+          display: none;
         }
 
         li {

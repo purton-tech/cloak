@@ -59,6 +59,10 @@ html {
     font-family: var(--font-family-light);
 }
 
+body {
+    background: #f7f7f7;
+}
+
 @import './navbar';
 @import './footer';
 @import './buttons';
@@ -68,3 +72,5 @@ html {
 @import './blog';
 @import './typography';
 @import './utility';
+@import './cards';
+@import './pricing';
