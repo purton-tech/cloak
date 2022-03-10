@@ -8,7 +8,7 @@ Installing the precompiled binary is the easiest way to get started with Cloak. 
 ## Step 1. Install the precompiled binary (Linux)
 
 ```sh
-$ sudo /bin/sh -c 'wget https://github.com/purton-tech/cloak/releases/latest/download/cli -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak'
+$ sudo /bin/sh -c 'wget https://github.com/purton-tech/cloak/releases/latest/download/cloak-linux -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak'
 ```
 
 Install a particular version 
@@ -24,7 +24,9 @@ Coming soon.
 
 ## Step 1. Install the precompiled binary (MacOS)
 
-Coming soon.
+```sh
+$ sudo /bin/sh -c 'wget https://github.com/purton-tech/cloak/releases/latest/download/cloak-macos -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak'
+```
 
 ## Step 2. Verify the checksum (Optional)
 

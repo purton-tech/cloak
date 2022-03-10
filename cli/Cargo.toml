@@ -24,7 +24,7 @@ base64 = "0" # So we encode DER public key to base64
 aes-gcm = "0"
 
 # OK, I wanted a pretty table
-cli-table = "0"
+cli-table = { version = "0", default-features = false, features = ["derive"] }
 
 [build-dependencies]
 rust-grpc-web = { git = "https://github.com/elliptic-email/rust-grpc-web" }
