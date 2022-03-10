@@ -12,3 +12,9 @@
 
 1. docker login
 1. earthly -P --push +all
+
+## Pirate metrics
+
+1. Decrypt cloak key `export ECDH_PRIVATE_KEY=$(openssl pkcs8 -topk8 -nocrypt -in cloak.enc.pem)`
+1. `cloak secrets` and get postgres url.
+1. `psql postgres-url -c 'select email from users;'
