@@ -35,7 +35,7 @@ jobs:
     # Earthly with caching https://docs.earthly.dev/docs/guides/shared-cache
     - name: Run build using Readonly Cache
       if: github.ref != 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache +all
+      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache +pull-request
       
     - name: Run build and Deploy Containers
       if: github.ref == 'refs/heads/main'

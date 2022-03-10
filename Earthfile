@@ -11,6 +11,8 @@ ARG APP_EXE_NAME=app
 ARG APP_FOLDER=app
 ARG CLI_FOLDER=cli
 ARG CLI_EXE_NAME=cli
+ARG CLI_LINUX_EXE_NAME=cloak-linux
+ARG CLI_MACOS_EXE_NAME=cloak-macos
 
 # Base images
 ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
@@ -32,12 +34,16 @@ DO github.com/earthly/lib+INSTALL_DIND
 
 USER vscode
 
-all:
+pull-request:
     BUILD +init-container
     BUILD +app-container
     BUILD +envoy-container
     BUILD +www-container
     BUILD +integration-test
+
+all:
+    BUILD +pull-request
+    BUILD +build-cli-osx
 
 npm-deps:
     COPY $APP_FOLDER/package.json $APP_FOLDER/package.json
@@ -89,7 +95,7 @@ build:
             && cargo build --release --target x86_64-unknown-linux-musl
     END
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/$APP_EXE_NAME
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_LINUX_EXE_NAME
 
 init-container:
     FROM ianpurton/rust-diesel:latest
@@ -175,3 +181,14 @@ integration-test:
     IF [ -f fail ]
         RUN echo "Selenium has failed." && exit 1
     END
+
+build-cli-osx:
+    FROM joseluisq/rust-linux-darwin-builder:1.59.0
+    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
+    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
+    COPY --dir migrations Cargo.lock Cargo.toml protos .
+    RUN cd cli \ 
+        && CC=o64-clang \
+        CXX=o64-clang++ \
+        cargo build --release --target x86_64-apple-darwin
+    SAVE ARTIFACT target/x86_64-apple-darwin/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_MACOS_EXE_NAME

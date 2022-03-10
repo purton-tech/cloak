@@ -12,7 +12,7 @@ mod service_accounts;
 mod team;
 mod vaults;
 
-use axum::AddExtensionLayer;
+use axum::extract::Extension;
 use sqlx::PgPool;
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
@@ -42,7 +42,7 @@ async fn main() {
         .merge(statics::asset_pipeline_routes())
         .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())
-        .layer(AddExtensionLayer::new(db_pool))
+        .layer(Extension(db_pool))
         .into_make_service();
 
     let grpc_service = tonic::transport::Server::builder()
