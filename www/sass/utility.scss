@@ -1,6 +1,6 @@
 @import 'responsive-mixin';
 
-.row {
+.row, .row-reverse {
     max-width: var(--content-width);
     margin-left: auto;
     margin-right: auto;
@@ -15,7 +15,12 @@
         flex-wrap: wrap;
         width: 100%;
         gap: 6rem;
+
+        &.reverse {
+            flex-direction: row-reverse;
+        }
     }
+
       
     .column {
         display: flex;
