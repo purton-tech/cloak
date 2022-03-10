@@ -164,23 +164,16 @@ integration-test:
         --load $WWW_IMAGE_NAME=+www-container \
         --load $ENVOY_IMAGE_NAME=+envoy-container
 
-        # Force to command to always be succesful so the artifact is saved. 
-        # https://github.com/earthly/earthly/issues/988
         RUN diesel migration run \
             && docker run -d -p 7103:7103 --rm --network=build_default -e APP_DATABASE_URL=$APP_DATABASE_URL --name app $APP_IMAGE_NAME \
             && docker run -d --rm --network=build_default --name www $WWW_IMAGE_NAME \
             && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
             && cargo test --no-run --release --target x86_64-unknown-linux-musl \
             && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
-            && (cargo test --release --target x86_64-unknown-linux-musl -- --nocapture || echo fail > fail) \
+            && cargo test --release --target x86_64-unknown-linux-musl -- --nocapture \
             && docker stop app www envoy video
     END
     SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
-
-    # If we failed in selenium a fail file will have been created
-    IF [ -f fail ]
-        RUN echo "cargo test has failed." && exit 1
-    END
 
 build-cli-osx:
     FROM joseluisq/rust-linux-darwin-builder:1.59.0
