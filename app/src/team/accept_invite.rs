@@ -28,7 +28,7 @@ pub async fn invite(
     Path(org): Path<u32>,
     Query(params): Query<Params>,
     Extension(pool): Extension<PgPool>,
-    authentication: Authentication,
+    _authentication: Authentication,
     request: Request<Body>, // Request<Body> Has to be the last extractor
 ) -> Result<impl IntoResponse, CustomError> {
     let request_uri = (
@@ -75,15 +75,7 @@ pub async fn invite(
                         let since_the_epoch = start
                             .duration_since(UNIX_EPOCH)
                             .expect("Time went backwards");
-                        if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {
-                            // All details are correct add the user to the team.
-                            organisation::Organisation::add_user_dangerous(
-                                &pool,
-                                &authentication,
-                                org,
-                            )
-                            .await?;
-                        }
+                        if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {}
                     }
                 }
             }
@@ -94,37 +86,4 @@ pub async fn invite(
     };
 
     Ok(Redirect::to("/app/vaults".parse()?))
-}
-
-markup::define! {
-    InviteUserPage(organisation_id: i32, user_id: u32) {
-
-        form.m_form {
-            invite_user[label="Invite User",
-                user=format!("{}", user_id),
-                organisation=format!("{}", organisation_id)] {
-                template[slot="body"] {
-                    p {
-                        "Invite people into your team."
-                    }
-
-                    fieldset {
-                        label[for="email"] { "Email" }
-                        input[type="email", required="", name="name"] {}
-
-                        label[for="invite"] { "Invite" }
-                        p[id="invite"] {
-
-                        }
-
-                    }
-                }
-
-                template[slot="footer"] {
-                    button.a_button.auto.success { "Create Invitation" }
-                    button.a_button.auto.danger { "Cancel" }
-                }
-            }
-        }
-    }
 }

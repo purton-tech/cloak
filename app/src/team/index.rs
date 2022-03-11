@@ -1,6 +1,6 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
-use crate::models::organisation;
+use crate::models::{invitation, organisation};
 use axum::{extract::Extension, response::Html};
 use sqlx::PgPool;
 
@@ -12,8 +12,11 @@ pub async fn index(
 
     let users = organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
 
+    let invites = invitation::Invitation::get_all(&pool, &authentication, org.id as u32).await?;
+
     let page = TeamPage {
         users,
+        invites,
         organisation_id: org.id,
         authentication,
     };
@@ -24,6 +27,7 @@ pub async fn index(
 markup::define! {
     TeamPage(
         users: Vec<organisation::User>,
+        invites: Vec<invitation::Invitation>,
         organisation_id: i32,
         authentication: Authentication) {
 
@@ -31,7 +35,7 @@ markup::define! {
             div.header {
                 span { "Team" }
 
-                @super::invite_user::InviteUserPage {
+                @super::create_invite::InviteUserPage {
                     organisation_id: *organisation_id,
                     user_id: authentication.user_id
                 }
@@ -43,6 +47,7 @@ markup::define! {
                     thead {
                         tr {
                             th { "Email" }
+                            th { "Invitation Status" }
                             th { "Action" }
                         }
                     }
@@ -51,6 +56,22 @@ markup::define! {
                             tr {
                                 td {
                                     {user.email}
+                                }
+                                td {
+                                    "Accepted"
+                                }
+                                td {
+
+                                }
+                            }
+                        }
+                        @for invite in invites {
+                            tr {
+                                td {
+                                    {invite.email}
+                                }
+                                td {
+                                    "Pending"
                                 }
                                 td {
 

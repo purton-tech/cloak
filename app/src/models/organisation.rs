@@ -35,27 +35,6 @@ impl Organisation {
         .await?)
     }
 
-    pub async fn add_user_dangerous(
-        pool: &PgPool,
-        authenticated_user: &Authentication,
-        organisation_id: u32,
-    ) -> Result<(), CustomError> {
-        sqlx::query!(
-            "
-                INSERT INTO 
-                    organisation_users (user_id, organisation_id)
-                VALUES($1, $2) 
-            ",
-            authenticated_user.user_id as i32,
-            organisation_id as i32,
-        )
-        .execute(pool)
-        .await
-        .map_err(|e| CustomError::Database(e.to_string()))?;
-
-        Ok(())
-    }
-
     pub async fn create(
         pool: &PgPool,
         authenticated_user: &Authentication,

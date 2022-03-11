@@ -1,10 +1,11 @@
 import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
-import { Vault, ByteData, ECDSAKeyPair } from '../../asset-pipeline/cryptography/vault'
+import { ByteData, ECDSAKeyPair } from '../../asset-pipeline/cryptography/vault'
 
 class InviteUser extends SideDrawer {
 
     private emailInput : HTMLInputElement
-    private inviteText : HTMLParamElement
+    private inviteText : HTMLInputElement
+    private inviteForm : HTMLFormElement
     private organisationId: number
     private userId: number
 
@@ -12,7 +13,8 @@ class InviteUser extends SideDrawer {
         super()
 
         this.emailInput = this.querySelector("input[type='email']")
-        this.inviteText = this.querySelector("p#invite")
+        this.inviteText = this.querySelector("input#invite")
+        this.inviteForm = this.querySelector("form#create-invite-form")
         this.organisationId = parseInt(this.getAttribute("organisation"))
         this.userId = parseInt(this.getAttribute("user"))
 
@@ -51,7 +53,8 @@ class InviteUser extends SideDrawer {
             const sigPromise = aliceECDSAKeyPair.privateKey.sign(data)
             const urlToSend = this.generateUrl(encodeURIComponent(email), date)
             sigPromise.then(signature => {
-                this.inviteText.innerText = urlToSend + '&sig=' + encodeURIComponent(signature.toDER().b64)
+                this.inviteText.value = urlToSend + '&sig=' + encodeURIComponent(signature.toDER().b64)
+                this.inviteForm.submit()
             })
         }
 
