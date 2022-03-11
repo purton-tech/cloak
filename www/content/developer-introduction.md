@@ -25,7 +25,7 @@ Coming soon.
 ## Step 1. Install the precompiled binary (MacOS)
 
 ```sh
-$ sudo /bin/sh -c 'wget https://github.com/purton-tech/cloak/releases/latest/download/cloak-macos -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak'
+$ sudo /bin/sh -c 'curl https://github.com/purton-tech/cloak/releases/latest/download/cloak-macos -L -o /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak'
 ```
 
 ## Step 2. Verify the checksum (Optional)
