@@ -49,7 +49,7 @@ markup::define! {
 
                     fieldset {
                         label[for="email"] { "Email" }
-                        input[type="email", autocomplete="off", required="", name="name"] {}
+                        input[type="email", autocomplete="off", required="", name="email"] {}
                         input[id="invite", type="hidden", name="invitation"] {}
                     }
                 }
