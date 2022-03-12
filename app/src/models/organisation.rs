@@ -38,16 +38,18 @@ impl Organisation {
     // Add an invited user to the organisation
     pub async fn add_user_dangerous(
         pool: &PgPool,
-        user_id: u32,
+        email: &str,
         organisation_id: u32,
     ) -> Result<(), CustomError> {
+        let user = super::user::User::get_by_email_dangerous(pool, email).await?;
+
         sqlx::query!(
             "
                 INSERT INTO 
                     organisation_users (user_id, organisation_id)
                 VALUES($1, $2) 
             ",
-            user_id as i32,
+            user.id,
             organisation_id as i32,
         )
         .execute(pool)

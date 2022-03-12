@@ -77,8 +77,12 @@ pub async fn invite(
                             .expect("Time went backwards");
                         if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {
                             // All details are correct add the user to the team.
-                            organisation::Organisation::add_user_dangerous(&pool, params.id, org)
-                                .await?;
+                            organisation::Organisation::add_user_dangerous(
+                                &pool,
+                                &params.email,
+                                org,
+                            )
+                            .await?;
 
                             invitation::Invitation::delete_dangerous(&pool, &params.email, org)
                                 .await?;

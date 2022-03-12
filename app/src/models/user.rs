@@ -24,4 +24,21 @@ impl User {
         .fetch_one(pool)
         .await?)
     }
+
+    pub async fn get_by_email_dangerous(pool: &PgPool, email: &str) -> Result<User, CustomError> {
+        Ok(sqlx::query_as!(
+            User,
+            "
+                SELECT 
+                    id, email, ecdsa_public_key
+                FROM 
+                    users
+                WHERE
+                    email = $1
+            ",
+            email
+        )
+        .fetch_one(pool)
+        .await?)
+    }
 }

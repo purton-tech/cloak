@@ -47,7 +47,7 @@ markup::define! {
                     thead {
                         tr {
                             th { "Email" }
-                            th { "Invitation Status" }
+                            th { "Status" }
                             th { "Action" }
                         }
                     }
@@ -57,8 +57,14 @@ markup::define! {
                                 td {
                                     {user.email}
                                 }
-                                td {
-                                    "Accepted"
+                                @if user.is_admin {
+                                    td {
+                                        "Administrator"
+                                    }
+                                } else {
+                                    td {
+                                        "Invitation Accepted"
+                                    }
                                 }
                                 td {
 
@@ -71,7 +77,7 @@ markup::define! {
                                     {invite.email}
                                 }
                                 td {
-                                    "Pending"
+                                    "Invitation Pending"
                                 }
                                 td {
 
