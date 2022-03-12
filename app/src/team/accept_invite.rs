@@ -1,6 +1,6 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
-use crate::models::{organisation, user};
+use crate::models::{invitation, organisation, user};
 use axum::{
     body::Body,
     extract::{Extension, Path, Query},
@@ -75,7 +75,14 @@ pub async fn invite(
                         let since_the_epoch = start
                             .duration_since(UNIX_EPOCH)
                             .expect("Time went backwards");
-                        if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {}
+                        if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {
+                            // All details are correct add the user to the team.
+                            organisation::Organisation::add_user_dangerous(&pool, params.id, org)
+                                .await?;
+
+                            invitation::Invitation::delete_dangerous(&pool, &params.email, org)
+                                .await?;
+                        }
                     }
                 }
             }
@@ -85,5 +92,5 @@ pub async fn invite(
         }
     };
 
-    Ok(Redirect::to("/app/vaults".parse()?))
+    Ok(Redirect::to("/app/team".parse()?))
 }

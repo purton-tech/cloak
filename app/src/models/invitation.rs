@@ -48,6 +48,29 @@ impl Invitation {
         ))
     }
 
+    pub async fn delete_dangerous(
+        pool: &PgPool,
+        email: &str,
+        organisation_id: u32,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    invitations
+                WHERE
+                    email = $1
+                AND
+                    organisation_id = $2
+            "#,
+            email,
+            organisation_id as i32
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
+    }
+
     pub async fn get_all(
         pool: &PgPool,
         authenticated_user: &Authentication,
