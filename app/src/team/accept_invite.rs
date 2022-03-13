@@ -1,100 +1,31 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
-use crate::models::{invitation, organisation, user};
+use crate::models::invitation;
 use axum::{
-    body::Body,
-    extract::{Extension, Path, Query},
+    extract::{Extension, Query},
     response::{IntoResponse, Redirect},
-};
-use hyper::Request;
-use p256::pkcs8::DecodePublicKey;
-use p256::{
-    ecdsa::{signature::Verifier, Signature, VerifyingKey},
-    PublicKey,
 };
 use serde::Deserialize;
 use sqlx::PgPool;
-use std::time::{SystemTime, UNIX_EPOCH};
 
-#[derive(Debug, Deserialize)]
-pub struct Params {
-    id: u32,
-    email: String,
-    time: u64,
-    sig: String,
+#[derive(Deserialize)]
+pub struct Invite {
+    invite_selector: String,
+    invite_validator: String,
 }
 
 pub async fn invite(
-    Path(org): Path<u32>,
-    Query(params): Query<Params>,
+    Query(invite): Query<Invite>,
     Extension(pool): Extension<PgPool>,
-    _authentication: Authentication,
-    request: Request<Body>, // Request<Body> Has to be the last extractor
+    current_user: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
-    let request_uri = (
-        request.uri().host(),
-        request.uri().scheme(),
-        request.uri().port(),
-    );
-
-    match request_uri {
-        (Some(host), Some(scheme), Some(port)) => {
-            // Reconstruct URL and check signature
-            let url = format!(
-                "{scheme}://{host}:{port}/app/team/invite/{org}?id={id}&email={email}&time={date}",
-                id = &params.id,
-                email = &params.email,
-                date = params.time
-            );
-
-            // We need to know, does the user who created the link have authorizatiion
-            // to invite users?
-            if let Ok(org_user) =
-                organisation::Organisation::get_dangerous(&pool, params.id, org).await
-            {
-                // Is the user doing the inviations an ad in for the org they want to invite
-                // the user to?
-                if org_user.is_admin {
-                    let user = user::User::get_dangerous(&pool, params.id).await?;
-
-                    // Now we can do the public key check
-                    let user_key_der = base64::decode(user.ecdsa_public_key)
-                        .map_err(|e| CustomError::FaultySetup(e.to_string()))?;
-                    let user_public_key = PublicKey::from_public_key_der(&user_key_der)
-                        .map_err(|e| CustomError::FaultySetup(e.to_string()))?;
-
-                    let sig_der = base64::decode(params.sig)
-                        .map_err(|e| CustomError::InvalidInput(e.to_string()))?;
-
-                    let verify_key = VerifyingKey::from(&user_public_key);
-                    let signature = Signature::from_der(&sig_der)
-                        .map_err(|e| CustomError::InvalidInput(e.to_string()))?;
-
-                    if verify_key.verify(url.as_bytes(), &signature).is_ok() {
-                        let start = SystemTime::now();
-                        let since_the_epoch = start
-                            .duration_since(UNIX_EPOCH)
-                            .expect("Time went backwards");
-                        if since_the_epoch.as_millis() < (params.time + (24 * 60 * 60000)).into() {
-                            // All details are correct add the user to the team.
-                            organisation::Organisation::add_user_dangerous(
-                                &pool,
-                                &params.email,
-                                org,
-                            )
-                            .await?;
-
-                            invitation::Invitation::delete_dangerous(&pool, &params.email, org)
-                                .await?;
-                        }
-                    }
-                }
-            }
-        }
-        _ => {
-            dbg!("Unable to destruct");
-        }
-    };
+    invitation::Invitation::accept_invitation(
+        &pool,
+        &current_user,
+        &invite.invite_selector,
+        &invite.invite_validator,
+    )
+    .await?;
 
     Ok(Redirect::to("/app/team".parse()?))
 }

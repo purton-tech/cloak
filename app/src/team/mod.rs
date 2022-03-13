@@ -9,11 +9,11 @@ use axum::{
 
 pub static INDEX: &str = "/app/team";
 pub static CREATE_INVITE: &str = "/app/team/create_invite";
-pub static INVITE: &str = "/app/team/invite/:org";
+pub static ACCEPT_INVITE: &str = "/app/team/accept_invite/";
 
 pub fn routes() -> Router {
     Router::new()
         .route(INDEX, get(index::index))
-        .route(INVITE, get(accept_invite::invite))
+        .route(ACCEPT_INVITE, get(accept_invite::invite))
         .route(CREATE_INVITE, post(create_invite::create_invite))
 }
