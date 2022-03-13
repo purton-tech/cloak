@@ -12,7 +12,7 @@ pub async fn index(
 
     let users = organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
 
-    let invites = invitation::Invitation::get_all(&pool, &authentication, org.id as u32).await?;
+    let invites = invitation::Invitation::get_all(&pool, &authentication).await?;
 
     let page = TeamPage { users, invites };
 

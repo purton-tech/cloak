@@ -70,9 +70,10 @@ impl Invitation {
 
     pub async fn get_all(
         pool: &PgPool,
-        authenticated_user: &Authentication,
-        organisation_id: u32,
+        current_user: &Authentication,
     ) -> Result<Vec<Invitation>, CustomError> {
+        let org = organisation::Organisation::get_primary_org(pool, current_user).await?;
+
         Ok(sqlx::query_as!(
             Invitation,
             "
@@ -85,17 +86,8 @@ impl Invitation {
                 FROM 
                     invitations 
                 WHERE organisation_id = $1
-                    AND
-                        organisation_id 
-                    IN
-                        (SELECT id 
-                        FROM
-                            organisation_users
-                        WHERE
-                            user_id = $2)
             ",
-            organisation_id as i32,
-            authenticated_user.user_id as i32
+            org.id as i32,
         )
         .fetch_all(pool)
         .await?)
