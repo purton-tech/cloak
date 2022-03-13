@@ -8,7 +8,7 @@ use axum::{
 };
 
 pub static INDEX: &str = "/app/team";
-pub static CREATE_INVITE: &str = "/app/team/create_invite/:org";
+pub static CREATE_INVITE: &str = "/app/team/create_invite";
 pub static INVITE: &str = "/app/team/invite/:org";
 
 pub fn routes() -> Router {

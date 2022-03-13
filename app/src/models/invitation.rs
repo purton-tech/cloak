@@ -1,13 +1,14 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use crate::models::organisation;
+use rand::Rng;
+use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 
 pub struct Invitation {
     pub id: i32,
     pub organisation_id: i32,
     pub email: String,
-    pub invitation: String,
     pub created_at: chrono::DateTime<chrono::Utc>,
     pub updated_at: chrono::DateTime<chrono::Utc>,
 }
@@ -16,36 +17,32 @@ impl Invitation {
     pub async fn create(
         pool: &PgPool,
         authenticated_user: &Authentication,
-        organisation_id: u32,
-        email: String,
-        invitation: String,
-    ) -> Result<(), CustomError> {
-        if let Ok(_org_user) = organisation::Organisation::get_dangerous(
-            pool,
-            authenticated_user.user_id,
-            organisation_id,
+        email: &str,
+    ) -> Result<(String, String), CustomError> {
+        let org = organisation::Organisation::get_primary_org(pool, authenticated_user).await?;
+
+        let invitation_selector = rand::thread_rng().gen::<[u8; 8]>();
+        let invitation_selector_base64 = base64::encode(invitation_selector);
+        let invitation_verifier = rand::thread_rng().gen::<[u8; 24]>();
+        let invitation_verifier_hash = Sha256::digest(&invitation_verifier);
+        let invitation_verifier_hash_base64 = base64::encode(invitation_verifier_hash);
+        let invitation_verifier_base64 = base64::encode(invitation_verifier);
+
+        sqlx::query!(
+            "
+                INSERT INTO 
+                    invitations (organisation_id, email, invitation_selector, invitation_verifier_hash)
+                VALUES($1, $2, $3, $4) 
+            ",
+            org.id as i32,
+            email,
+            invitation_selector_base64,
+            invitation_verifier_hash_base64,
         )
-        .await
-        {
-            sqlx::query!(
-                "
-                    INSERT INTO 
-                        invitations (organisation_id, email, invitation)
-                    VALUES($1, $2, $3) 
-                ",
-                organisation_id as i32,
-                email,
-                invitation,
-            )
-            .execute(pool)
-            .await?;
+        .execute(pool)
+        .await?;
 
-            return Ok(());
-        }
-
-        Err(CustomError::Unauthorized(
-            "suspicious idor request".to_string(),
-        ))
+        Ok((invitation_verifier_base64, invitation_selector_base64))
     }
 
     pub async fn delete_dangerous(
@@ -82,7 +79,6 @@ impl Invitation {
                 SELECT  
                     id, 
                     email,
-                    invitation,
                     organisation_id,
                     updated_at, 
                     created_at  

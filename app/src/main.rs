@@ -1,6 +1,7 @@
 mod api_service;
 mod authentication;
 mod config;
+mod email;
 mod errors;
 mod hybrid;
 mod layout;
@@ -31,6 +32,7 @@ async fn main() {
         .await
         .expect("Problem connecting to the database");
     let grpc_db_pool = db_pool.clone();
+    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
 
     let axum_make_service = axum::Router::new()
         .merge(vaults::routes())
@@ -43,6 +45,7 @@ async fn main() {
         .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())
         .layer(Extension(db_pool))
+        .layer(Extension(config))
         .into_make_service();
 
     let grpc_service = tonic::transport::Server::builder()
@@ -53,7 +56,6 @@ async fn main() {
 
     let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
     tracing::debug!("listening on {}", addr);
     let server = hyper::Server::bind(&addr).serve(hybrid_make_service);
 

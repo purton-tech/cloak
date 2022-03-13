@@ -2,7 +2,8 @@ CREATE TABLE invitations (
     id SERIAL PRIMARY KEY, 
     organisation_id INT NOT NULL, 
     email VARCHAR NOT NULL,
-    invitation VARCHAR NOT NULL,
+    invitation_selector VARCHAR NOT NULL,
+    invitation_verifier_hash VARCHAR NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
    CONSTRAINT fk_organisation
