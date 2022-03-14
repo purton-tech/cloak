@@ -86,6 +86,7 @@ impl Invitation {
         if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
             let user = user::User::get_dangerous(pool, current_user.user_id).await?;
 
+            // Make sure the user accepting the invitation is the user that we emailed
             if user.email == invitation.email {
                 organisation::Organisation::add_user_dangerous(
                     pool,

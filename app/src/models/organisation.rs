@@ -9,6 +9,7 @@ pub struct Organisation {
 
 pub struct User {
     pub id: i32,
+    pub organisation_id: i32,
     pub email: String,
     pub ecdh_public_key: String,
     pub is_admin: bool,
@@ -107,7 +108,7 @@ impl Organisation {
             User,
             "
                 SELECT 
-                    u.id, u.email, u.ecdh_public_key, ou.is_admin
+                    u.id, ou.organisation_id, u.email, u.ecdh_public_key, ou.is_admin
                 FROM 
                     organisation_users ou
                 LEFT JOIN users u ON u.id = ou.user_id
@@ -145,5 +146,41 @@ impl Organisation {
         )
         .fetch_all(pool)
         .await?)
+    }
+
+    pub async fn remove_user(
+        pool: &PgPool,
+        current_user: &Authentication,
+        organisation_id: u32,
+        user_id: u32,
+    ) -> Result<(), CustomError> {
+        sqlx::query!(
+            r#"
+                DELETE FROM
+                    organisation_users
+                WHERE
+                    user_id = $1
+                AND
+                    organisation_id = $2 
+                and $3 IN
+                -- Make sure the current user is an admin for this team
+                    (SELECT 
+                        user_id 
+                    FROM 
+                        organisation_users 
+                    WHERE
+                        is_admin = true
+                    AND
+                    organisation_id = $2
+                    )
+            "#,
+            user_id as i32,
+            organisation_id as i32,
+            current_user.user_id as i32,
+        )
+        .execute(pool)
+        .await?;
+
+        Ok(())
     }
 }

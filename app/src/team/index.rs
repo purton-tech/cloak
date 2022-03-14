@@ -1,6 +1,7 @@
 use crate::authentication::Authentication;
 use crate::errors::CustomError;
 use crate::models::{invitation, organisation};
+use crate::statics;
 use axum::{extract::Extension, response::Html};
 use sqlx::PgPool;
 
@@ -30,6 +31,14 @@ markup::define! {
         users: Vec<organisation::User>,
         invites: Vec<invitation::Invitation>,
         teams: Vec<organisation::Team>) {
+
+        @for user in users {
+            @super::delete_member::DeleteMemberForm {
+                organisation_id: user.organisation_id as u32,
+                user_id: user.id as u32,
+                email: user.email.clone()
+            }
+        }
 
         div.m_card {
             div.header {
@@ -64,7 +73,16 @@ markup::define! {
                                     }
                                 }
                                 td {
-
+                                    a[
+                                        href="#",
+                                        "data-drawer-target"=format!(
+                                            "delete-member-drawer-{}-{}",
+                                            user.organisation_id,
+                                            user.id
+                                        )
+                                    ] {
+                                        img[src=statics::get_delete_svg(), width="18"] {}
+                                    }
                                 }
                             }
                         }
