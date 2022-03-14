@@ -6,15 +6,21 @@ use sqlx::PgPool;
 
 pub async fn index(
     Extension(pool): Extension<PgPool>,
-    authentication: Authentication,
+    current_user: Authentication,
 ) -> Result<Html<String>, CustomError> {
-    let org = organisation::Organisation::get_primary_org(&pool, &authentication).await?;
+    let org = organisation::Organisation::get_primary_org(&pool, &current_user).await?;
 
-    let users = organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
+    let users = organisation::Organisation::get_users(&pool, &current_user, org.id).await?;
 
-    let invites = invitation::Invitation::get_all(&pool, &authentication).await?;
+    let invites = invitation::Invitation::get_all(&pool, &current_user).await?;
 
-    let page = TeamPage { users, invites };
+    let teams = organisation::Organisation::get_teams(&pool, &current_user).await?;
+
+    let page = TeamPage {
+        users,
+        invites,
+        teams,
+    };
 
     crate::layout::layout("Team", &page.to_string(), &crate::layout::SideBar::Team)
 }
@@ -22,7 +28,8 @@ pub async fn index(
 markup::define! {
     TeamPage(
         users: Vec<organisation::User>,
-        invites: Vec<invitation::Invitation>) {
+        invites: Vec<invitation::Invitation>,
+        teams: Vec<organisation::Team>) {
 
         div.m_card {
             div.header {
@@ -71,6 +78,34 @@ markup::define! {
                                 }
                                 td {
 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        div.m_card {
+            div.header {
+                span { "Team you are a member of" }
+            }
+            div.body {
+                table.m_table {
+                    thead {
+                        tr {
+                            th { "Team Name" }
+                            th { "Team Owner" }
+                        }
+                    }
+                    tbody {
+                        @for team in teams {
+                            tr {
+                                td {
+                                    {team.organisation_name}
+                                }
+                                td {
+                                    {team.team_owner}
                                 }
                             }
                         }

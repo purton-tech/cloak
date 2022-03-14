@@ -14,6 +14,11 @@ pub struct User {
     pub is_admin: bool,
 }
 
+pub struct Team {
+    pub team_owner: String,
+    pub organisation_name: Option<String>,
+}
+
 impl Organisation {
     pub async fn get_primary_org(
         pool: &PgPool,
@@ -114,6 +119,29 @@ impl Organisation {
             ",
             authenticated_user.user_id as i32,
             idor_organisation_id
+        )
+        .fetch_all(pool)
+        .await?)
+    }
+
+    pub async fn get_teams(
+        pool: &PgPool,
+        current_user: &Authentication,
+    ) -> Result<Vec<Team>, CustomError> {
+        Ok(sqlx::query_as!(
+            Team,
+            "
+                SELECT 
+                    o.name as organisation_name, 
+                    u.email as team_owner
+                FROM 
+                    organisation_users ou
+                LEFT JOIN organisations o ON o.id = ou.organisation_id
+                LEFT JOIN users u ON u.id = o.created_by_user_id
+                WHERE
+                    ou.user_id = $1
+            ",
+            current_user.user_id as i32,
         )
         .fetch_all(pool)
         .await?)
