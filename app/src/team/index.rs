@@ -49,7 +49,7 @@ markup::define! {
                 button.a_button.mini.primary[id="invite-user"] { "New User" }
             }
             div.body {
-                table.m_table.secrets_table {
+                table.m_table.team_table {
                     thead {
                         tr {
                             th { "Email" }
@@ -109,7 +109,7 @@ markup::define! {
                 span { "Team you are a member of" }
             }
             div.body {
-                table.m_table {
+                table.m_table.memberships {
                     thead {
                         tr {
                             th { "Team Name" }

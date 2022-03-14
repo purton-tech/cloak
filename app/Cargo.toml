@@ -49,4 +49,5 @@ tonic-build = "0"
 thirtyfour = { version = "0", default-features = false, features = [ "reqwest-rustls-tls", "tokio-runtime" ] }
 tokio = { version = "1", features = ["macros"] }
 rand = "0"
+reqwest = { version = "0", default-features = false }
 

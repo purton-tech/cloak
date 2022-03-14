@@ -87,6 +87,7 @@ dependencies = [
  "pin-project",
  "prost",
  "rand",
+ "reqwest",
  "serde",
  "sha1",
  "sha2",

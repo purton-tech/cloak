@@ -41,12 +41,7 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     )
     .await?;
 
-    let invite = add_team_member(driver, &team_member).await?;
-
-    sign_in_user(driver, &team_member, config).await?;
-
-    // Try put the inviation
-    driver.get(invite).await?;
+    add_team_member(driver, &team_member, &account_owner, config).await?;
 
     sign_in_user(driver, &account_owner, config).await?;
 
@@ -69,6 +64,24 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     assert_eq!(count, 1);
 
     Ok(())
+}
+
+async fn get_invite_url_from_email() -> WebDriverResult<String> {
+    let body: String = reqwest::get("http://smtp:8025/api/v2/messages?limit=1")
+        .await?
+        .text()
+        .await?;
+
+    let url: Vec<&str> = body.split("Click ").collect();
+    let url: Vec<&str> = url[1].split(" to accept the invite").collect();
+
+    let url = url[0].to_string();
+    let url = url.replace("localhost:7100", "envoy:7100");
+    let url = url.replace("\\u0026", "&");
+
+    dbg!(&url);
+
+    Ok(url)
 }
 
 async fn sign_in_user(
@@ -133,27 +146,47 @@ async fn add_member_to_vault(driver: &WebDriver, email: &str) -> WebDriverResult
     Ok(())
 }
 
-async fn add_team_member(driver: &WebDriver, email: &str) -> WebDriverResult<String> {
+async fn add_team_member(
+    driver: &WebDriver,
+    team_member: &str,
+    team_owner: &str,
+    config: &common::Config,
+) -> WebDriverResult<()> {
     let sa_link = driver.find_element(By::LinkText("Team")).await?;
     sa_link.click().await?;
 
     let new_user_button = driver.find_element(By::Id("invite-user")).await?;
     new_user_button.click().await?;
 
-    let name_field = driver.find_element(By::Css("input[name='name']")).await?;
-    name_field.send_keys(email).await?;
+    let name_field = driver.find_element(By::Css("input[name='email']")).await?;
+    name_field.send_keys(team_member).await?;
 
     let submit_button = driver
         .find_element(By::Css(".a_button.auto.success"))
         .await?;
     submit_button.click().await?;
 
-    // Make sure invitation is generated.
-    let pause = std::time::Duration::from_millis(500);
-    std::thread::sleep(pause);
+    let table_cell = driver
+        .find_element(By::XPath(
+            "//table[@class='m_table team_table']/tbody/tr[last()]/td[2]",
+        ))
+        .await?;
 
-    let invite_field = driver.find_element(By::Css("p[id='invite']")).await?;
-    let invite = invite_field.text().await?;
+    assert_eq!(table_cell.text().await?, "Invitation Pending");
 
-    Ok(invite)
+    // Get the invite from mailhog
+    let invitation_url = get_invite_url_from_email().await?;
+
+    sign_in_user(driver, team_member, config).await?;
+    driver.get(invitation_url).await?;
+
+    let table_cell = driver
+        .find_element(By::XPath(
+            "//table[@class='m_table memberships']/tbody/tr[last()]/td[2]",
+        ))
+        .await?;
+
+    assert_eq!(table_cell.text().await?, team_owner);
+
+    Ok(())
 }
