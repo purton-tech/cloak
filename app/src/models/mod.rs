@@ -1,3 +1,4 @@
+pub mod invitation;
 pub mod organisation;
 pub mod secret;
 pub mod service_account;

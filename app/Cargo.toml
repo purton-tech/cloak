@@ -31,6 +31,11 @@ prost = "0"
 sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "postgres", "macros", "json" , "chrono" ] }
 chrono = { version = "0", features = ["serde"] }
 
+# Generate secure invitations
+rand = "0"
+sha2 = "0"
+lettre = { version = "0.10.0-rc.4", default-features = false,  features = ["rustls-tls", "smtp-transport", "builder"] }
+
 # Elliptic Curve Digital Signature Algorithm
 p256 = { version = "0.10", default-features = false, features = ["ecdsa", "pem"] } 
 base64 = "0" # So we encode DER public key to base64
@@ -44,4 +49,5 @@ tonic-build = "0"
 thirtyfour = { version = "0", default-features = false, features = [ "reqwest-rustls-tls", "tokio-runtime" ] }
 tokio = { version = "1", features = ["macros"] }
 rand = "0"
+reqwest = { version = "0", default-features = false }
 

@@ -9,3 +9,7 @@ services:
   selenium:
     ports:
       - 4444:4444
+
+  smtp:
+    ports:
+      - "8025:8025"

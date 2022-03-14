@@ -10,7 +10,7 @@ pub enum CustomError {
     FaultySetup(String),
     Database(String),
     InvalidInput(String),
-    //Unauthorized(String),
+    Unauthorized(String),
 }
 
 // Allow the use of "{}" format specifier
@@ -23,6 +23,7 @@ impl fmt::Display for CustomError {
                 write!(f, "Database Error: {}", cause)
             }
             CustomError::InvalidInput(ref cause) => write!(f, "Invalid Input: {}", cause),
+            CustomError::Unauthorized(ref cause) => write!(f, "Invalid Request: {}", cause),
         }
     }
 }
@@ -34,6 +35,7 @@ impl From<CustomError> for Status {
             CustomError::Database(cause) => Status::new(Code::Internal, cause),
             CustomError::FaultySetup(cause) => Status::new(Code::Internal, cause),
             CustomError::InvalidInput(cause) => Status::new(Code::Internal, cause),
+            CustomError::Unauthorized(cause) => Status::new(Code::Internal, cause),
         }
     }
 }
@@ -45,6 +47,7 @@ impl IntoResponse for CustomError {
             CustomError::Database(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
             CustomError::FaultySetup(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
             CustomError::InvalidInput(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
+            CustomError::Unauthorized(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
         };
 
         format!("status = {}, message = {}", status, error_message).into_response()
