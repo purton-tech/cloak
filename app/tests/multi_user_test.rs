@@ -66,24 +66,6 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     Ok(())
 }
 
-async fn get_invite_url_from_email() -> WebDriverResult<String> {
-    let body: String = reqwest::get("http://smtp:8025/api/v2/messages?limit=1")
-        .await?
-        .text()
-        .await?;
-
-    let url: Vec<&str> = body.split("Click ").collect();
-    let url: Vec<&str> = url[1].split(" to accept the invite").collect();
-
-    let url = url[0].to_string();
-    let url = url.replace("localhost:7100", "envoy:7100");
-    let url = url.replace("\\u0026", "&");
-
-    dbg!(&url);
-
-    Ok(url)
-}
-
 async fn sign_in_user(
     driver: &WebDriver,
     email: &str,
@@ -175,7 +157,7 @@ async fn add_team_member(
     assert_eq!(table_cell.text().await?, "Invitation Pending");
 
     // Get the invite from mailhog
-    let invitation_url = get_invite_url_from_email().await?;
+    let invitation_url = get_invite_url_from_email(config).await?;
 
     sign_in_user(driver, team_member, config).await?;
     driver.get(invitation_url).await?;
@@ -189,4 +171,23 @@ async fn add_team_member(
     assert_eq!(table_cell.text().await?, team_owner);
 
     Ok(())
+}
+
+async fn get_invite_url_from_email(config: &common::Config) -> WebDriverResult<String> {
+    let body: String = reqwest::get(config.mailhog_url.clone())
+        .await?
+        .text()
+        .await?;
+
+    dbg!(&body);
+
+    let url: Vec<&str> = body.split("Click ").collect();
+    let url: Vec<&str> = url[1].split(" to accept the invite").collect();
+
+    let url = url[0].to_string();
+    let url = url.replace("\\u0026", "&");
+
+    dbg!(&url);
+
+    Ok(url)
 }

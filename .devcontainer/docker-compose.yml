@@ -83,7 +83,7 @@ services:
       VAULT_SERVER_URL: http://localhost:7103
       VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103
 
-      INVITE_DOMAIN: http://localhost:7100
+      INVITE_DOMAIN: http://envoy:7100
       INVITE_FROM_EMAIL_ADDRESS: support@cloak.com
       SMTP_HOST: smtp
       SMTP_PORT: 1025

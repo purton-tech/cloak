@@ -149,6 +149,8 @@ integration-test:
     ARG WEB_DRIVER_URL='http://localhost:4444' 
     # The selenium container will connect to the envoy container
     ARG WEB_DRIVER_DESTINATION_HOST='http://envoy:7100' 
+    # How do we connect to mailhog
+    ARG MAILHOG_URL=http://localhost:8025/api/v2/messages?limit=1
     USER root
     WITH DOCKER \
         --compose docker-compose.yml \
@@ -167,7 +169,16 @@ integration-test:
         # Force to command to always be succesful so the artifact is saved. 
         # https://github.com/earthly/earthly/issues/988
         RUN diesel migration run \
-            && docker run -d -p 7103:7103 --rm --network=build_default -e APP_DATABASE_URL=$APP_DATABASE_URL --name app $APP_IMAGE_NAME \
+            && docker run -d -p 7103:7103 --rm --network=build_default \
+                -e APP_DATABASE_URL=$APP_DATABASE_URL \
+                -e INVITE_DOMAIN=http://envoy:7100 \
+                -e INVITE_FROM_EMAIL_ADDRESS=support@cloak.com \
+                -e SMTP_HOST=smtp \
+                -e SMTP_PORT=1025 \
+                -e SMTP_USERNAME=thisisnotused \
+                -e SMTP_PASSWORD=thisisnotused \
+                -e SMTP_TLS_OFF='true' \
+                --name app $APP_IMAGE_NAME \
             && docker run -d --rm --network=build_default --name www $WWW_IMAGE_NAME \
             && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
             && cargo test --no-run --release --target x86_64-unknown-linux-musl \

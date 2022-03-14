@@ -10,6 +10,7 @@ pub struct Config {
     // The database
     pub db_pool: PgPool,
     pub headless: bool,
+    pub mailhog_url: String,
 }
 
 impl Config {
@@ -29,6 +30,12 @@ impl Config {
             "http://envoy:7100".into()
         };
 
+        let mailhog_url = if env::var("MAILHOG_URL").is_ok() {
+            env::var("MAILHOG_URL").unwrap()
+        } else {
+            "http://smtp:8025/api/v2/messages?limit=1".into()
+        };
+
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL not set");
         let db_pool = PgPool::connect(&database_url).await.unwrap();
 
@@ -37,6 +44,7 @@ impl Config {
             host,
             db_pool,
             headless,
+            mailhog_url,
         }
     }
 
