@@ -104,7 +104,7 @@ const authPod = new kx.PodBuilder({
     imagePullSecrets: [{ name: 'image-pull' }],
     containers: [{
         name: AUTH_NAME,
-        image: 'purtontech/barricade:1.1.0',
+        image: 'purtontech/barricade:1.2.0',
         imagePullPolicy: 'Always',
         ports: { http: 9090 },
         env: [
