@@ -15,36 +15,25 @@ pub struct SmtpConfig {
 
 impl SmtpConfig {
     pub fn new() -> Option<SmtpConfig> {
-        if let Ok(host) = env::var("SMTP_HOST") {
-            if let Ok(username) = env::var("SMTP_USERNAME") {
-                if let Ok(password) = env::var("SMTP_PASSWORD") {
-                    if let Ok(smtp_port) = env::var("SMTP_PORT") {
-                        if let Ok(domain) = env::var("INVITE_DOMAIN") {
-                            if let Ok(from_email) = env::var("INVITE_FROM_EMAIL_ADDRESS") {
-                                Some(SmtpConfig {
-                                    host,
-                                    port: smtp_port.parse::<u16>().unwrap(),
-                                    tls_off: env::var("SMTP_TLS_OFF").is_ok(),
-                                    username,
-                                    password,
-                                    domain,
-                                    from_email: from_email.parse().unwrap(),
-                                })
-                            } else {
-                                None
-                            }
-                        } else {
-                            None
-                        }
-                    } else {
-                        None
-                    }
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
+        let host = env::var("SMTP_HOST");
+        let username = env::var("SMTP_USERNAME");
+        let password = env::var("SMTP_PASSWORD");
+        let smtp_port = env::var("SMTP_PORT");
+        let domain = env::var("INVITE_DOMAIN");
+        let from_email = env::var("INVITE_FROM_EMAIL_ADDRESS");
+
+        if let (Ok(host), Ok(username), Ok(password), Ok(smtp_port), Ok(domain), Ok(from_email)) =
+            (host, username, password, smtp_port, domain, from_email)
+        {
+            Some(SmtpConfig {
+                host,
+                port: smtp_port.parse::<u16>().unwrap(),
+                tls_off: env::var("SMTP_TLS_OFF").is_ok(),
+                username,
+                password,
+                domain,
+                from_email: from_email.parse().unwrap(),
+            })
         } else {
             None
         }

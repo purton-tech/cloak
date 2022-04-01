@@ -19,6 +19,8 @@
 
     h2 {
         font-size: 1.3rem;
+        line-height: 3;
+        margin-top: 2.5rem;
     }
 
     h3 {
@@ -200,7 +202,7 @@
         }
 
         @include for-tablet-landscape-up {
-            margin-left: 20px;
+            margin-left: 2rem;
         }
     }
 

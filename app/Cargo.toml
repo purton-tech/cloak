@@ -10,7 +10,7 @@ axum = "0"
 hyper = { version = "0", features = ["server"] }
 pin-project = "1"
 tower = { version = "0", default-features = false }
-tokio = { version = "1", default-features = false, features = ["macros", "rt", "rt-multi-thread"] }
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
 validator = { version = "0", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 tracing = "0"
