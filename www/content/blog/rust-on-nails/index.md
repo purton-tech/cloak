@@ -7,9 +7,11 @@ date = 2022-03-16
 
 ![You are on Nails](./yay-your-on-nails.png)
 
-To build a web application you need to make architecture decisions across a range of topics. The beauty of Ruby on Rails is that it makes those decisions for you. The disadvantage of Ruby on Rails is your code can become brittle making even small changes scary. Rust fixes the problems with Ruby but doesn't have a Rails style opinionated framework. Until now that is.
+To build a web application you need to make architecture decisions across a range of topics. The beauty of [Ruby on Rails](https://rubyonrails.org/) or [Django](https://www.djangoproject.com/) is that they make those decisions for you so you can start building your web application straight away. They also back those decisions up with great documentation.
 
-Rust on Nails is a framework leveraging existing solutions that fulfill the needs of a full stack development. It's set of design decisions built up with over 2 years experience using Rust to build web products.
+**Rust on Nails** is a framework leveraging existing solutions that fulfill the needs of a full stack development. We look at each decision that needs to be made then pull in solutions and package everything up so that it works together. It's an opinionated framework and it's how Cloak was built see the [Cloak Github Repo](https://github.com/purton-tech/cloak).
+
+Here's a breakdown of the services, decisions and best practices covered.
 
 1. [Development Environment as Code](#development-environment-as-code)
 1. [The Web Server and Routing](#the-web-server-and-routing)
@@ -28,15 +30,17 @@ Rust on Nails is a framework leveraging existing solutions that fulfill the need
 1. [Authentication](#authentication)
 1. [Integration Tests](#integration-tests)
 
+Let's get started.
+
 ## Development Environment as Code.
 
-The Visual Studio Code Remote - Containers extension lets you use a Docker container as a full-featured development environment. This fixes the following problems
+The [Visual Studio Code Remote - Containers](https://code.visualstudio.com/docs/remote/containers) extension lets you use a Docker container as a full-featured development environment. This fixes the following problems
 
 * Enables developers other than yourself to get quickly up to speed
 * Stops issues such as "It works on my machine"
 * Allows you to check your development environment into git.
 
-Install the devcontainer extension.
+Install the devcontainer extension in VSCode and then setup a Rust environment.
 
 ![Creating a vault](./containers-extension.png)
 
@@ -182,6 +186,8 @@ We will use this pattern over and over. When we add a tool to our solution we ad
 
 ## Configuration
 
+To configure our application we pull in environemnt variables a create a Rust struct. Create a `app/src/config.rs`.
+
 ```rust
 #[derive(Clone, Debug)]
 pub struct Config {
@@ -316,8 +322,6 @@ Add the following to your `app/Cargo.toml`
 sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "postgres", "macros", "chrono" ] }
 ```
 
-If you already know SQL then the learning curve is short and the code is much easier to read than [Diesel](https://diesel.rs/).
-
 Add the following code to a file called `app/src/models/user.rs`
 
 ```rust
@@ -419,7 +423,7 @@ async fn handler(Extension(pool): Extension<PgPool>) -> Result<Html<String>, err
 
 The main thing to note here is that our handler gets passed in a database connection auto magically by the framework.
 
-We also need to create a place to hold our applciations errors. Creat a file called `app/src/error.rs` like so.
+We also need to create a place to hold our application errors. Creat a file called `app/src/error.rs` like so.
 
 ```rust
 use axum::response::{IntoResponse, Response};
@@ -449,6 +453,8 @@ impl From<sqlx::Error> for CustomError {
 }
 ```
 
+Execute `cargo run` and you can access the application from `http://localhost:3000` in your browser.
+
 ## HTML Templating
 
 Because Rust supports macros we can create a DSL to handle our templating needs. This means we can leverage the Rust we already know to create loops and if statements.
@@ -459,7 +465,7 @@ We will use [markup.rs](https://github.com/utkarshkukreti/markup.rs). Add the fo
 markup = "0"
 ```
 
-And update your handler.
+**Markup** templating syntax looks like what we see below. We can re-use our existing Rust knowledge for conditions and loops and get compile time help at the same time.
 
 ```rust
 markup::define! {
@@ -489,6 +495,8 @@ markup::define! {
 ```
 
 ## Forms
+
+[Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. The example belows shows how we use a struct to handle the form data passed in to the `accept_form` function.
 
 ```rust
 use axum::{
@@ -935,22 +943,22 @@ RESET_DOMAIN=http://localhost:7100
 RESET_FROM_EMAIL_ADDRESS=support@wedontknowyet.com
 ```
 
-After rebuilding your *devcontainer* you will need to register to as a user. Make sure you server is running again i.e. 
+After rebuilding your *devcontainer* you will need to register as a user. Make sure you server is running again i.e. 
 
 ```sh
 $ cd app
 $ cargo run
 ```
 
-Expose port 9090 from your devcontainer then go to http://localhost:9090 and sign up.
+Expose port 9090 from your devcontainer then go to `http://localhost:9090` and sign up.
 
 ![Barricade](./login.png)
 
 ## Integration Tests
 
-> Production Example 
-> [Cloak Integration Tests](https://github.com/purton-tech/cloak/tree/main/app/tests) and
-> [Cloak docker-compose.yml](https://github.com/purton-tech/cloak/blob/main/.devcontainer/docker-compose.yml)
+Integration tests are used to test application from top to bottom. That means simulating the browser across important workflows as if it was a real user. We will use [Selenium](https://www.selenium.dev/) as our headless browser.
+
+Add the Selenium docker container to `.devcontainer/docker-compose.yml` and restart your devcontainer. Note the *No VNC* and *VNC* comments, the selenum container allows us to connect via [VNC](https://en.wikipedia.org/wiki/Virtual_Network_Computing) to the container so we can actually see the browser as it performs the tests. The *No VNC* port means we don't even have to install VNC. You can connect with a browser to this port and use the [No VNC](https://novnc.com/info.html) browser client.
 
 ```yaml
   # Integration testing using a headless chrome browser
@@ -961,10 +969,109 @@ Expose port 9090 from your devcontainer then go to http://localhost:9090 and sig
       VNC_NO_PASSWORD: 1
     ports:
       # VNC
-      - 7105:5900
+      - 5900:5900
       # No VNC
-      - 7106:7900
+      - 7900:7900
 ```
+
+We can write our tests in Rust using [ThirtyFour](https://github.com/stevepryde/thirtyfour) which is a Selenium / WebDriver library for Rust, for automated website UI testing.
+
+Add the following to bottom of `app/Cargo.toml`.
+
+```
+[dev-dependencies]
+# WebDriver Library for UI testing.
+thirtyfour = { version = "0", default-features = false, features = [ "reqwest-rustls-tls", "tokio-runtime" ] }
+```
+
+We need a helper class to configure our selenium driver. Add the following to `app/tests/config.rs`.
+
+```rust
+use std::env;
+use thirtyfour::prelude::*;
+
+#[derive(Clone, Debug)]
+pub struct Config {
+    pub webdriver_url: String,
+    pub host: String,
+}
+
+impl Config {
+    pub async fn new() -> Config {
+        let webdriver_url: String = if env::var("WEB_DRIVER_URL").is_ok() {
+            env::var("WEB_DRIVER_URL").unwrap()
+        } else {
+            // Default to selenium in our dev container
+            "http://selenium:4444".into()
+        };
+
+        let host = if env::var("WEB_DRIVER_DESTINATION_HOST").is_ok() {
+            env::var("WEB_DRIVER_DESTINATION_HOST").unwrap()
+        } else {
+            "http://auth:9090".into()
+        };
+
+        Config {
+            webdriver_url,
+            host,
+        }
+    }
+
+    pub async fn get_driver(&self) -> WebDriverResult<WebDriver> {
+        let mut caps = DesiredCapabilities::chrome();
+        caps.add_chrome_arg("--no-sandbox")?;
+        caps.add_chrome_arg("--disable-gpu")?;
+        caps.add_chrome_arg("--start-maximized")?;
+        WebDriver::new(&self.webdriver_url, &caps).await
+    }
+}
+```
+
+Create the following exmple test in `app/tests/example_test.rs`.
+
+```rust
+pub mod config;
+
+use thirtyfour::prelude::*;
+
+// let's set up the sequence of steps we want the browser to take
+#[tokio::test(flavor = "multi_thread", worker_threads = 1)]
+async fn run_test() -> WebDriverResult<()> {
+    let config = config::Config::new().await;
+
+    let driver = config.get_driver().await?;
+
+    let result = test(&driver, &config).await;
+
+    driver.quit().await?;
+
+    result?;
+
+    Ok(())
+}
+
+async fn test(driver: &WebDriver, config: &config::Config) -> WebDriverResult<()> {
+    let delay = std::time::Duration::new(11, 0);
+    driver.set_implicit_wait_timeout(delay).await?;
+
+    driver.get(&config.host).await?;
+
+    driver
+        .find_element(By::Id("email"))
+        .await?
+        .send_keys("test@test.com")
+        .await?;
+
+    Ok(())
+}
+```
+
+Point your browser at `http://localhost:7900` to view the tests. Run the test from the `app` folder with `cargo test`
+
+> Production Example 
+> [Cloak Integration Tests](https://github.com/purton-tech/cloak/tree/main/app/tests) and
+> [Cloak docker-compose.yml](https://github.com/purton-tech/cloak/blob/main/.devcontainer/docker-compose.yml)
+
 
 ## Conclusion
 
