@@ -9,7 +9,7 @@ date = 2022-03-16
 
 To build a web application you need to make architecture decisions across a range of topics. The beauty of [Ruby on Rails](https://rubyonrails.org/) or [Django](https://www.djangoproject.com/) is that they make those decisions for you so you can start building your web application straight away. They also back those decisions up with great documentation.
 
-**Rust on Nails** is a framework leveraging existing solutions that fulfill the needs of a full stack development. We look at each decision that needs to be made then pull in solutions and package everything up so that it works together. It's an opinionated framework and it's how Cloak was built see the [Cloak Github Repo](https://github.com/purton-tech/cloak).
+**Rust on Nails** is a framework leveraging existing solutions that fulfil the needs of a full stack development. We look at each decision that needs to be made then pull in solutions and package everything up so that it works together. It's an opinionated framework and it's how Cloak was built see the [Cloak Github Repo](https://github.com/purton-tech/cloak).
 
 Here's a breakdown of the services, decisions and best practices covered.
 
@@ -60,7 +60,7 @@ How you folder structure will look.
     └── Dockerfile
 ```
 
-We are going to create a workspace for our web application. Create a new `Cargo.toml` file in the root folder and add the foloowing.
+We are going to create a workspace for our web application. Create a new `Cargo.toml` file in the root folder and add the following.
 
 ```toml
 [workspace]
@@ -186,7 +186,7 @@ We will use this pattern over and over. When we add a tool to our solution we ad
 
 ## Configuration
 
-To configure our application we pull in environemnt variables a create a Rust struct. Create a `app/src/config.rs`.
+To configure our application we pull in environment variables a create a Rust struct. Create a `app/src/config.rs`.
 
 ```rust
 #[derive(Clone, Debug)]
@@ -423,7 +423,7 @@ async fn handler(Extension(pool): Extension<PgPool>) -> Result<Html<String>, err
 
 The main thing to note here is that our handler gets passed in a database connection auto magically by the framework.
 
-We also need to create a place to hold our application errors. Creat a file called `app/src/error.rs` like so.
+We also need to create a place to hold our application errors. Create a file called `app/src/error.rs` like so.
 
 ```rust
 use axum::response::{IntoResponse, Response};
@@ -496,7 +496,7 @@ markup::define! {
 
 ## Forms
 
-[Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. The example belows shows how we use a struct to handle the form data passed in to the `accept_form` function.
+[Axum](https://github.com/tokio-rs/axum) has support for [Handlers](https://docs.rs/axum/latest/axum/handler/index.html). We can use those in a lot of different ways and one way is for form implementations. The example below shows how we use a struct to handle the form data passed in to the `accept_form` function.
 
 ```rust
 use axum::{
@@ -601,7 +601,7 @@ Create an empty images folder in `app/asset-pipeline/images` then your project s
 
 Cache busting is where we invalidate a cached file and force the browser to retrieve the file from the server. We can instruct the browser to bypass the cache by simply changing the filename. To the browser, this is a completely new resource so it will fetch the resource from the server. The most common way to do this is to add the hash of the file to the URL.
 
-What we can do with Rust is take advantage of the `build.rs` mechanism which runs some code before each compile. We can generate a set of function that let us rerieve our assets and generate the necessary hashes at the same time. So for example to use the `index.css` in our code it would be nice to be able to call something like.
+What we can do with Rust is take advantage of the `build.rs` mechanism which runs some code before each compile. We can generate a set of function that let us retrieve our assets and generate the necessary hashes at the same time. So for example to use the `index.css` in our code it would be nice to be able to call something like.
 
 ```rust
 get_index_css() // Returns the URL with the hash.
@@ -609,7 +609,7 @@ get_index_css() // Returns the URL with the hash.
 
 The code for this is quite large so I won't publish it here. Please check out [https://github.com/purton-tech/cloak/blob/main/app/build.rs](https://github.com/purton-tech/cloak/blob/main/app/build.rs) for a full implementation.
 
-You'll also need to add the follopwing to your `app/Cargo.toml`
+You'll also need to add the following to your `app/Cargo.toml`
 
 ```
 tower-http = { version = "0", default-features = false, features = ["fs", "trace"] }
@@ -624,7 +624,7 @@ Now when your build your project a helper class will be created which we will us
 
 Layouts are pieces that fit together (for example header, footer, menus, etc) to make a complete view. An application may have as many layouts as needed. 
 
-In Nails a layout is just a function that takes HTML content and returns more HTML content. Let's put together our cache bustin strategy with our asset pipeline into a Layout we can use.
+In Nails a layout is just a function that takes HTML content and returns more HTML content. Let's put together our cache busting strategy with our asset pipeline into a Layout we can use.
 
 Create `app/src/layout.rs` with the following
 
@@ -671,7 +671,7 @@ markup::define! {
 
 ```
 
-And we need to chnage our `app/src/main.rs` to include the routes for our asset pipeline and to call out to the new layout.
+And we need to change our `app/src/main.rs` to include the routes for our asset pipeline and to call out to the new layout.
 
 ```rust
 mod config;
@@ -728,7 +728,7 @@ pub mod statics {
 
 Sometimes you need to enhance server side generated HTML. There are many ways to do this for example [Stimulus](https://stimulus.hotwired.dev/), which I've used on multiple projects.
 
-However all modern browser come with web components built in and as they are pretty simple to use it makes sense to implment client side enhancement using this technology.
+However all modern browser come with web components built in and as they are pretty simple to use it makes sense to implement client side enhancement using this technology.
 
 An example of a very simple component create the following in `app/src/asset-pipelibne/components/hello_world.ts`.
 
@@ -761,9 +761,9 @@ To use the element
 
 ## Partials and Components
 
-Partials in Rails are a way to split your templating into more manageable chunks. We can get the same thing in Rust by using functions. So if you have a peice of template you repeat often, this can be refactored into a function.
+Partials in Rails are a way to split your templating into more manageable chunks. We can get the same thing in Rust by using functions. So if you have a piece of template you repeat often, this can be refactored into a function.
 
-It's a similar process for components. With [markup.rs](https://github.com/utkarshkukreti/markup.rs) we can create use our existing tempating to make libraries of reusable components.
+It's a similar process for components. With [markup.rs](https://github.com/utkarshkukreti/markup.rs) we can create use our existing templating to make libraries of reusable components.
 
 Example 'Footer' component.
 
@@ -907,7 +907,7 @@ We've already created the tables that Barricade needs in the migrations section.
         condition: service_healthy
 ```
 
-We also need to add a healthcheck to our db section so that we know when the database is ready.
+We also need to add a health check to our db section so that we know when the database is ready.
 
 ```yml
   db:
@@ -958,7 +958,7 @@ Expose port 9090 from your devcontainer then go to `http://localhost:9090` and s
 
 Integration tests are used to test application from top to bottom. That means simulating the browser across important workflows as if it was a real user. We will use [Selenium](https://www.selenium.dev/) as our headless browser.
 
-Add the Selenium docker container to `.devcontainer/docker-compose.yml` and restart your devcontainer. Note the *No VNC* and *VNC* comments, the selenum container allows us to connect via [VNC](https://en.wikipedia.org/wiki/Virtual_Network_Computing) to the container so we can actually see the browser as it performs the tests. The *No VNC* port means we don't even have to install VNC. You can connect with a browser to this port and use the [No VNC](https://novnc.com/info.html) browser client.
+Add the Selenium docker container to `.devcontainer/docker-compose.yml` and restart your devcontainer. Note the *No VNC* and *VNC* comments, the selenium container allows us to connect via [VNC](https://en.wikipedia.org/wiki/Virtual_Network_Computing) to the container so we can actually see the browser as it performs the tests. The *No VNC* port means we don't even have to install VNC. You can connect with a browser to this port and use the [No VNC](https://novnc.com/info.html) browser client.
 
 ```yaml
   # Integration testing using a headless chrome browser
@@ -1027,7 +1027,7 @@ impl Config {
 }
 ```
 
-Create the following exmple test in `app/tests/example_test.rs`.
+Create the following example test in `app/tests/example_test.rs`.
 
 ```rust
 pub mod config;
@@ -1071,7 +1071,3 @@ Point your browser at `http://localhost:7900` to view the tests. Run the test fr
 > Production Example 
 > [Cloak Integration Tests](https://github.com/purton-tech/cloak/tree/main/app/tests) and
 > [Cloak docker-compose.yml](https://github.com/purton-tech/cloak/blob/main/.devcontainer/docker-compose.yml)
-
-
-## Conclusion
-
