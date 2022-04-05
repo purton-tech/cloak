@@ -7,7 +7,9 @@
     <h1 class="title">
       {{ page.title }}
     </h1>
-    <p class="subtitle"><strong>{{ page.date }}</strong></p>
+    {% if page.extra.subtitle %}
+    <h2 class="subtitle">{{ page.extra.subtitle }}</h2>
+    {% endif %}
     <article class="prose">
       {{ page.content | safe }}
     </article>

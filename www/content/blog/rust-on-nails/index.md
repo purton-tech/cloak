@@ -1,9 +1,9 @@
 +++
 title = "Rust on Nails"
 date = 2022-03-16
+[extra]
+subtitle = "A full stack architecture for Rust web applications"
 +++
-
-## A full stack architecture for Rust web applications
 
 ![You are on Nails](./yay-your-on-nails.png)
 

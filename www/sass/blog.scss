@@ -2,6 +2,10 @@
 
 .l_blog {
 
+    h1.title, h2.subtitle {
+        text-align: center;
+    }
+
     > div {
         // Set a max width and center content
         margin-left: auto;
