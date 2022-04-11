@@ -13,6 +13,7 @@ ARG CLI_FOLDER=cli
 ARG CLI_EXE_NAME=cli
 ARG CLI_LINUX_EXE_NAME=cloak-linux
 ARG CLI_MACOS_EXE_NAME=cloak-macos
+ARG DBMATE_VERSION=1.15.0
 
 # Base images
 ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
@@ -78,29 +79,35 @@ build-cache:
 build:
     COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
     COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
-    COPY --dir migrations Cargo.lock Cargo.toml protos .
+    COPY --dir db Cargo.lock Cargo.toml protos .
     COPY +build-cache/cargo_home $CARGO_HOME
     COPY +build-cache/target target
     RUN mkdir asset-pipeline
     COPY --dir +npm-build/dist $APP_FOLDER/
     COPY --dir $APP_FOLDER/asset-pipeline/images $APP_FOLDER/asset-pipeline
     # We need to run inside docker as we need postgres running for SQLX
-    ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432
+    ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/postgres?sslmode=disable
     USER root
     WITH DOCKER \
         --pull postgres:alpine
         RUN docker run -d --rm --network=host -e POSTGRES_PASSWORD=testpassword postgres:alpine \
             && while ! pg_isready --host=localhost --port=5432 --username=postgres; do sleep 1; done ;\
-                diesel migration run \
+                dbmate up \
             && cargo build --release --target x86_64-unknown-linux-musl
     END
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/$APP_EXE_NAME
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_LINUX_EXE_NAME
 
 init-container:
-    FROM ianpurton/rust-diesel:latest
-    COPY --dir migrations .
-    CMD diesel migration run
+    FROM debian:bullseye-slim
+    RUN apt-get update -y \  
+        && apt-get install -y --no-install-recommends ca-certificates curl libpq-dev \
+        && rm -rf /var/lib/apt/lists/*
+    RUN curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
+        && mv ./dbmate-linux-amd64 /usr/bin/dbmate \
+        && chmod +x /usr/bin/dbmate
+    COPY --dir db .
+    CMD dbmate up
     SAVE IMAGE $INIT_IMAGE_NAME
 
 app-container:
@@ -140,10 +147,10 @@ www-container:
 integration-test:
     FROM +build
     COPY --dir $APP_FOLDER/tests $APP_FOLDER/
-    COPY --dir migrations .
+    COPY --dir db .
     COPY .devcontainer/docker-compose.yml ./ 
     COPY .devcontainer/docker-compose.earthly.yml ./ 
-    ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/cloak
+    ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/cloak?sslmode=disable
     ARG APP_DATABASE_URL=postgresql://cloak:testpassword@db:5432/cloak
     # We expose selenium to localhost
     ARG WEB_DRIVER_URL='http://localhost:4444' 
@@ -168,7 +175,7 @@ integration-test:
 
         # Force to command to always be succesful so the artifact is saved. 
         # https://github.com/earthly/earthly/issues/988
-        RUN diesel migration run \
+        RUN dbmate up \
             && docker run -d -p 7103:7103 --rm --network=build_default \
                 -e APP_DATABASE_URL=$APP_DATABASE_URL \
                 -e INVITE_DOMAIN=http://envoy:7100 \
@@ -198,7 +205,7 @@ build-cli-osx:
     FROM joseluisq/rust-linux-darwin-builder:1.59.0
     COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
     COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
-    COPY --dir migrations Cargo.lock Cargo.toml protos .
+    COPY --dir db Cargo.lock Cargo.toml protos .
     RUN cd cli \ 
         && CC=o64-clang \
         CXX=o64-clang++ \

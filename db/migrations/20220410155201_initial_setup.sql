@@ -1,8 +1,4 @@
--- This file was automatically created by Diesel to setup helper functions
--- and other internal bookkeeping. This file is safe to edit, any future
--- changes will be added to existing projects as new migrations.
-
-
+-- migrate:up
 
 
 -- Sets up a trigger for the given table to automatically set a column called
@@ -34,3 +30,35 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+DO $$
+BEGIN
+  CREATE ROLE cloak LOGIN ENCRYPTED PASSWORD 'testpassword';
+  EXCEPTION WHEN DUPLICATE_OBJECT THEN
+  RAISE NOTICE 'not creating role cloak -- it already exists';
+END
+$$;
+DO $$
+BEGIN
+  CREATE ROLE cloak_auth LOGIN ENCRYPTED PASSWORD 'testpassword';
+  EXCEPTION WHEN DUPLICATE_OBJECT THEN
+  RAISE NOTICE 'not creating role cloak_auth -- it already exists';
+END
+$$;
+DO $$
+BEGIN
+  CREATE ROLE cloak_readonly LOGIN ENCRYPTED PASSWORD 'testpassword';
+  EXCEPTION WHEN DUPLICATE_OBJECT THEN
+  RAISE NOTICE 'not creating role cloak_readonly -- it already exists';
+END
+$$;
+
+-- migrate:down
+DROP OWNED BY cloak;
+DROP OWNED BY cloak_auth;
+DROP OWNED BY cloak_readonly;
+
+DROP USER cloak;
+DROP USER cloak_auth;
+DROP USER cloak_readonly;
+

@@ -30,11 +30,7 @@ RUN sudo apt-get update --allow-releaseinfo-change && curl -sL https://aka.ms/In
 # k9s
 RUN curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Linux_x86_64.tar.gz | tar xvz -C /tmp && sudo mv /tmp/k9s /usr/bin
 
-# Install secrets management
-ARG CLOAK_VERSION=1.1.0
-RUN sudo /bin/sh -c "wget https://github.com/purton-tech/cloak/releases/download/v$CLOAK_VERSION/cli -O /usr/local/bin/cloak && chmod +x /usr/local/bin/cloak"
-    
 # all the volumes configured in the docker-compose.yml
-RUN sudo mkdir -p /vscode/target && sudo chown $USERNAME:$USERNAME /vscode/target
-RUN sudo mkdir -p /vscode/app/node_modules && sudo chown $USERNAME:$USERNAME /vscode/app/node_modules
-RUN sudo mkdir -p /vscode/infra/node_modules && sudo chown $USERNAME:$USERNAME /vscode/infra/node_modules
+RUN sudo mkdir -p /workspace/target && sudo chown $USERNAME:$USERNAME /workspace/target
+RUN sudo mkdir -p /workspace/app/node_modules && sudo chown $USERNAME:$USERNAME /workspace/app/node_modules
+RUN sudo mkdir -p /workspace/infra/node_modules && sudo chown $USERNAME:$USERNAME /workspace/infra/node_modules
