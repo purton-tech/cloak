@@ -66,18 +66,18 @@ services:
       dockerfile: Dockerfile
     
     volumes:
-      - ..:/vscode:cached
+      - ..:/workspace:cached
       # Give access to ssh keys on the host (Is there a better way to do this?)
       - ~/.ssh:/home/host-ssh:cached
       # We need this so docker in docker works (Check this)
       - /var/run/docker.sock:/var/run/docker.sock
-      - target:/vscode/target # Set target as a volume for performance. 
-      - node_modules:/vscode/app/node_modules # Set target as a volume for performance. 
-      - infra_node_modules:/vscode/infra/node_modules # Set target as a volume for performance. 
+      - target:/workspace/target # Set target as a volume for performance. 
+      - node_modules:/workspace/app/node_modules # Set target as a volume for performance. 
+      - infra_node_modules:/workspace/infra/node_modules # Set target as a volume for performance. 
 
     environment:
       # The following is used by the migrations and also for SQLX at compile time.
-      DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak
+      DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak?sslmode=disable
       # A less privelaged role for basic INSERTS, SELECT etc.
       APP_DATABASE_URL: postgresql://cloak:testpassword@db:5432/cloak
       VAULT_SERVER_URL: http://localhost:7103

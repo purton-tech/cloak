@@ -24,12 +24,5 @@ alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/www/content:/workdir tmai
 # npm
 alias nrs='npm run start'
 
-# Database migrations
-alias mr='diesel migration run'
-alias mre='diesel migration redo'
-alias ml='diesel migration list'
-alias mg='diesel migration generate'
-alias db='psql $DATABASE_URL'
-
 # Leave a line below or the files will cat together
 
