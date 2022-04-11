@@ -9,7 +9,7 @@
 | `/cli` | Command Line Interface. Written in Rust.||
 | `/infra` | Infrastructure as Code using [Pulumi](https://www.pulumi.com/).||
 | `/protos` | [gRPC](https://grpc.io/) schema for the API.||
-| `/migrations` | Database migrations for building the Postgres Database.|purtontech/cloak-db-migrations|
+| `/db/migrations` | Database migrations for building the Postgres Database.|purtontech/cloak-db-migrations|
 | `/www` | The website. Built with [Zola](https://www.getzola.org) static site generator.|purtontech/cloak-website|
 | `Earthfile` |[Earthly](https://earthly.dev) Builds our containers and executables||
 | `.releaserc.json`|[Semantic Releases](https://github.com/semantic-release/semantic-release)||
