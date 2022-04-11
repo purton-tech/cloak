@@ -43,7 +43,10 @@ pull-request:
     BUILD +integration-test
 
 all:
-    BUILD +pull-request
+    BUILD +init-container
+    BUILD +app-container
+    BUILD +envoy-container
+    BUILD +www-container
     BUILD +build-cli-osx
 
 npm-deps:
