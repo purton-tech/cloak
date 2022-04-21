@@ -75,6 +75,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .envs(&filtered_env)
                 .spawn()
                 .expect("Failed to run command");
+
+            println!("finished");
         }
         Commands::Info => {
             println!("Public Key {:?}", config.public_key_der_base64);
