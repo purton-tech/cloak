@@ -16,4 +16,4 @@
 ## Pirate metrics
 
 1. Decrypt cloak key `export ECDH_PRIVATE_KEY=$(openssl pkcs8 -topk8 -nocrypt -in cloak.enc.pem)`
-1. `psql '$READONLY_DATABASE_URL' -c 'SELECT email FROM users''
+1. `cloak psql '$READONLY_DATABASE_URL' -c 'SELECT email FROM users'`
