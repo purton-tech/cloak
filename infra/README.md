@@ -16,5 +16,4 @@
 ## Pirate metrics
 
 1. Decrypt cloak key `export ECDH_PRIVATE_KEY=$(openssl pkcs8 -topk8 -nocrypt -in cloak.enc.pem)`
-1. `cloak secrets` and get postgres url.
-1. `psql postgres-url -c 'select email from users;'
+1. `psql '$READONLY_DATABASE_URL' -c 'SELECT email FROM users''

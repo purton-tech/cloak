@@ -28,7 +28,7 @@ tonic = "0"
 prost = "0"
 
 # Access the database
-sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "postgres", "macros", "json" , "chrono" ] }
+sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "offline", "postgres", "macros", "json" , "chrono" ] }
 chrono = { version = "0", features = ["serde"] }
 
 # Generate secure invitations
