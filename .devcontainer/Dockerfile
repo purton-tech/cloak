@@ -31,6 +31,7 @@ RUN sudo apt-get update --allow-releaseinfo-change && curl -sL https://aka.ms/In
 RUN curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Linux_x86_64.tar.gz | tar xvz -C /tmp && sudo mv /tmp/k9s /usr/bin
 
 RUN cargo install sqlx-cli --features openssl-vendored
+RUN cargo install cornucopia
 
 # all the volumes configured in the docker-compose.yml
 RUN sudo mkdir -p /workspace/target && sudo chown $USERNAME:$USERNAME /workspace/target
