@@ -1,17 +1,22 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use crate::statics;
 use axum::{extract::Extension, response::Html};
-use sqlx::PgPool;
+use deadpool_postgres::Pool;
+use time::format_description::well_known::Rfc3339;
 
 pub async fn index(
-    authentication: Authentication,
-    Extension(pool): Extension<PgPool>,
+    current_user: Authentication,
+    Extension(pool): Extension<Pool>,
 ) -> Result<Html<String>, CustomError> {
+    let client = pool.get().await?;
+
     let service_accounts =
-        models::service_account::ServiceAccount::get_all(&pool, &authentication).await?;
-    let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
+        queries::service_accounts::get_all(&client, &(current_user.user_id as i32)).await?;
+
+    let vaults =
+        queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
 
     if service_accounts.is_empty() {
         let empty_page = EmptyServiceAccounts {};
@@ -54,8 +59,8 @@ markup::define! {
             }
         }
     }
-    ServiceAccountsPage(service_accounts: Vec<models::service_account::ServiceAccount>,
-        vaults: Vec<models::vault::VaultSummary>) {
+    ServiceAccountsPage(service_accounts: Vec<queries::service_accounts::GetAll>,
+        vaults: Vec<queries::vaults::GetAll>) {
         div.m_card {
             div.header {
                 span { "Service Accounts" }
@@ -77,14 +82,14 @@ markup::define! {
                                 @if let Some(vault_name) = service_account.vault_name.clone() {
                                     td[id=format!("service-account-view-{}", service_account.id)] {
                                         a[href="#"]
-                                        { {service_account.name} }
+                                        { {service_account.account_name} }
                                     }
                                     td {
                                         {vault_name}
                                     }
                                 } else {
                                     td {
-                                        {service_account.name}
+                                        {service_account.account_name}
                                     }
                                     td[id=format!("service-account-row-{}", service_account.id)] {
                                         a[href="#"]
@@ -92,10 +97,10 @@ markup::define! {
                                     }
                                 }
                                 td {
-                                    relative_time[datetime=service_account.updated_at.to_rfc3339()] {}
+                                    relative_time[datetime=service_account.updated_at.format(&Rfc3339).unwrap()] {}
                                 }
                                 td {
-                                    relative_time[datetime=service_account.created_at.to_rfc3339()] {}
+                                    relative_time[datetime=service_account.created_at.format(&Rfc3339).unwrap()] {}
                                 }
                                 td {
                                     a[id=format!("delete-account-controller-{}", service_account.id), href="#"] {
@@ -117,7 +122,7 @@ markup::define! {
             }
             @super::delete::DeleteServiceAccountForm {
                 service_account_id: service_account.id as u32,
-                service_account_name: service_account.name.clone()
+                service_account_name: service_account.account_name.clone()
             }
         }
     }

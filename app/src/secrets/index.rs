@@ -1,22 +1,26 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use crate::statics;
 use axum::{
     extract::{Extension, Path},
     response::Html,
 };
-use sqlx::PgPool;
+use deadpool_postgres::Pool;
+use time::format_description::well_known::Rfc3339;
 
 pub async fn index(
-    Path(idor_vault_id): Path<u32>,
-    Extension(pool): Extension<PgPool>,
-    authentication: Authentication,
+    Path(idor_vault_id): Path<i32>,
+    Extension(pool): Extension<Pool>,
+    current_user: Authentication,
 ) -> Result<Html<String>, CustomError> {
-    let secrets = models::secret::Secret::get_all(&pool, &authentication, idor_vault_id).await?;
+    let client = pool.get().await?;
+
+    let secrets =
+        queries::secrets::get_all(&client, &idor_vault_id, &(current_user.user_id as i32)).await?;
 
     let user_vault =
-        models::user_vault::UserVault::get(&pool, &authentication, idor_vault_id).await?;
+        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
 
     if secrets.is_empty() {
         let empty_page = EmptySecretsPage {
@@ -50,11 +54,11 @@ pub async fn index(
 }
 
 markup::define! {
-    SecretsHeader<'a>(user_vault: &'a models::user_vault::UserVault) {
+    SecretsHeader<'a>(user_vault: &'a queries::user_vaults::Get) {
         @super::new_secret::NewSecretPage { user_vault }
         button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
     }
-    EmptySecretsPage<'a>(user_vault: &'a models::user_vault::UserVault) {
+    EmptySecretsPage<'a>(user_vault: &'a queries::user_vaults::Get) {
         .empty_page {
             div {
                 h2 { "No Secrets Created"}
@@ -64,7 +68,7 @@ markup::define! {
             }
         }
     }
-    SecretsPage<'a>(user_vault: &'a models::user_vault::UserVault, secrets: Vec<models::secret::Secret>) {
+    SecretsPage<'a>(user_vault: &'a queries::user_vaults::Get, secrets: Vec<queries::secrets::GetAll>) {
         div.m_card[id="secrets-table-controller"] {
             div.header {
                 span { "Secrets" }
@@ -88,10 +92,10 @@ markup::define! {
                                         "ecdh-public-key"=user_vault.ecdh_public_key.clone()] {}
                                 }
                                 td {
-                                    relative_time[datetime=secret.updated_at.to_rfc3339()] {}
+                                    relative_time[datetime=secret.updated_at.format(&Rfc3339).unwrap()] {}
                                 }
                                 td {
-                                    relative_time[datetime=secret.created_at.to_rfc3339()] {}
+                                    relative_time[datetime=secret.created_at.format(&Rfc3339).unwrap()] {}
                                 }
                                 td {
                                     a[id=format!("delete-secret-controller-{}", secret.id), href="#"] {

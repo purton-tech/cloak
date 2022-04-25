@@ -14,7 +14,7 @@ INSERT INTO
     service_accounts (user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
 VALUES($1, $2, $3, $4) 
 
---! get_all(user_id) { id, vault_id, account_name, vault_name, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_all(user_id) { id, vault_id, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
 SELECT 
     sa.id, sa.vault_id, sa.name, v.name as vault_name, 
     sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
@@ -50,7 +50,7 @@ WHERE
             WHERE
                 vault_id = $1)
 
---! get_by_ecdh_public_key(ecdh_public_key) { id, vault_id, account_name, vault_name, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_by_ecdh_public_key(ecdh_public_key) { id, vault_id?, account_name, vault_name, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at }
 SELECT 
     sa.id, sa.vault_id, sa.name, v.name as vault_name, 
     sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
@@ -63,7 +63,7 @@ ON
     v.id = sa.vault_id
 WHERE sa.ecdh_public_key = $1
 
---! get_dangerous(id) { id, vault_id, account_name, vault_name, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_dangerous(id) { id, vault_id?, account_name, vault_name, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at }
 SELECT
     sa.id, sa.vault_id, sa.name, v.name as vault_name, 
     sa.ecdh_public_key, sa.encrypted_ecdh_private_key,

@@ -1,4 +1,4 @@
---! insert(user_id, name) ?
+--! insert(user_id, name)
 INSERT INTO 
     vaults (user_id, name)
 VALUES($1, $2) 
@@ -9,7 +9,7 @@ INSERT INTO
     users_vaults (user_id, vault_id, ecdh_public_key, encrypted_vault_key)
 VALUES($1, $2, $3, $4) 
 
---! get_dangerous(id) { id, name, updated_at, created_at } ?
+--! get_dangerous(id) { id, name, updated_at, created_at }
 SELECT 
     id, name, updated_at, created_at
 FROM 
@@ -17,7 +17,7 @@ FROM
 WHERE
     id = $1 
 
---! get(id, current_user_id) { id, name, updated_at, created_at } ?
+--! get(id, current_user_id) { id, name, updated_at, created_at }
 SELECT 
     id, name, updated_at, created_at
 FROM 
@@ -42,10 +42,10 @@ LEFT JOIN users_vaults uv ON uv.vault_id = v.id
 WHERE
     uv.user_id = $1
 
---! user_vault_count(vault_id) ?
+--! user_vault_count(vault_id)
 SELECT count(*) FROM users_vaults WHERE vault_id = $1
 
---! secrets_count(vault_id) ?
+--! secrets_count(vault_id)
 SELECT count(*) FROM secrets WHERE vault_id = $1
 
 --! delete(vault_id, current_user_id)

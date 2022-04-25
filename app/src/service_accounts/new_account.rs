@@ -1,12 +1,12 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form},
     response::{IntoResponse, Redirect},
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
@@ -20,18 +20,20 @@ pub struct NewServiceAccount {
 }
 
 pub async fn new(
-    authenticated_user: Authentication,
+    current_user: Authentication,
     Form(new_service_account): Form<NewServiceAccount>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let new_account = models::service_account::NewAccount {
-        name: new_service_account.name,
-        ecdh_public_key: new_service_account.public_key,
-        encrypted_ecdh_private_key: new_service_account.encrypted_private_key,
-    };
+    let client = pool.get().await?;
 
-    models::service_account::ServiceAccount::create(&pool, &authenticated_user, new_account)
-        .await?;
+    queries::service_accounts::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &new_service_account.name,
+        &new_service_account.public_key,
+        &new_service_account.encrypted_private_key,
+    )
+    .await?;
 
     Ok(Redirect::to(super::INDEX.parse().unwrap()))
 }

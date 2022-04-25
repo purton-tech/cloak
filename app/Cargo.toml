@@ -31,6 +31,15 @@ prost = "0"
 sqlx = { version = "0", default-features = false,  features = [ "runtime-tokio-rustls", "offline", "postgres", "macros", "json" , "chrono" ] }
 chrono = { version = "0", features = ["serde"] }
 
+# Access to the database https://github.com/LouisGariepy/cornucopia
+deadpool-postgres = { version = "0", features = ["serde"] }
+#postgres-types = { version = "0", features = ["derive"] }
+tokio-postgres = { version = "0.7", features = [
+    "with-time-0_3",
+] }
+time = { version = "0", default-features = false,  features = ["formatting"] }
+cornucopia_client = "0"
+
 # Generate secure invitations
 rand = "0"
 sha2 = "0"

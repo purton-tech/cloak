@@ -1,12 +1,12 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form, Path},
     response::{IntoResponse, Redirect},
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
@@ -18,27 +18,28 @@ pub struct AddMember {
 }
 
 pub async fn add(
-    Path(id): Path<u32>,
-    authenticated_user: Authentication,
+    Path(id): Path<i32>,
+    current_user: Authentication,
     Form(add_member): Form<AddMember>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let user_vault = models::user_vault::UserVault {
-        vault_id: id as i32,
-        user_id: add_member.user_id as i32,
-        encrypted_vault_key: add_member.wrapped_vault_key,
-        ecdh_public_key: add_member.ecdh_public_key,
-    };
+    let client = pool.get().await?;
 
-    models::user_vault::UserVault::add_user_vault(&pool, &authenticated_user, &user_vault, id)
-        .await?;
+    queries::user_vaults::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &id,
+        &add_member.wrapped_vault_key,
+        &add_member.wrapped_vault_key,
+    )
+    .await?;
 
     Ok(Redirect::to(super::member_route(id).parse()?))
 }
 
 markup::define! {
-    AddMemberDrawer<'a>(team: &'a Vec<models::organisation::User>,
-        user_vault: &'a models::user_vault::UserVault) {
+    AddMemberDrawer<'a>(team: &'a Vec<queries::organisations::GetUsers>,
+        user_vault: &'a queries::user_vaults::Get) {
 
         form.m_form[id="add-team-member", method = "post", action=super::add_route(user_vault.vault_id)] {
             add_member[label="Add Member"] {

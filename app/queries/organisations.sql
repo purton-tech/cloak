@@ -1,4 +1,4 @@
---! get_organisations(created_by_user_id) { id, name } * 
+--! get_primary_organisation(created_by_user_id) { id, name }
 SELECT 
     id, name
 FROM 
@@ -53,7 +53,7 @@ WHERE
 AND
     organisation_id = $2 
 and $3 IN
--- Make sure the current user is an admin for this team
+    -- Make sure the current user is an admin for this team
     (SELECT 
         user_id 
     FROM 

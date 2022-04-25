@@ -7,8 +7,8 @@ use axum::{
 };
 use lettre::Message;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
+use deadpool_postgres::Pool;
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct NewInvite {
@@ -17,7 +17,7 @@ pub struct NewInvite {
 }
 
 pub async fn create_invite(
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
     Extension(config): Extension<crate::config::Config>,
     Form(new_invite): Form<NewInvite>,
     authentication: Authentication,

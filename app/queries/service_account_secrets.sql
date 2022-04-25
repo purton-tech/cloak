@@ -6,7 +6,7 @@ FROM
 WHERE 
     service_account_id = $1
 
---! get_users_vaults(user_id, vault_id) *
+--! get_users_vaults(user_id, vault_id)
 SELECT user_id 
 FROM 
     users_vaults 

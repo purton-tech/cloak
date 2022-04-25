@@ -17,7 +17,7 @@ IN
     WHERE
         user_id = $2)
 
---! get(id, current_user_id) { id, vault_id, name, name_blind_index, secret, updated_at, created_at } ?
+--! get(id, current_user_id) { id, vault_id, name, name_blind_index, secret, updated_at, created_at }
 SELECT  
     id, vault_id, name, name_blind_index, secret,
     updated_at, created_at  
@@ -31,7 +31,7 @@ IN
     WHERE
         user_id = $2)
 
---! delete_secrets(id, current_user_id)
+--! delete_secret(id, current_user_id)
 DELETE FROM
     secrets
 WHERE

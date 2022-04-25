@@ -1,4 +1,4 @@
---! get_dangerous(id) { id, email, ecdsa_public_key } ?
+--! get_dangerous(id) { id, email, ecdsa_public_key }
 SELECT 
     id, email, ecdsa_public_key
 FROM 
@@ -6,7 +6,7 @@ FROM
 WHERE
     id = $1
 
---! get_by_email_dangerous(email) { id, email, ecdsa_public_key } ?
+--! get_by_email_dangerous(email) { id, email, ecdsa_public_key }
 SELECT 
     id, email, ecdsa_public_key
 FROM 

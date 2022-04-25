@@ -45,7 +45,7 @@ pub fn vault_layout(
     content: &str,
     header: &str,
     side_bar: &SideBar,
-    vault: Option<u32>,
+    vault: Option<i32>,
 ) -> Result<Html<String>, CustomError> {
     let html = ApplicationLayout {
         content,
@@ -124,7 +124,7 @@ markup::define! {
         header: &'a str,
         title: &'a str,
         side_bar: &'a SideBar,
-        vault: Option<u32>
+        vault: Option<i32>
     )
     {
         @markup::doctype()

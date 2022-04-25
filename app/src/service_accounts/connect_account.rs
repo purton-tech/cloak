@@ -1,42 +1,45 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use crate::models;
 use axum::{
     extract::{Extension, Form},
     response::{IntoResponse, Redirect},
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct ConnectServiceAccount {
-    pub vault_id: u32,
-    pub service_account_id: u32,
+    pub vault_id: i32,
+    pub service_account_id: i32,
 }
 
 pub async fn connect(
-    authenticated_user: Authentication,
+    current_user: Authentication,
     Form(connect_form): Form<ConnectServiceAccount>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let connect_account = models::service_account::ConnectAccount {
-        vault_id: connect_form.vault_id,
-        service_account_id: connect_form.service_account_id,
-    };
+    let client = pool.get().await?;
 
-    models::service_account::ServiceAccount::connect(&pool, &authenticated_user, connect_account)
-        .await?;
+    queries::service_accounts::connect(
+        &client,
+        &connect_form.vault_id,
+        &connect_form.service_account_id,
+        &(current_user.user_id as i32),
+    )
+    .await?;
 
     Ok(Redirect::to(super::INDEX.parse().unwrap()))
 }
 
 markup::define! {
     ConnectServiceAccountDrawer<'a>(
-        service_account: &'a crate::models::service_account::ServiceAccount,
-        vaults: &'a Vec<models::vault::VaultSummary>) {
+        service_account: &'a queries::service_accounts::GetAll,
+        vaults: &'a Vec<queries::vaults::GetAll>) {
 
-        connect_account[label=format!("View {}", service_account.name),
+        connect_account[label=format!("View {}", service_account.account_name),
             "service-account-id"=format!("{}", service_account.id)] {
 
             template[slot="body"] {

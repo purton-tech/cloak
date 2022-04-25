@@ -1,9 +1,10 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models::{organisation, user};
+use crate::models::organisation;
+use deadpool_postgres::Pool;
 use rand::Rng;
 use sha2::{Digest, Sha256};
-use sqlx::PgPool;
 
 pub struct Invitation {
     pub id: i32,
@@ -17,11 +18,17 @@ pub struct Invitation {
 
 impl Invitation {
     pub async fn create(
-        pool: &PgPool,
-        authenticated_user: &Authentication,
+        pool: &Pool,
+        current_user: &Authentication,
         email: &str,
     ) -> Result<(String, String), CustomError> {
-        let org = organisation::Organisation::get_primary_org(pool, authenticated_user).await?;
+        let client = pool.get().await?;
+
+        let org = queries::organisations::get_primary_organisation(
+            &client,
+            &(current_user.user_id as i32),
+        )
+        .await?;
 
         let invitation_selector = rand::thread_rng().gen::<[u8; 8]>();
         let invitation_selector_base64 =
@@ -33,25 +40,20 @@ impl Invitation {
         let invitation_verifier_base64 =
             base64::encode_config(invitation_verifier, base64::URL_SAFE);
 
-        sqlx::query!(
-            "
-                INSERT INTO 
-                    invitations (organisation_id, email, invitation_selector, invitation_verifier_hash)
-                VALUES($1, $2, $3, $4) 
-            ",
-            org.id as i32,
-            email,
-            invitation_selector_base64,
-            invitation_verifier_hash_base64,
+        queries::invitations::insert_invitation(
+            &client,
+            &org.id,
+            &email,
+            &invitation_selector_base64,
+            &invitation_verifier_hash_base64,
         )
-        .execute(pool)
         .await?;
 
         Ok((invitation_verifier_base64, invitation_selector_base64))
     }
 
     pub async fn accept_invitation(
-        pool: &PgPool,
+        pool: &Pool,
         current_user: &Authentication,
         invitation_selector: &str,
         invitation_verifier: &str,
@@ -62,52 +64,28 @@ impl Invitation {
         let invitation_verifier_hash_base64 =
             base64::encode_config(invitation_verifier_hash, base64::URL_SAFE);
 
-        let invitation = sqlx::query_as!(
-            Invitation,
-            "
-                SELECT 
-                    id, 
-                    organisation_id, 
-                    email, 
-                    invitation_selector, 
-                    invitation_verifier_hash,
-                    created_at,
-                    updated_at
-                FROM 
-                    invitations 
-                WHERE
-                    invitation_selector = $1
-            ",
-            invitation_selector,
-        )
-        .fetch_one(pool)
-        .await?;
+        let client = pool.get().await?;
+
+        let invitation = queries::invitations::get_invitation(&client, invitation_selector).await?;
 
         if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
-            let user = user::User::get_dangerous(pool, current_user.user_id).await?;
+            let user =
+                queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
 
             // Make sure the user accepting the invitation is the user that we emailed
             if user.email == invitation.email {
                 organisation::Organisation::add_user_dangerous(
                     pool,
                     &invitation.email,
-                    invitation.organisation_id as u32,
+                    invitation.organisation_id,
                 )
                 .await?;
 
-                sqlx::query!(
-                    r#"
-                        DELETE FROM
-                            invitations
-                        WHERE
-                            email = $1
-                        AND
-                            organisation_id = $2
-                    "#,
+                queries::invitations::delete_invitation(
+                    &client,
                     &invitation.email,
-                    invitation.organisation_id
+                    &invitation.organisation_id,
                 )
-                .execute(pool)
                 .await?;
             }
         }
@@ -116,29 +94,17 @@ impl Invitation {
     }
 
     pub async fn get_all(
-        pool: &PgPool,
+        pool: &Pool,
         current_user: &Authentication,
-    ) -> Result<Vec<Invitation>, CustomError> {
-        let org = organisation::Organisation::get_primary_org(pool, current_user).await?;
+    ) -> Result<Vec<queries::invitations::GetAll>, CustomError> {
+        let client = pool.get().await?;
 
-        Ok(sqlx::query_as!(
-            Invitation,
-            "
-                SELECT  
-                    id, 
-                    email,
-                    invitation_selector, 
-                    invitation_verifier_hash,
-                    organisation_id,
-                    updated_at, 
-                    created_at  
-                FROM 
-                    invitations 
-                WHERE organisation_id = $1
-            ",
-            org.id as i32,
+        let org = queries::organisations::get_primary_organisation(
+            &client,
+            &(current_user.user_id as i32)
         )
-        .fetch_all(pool)
-        .await?)
+        .await?;
+
+        Ok(queries::invitations::get_all(&client, &org.id).await?)
     }
 }

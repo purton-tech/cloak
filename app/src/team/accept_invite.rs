@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Redirect},
 };
 use serde::Deserialize;
-use sqlx::PgPool;
+use deadpool_postgres::Pool;
 
 #[derive(Deserialize)]
 pub struct Invite {
@@ -16,7 +16,7 @@ pub struct Invite {
 
 pub async fn invite(
     Query(invite): Query<Invite>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
     invitation::Invitation::accept_invitation(
