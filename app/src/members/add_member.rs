@@ -11,7 +11,7 @@ use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct AddMember {
-    pub user_id: u32,
+    pub user_id: i32,
     pub wrapped_vault_key: String,
     #[validate(length(min = 1, message = "The ecdh_public_key is mandatory"))]
     pub ecdh_public_key: String,
@@ -25,11 +25,15 @@ pub async fn add(
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
 
+    // Do an IDOR check, does this user have access to the vault. This will
+    // blow up if we don't
+    queries::vaults::get(&client, &id, &(current_user.user_id as i32)).await?;
+
     queries::user_vaults::insert(
         &client,
-        &(current_user.user_id as i32),
+        &add_member.user_id,
         &id,
-        &add_member.wrapped_vault_key,
+        &add_member.ecdh_public_key,
         &add_member.wrapped_vault_key,
     )
     .await?;
