@@ -6,7 +6,6 @@ mod errors;
 mod hybrid;
 mod layout;
 mod members;
-mod models;
 mod registration_handler;
 mod secrets;
 mod service_accounts;

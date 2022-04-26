@@ -175,15 +175,11 @@ async fn get_invite_url_from_email(config: &common::Config) -> WebDriverResult<S
         .text()
         .await?;
 
-    dbg!(&body);
-
     let url: Vec<&str> = body.split("Click ").collect();
     let url: Vec<&str> = url[1].split(" to accept the invite").collect();
 
     let url = url[0].to_string();
     let url = url.replace("\\u0026", "&");
-
-    dbg!(&url);
 
     Ok(url)
 }

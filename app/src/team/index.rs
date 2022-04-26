@@ -1,7 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models::invitation;
 use crate::statics;
 use axum::{extract::Extension, response::Html};
 use deadpool_postgres::Pool;
@@ -19,7 +18,7 @@ pub async fn index(
     let users =
         queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
 
-    let invites = invitation::Invitation::get_all(&pool, &current_user).await?;
+    let invites = queries::invitations::get_all(&client, &org.id).await?;
 
     let teams = queries::organisations::get_teams(&client, &(current_user.user_id as i32)).await?;
 
