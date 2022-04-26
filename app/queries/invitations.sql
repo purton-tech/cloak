@@ -25,7 +25,7 @@ WHERE
 AND
     organisation_id = $2
 
---! get_all(organisation_id) { id, organisation_id, email, invitation_selector, invitation_verifier_hash, created_at, updated_at} *
+--! get_all(organisation_id) { id, email, invitation_selector, invitation_verifier_hash, organisation_id, updated_at, created_at} *
 SELECT  
     id, 
     email,
