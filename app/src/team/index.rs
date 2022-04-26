@@ -16,7 +16,6 @@ pub async fn index(
         queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
             .await?;
 
-    //let users = organisation::Organisation::get_users(&pool, &current_user, org.id).await?;
     let users =
         queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
 

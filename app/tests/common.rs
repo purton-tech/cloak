@@ -1,14 +1,16 @@
+use deadpool_postgres;
+use deadpool_postgres::Pool;
 use rand::Rng;
-use sqlx::PgPool;
 use std::env;
 use thirtyfour::{components::select::SelectElement, prelude::*};
+use tokio_postgres::NoTls;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Config {
     pub webdriver_url: String,
     pub host: String,
     // The database
-    pub db_pool: PgPool,
+    pub db_pool: Pool,
     pub headless: bool,
     pub mailhog_url: String,
 }
@@ -37,7 +39,16 @@ impl Config {
         };
 
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL not set");
-        let db_pool = PgPool::connect(&database_url).await.unwrap();
+
+        let mut cfg = deadpool_postgres::Config::new();
+        cfg.user = Some(String::from("cloak"));
+        cfg.password = Some(String::from("testpassword"));
+        cfg.host = Some(String::from("db"));
+        cfg.port = Some(5432);
+        cfg.dbname = Some(String::from("cloak"));
+        let db_pool = cfg
+            .create_pool(Some(deadpool_postgres::Runtime::Tokio1), NoTls)
+            .unwrap();
 
         Config {
             webdriver_url,
@@ -118,9 +129,7 @@ pub async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
 pub async fn register_user(driver: &WebDriver, config: &Config) -> WebDriverResult<String> {
     let email = register_random_user(driver).await?;
 
-    force_otp(config)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    force_otp(config).await;
 
     driver.get(format!("{}/auth/decrypt", config.host)).await?;
 
@@ -174,12 +183,15 @@ pub async fn register_random_user(driver: &WebDriver) -> WebDriverResult<String>
     Ok(email)
 }
 
-pub async fn force_otp(config: &Config) -> Result<(), sqlx::Error> {
-    sqlx::query!("UPDATE sessions SET otp_code_confirmed = true",)
-        .execute(&config.db_pool)
-        .await?;
-
-    Ok(())
+pub async fn force_otp(config: &Config) {
+    let client = config.db_pool.get().await.unwrap();
+    let stmt = client
+        .prepare_cached(
+            "UPDATE sessions SET otp_code_confirmed = true",
+        )
+        .await
+        .unwrap();
+    client.execute(&stmt, &[]).await.unwrap();
 }
 
 pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
@@ -224,80 +236,83 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
 pub async fn count_service_account_secrets(
     config: &Config,
     email: &str,
-) -> Result<i64, sqlx::Error> {
-    let vault_id = sqlx::query!(
-        "
-            SELECT 
-                id
-            FROM 
-                vaults 
-            WHERE
-                id IN
-                    (SELECT vault_id FROM users_vaults uv 
-                    WHERE uv.user_id IN (SELECT id FROM users WHERE email=$1))
-        ",
-        email
-    )
-    .fetch_one(&config.db_pool)
-    .await?;
+) -> i64 {
+    let client = config.db_pool.get().await.unwrap();
+    let stmt = client
+        .prepare_cached(
+            "
+        SELECT 
+            id
+        FROM 
+            vaults 
+        WHERE
+            id IN
+                (SELECT vault_id FROM users_vaults uv 
+                WHERE uv.user_id IN (SELECT id FROM users WHERE email=$1))
+    ",
+        )
+        .await
+        .unwrap();
+    let rows = client.query(&stmt, &[&email]).await.unwrap();
+    let vault_id: i32 = rows[0].get(0);
 
     dbg!(&vault_id);
 
-    let count = sqlx::query!(
-        "
+    let stmt = client
+        .prepare_cached(
+            "
             SELECT 
                 count(*)
             FROM 
                 service_account_secrets 
             WHERE
                 service_account_id IN (SELECT id FROM service_accounts WHERE vault_id = $1)
-        ",
-        vault_id.id
-    )
-    .fetch_one(&config.db_pool)
-    .await?;
+    ",
+        )
+        .await
+        .unwrap();
+    let rows = client.query(&stmt, &[&vault_id]).await.unwrap();
+    let count: i64 = rows[0].get(0);
 
-    if let Some(count) = count.count {
-        return Ok(count);
-    }
-
-    Err(sqlx::Error::Protocol("Failed".to_string()))
+    return count;
 }
 
-pub async fn count_secrets(config: &Config, email: &str) -> Result<i64, sqlx::Error> {
-    let user = sqlx::query!(
-        "
+pub async fn count_secrets(config: &Config, email: &str) -> i64 {
+
+    let client = config.db_pool.get().await.unwrap();
+    let stmt = client
+        .prepare_cached(
+            "
             SELECT 
                 id
             FROM 
                 users 
             WHERE
                 email = $1
-        ",
-        email
-    )
-    .fetch_one(&config.db_pool)
-    .await?;
+    ",
+        )
+        .await
+        .unwrap();
+    let rows = client.query(&stmt, &[&email]).await.unwrap();
+    let user_id: i32 = rows[0].get(0);
 
-    let count = sqlx::query!(
-        "
+    let stmt = client
+        .prepare_cached(
+            "
             SELECT 
                 count(*)
             FROM 
                 secrets 
             WHERE
                 vault_id IN (SELECT vault_id FROM users_vaults WHERE USER_ID = $1)
-        ",
-        user.id
-    )
-    .fetch_one(&config.db_pool)
-    .await?;
+    ",
+        )
+        .await
+        .unwrap();
+    let rows = client.query(&stmt, &[&user_id]).await.unwrap();
+    let count: i64 = rows[0].get(0);
 
-    if let Some(count) = count.count {
-        return Ok(count);
-    }
-
-    Err(sqlx::Error::Protocol("Failed".to_string()))
+    return count;
 }
 
 pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, std::num::ParseIntError> {

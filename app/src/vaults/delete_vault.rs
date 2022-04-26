@@ -25,8 +25,8 @@ pub async fn delete(
 
     let vault = queries::vaults::get(
         &client,
-        &(current_user.user_id as i32),
         &idor_delete_vault.vault_id,
+        &(current_user.user_id as i32),
     )
     .await?;
 

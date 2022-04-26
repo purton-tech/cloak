@@ -28,7 +28,7 @@ pub async fn new(
     let client = pool.get().await?;
 
     // This will blow up if the user doesn't have access to the vault
-    queries::vaults::get(&client, &(current_user.user_id as i32), &id).await?;
+    queries::vaults::get(&client, &id, &(current_user.user_id as i32)).await?;
 
     queries::secrets::insert(
         &client,

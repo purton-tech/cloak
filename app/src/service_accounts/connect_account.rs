@@ -1,7 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form},
     response::{IntoResponse, Redirect},

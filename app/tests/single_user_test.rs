@@ -46,17 +46,13 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
     )
     .await?;
 
-    let count = common::count_secrets(config, &email)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let count = common::count_secrets(config, &email).await;
 
     assert_eq!(count, 2);
 
     common::add_service_account(driver).await?;
 
-    let count = common::count_service_account_secrets(config, &email)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let count = common::count_service_account_secrets(config, &email).await;
 
     assert_eq!(count, 2);
 
@@ -70,15 +66,11 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
     )
     .await?;
 
-    let count = common::count_secrets(config, &email)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let count = common::count_secrets(config, &email).await;
 
     assert_eq!(count, 3);
 
-    let count = common::count_service_account_secrets(config, &email)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let count = common::count_service_account_secrets(config, &email).await;
 
     assert_eq!(count, 3);
 

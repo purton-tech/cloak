@@ -1,4 +1,4 @@
---! get_primary_organisation(created_by_user_id) { id, name }
+--! get_primary_organisation(created_by_user_id) { id, name? }
 SELECT 
     id, name
 FROM 
@@ -34,7 +34,7 @@ AND
     -- Make sure the user has access to this org
     $1 IN (SELECT user_id FROM organisation_users WHERE organisation_id = $2)
 
---! get_teams(user_id) { organisation_name, team_owner } *
+--! get_teams(user_id) { organisation_name?, team_owner } *
 SELECT 
     o.name as organisation_name, 
     u.email as team_owner

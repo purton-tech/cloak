@@ -19,8 +19,8 @@ pub async fn index(
         queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
             .await?;
 
-    let vault =
-        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
+    // Blow up if the user doesn't have access to the vault
+    queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
 
     let members = queries::user_vaults::get_users_dangerous(&client, &idor_vault_id).await?;
 
