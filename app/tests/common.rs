@@ -40,15 +40,7 @@ impl Config {
 
         let database_url = env::var("DATABASE_URL").expect("DATABASE_URL not set");
 
-        let mut cfg = deadpool_postgres::Config::new();
-        cfg.user = Some(String::from("cloak"));
-        cfg.password = Some(String::from("testpassword"));
-        cfg.host = Some(String::from("db"));
-        cfg.port = Some(5432);
-        cfg.dbname = Some(String::from("cloak"));
-        let db_pool = cfg
-            .create_pool(Some(deadpool_postgres::Runtime::Tokio1), NoTls)
-            .unwrap();
+        let db_pool = create_pool(&database_url);
 
         Config {
             webdriver_url,
@@ -72,6 +64,28 @@ impl Config {
         }
         WebDriver::new(&self.webdriver_url, &caps).await
     }
+}
+
+pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
+    // Example to parse
+    // APP_DATABASE_URL=postgresql://cloak:testpassword@db:5432/cloak?sslmode=disable
+    let mut cfg = deadpool_postgres::Config::new();
+    let url: Vec<&str> = database_url.split("postgresql://").collect();
+    let split_on_at: Vec<&str> = url[1].split("@").collect();
+    let user_and_pass: Vec<&str> = split_on_at[0].split(":").collect();
+
+    let split_on_slash: Vec<&str> = split_on_at[1].split("/").collect();
+    let host_and_port: Vec<&str> = split_on_slash[0].split(":").collect();
+    let dbname_and_params: Vec<&str> = split_on_slash[1].split("?").collect();
+
+    cfg.user = Some(String::from(user_and_pass[0]));
+    cfg.password = Some(String::from(user_and_pass[1]));
+    cfg.host = Some(String::from(host_and_port[0]));
+    cfg.port = Some(host_and_port[1].parse::<u16>().unwrap());
+    cfg.dbname = Some(String::from(dbname_and_params[0]));
+
+    cfg.create_pool(Some(deadpool_postgres::Runtime::Tokio1), NoTls)
+        .unwrap()
 }
 
 pub async fn add_secrets(
@@ -186,9 +200,7 @@ pub async fn register_random_user(driver: &WebDriver) -> WebDriverResult<String>
 pub async fn force_otp(config: &Config) {
     let client = config.db_pool.get().await.unwrap();
     let stmt = client
-        .prepare_cached(
-            "UPDATE sessions SET otp_code_confirmed = true",
-        )
+        .prepare_cached("UPDATE sessions SET otp_code_confirmed = true")
         .await
         .unwrap();
     client.execute(&stmt, &[]).await.unwrap();
@@ -233,10 +245,7 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
     Ok(())
 }
 
-pub async fn count_service_account_secrets(
-    config: &Config,
-    email: &str,
-) -> i64 {
+pub async fn count_service_account_secrets(config: &Config, email: &str) -> i64 {
     let client = config.db_pool.get().await.unwrap();
     let stmt = client
         .prepare_cached(
@@ -278,7 +287,6 @@ pub async fn count_service_account_secrets(
 }
 
 pub async fn count_secrets(config: &Config, email: &str) -> i64 {
-
     let client = config.db_pool.get().await.unwrap();
     let stmt = client
         .prepare_cached(

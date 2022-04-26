@@ -20,7 +20,6 @@ pub async fn delete(
     Form(idor_delete_vault): Form<DeleteVault>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-
     let client = pool.get().await?;
 
     let vault = queries::vaults::get(

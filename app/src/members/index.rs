@@ -28,8 +28,7 @@ pub async fn index(
         queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
 
     let user_vault =
-        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id)
-            .await?;
+        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
 
     let page = MembersPage {
         _vault_name: "vaults".to_string(),

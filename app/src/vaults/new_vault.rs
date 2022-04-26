@@ -33,16 +33,17 @@ pub async fn new(
 
     models::vault::Vault::create(&pool, &authentication, vault).await?;**/
 
-    let vault_id = queries::vaults::insert(
+    let vault_id =
+        queries::vaults::insert(&client, &(current_user.user_id as i32), &new_vault.name).await?;
+
+    queries::vaults::insert_user_vaults(
         &client,
         &(current_user.user_id as i32),
-        &new_vault.name,
+        &vault_id,
+        &new_vault.public_key,
+        &new_vault.encrypted_vault_key,
     )
     .await?;
-
-    queries::vaults::insert_user_vaults(&client, &(current_user.user_id as i32), &vault_id, 
-        &new_vault.public_key,
-        &new_vault.encrypted_vault_key,).await?;
 
     crate::layout::redirect_and_snackbar(super::INDEX, "Vault Created")
 }

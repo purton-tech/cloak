@@ -56,8 +56,6 @@ fn cornucopia() -> Result<(), std::io::Error> {
 }
 
 fn asset_pipeline() {
-
-
     // Asset pipeline
     let mut data = String::new();
 

@@ -15,8 +15,7 @@ pub async fn index(
     let service_accounts =
         queries::service_accounts::get_all(&client, &(current_user.user_id as i32)).await?;
 
-    let vaults =
-        queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
+    let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
 
     if service_accounts.is_empty() {
         let empty_page = EmptyServiceAccounts {};

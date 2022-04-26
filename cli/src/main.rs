@@ -57,8 +57,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // cargo run -- --api-host-url=http://envoy:7100 secrets
     match &args.command {
         Commands::Run(args) => {
-
-
             let env_vars_to_inject = get_secrets(&config).await?;
 
             let filtered_env: HashMap<String, String> = env::vars()
@@ -117,7 +115,7 @@ async fn insert_secrets(cmd_args: &[OsString], secrets: &HashMap<String, String>
                 let env_name = format!("${}", name);
                 if &arg_to_check == &env_name {
                     arg = OsString::from(value);
-                } 
+                }
             }
         }
         process_args.push(arg);

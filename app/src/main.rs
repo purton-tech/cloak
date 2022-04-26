@@ -15,8 +15,6 @@ mod vaults;
 use axum::extract::Extension;
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
-use deadpool_postgres::{Config, Runtime};
-use tokio_postgres::NoTls;
 
 #[tokio::main]
 async fn main() {
@@ -30,14 +28,7 @@ async fn main() {
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
 
     let config = config::Config::new();
-
-    let mut cfg = Config::new();
-    cfg.user = Some(String::from("cloak"));
-    cfg.password = Some(String::from("testpassword"));
-    cfg.host = Some(String::from("db"));
-    cfg.port = Some(5432);
-    cfg.dbname = Some(String::from("cloak"));
-    let pool = cfg.create_pool(Some(Runtime::Tokio1), NoTls).unwrap();
+    let pool = config.create_pool();
 
     let axum_make_service = axum::Router::new()
         .merge(vaults::routes())

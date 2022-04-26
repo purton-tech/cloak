@@ -1,12 +1,12 @@
 use crate::authentication::Authentication;
-use crate::errors::CustomError;
 use crate::cornucopia::queries;
+use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Query},
     response::{IntoResponse, Redirect},
 };
-use serde::Deserialize;
 use deadpool_postgres::Pool;
+use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
 #[derive(Deserialize)]
@@ -48,16 +48,18 @@ pub async fn accept_invitation(
     let invitation = queries::invitations::get_invitation(&client, invitation_selector).await?;
 
     if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
-        let user =
-            queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+        let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
 
         // Make sure the user accepting the invitation is the user that we emailed
         if user.email == invitation.email {
-
             let user = queries::users::get_by_email_dangerous(&client, &user.email).await?;
 
-            queries::organisations::add_user_to_organisation(&client, &user.id, &invitation.organisation_id)
-                .await?;
+            queries::organisations::add_user_to_organisation(
+                &client,
+                &user.id,
+                &invitation.organisation_id,
+            )
+            .await?;
 
             queries::invitations::delete_invitation(
                 &client,
