@@ -161,67 +161,28 @@ impl app::vault::vault_server::Vault for VaultService {
             if let Some(vault_id) = sa.vault_id {
                 // Blow up, if the user doesn't have access to the vault.
                 queries::service_account_secrets::get_users_vaults(
-                    &client, 
-                    &(authenticated_user.user_id as i32), 
-                    &vault_id)
-                    .await
-                    .map_err(|e| CustomError::Database(e.to_string()))?;
+                    &client,
+                    &(authenticated_user.user_id as i32),
+                    &vault_id,
+                )
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
             }
 
             // If yes, save the secret
             for secret in account_secret.secrets {
                 queries::service_account_secrets::insert(
-                    &client, 
-                    &(account_secret.service_account_id as i32), 
-                    &secret.encrypted_name, 
-                    &secret.name_blind_index, 
-                    &secret.encrypted_secret_value, 
-                    &account_secret.public_ecdh_key)
-                    .await
-                    .map_err(|e| CustomError::Database(e.to_string()))?;
-            }
-
-            // If yes, save the secret
-            /***sqlx::query!(
-                "
-                        INSERT INTO service_account_secrets
-                            (service_account_id, name, name_blind_index, secret, ecdh_public_key)
-                        VALUES
-                            ($1, $2, $3, $4, $5)
-                    ",
-                secret.service_account_id,
-                secret.name,
-                secret.name_blind_index,
-                secret.secret,
-                secret.ecdh_public_key
-            )
-            .execute(pool)
-            .await?;**/
-        }
-
-        /***let mut secrets: Vec<models::service_account_secret::ServiceAccountSecret> =
-            Default::default();
-
-        for account_secret in service_account.account_secrets {
-            let ecdh_public_key = account_secret.public_ecdh_key.clone();
-            for secret in account_secret.secrets {
-                secrets.push(models::service_account_secret::ServiceAccountSecret {
-                    id: 0,
-                    service_account_id: account_secret.service_account_id as i32,
-                    name: secret.encrypted_name,
-                    name_blind_index: secret.name_blind_index,
-                    secret: secret.encrypted_secret_value,
-                    ecdh_public_key: ecdh_public_key.clone(),
-                })
+                    &client,
+                    &(account_secret.service_account_id as i32),
+                    &secret.encrypted_name,
+                    &secret.name_blind_index,
+                    &secret.encrypted_secret_value,
+                    &account_secret.public_ecdh_key,
+                )
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
             }
         }
-
-        models::service_account_secret::ServiceAccountSecret::create(
-            &self.pool,
-            &authenticated_user,
-            secrets,
-        )
-        .await?;**/
 
         let response = CreateSecretsResponse {};
 
