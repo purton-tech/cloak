@@ -55,13 +55,6 @@ impl IntoResponse for CustomError {
 }
 
 // Any errors from sqlx get converted to CustomError
-impl From<sqlx::Error> for CustomError {
-    fn from(err: sqlx::Error) -> CustomError {
-        CustomError::Database(err.to_string())
-    }
-}
-
-// Any errors from sqlx get converted to CustomError
 impl From<axum::http::uri::InvalidUri> for CustomError {
     fn from(err: axum::http::uri::InvalidUri) -> CustomError {
         CustomError::FaultySetup(err.to_string())

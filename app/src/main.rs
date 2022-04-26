@@ -14,7 +14,6 @@ mod team;
 mod vaults;
 
 use axum::extract::Extension;
-use sqlx::PgPool;
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
 use deadpool_postgres::{Config, Runtime};
@@ -29,10 +28,6 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     let config = config::Config::new();
-
-    let db_pool = PgPool::connect(&config.app_database_url)
-        .await
-        .expect("Problem connecting to the database");
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
 
     let config = config::Config::new();
@@ -55,7 +50,6 @@ async fn main() {
         .merge(statics::asset_pipeline_routes())
         .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())
-        .layer(Extension(db_pool))
         .layer(Extension(config))
         .layer(Extension(pool.clone()))
         .into_make_service();

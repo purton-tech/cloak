@@ -7,13 +7,6 @@ use rand::Rng;
 use sha2::{Digest, Sha256};
 
 pub struct Invitation {
-    pub id: i32,
-    pub organisation_id: i32,
-    pub email: String,
-    pub invitation_selector: String,
-    pub invitation_verifier_hash: String,
-    pub created_at: chrono::DateTime<chrono::Utc>,
-    pub updated_at: chrono::DateTime<chrono::Utc>,
 }
 
 impl Invitation {
