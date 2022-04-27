@@ -55,15 +55,20 @@ impl IntoResponse for CustomError {
 }
 
 // Any errors from sqlx get converted to CustomError
-impl From<sqlx::Error> for CustomError {
-    fn from(err: sqlx::Error) -> CustomError {
+impl From<axum::http::uri::InvalidUri> for CustomError {
+    fn from(err: axum::http::uri::InvalidUri) -> CustomError {
+        CustomError::FaultySetup(err.to_string())
+    }
+}
+
+impl From<tokio_postgres::Error> for CustomError {
+    fn from(err: tokio_postgres::Error) -> CustomError {
         CustomError::Database(err.to_string())
     }
 }
 
-// Any errors from sqlx get converted to CustomError
-impl From<axum::http::uri::InvalidUri> for CustomError {
-    fn from(err: axum::http::uri::InvalidUri) -> CustomError {
-        CustomError::FaultySetup(err.to_string())
+impl From<deadpool_postgres::PoolError> for CustomError {
+    fn from(err: deadpool_postgres::PoolError) -> CustomError {
+        CustomError::Database(err.to_string())
     }
 }

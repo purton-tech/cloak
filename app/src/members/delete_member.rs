@@ -1,36 +1,37 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form, Path},
     response::IntoResponse,
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteMember {
-    pub user_id: u32,
-    pub vault_id: u32,
+    pub user_id: i32,
+    pub vault_id: i32,
 }
 
 pub async fn delete(
-    Path(vault_id): Path<u32>,
-    authentication: Authentication,
+    Path(vault_id): Path<i32>,
+    current_user: Authentication,
     Form(delete_member): Form<DeleteMember>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    models::user_vault::UserVault::remove_user_from_vault(
-        &pool,
-        &authentication,
-        delete_member.user_id,
-        delete_member.vault_id,
+    let client = pool.get().await?;
+    queries::user_vaults::remove_user_from_vault(
+        &client,
+        &delete_member.user_id,
+        &delete_member.vault_id,
+        &(current_user.user_id as i32),
     )
     .await?;
 
     // If we remove ourself, redirect to vaults page.
-    let url = if delete_member.user_id == authentication.user_id {
+    let url = if delete_member.user_id == (current_user.user_id as i32) {
         crate::vaults::INDEX.to_string()
     } else {
         super::member_route(vault_id)
@@ -41,7 +42,7 @@ pub async fn delete(
 
 markup::define! {
     DeleteMemberForm<'a>(
-        user: &'a models::user_vault::UserDetails) {
+        user: &'a queries::user_vaults::GetUsersDangerous) {
 
         form.m_form[method="post", action=super::delete_route(user.vault_id as u32)] {
             side_drawer[label="Remove Member from Vault?",

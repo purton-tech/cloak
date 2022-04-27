@@ -57,9 +57,7 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     // Add a service account
     common::add_service_account(driver).await?;
 
-    let count = common::count_service_account_secrets(config, &team_member)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let count = common::count_service_account_secrets(config, &team_member).await;
 
     assert_eq!(count, 1);
 
@@ -100,9 +98,7 @@ async fn sign_in_user(
     // Wait for page to load as code might not be in database yet.
     driver.find_element(By::Id("code")).await?;
 
-    common::force_otp(config)
-        .await
-        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    common::force_otp(config).await;
 
     driver.get(format!("{}/auth/decrypt", config.host)).await?;
 
@@ -179,15 +175,11 @@ async fn get_invite_url_from_email(config: &common::Config) -> WebDriverResult<S
         .text()
         .await?;
 
-    dbg!(&body);
-
     let url: Vec<&str> = body.split("Click ").collect();
     let url: Vec<&str> = url[1].split(" to accept the invite").collect();
 
     let url = url[0].to_string();
     let url = url.replace("\\u0026", "&");
-
-    dbg!(&url);
 
     Ok(url)
 }

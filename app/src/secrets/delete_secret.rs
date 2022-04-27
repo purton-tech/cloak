@@ -1,26 +1,43 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form, Path},
     response::IntoResponse,
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteSecret {
-    pub secret_id: u32,
+    pub secret_id: i32,
 }
 
 pub async fn delete(
     Path(vault_id): Path<u32>,
-    authentication: Authentication,
+    current_user: Authentication,
     Form(delete_secret): Form<DeleteSecret>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    models::secret::Secret::delete(&pool, delete_secret.secret_id, &authentication).await?;
+    let client = pool.get().await?;
+
+    let secret = queries::secrets::get(
+        &client,
+        &delete_secret.secret_id,
+        &(current_user.user_id as i32),
+    )
+    .await?;
+
+    queries::secrets::delete_secret(
+        &client,
+        &delete_secret.secret_id,
+        &(current_user.user_id as i32),
+    )
+    .await?;
+
+    queries::secrets::delete_service_account(&client, &secret.name_blind_index, &secret.vault_id)
+        .await?;
 
     crate::layout::redirect_and_snackbar(&super::secret_route(vault_id as i32), "Secret Deleted")
 }
@@ -30,7 +47,7 @@ markup::define! {
         secret_id: u32,
         vault_id: u32,
         secret_name: String,
-        user_vault: &'a models::user_vault::UserVault) {
+        user_vault: &'a queries::user_vaults::Get) {
 
         form.m_form[method="post", action=super::delete_route(*vault_id)] {
             side_drawer[label="Delete Secret?",

@@ -1,12 +1,12 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form, Path},
     response::{IntoResponse, Redirect},
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
@@ -21,24 +21,29 @@ pub struct NewSecret {
 
 pub async fn new(
     Path(id): Path<i32>,
-    authentication: Authentication,
+    current_user: Authentication,
     Form(new_secret): Form<NewSecret>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let new_secret = models::secret::NewSecret {
-        name: new_secret.name,
-        secret: new_secret.secret,
-        idor_vault_id: id,
-        name_blind_index: new_secret.name_blind_index,
-    };
+    let client = pool.get().await?;
 
-    models::secret::Secret::create(&pool, &authentication, new_secret).await?;
+    // This will blow up if the user doesn't have access to the vault
+    queries::vaults::get(&client, &id, &(current_user.user_id as i32)).await?;
+
+    queries::secrets::insert(
+        &client,
+        &id,
+        &new_secret.name,
+        &new_secret.name_blind_index,
+        &new_secret.secret,
+    )
+    .await?;
 
     Ok(Redirect::to(super::secret_route(id).parse()?))
 }
 
 markup::define! {
-    NewSecretPage<'a>(user_vault: &'a models::user_vault::UserVault) {
+    NewSecretPage<'a>(user_vault: &'a queries::user_vaults::Get) {
 
         form.m_form[id="add-secret-form", method = "post",
             action=super::new_route(user_vault.vault_id)] {

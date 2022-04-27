@@ -1,14 +1,26 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{extract::Extension, response::Html};
-use sqlx::PgPool;
+use deadpool_postgres::Pool;
+use time::{format_description::well_known::Rfc3339, OffsetDateTime};
+
+pub struct VaultSummary {
+    pub id: i32,
+    pub name: String,
+    pub user_count: i32,
+    pub secrets_count: i32,
+    pub created_at: OffsetDateTime,
+    pub updated_at: OffsetDateTime,
+}
 
 pub async fn index(
-    authentication: Authentication,
-    Extension(pool): Extension<PgPool>,
+    current_user: Authentication,
+    Extension(pool): Extension<Pool>,
 ) -> Result<Html<String>, CustomError> {
-    let vaults = models::vault::Vault::get_all(&pool, &authentication).await?;
+    let client = pool.get().await?;
+
+    let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
 
     if vaults.is_empty() {
         let empty_page = EmptyVaultPage {};
@@ -19,8 +31,27 @@ pub async fn index(
             &crate::layout::SideBar::Vaults,
         )
     } else {
+        let mut summary_vaults: Vec<VaultSummary> = Default::default();
+
+        for vault in vaults {
+            let user_count = queries::vaults::user_vault_count(&client, &vault.id).await?;
+
+            let secret_count = queries::vaults::secrets_count(&client, &vault.id).await?;
+
+            summary_vaults.push(VaultSummary {
+                user_count: user_count as i32,
+                secrets_count: secret_count as i32,
+                id: vault.id,
+                name: vault.name,
+                created_at: vault.created_at,
+                updated_at: vault.updated_at,
+            });
+        }
+
         let header = VaultHeader {};
-        let page = VaultsPage { vaults };
+        let page = VaultsPage {
+            vaults: summary_vaults,
+        };
         crate::layout::layout_with_header(
             "Vaults",
             &page.to_string(),
@@ -46,7 +77,7 @@ markup::define! {
         }
     }
     VaultsPage(
-        vaults: Vec<models::vault::VaultSummary>) {
+        vaults: Vec<VaultSummary>) {
 
         @for vault in vaults {
             .m_card."vault-card".clickable[href=crate::secrets::secret_route(vault.id)] {
@@ -55,7 +86,7 @@ markup::define! {
                         h4.title { {vault.name} }
                         .created {
                             "Created "
-                            relative_time[datetime=vault.created_at.to_rfc3339()] {}
+                            relative_time[datetime=vault.created_at.format(&Rfc3339).unwrap()] {}
                         }
                     }
                     div {

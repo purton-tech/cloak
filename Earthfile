@@ -80,7 +80,7 @@ build-cache:
     SAVE IMAGE --cache-hint
 
 build:
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
+    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/queries $APP_FOLDER/asset-pipeline $APP_FOLDER
     COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
     COPY --dir db Cargo.lock Cargo.toml protos .
     COPY +build-cache/cargo_home $CARGO_HOME

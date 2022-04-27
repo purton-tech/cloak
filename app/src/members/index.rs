@@ -1,30 +1,34 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use crate::statics;
 use axum::{
     extract::{Extension, Path},
     response::Html,
 };
-use sqlx::PgPool;
+use deadpool_postgres::Pool;
 
 pub async fn index(
-    Path(idor_vault_id): Path<u32>,
-    Extension(pool): Extension<PgPool>,
-    authentication: Authentication,
+    Path(idor_vault_id): Path<i32>,
+    Extension(pool): Extension<Pool>,
+    current_user: Authentication,
 ) -> Result<Html<String>, CustomError> {
-    let org = models::organisation::Organisation::get_primary_org(&pool, &authentication).await?;
+    let client = pool.get().await?;
 
-    let vault = models::user_vault::UserVault::get(&pool, &authentication, idor_vault_id).await?;
+    let org =
+        queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
+            .await?;
 
-    let members =
-        models::user_vault::UserVault::get_users_dangerous(&pool, vault.vault_id as u32).await?;
+    // Blow up if the user doesn't have access to the vault
+    queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
+
+    let members = queries::user_vaults::get_users_dangerous(&client, &idor_vault_id).await?;
 
     let team =
-        models::organisation::Organisation::get_users(&pool, &authentication, org.id).await?;
+        queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
 
     let user_vault =
-        models::user_vault::UserVault::get(&pool, &authentication, idor_vault_id).await?;
+        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
 
     let page = MembersPage {
         _vault_name: "vaults".to_string(),
@@ -48,8 +52,8 @@ pub async fn index(
 markup::define! {
     MembersHeader<'a>(
         _vault_name: String,
-        user_vault: &'a models::user_vault::UserVault,
-        team: &'a Vec<models::organisation::User>)
+        user_vault: &'a queries::user_vaults::Get,
+        team: &'a Vec<queries::organisations::GetUsers>)
     {
         @super::add_member::AddMemberDrawer {
             user_vault: *user_vault,
@@ -59,7 +63,7 @@ markup::define! {
     }
     MembersPage<'a>(
         _vault_name: String,
-        members: &'a Vec<models::user_vault::UserDetails>)
+        members: &'a Vec<queries::user_vaults::GetUsersDangerous>)
     {
         div.m_card {
             div.header {

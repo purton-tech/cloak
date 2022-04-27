@@ -1,21 +1,26 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models::{invitation, organisation};
 use crate::statics;
 use axum::{extract::Extension, response::Html};
-use sqlx::PgPool;
+use deadpool_postgres::Pool;
 
 pub async fn index(
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<Html<String>, CustomError> {
-    let org = organisation::Organisation::get_primary_org(&pool, &current_user).await?;
+    let client = pool.get().await?;
 
-    let users = organisation::Organisation::get_users(&pool, &current_user, org.id).await?;
+    let org =
+        queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
+            .await?;
 
-    let invites = invitation::Invitation::get_all(&pool, &current_user).await?;
+    let users =
+        queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
 
-    let teams = organisation::Organisation::get_teams(&pool, &current_user).await?;
+    let invites = queries::invitations::get_all(&client, &org.id).await?;
+
+    let teams = queries::organisations::get_teams(&client, &(current_user.user_id as i32)).await?;
 
     let page = TeamPage {
         users,
@@ -28,9 +33,9 @@ pub async fn index(
 
 markup::define! {
     TeamPage(
-        users: Vec<organisation::User>,
-        invites: Vec<invitation::Invitation>,
-        teams: Vec<organisation::Team>) {
+        users: Vec<queries::organisations::GetUsers>,
+        invites: Vec<queries::invitations::GetAll>,
+        teams: Vec<queries::organisations::GetTeams>) {
 
         @for user in users {
             @super::delete_member::DeleteMemberForm {

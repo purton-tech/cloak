@@ -1,12 +1,12 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form},
     response::IntoResponse,
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
@@ -20,17 +20,30 @@ pub struct NewVault {
 }
 
 pub async fn new(
-    authentication: Authentication,
+    current_user: Authentication,
     Form(new_vault): Form<NewVault>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let vault = models::vault::NewVault {
+    let client = pool.get().await?;
+    /***let vault = models::vault::NewVault {
         name: new_vault.name,
         encrypted_vault_key: new_vault.encrypted_vault_key,
         ecdh_public_key: new_vault.public_key,
     };
 
-    models::vault::Vault::create(&pool, &authentication, vault).await?;
+    models::vault::Vault::create(&pool, &authentication, vault).await?;**/
+
+    let vault_id =
+        queries::vaults::insert(&client, &(current_user.user_id as i32), &new_vault.name).await?;
+
+    queries::vaults::insert_user_vaults(
+        &client,
+        &(current_user.user_id as i32),
+        &vault_id,
+        &new_vault.public_key,
+        &new_vault.encrypted_vault_key,
+    )
+    .await?;
 
     crate::layout::redirect_and_snackbar(super::INDEX, "Vault Created")
 }

@@ -1,11 +1,11 @@
-use crate::authentication;
-use crate::models;
+use crate::cornucopia::queries;
+use crate::{authentication, errors::CustomError};
 use app::vault::*;
-use sqlx::PgPool;
+use deadpool_postgres::Pool;
 use tonic::{Code, Request, Response, Status};
 
 pub struct VaultService {
-    pub pool: PgPool,
+    pub pool: Pool,
 }
 
 #[tonic::async_trait]
@@ -15,21 +15,26 @@ impl app::vault::vault_server::Vault for VaultService {
         request: Request<GetServiceAccountRequest>,
     ) -> Result<Response<GetServiceAccountResponse>, Status> {
         let req = request.into_inner();
+        let client = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let service_account = models::service_account::ServiceAccount::get_by_ecdh_public_key(
-            &self.pool,
-            req.ecdh_public_key,
-        )
-        .await?;
+        let service_account =
+            queries::service_accounts::get_by_ecdh_public_key(&client, &req.ecdh_public_key)
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
 
         if let Some(vault_id) = service_account.vault_id {
-            let _vault = models::vault::Vault::get_dangerous(&self.pool, vault_id as u32).await?;
+            queries::vaults::get_dangerous(&client, &vault_id)
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
 
-            let secrets = models::service_account_secret::ServiceAccountSecret::get_all_dangerous(
-                &self.pool,
-                service_account.id as u32,
-            )
-            .await?;
+            let secrets =
+                queries::service_account_secrets::get_all_dangerous(&client, &service_account.id)
+                    .await
+                    .map_err(|e| CustomError::Database(e.to_string()))?;
 
             let secrets = secrets
                 .into_iter()
@@ -62,21 +67,43 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let req = request.into_inner();
 
-        dbg!(&authenticated_user);
+        let client = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let secrets =
-            models::secret::Secret::get_all(&self.pool, &authenticated_user, req.vault_id).await?;
-        let vault =
-            models::vault::Vault::get(&self.pool, &authenticated_user, req.vault_id).await?;
-        let user_vault =
-            models::user_vault::UserVault::get(&self.pool, &authenticated_user, req.vault_id)
-                .await?;
-        let service_accounts = models::service_account::ServiceAccount::get_by_vault(
-            &self.pool,
-            req.vault_id,
-            &authenticated_user,
+        let secrets = queries::secrets::get_all(
+            &client,
+            &(req.vault_id as i32),
+            &(authenticated_user.user_id as i32),
         )
-        .await?;
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        let vault = queries::vaults::get(
+            &client,
+            &(req.vault_id as i32),
+            &(authenticated_user.user_id as i32),
+        )
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        let user_vault = queries::user_vaults::get(
+            &client,
+            &(authenticated_user.user_id as i32),
+            &(req.vault_id as i32),
+        )
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        let service_accounts = queries::service_accounts::get_by_vault(
+            &client,
+            &(req.vault_id as i32),
+            &(authenticated_user.user_id as i32),
+        )
+        .await
+        .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let secrets = secrets
             .into_iter()
@@ -110,35 +137,52 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         request: Request<CreateSecretsRequest>,
     ) -> Result<Response<CreateSecretsResponse>, Status> {
-        dbg!(&request);
+        let client = self
+            .pool
+            .get()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let authenticated_user = authenticate(&request).await?;
 
         let service_account = request.into_inner();
 
-        let mut secrets: Vec<models::service_account_secret::ServiceAccountSecret> =
-            Default::default();
-
         for account_secret in service_account.account_secrets {
-            let ecdh_public_key = account_secret.public_ecdh_key.clone();
+            // Get the service account this request is trying to access
+            let sa = queries::service_accounts::get_dangerous(
+                &client,
+                &(account_secret.service_account_id as i32),
+            )
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
+
+            // If the vault is already connected we can do an IDOR check
+            // And see if the user actually has access to the vault.
+            if let Some(vault_id) = sa.vault_id {
+                // Blow up, if the user doesn't have access to the vault.
+                queries::service_account_secrets::get_users_vaults(
+                    &client,
+                    &(authenticated_user.user_id as i32),
+                    &vault_id,
+                )
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
+            }
+
+            // If yes, save the secret
             for secret in account_secret.secrets {
-                secrets.push(models::service_account_secret::ServiceAccountSecret {
-                    id: 0,
-                    service_account_id: account_secret.service_account_id as i32,
-                    name: secret.encrypted_name,
-                    name_blind_index: secret.name_blind_index,
-                    secret: secret.encrypted_secret_value,
-                    ecdh_public_key: ecdh_public_key.clone(),
-                })
+                queries::service_account_secrets::insert(
+                    &client,
+                    &(account_secret.service_account_id as i32),
+                    &secret.encrypted_name,
+                    &secret.name_blind_index,
+                    &secret.encrypted_secret_value,
+                    &account_secret.public_ecdh_key,
+                )
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
             }
         }
-
-        models::service_account_secret::ServiceAccountSecret::create(
-            &self.pool,
-            &authenticated_user,
-            secrets,
-        )
-        .await?;
 
         let response = CreateSecretsResponse {};
 

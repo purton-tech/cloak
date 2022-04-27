@@ -1,9 +1,11 @@
+use crate::cornucopia::queries;
+
 markup::define! {
     ViewServiceAccount<'a>(
-        service_account: &'a crate::models::service_account::ServiceAccount) {
+        service_account: &'a queries::service_accounts::GetAll) {
 
         form.m_form {
-            view_account[label=format!("View {}", service_account.name),
+            view_account[label=format!("View {}", service_account.account_name),
             "service-account-id"=format!("{}", service_account.id)] {
 
                 template[slot="body"] {

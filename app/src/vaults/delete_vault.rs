@@ -1,30 +1,41 @@
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use crate::models;
 use axum::{
     extract::{Extension, Form},
     response::IntoResponse,
 };
+use deadpool_postgres::Pool;
 use serde::Deserialize;
-use sqlx::PgPool;
 use validator::Validate;
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteVault {
-    pub vault_id: u32,
+    pub vault_id: i32,
     pub name: String,
 }
 
 pub async fn delete(
-    authentication: Authentication,
+    current_user: Authentication,
     Form(idor_delete_vault): Form<DeleteVault>,
-    Extension(pool): Extension<PgPool>,
+    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let vault =
-        models::vault::Vault::get(&pool, &authentication, idor_delete_vault.vault_id).await?;
+    let client = pool.get().await?;
+
+    let vault = queries::vaults::get(
+        &client,
+        &idor_delete_vault.vault_id,
+        &(current_user.user_id as i32),
+    )
+    .await?;
 
     if vault.name == idor_delete_vault.name {
-        models::vault::Vault::delete(&pool, idor_delete_vault.vault_id, &authentication).await?;
+        queries::vaults::delete(
+            &client,
+            &idor_delete_vault.vault_id,
+            &(current_user.user_id as i32),
+        )
+        .await?;
     } else {
         return crate::layout::redirect_and_snackbar(super::INDEX, "Name did not match");
     }

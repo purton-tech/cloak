@@ -6,7 +6,6 @@ mod errors;
 mod hybrid;
 mod layout;
 mod members;
-mod models;
 mod registration_handler;
 mod secrets;
 mod service_accounts;
@@ -14,7 +13,6 @@ mod team;
 mod vaults;
 
 use axum::extract::Extension;
-use sqlx::PgPool;
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
 
@@ -27,12 +25,10 @@ async fn main() {
     tracing_subscriber::fmt::init();
 
     let config = config::Config::new();
-
-    let db_pool = PgPool::connect(&config.app_database_url)
-        .await
-        .expect("Problem connecting to the database");
-    let grpc_db_pool = db_pool.clone();
     let addr = SocketAddr::from(([0, 0, 0, 0], config.port));
+
+    let config = config::Config::new();
+    let pool = config.create_pool();
 
     let axum_make_service = axum::Router::new()
         .merge(vaults::routes())
@@ -44,13 +40,13 @@ async fn main() {
         .merge(statics::asset_pipeline_routes())
         .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())
-        .layer(Extension(db_pool))
         .layer(Extension(config))
+        .layer(Extension(pool.clone()))
         .into_make_service();
 
     let grpc_service = tonic::transport::Server::builder()
         .add_service(app::vault::vault_server::VaultServer::new(
-            api_service::VaultService { pool: grpc_db_pool },
+            api_service::VaultService { pool },
         ))
         .into_service();
 
@@ -68,4 +64,8 @@ async fn main() {
 // in .vscode/settings.json
 pub mod statics {
     include!(concat!(env!("OUT_DIR"), "/statics.rs"));
+}
+
+pub mod cornucopia {
+    include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 }

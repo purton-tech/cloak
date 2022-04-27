@@ -18,7 +18,7 @@ pub fn routes() -> Router {
         .route(DELETE, post(delete_member::delete))
 }
 
-pub fn member_route(vault_id: u32) -> String {
+pub fn member_route(vault_id: i32) -> String {
     format!("/app/vault/{}/members", vault_id)
 }
 
