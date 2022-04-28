@@ -72,7 +72,7 @@ impl Config {
         // Example to parse
         // APP_DATABASE_URL=postgresql://cloak:testpassword@db:5432/cloak?sslmode=disable
         let mut cfg = deadpool_postgres::Config::new();
-        let url: Vec<&str> = if self.app_database_url.starts_with("") {
+        let url: Vec<&str> = if self.app_database_url.starts_with("postgresql://") {
             self.app_database_url.split("postgresql://").collect()
         } else {
             self.app_database_url.split("postgres://").collect()
