@@ -33,8 +33,11 @@ deadpool-postgres = { version = "0", features = ["serde"] }
 tokio-postgres = { version = "0.7", features = [
     "with-time-0_3",
 ] }
+tokio-postgres-rustls = "0"
 time = { version = "0", default-features = false,  features = ["formatting"] }
 cornucopia_client = "0"
+rustls = "0"
+webpki-roots = "0"
 
 # Generate secure invitations
 rand = "0"
