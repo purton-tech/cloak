@@ -1,10 +1,11 @@
-FROM ianpurton/rust-fullstack-devcontainer:latest AS development
+FROM purtontech/rust-on-nails-devcontainer:1.0.3 AS development
 
 COPY *.bash ./
 
 # Add our aliases and ps1
-RUN cat aliases.bash >> ~/.bashrc && cat ps1.bash >> ~/.bashrc && sudo rm *.bash
+RUN cat ps1.bash >> ~/.bashrc && sudo rm *.bash
 
+COPY .bash_aliases /home/vscode/.bash_aliases
 
 # Enable our git hooks and set the permisisons on docker sock.
 RUN echo 'git config core.hooksPath /vscode/.devcontainer/.githooks' >> ~/.bashrc \
