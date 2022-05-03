@@ -143,7 +143,8 @@ CREATE TABLE public.secrets (
     secret character varying NOT NULL,
     name_blind_index character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    folder character varying DEFAULT '/'::character varying NOT NULL
 );
 
 
@@ -563,4 +564,5 @@ ALTER TABLE ONLY public.invitations
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155201'),
-    ('20220410155319');
+    ('20220410155319'),
+    ('20220503064229');
