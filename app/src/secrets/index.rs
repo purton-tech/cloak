@@ -77,6 +77,7 @@ markup::define! {
                 table.m_table.secrets_table {
                     thead {
                         tr {
+                            th { "Folder" }
                             th { "Name" }
                             th { "Updated" }
                             th { "Created" }
@@ -86,6 +87,9 @@ markup::define! {
                     tbody {
                         @for secret in secrets {
                             tr {
+                                td {
+                                    {secret.folder}
+                                }
                                 td {
                                     ecdh_cipher[cipher=secret.name.clone(),
                                         "wrapped-aes-key"=user_vault.encrypted_vault_key.clone(),

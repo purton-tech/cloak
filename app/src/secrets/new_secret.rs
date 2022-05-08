@@ -13,6 +13,8 @@ use validator::Validate;
 pub struct NewSecret {
     #[validate(length(min = 1, message = "The name is mandatory"))]
     pub name: String,
+    #[validate(length(min = 1, message = "The folder is mandatory"))]
+    pub folder: String,
     #[validate(length(min = 1, message = "The blind index is mandatory"))]
     pub name_blind_index: String,
     #[validate(length(min = 1, message = "The secret is mandatory"))]
@@ -36,6 +38,7 @@ pub async fn new(
         &new_secret.name,
         &new_secret.name_blind_index,
         &new_secret.secret,
+        &new_secret.folder,
     )
     .await?;
 
@@ -62,6 +65,8 @@ markup::define! {
                         label[for="secret"] { "Secret" }
                         textarea[rows="10", id="secret-value", type="text", autocomplete="off", required="", name="secret"] {}
 
+                        label[for="folder"] { "Folder" }
+                        input[id="secret-folder", type="text", autocomplete="off", required="", name="folder", value="/"] {}
                     }
 
                     // Store the encrypted vault key here, then we can use it in the client to
