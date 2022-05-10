@@ -1,11 +1,12 @@
---! insert(vault_id, name, name_blind_index, secret, folder)
+--! insert(vault_id, name, name_blind_index, secret, environment_id)
 INSERT INTO 
-    secrets (vault_id, name, name_blind_index, secret, folder)
+    secrets (vault_id, name, name_blind_index, secret, environment_id)
 VALUES($1, $2, $3, $4, $5) 
 
---! get_all(vault_id, current_user_id) { id, vault_id, name, name_blind_index, secret, folder, updated_at, created_at } *
+--! get_all(vault_id, current_user_id) { id, vault_id, name, name_blind_index, secret, environment_name, updated_at, created_at } *
 SELECT  
-    id, vault_id, name, name_blind_index, secret, folder,
+    id, vault_id, name, name_blind_index, secret, 
+    (SELECT name from environments WHERE id = environment_id) AS environment_name,
     updated_at, created_at  
 FROM secrets WHERE vault_id = $1
 AND
@@ -16,7 +17,7 @@ IN
         users_vaults
     WHERE
         user_id = $2)
-ORDER BY folder
+ORDER BY environment_name
 
 --! get(id, current_user_id) { id, vault_id, name, name_blind_index, secret, updated_at, created_at }
 SELECT  

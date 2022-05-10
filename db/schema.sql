@@ -47,6 +47,58 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
+-- Name: environments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.environments (
+    id integer NOT NULL,
+    vault_id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+--
+-- Name: TABLE environments; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.environments IS 'Contains the environments of secrets we store in a vault';
+
+
+--
+-- Name: COLUMN environments.vault_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.environments.vault_id IS 'The vault these environments belong to';
+
+
+--
+-- Name: COLUMN environments.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.environments.name IS 'A user generated name for the environment';
+
+
+--
+-- Name: environments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.environments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: environments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.environments_id_seq OWNED BY public.environments.id;
+
+
+--
 -- Name: invitations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -144,7 +196,7 @@ CREATE TABLE public.secrets (
     name_blind_index character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    folder character varying DEFAULT '/'::character varying NOT NULL
+    environment_id integer DEFAULT 0 NOT NULL
 );
 
 
@@ -360,6 +412,13 @@ ALTER SEQUENCE public.vaults_id_seq OWNED BY public.vaults.id;
 
 
 --
+-- Name: environments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.environments ALTER COLUMN id SET DEFAULT nextval('public.environments_id_seq'::regclass);
+
+
+--
 -- Name: invitations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -413,6 +472,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.vaults ALTER COLUMN id SET DEFAULT nextval('public.vaults_id_seq'::regclass);
+
+
+--
+-- Name: environments environments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.environments
+    ADD CONSTRAINT environments_pkey PRIMARY KEY (id);
 
 
 --

@@ -22,9 +22,14 @@ pub async fn index(
     let user_vault =
         queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
 
+    let environments =
+        queries::environments::get_all(&client, &idor_vault_id, &(current_user.user_id as i32))
+            .await?;
+
     if secrets.is_empty() {
         let empty_page = EmptySecretsPage {
             user_vault: &user_vault,
+            environments,
         };
         crate::layout::vault_layout(
             "Secrets",
@@ -36,6 +41,7 @@ pub async fn index(
     } else {
         let header = SecretsHeader {
             user_vault: &user_vault,
+            environments,
         };
 
         let page = SecretsPage {
@@ -54,16 +60,28 @@ pub async fn index(
 }
 
 markup::define! {
-    SecretsHeader<'a>(user_vault: &'a queries::user_vaults::Get) {
-        @super::new_secret::NewSecretPage { user_vault }
+    SecretsHeader<'a>(
+        user_vault: &'a queries::user_vaults::Get,
+        environments: Vec<queries::environments::GetAll>
+    ) {
+        @super::new_secret::NewSecretPage {
+            user_vault,
+            environments: environments
+        }
         button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
     }
-    EmptySecretsPage<'a>(user_vault: &'a queries::user_vaults::Get) {
+    EmptySecretsPage<'a>(
+        user_vault: &'a queries::user_vaults::Get,
+        environments: Vec<queries::environments::GetAll>
+    ) {
         .empty_page {
             div {
                 h2 { "No Secrets Created"}
                 h3 { "Create your first secret and add it to the vault"}
-                @super::new_secret::NewSecretPage { user_vault }
+                @super::new_secret::NewSecretPage {
+                    user_vault,
+                    environments: environments
+                }
                 button.a_button.mini.primary[id="new-secret"] { "Add Secret" }
             }
         }
@@ -77,7 +95,7 @@ markup::define! {
                 table.m_table.secrets_table {
                     thead {
                         tr {
-                            th { "Folder" }
+                            th { "Environment" }
                             th { "Name" }
                             th { "Updated" }
                             th { "Created" }
@@ -88,7 +106,7 @@ markup::define! {
                         @for secret in secrets {
                             tr {
                                 td {
-                                    {secret.folder}
+                                    {secret.environment_name}
                                 }
                                 td {
                                     ecdh_cipher[cipher=secret.name.clone(),
