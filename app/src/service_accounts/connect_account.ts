@@ -34,7 +34,9 @@ class ConnectAccount extends SideDrawer {
 
             const vaultClient = this.getVaultClient()
 
-            const vaultId = parseInt(vaultSelect.options[vaultSelect.selectedIndex].value)
+            const selectValue = vaultSelect.options[vaultSelect.selectedIndex].value
+            const vaultId = parseInt(selectValue.split(':')[0])
+            const environmentId = parseInt(selectValue.split(':')[1])
 
             const serviceAccountECDHPublicKey = await ECDHPublicKey.import(ByteData.fromB64(ecdhKey.value))
 
@@ -48,7 +50,7 @@ class ConnectAccount extends SideDrawer {
             const vault : GetVaultResponse = await call.response
 
             await this.transferSecretsToServiceAccount(vault, serviceAccountId, 
-                vaultId, serviceAccountECDHPublicKey)
+                vaultId, environmentId, serviceAccountECDHPublicKey)
         } else {
             console.log("Didn't find needed element")
             console.log('vault select = ' + vaultSelect)
@@ -57,8 +59,7 @@ class ConnectAccount extends SideDrawer {
     }
 
     async transferSecretsToServiceAccount(vault: GetVaultResponse, serviceAccountId: number,
-        vaultId: number, serviceAccountECDHPublicKey: ECDHPublicKey) {
-        console.log(vault)
+        vaultId: number, environmentId: number, serviceAccountECDHPublicKey: ECDHPublicKey) {
 
         const wrappedVaultKey = Cipher.fromString(vault.userVaultEncryptedVaultKey)
         const ecdhUserPublicKey = await ECDHPublicKey.import(ByteData.fromB64(vault.userVaultPublicEcdhKey))
@@ -76,10 +77,15 @@ class ConnectAccount extends SideDrawer {
 
         const connectForm = document.getElementById('service-account-form-' + serviceAccountId)
         const connectFormVaultId = document.getElementById('service-account-form-vault-id-' + serviceAccountId)
+        const connectFormEnvironmentId = document.getElementById('service-account-form-environment-id-' + serviceAccountId)
 
         const vaultClient = this.getVaultClient()
 
-        if (connectForm instanceof HTMLFormElement && connectFormVaultId instanceof HTMLInputElement) {
+        if (
+            connectForm instanceof HTMLFormElement && 
+            connectFormVaultId instanceof HTMLInputElement &&
+            connectFormEnvironmentId instanceof HTMLInputElement
+        ) {
 
             const call = vaultClient.createSecrets({
                 accountSecrets: [
@@ -94,6 +100,7 @@ class ConnectAccount extends SideDrawer {
 
             // Assuming that all worked, connect the account to the vault
             connectFormVaultId.value = '' + vaultId
+            connectFormEnvironmentId.value = '' + environmentId
             connectForm.submit()
         }
     }

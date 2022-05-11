@@ -268,7 +268,8 @@ CREATE TABLE public.service_accounts (
     encrypted_ecdh_private_key character varying NOT NULL,
     ecdh_public_key character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    environment_id integer
 );
 
 

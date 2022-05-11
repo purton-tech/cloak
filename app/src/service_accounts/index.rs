@@ -15,7 +15,9 @@ pub async fn index(
     let service_accounts =
         queries::service_accounts::get_all(&client, &(current_user.user_id as i32)).await?;
 
-    let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
+    //let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
+    let environments_and_vaults =
+        queries::environments::get_environments_and_vaults(&client, &(current_user.user_id as i32)).await?;
 
     if service_accounts.is_empty() {
         let empty_page = EmptyServiceAccounts {};
@@ -29,7 +31,7 @@ pub async fn index(
 
         let page = ServiceAccountsPage {
             service_accounts,
-            vaults,
+            environments_and_vaults,
         };
 
         crate::layout::layout_with_header(
@@ -58,8 +60,10 @@ markup::define! {
             }
         }
     }
-    ServiceAccountsPage(service_accounts: Vec<queries::service_accounts::GetAll>,
-        vaults: Vec<queries::vaults::GetAll>) {
+    ServiceAccountsPage(
+        service_accounts: Vec<queries::service_accounts::GetAll>,
+        environments_and_vaults: Vec<queries::environments::GetEnvironmentsAndVaults>
+    ) {
         div.m_card {
             div.header {
                 span { "Service Accounts" }
@@ -70,6 +74,7 @@ markup::define! {
                         tr {
                             th { "Service Account Name" }
                             th { "Vault" }
+                            th { "Environment" }
                             th { "Updated" }
                             th { "Created" }
                             th { "Action" }
@@ -92,8 +97,15 @@ markup::define! {
                                     }
                                     td[id=format!("service-account-row-{}", service_account.id)] {
                                         a[href="#"]
-                                        { "Attach to Vault" }
+                                        { "Connect to Vault" }
                                     }
+                                }
+                                @if let Some(env_name) = service_account.environment_name.clone() {
+                                    td {                                        
+                                        {env_name}
+                                    }
+                                } else {
+                                    td {}
                                 }
                                 td {
                                     relative_time[datetime=service_account.updated_at.format(&Rfc3339).unwrap()] {}
@@ -115,7 +127,9 @@ markup::define! {
         // Generate all the details flyouts
         @for service_account in service_accounts {
             @if service_account.vault_id.is_none() {
-                @super::connect_account::ConnectServiceAccountDrawer{ service_account, vaults }
+                @super::connect_account::ConnectServiceAccountDrawer{ 
+                    service_account, environments_and_vaults 
+                }
             } else {
                 @super::view::ViewServiceAccount{ service_account }
             }
