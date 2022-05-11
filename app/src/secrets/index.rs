@@ -103,8 +103,7 @@ markup::define! {
                     table.m_table.secrets_table {
                         thead {
                             tr {
-                                th { "Environment" }
-                                th { "Name" }
+                                th { "Name of Secret" }
                                 th { "Updated" }
                                 th { "Created" }
                                 th { "Action" }
@@ -114,9 +113,6 @@ markup::define! {
                             @for secret in secrets {
                                 @if secret.environment_name == environment.name {
                                     tr {
-                                        td {
-                                            {secret.environment_name}
-                                        }
                                         td {
                                             ecdh_cipher[cipher=secret.name.clone(),
                                                 "wrapped-aes-key"=user_vault.encrypted_vault_key.clone(),
