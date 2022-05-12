@@ -564,6 +564,14 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: users_vaults users_vaults_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_vaults
+    ADD CONSTRAINT users_vaults_pkey PRIMARY KEY (user_id, vault_id);
+
+
+--
 -- Name: vaults vaults_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -633,4 +641,5 @@ ALTER TABLE ONLY public.invitations
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155201'),
     ('20220410155319'),
-    ('20220503064229');
+    ('20220503064229'),
+    ('20220512092812');
