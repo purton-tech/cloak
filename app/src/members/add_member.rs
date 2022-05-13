@@ -15,15 +15,19 @@ pub struct AddMember {
     pub wrapped_vault_key: String,
     #[validate(length(min = 1, message = "The ecdh_public_key is mandatory"))]
     pub ecdh_public_key: String,
+    // Comma separated list of environemnt id's
+    pub environments: String,
 }
 
 pub async fn add(
     Path(id): Path<i32>,
     current_user: Authentication,
     Form(add_member): Form<AddMember>,
-    Extension(pool): Extension<Pool>,
+    Extension(pool): Extension<Pool>
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
+
+    dbg!(&add_member);
 
     // Do an IDOR check, does this user have access to the vault. This will
     // blow up if we don't
@@ -42,24 +46,35 @@ pub async fn add(
 }
 
 markup::define! {
-    AddMemberDrawer<'a>(team: &'a Vec<queries::organisations::GetUsers>,
-        user_vault: &'a queries::user_vaults::Get) {
+    AddMemberDrawer<'a>(
+        team: &'a Vec<queries::organisations::GetUsers>,
+        environments: &'a Vec<queries::environments::GetAll>,
+        user_vault: &'a queries::user_vaults::Get
+    ) {
 
         form.m_form[id="add-team-member", method = "post", action=super::add_route(user_vault.vault_id)] {
             add_member[label="Add Member"] {
                 template[slot="body"] {
-                    p {
-                        "Invite people into your team."
-                    }
 
-
-                    select[id="user-selection", name="user_id"] {
-                        @for user in *team {
-                            option[value=format!("{}", user.id), "data-ecdh-pub-key"=user.ecdh_public_key.clone()] {
-                                {user.email}
+                    fieldset {
+                        label[for="name"] { "Give the following user permissions to this vault" }
+                        select[id="user-selection", name="user_id"] {
+                            @for user in *team {
+                                option[value=format!("{}", user.id), "data-ecdh-pub-key"=user.ecdh_public_key.clone()] {
+                                    {user.email}
+                                }
                             }
                         }
+                        
+                        label[for="name"] { "Give the user access to these environments" }
+
+                        @for env in *environments {
+                            input[type="checkbox", name="env", value=env.id] { {env.name} }
+                        }
                     }
+
+                    // We convert the checkboxes into a comma separated lsit of environment id's
+                    input[type="hidden", name="environments", id="environments"] {}
 
                     // Store the encrypted vault key here, then we can use it in the client to
                     // encrypt the secrets we create.

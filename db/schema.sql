@@ -348,6 +348,23 @@ CREATE TABLE public.users (
 
 
 --
+-- Name: users_environments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users_environments (
+    environment_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+--
+-- Name: TABLE users_environments; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.users_environments IS 'Members of a vault have access to a selection of environments';
+
+
+--
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -556,6 +573,14 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: users_environments users_environments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_environments
+    ADD CONSTRAINT users_environments_pkey PRIMARY KEY (environment_id, user_id);
+
+
+--
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -642,4 +667,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155201'),
     ('20220410155319'),
     ('20220503064229'),
-    ('20220512092812');
+    ('20220512092812'),
+    ('20220513084444');

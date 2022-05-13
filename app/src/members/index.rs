@@ -30,12 +30,17 @@ pub async fn index(
     let user_vault =
         queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
 
+    let environments =
+        queries::environments::get_all(&client, &user_vault.vault_id, &(current_user.user_id as i32))
+            .await?;
+
     let page = MembersPage {
         _vault_name: "vaults".to_string(),
         members: &members,
     };
     let header = MembersHeader {
         _vault_name: "vaults".to_string(),
+        environments: &environments,
         team: &team,
         user_vault: &user_vault,
     };
@@ -53,10 +58,12 @@ markup::define! {
     MembersHeader<'a>(
         _vault_name: String,
         user_vault: &'a queries::user_vaults::Get,
-        team: &'a Vec<queries::organisations::GetUsers>)
-    {
+        environments: &'a Vec<queries::environments::GetAll>,
+        team: &'a Vec<queries::organisations::GetUsers>
+    ) {
         @super::add_member::AddMemberDrawer {
             user_vault: *user_vault,
+            environments: *environments,
             team: *team
         }
         button.a_button.mini.primary[id="add-member"] { "Add Member" }
