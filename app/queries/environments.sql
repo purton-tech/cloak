@@ -13,6 +13,9 @@ IN
         user_id = $2)
 ORDER BY name
 
+--! connect_environment_to_user(user_id, environment_id)
+INSERT INTO users_environments (user_id, environment_id) VALUES($1, $2);
+
 --! setup_environments(vault_id)
 INSERT INTO 
     environments (vault_id, name)
