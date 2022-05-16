@@ -69,7 +69,7 @@ markup::define! {
                 template[slot="body"] {
 
                     fieldset {
-                        label[for="name"] { "Give the following user permissions to this vault" }
+                        label[for="name"] { "Which team member do you want ot give access to?" }
                         select[id="user-selection", name="user_id"] {
                             @for user in *team {
                                 option[value=format!("{}", user.id), "data-ecdh-pub-key"=user.ecdh_public_key.clone()] {
@@ -77,11 +77,20 @@ markup::define! {
                                 }
                             }
                         }
+                        span.a_help_text {
+                            "Select a user"
+                        }
 
-                        label[for="name"] { "Give the user access to these environments" }
+                        label[for="name"] { "Which environments do you want the user to have access to?" }
 
                         @for env in *environments {
-                            input[type="checkbox", name="env", value=env.id] { {env.name} }
+                            label[] {
+                                input[type="checkbox", name="env", value=env.id] {  }
+                                {env.name}
+                            }
+                        }
+                        span.a_help_text {
+                            "Select at least one environment"
                         }
                     }
 
