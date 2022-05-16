@@ -647,11 +647,27 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.vaults FOR EACH ROW EXECUT
 
 
 --
+-- Name: users_environments fk_environment; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_environments
+    ADD CONSTRAINT fk_environment FOREIGN KEY (environment_id) REFERENCES public.environments(id) ON DELETE CASCADE;
+
+
+--
 -- Name: invitations fk_organisation; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.invitations
     ADD CONSTRAINT fk_organisation FOREIGN KEY (organisation_id) REFERENCES public.organisations(id);
+
+
+--
+-- Name: users_environments fk_user; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_environments
+    ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --

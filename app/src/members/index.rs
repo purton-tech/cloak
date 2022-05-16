@@ -24,8 +24,8 @@ pub async fn index(
 
     let members = queries::user_vaults::get_users_dangerous(&client, &idor_vault_id).await?;
 
-    let team =
-        queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
+    let non_members =
+        queries::user_vaults::get_non_members_dangerous(&client, &idor_vault_id, &org.id).await?;
 
     let user_vault =
         queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
@@ -39,7 +39,7 @@ pub async fn index(
     };
     let header = MembersHeader {
         environments: &environments,
-        team: &team,
+        non_members: &non_members,
         user_vault: &user_vault,
     };
 
@@ -56,14 +56,16 @@ markup::define! {
     MembersHeader<'a>(
         user_vault: &'a queries::user_vaults::Get,
         environments: &'a Vec<queries::environments::GetAll>,
-        team: &'a Vec<queries::organisations::GetUsers>
+        non_members: &'a Vec<queries::user_vaults::GetNonMembersDangerous>
     ) {
-        @super::add_member::AddMemberDrawer {
-            user_vault: *user_vault,
-            environments: *environments,
-            team: *team
+        @if non_members.len() != 0 {
+            @super::add_member::AddMemberDrawer {
+                user_vault: *user_vault,
+                environments: *environments,
+                non_members: *non_members
+            }
+            button.a_button.mini.primary[id="add-member"] { "Add Member" }
         }
-        button.a_button.mini.primary[id="add-member"] { "Add Member" }
     }
     MembersPage<'a>(
         members: &'a Vec<queries::user_vaults::GetUsersDangerous>)

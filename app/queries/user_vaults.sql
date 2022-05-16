@@ -42,11 +42,23 @@ LEFT JOIN users u ON u.id = uv.user_id
 WHERE 
     uv.vault_id = $1
 
+-- Fetch members of the team that have not been added to this vault
+--! get_non_members_dangerous(vault_id, organisation_id) { id, email, ecdh_public_key } *
+SELECT 
+    u.id, 
+    u.email,
+    u.ecdh_public_key
+FROM users u
+WHERE 
+    u.id IN (SELECT user_id FROM organisation_users WHERE organisation_id = $2)
+AND
+    u.id NOT IN (SELECT user_id FROM users_vaults WHERE vault_id = $1)
+
 --! remove_user_from_vault(user_id, vault_id, current_user)
 DELETE FROM
     users_vaults
 WHERE
-    vault_id = $1
+    vault_id = $2
 AND
-    user_id =$2
+    user_id =$1
 AND vault_id IN (SELECT vault_id FROM users_vaults WHERE user_id = $3)

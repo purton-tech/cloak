@@ -59,7 +59,7 @@ pub async fn add(
 
 markup::define! {
     AddMemberDrawer<'a>(
-        team: &'a Vec<queries::organisations::GetUsers>,
+        non_members: &'a Vec<queries::user_vaults::GetNonMembersDangerous>,
         environments: &'a Vec<queries::environments::GetAll>,
         user_vault: &'a queries::user_vaults::Get
     ) {
@@ -71,7 +71,7 @@ markup::define! {
                     fieldset {
                         label[for="name"] { "Which team member do you want ot give access to?" }
                         select[id="user-selection", name="user_id"] {
-                            @for user in *team {
+                            @for user in *non_members {
                                 option[value=format!("{}", user.id), "data-ecdh-pub-key"=user.ecdh_public_key.clone()] {
                                     {user.email}
                                 }
