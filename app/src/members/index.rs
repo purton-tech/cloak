@@ -35,11 +35,9 @@ pub async fn index(
             .await?;
 
     let page = MembersPage {
-        _vault_name: "vaults".to_string(),
         members: &members,
     };
     let header = MembersHeader {
-        _vault_name: "vaults".to_string(),
         environments: &environments,
         team: &team,
         user_vault: &user_vault,
@@ -56,7 +54,6 @@ pub async fn index(
 
 markup::define! {
     MembersHeader<'a>(
-        _vault_name: String,
         user_vault: &'a queries::user_vaults::Get,
         environments: &'a Vec<queries::environments::GetAll>,
         team: &'a Vec<queries::organisations::GetUsers>
@@ -69,7 +66,6 @@ markup::define! {
         button.a_button.mini.primary[id="add-member"] { "Add Member" }
     }
     MembersPage<'a>(
-        _vault_name: String,
         members: &'a Vec<queries::user_vaults::GetUsersDangerous>)
     {
         div.m_card {
@@ -81,6 +77,7 @@ markup::define! {
                     thead {
                         tr {
                             th { "Name" }
+                            th { "Environments" }
                             th { "Action" }
                         }
                     }
@@ -90,6 +87,11 @@ markup::define! {
                                 td {
                                     span[class="cipher"] {
                                         {member.email}
+                                    }
+                                }
+                                td {
+                                    @if let Some(envs) = &member.environments {
+                                        {envs}
                                     }
                                 }
                                 td {
