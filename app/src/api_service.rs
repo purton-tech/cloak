@@ -116,10 +116,19 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let service_accounts = service_accounts
             .into_iter()
-            .map(|s| ServiceAccount {
-                service_account_id: s.id as u32,
-                public_ecdh_key: s.ecdh_public_key,
+            .map(|s| {
+                if let Some(env_id) = s.environment_id {
+                    return Some(ServiceAccount {
+                        service_account_id: s.id as u32,
+                        environment_id: env_id as u32,
+                        public_ecdh_key: s.ecdh_public_key
+                    })
+                } else {
+                    return None
+                };
             })
+            .filter(|s| s.is_some())
+            .map(|x| x.unwrap())
             .collect();
 
         let response = GetVaultResponse {

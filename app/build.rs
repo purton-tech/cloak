@@ -12,6 +12,7 @@ fn main() -> Result<(), std::io::Error> {
             &["../protos"], // The path to search
         )
         .unwrap();
+    println!("cargo:rerun-if-changed=../protos");
 
     asset_pipeline();
 

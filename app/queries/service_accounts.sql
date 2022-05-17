@@ -26,11 +26,16 @@ FROM
 WHERE 
     sa.user_id = $1
 
---! get_by_vault(vault_id, current_user_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_by_vault(vault_id, current_user_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, environment_id?, updated_at, created_at } *
 SELECT 
-    sa.id, sa.vault_id, sa.name, v.name as vault_name, 
-    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
-    sa.updated_at, sa.created_at 
+    sa.id, sa.vault_id, 
+    sa.name, 
+    v.name as vault_name, 
+    sa.ecdh_public_key, 
+    sa.encrypted_ecdh_private_key,
+    sa.environment_id,
+    sa.updated_at, 
+    sa.created_at 
 FROM 
     service_accounts sa
 LEFT OUTER JOIN

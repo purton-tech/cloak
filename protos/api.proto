@@ -27,7 +27,8 @@ message Secret {
 
 message ServiceAccount {
     uint32 service_account_id = 1;
-    string public_ecdh_key = 2;
+    uint32 environment_id = 2;
+    string public_ecdh_key = 3;
 }
 
 message ServiceAccountSecrets {
