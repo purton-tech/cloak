@@ -10,6 +10,27 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: rowcount_all(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.rowcount_all(schema_name text DEFAULT 'public'::text) RETURNS TABLE(table_name text, cnt bigint)
+    LANGUAGE plpgsql
+    AS $$
+declare
+ table_name text;
+begin
+  for table_name in SELECT c.relname FROM pg_class c
+    JOIN pg_namespace s ON (c.relnamespace=s.oid)
+    WHERE c.relkind = 'r' AND s.nspname=schema_name
+  LOOP
+    RETURN QUERY EXECUTE format('select cast(%L as text),count(*) from %I.%I',
+       table_name, schema_name, table_name);
+  END LOOP;
+end
+$$;
+
+
+--
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -663,11 +684,35 @@ ALTER TABLE ONLY public.invitations
 
 
 --
+-- Name: secrets fk_secret_vault; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.secrets
+    ADD CONSTRAINT fk_secret_vault FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
+
+
+--
+-- Name: service_account_secrets fk_secrets_service_accounts; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.service_account_secrets
+    ADD CONSTRAINT fk_secrets_service_accounts FOREIGN KEY (service_account_id) REFERENCES public.service_accounts(id) ON DELETE CASCADE;
+
+
+--
 -- Name: users_environments fk_user; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users_environments
     ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users_vaults fk_users_vaults_vaults; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_vaults
+    ADD CONSTRAINT fk_users_vaults_vaults FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
 
 
 --
