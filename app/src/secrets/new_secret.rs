@@ -68,7 +68,7 @@ markup::define! {
                         textarea[rows="10", id="secret-value", type="text", autocomplete="off", required="", name="secret"] {}
 
                         label[for="folder"] { "Environment" }
-                        select[name="environment_id"] {
+                        select[id="environment_id", name="environment_id"] {
                             @for environment in *environments {
                                 option[value=environment.id] {
                                     {environment.name}

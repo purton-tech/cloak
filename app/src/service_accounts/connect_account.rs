@@ -52,9 +52,9 @@ markup::define! {
 
                             option { {"Select..."} }
 
-                            @for vault in *environments_and_vaults {
-                                option[value=format!("{}:{}", vault.vault_id, vault.id)] { 
-                                    {format!("Vault: {}, Environment: {}", vault.vault_name, vault.name)} 
+                            @for environment in *environments_and_vaults {
+                                option[value=format!("{}:{}", environment.vault_id, environment.id)] { 
+                                    {format!("Vault: {}, Environment: {}", environment.vault_name, environment.name)} 
                                 }
                             }
     

@@ -21,6 +21,7 @@ class NewSecret extends SideDrawer {
     private blindIndexInput: HTMLInputElement
     private secretForm: HTMLFormElement
     private vaultIdInput: HTMLInputElement
+    private environmentIdSelect: HTMLSelectElement
 
     constructor() {
         super()
@@ -46,6 +47,7 @@ class NewSecret extends SideDrawer {
         this.blindIndexInput = document.getElementById('name-blind-index') as HTMLInputElement
         this.secretForm = document.getElementById('add-secret-form') as HTMLFormElement
         this.vaultIdInput = document.getElementById('vault-id') as HTMLInputElement
+        this.environmentIdSelect = document.getElementById('environment_id') as HTMLSelectElement
 
         const vaultId = parseInt(this.vaultIdInput.value)
 
@@ -60,8 +62,11 @@ class NewSecret extends SideDrawer {
                 const cipherValue = await vaultKey.encrypt(ByteData.fromText(plaintextValue))
                 const nameBlindIndex = await Vault.blindIndex(plaintextName, vaultId)
 
+                const environmentId = parseInt(this.environmentIdSelect.value)
+
                 await this.sendSecretsToServiceAccounts(vaultId, 
-                    plaintextName, plaintextValue, cipherName, cipherValue, nameBlindIndex)
+                    plaintextName, plaintextValue, cipherName, cipherValue, 
+                    nameBlindIndex, environmentId)
 
             } catch (err) {
                 if (err instanceof Error) {
@@ -80,7 +85,7 @@ class NewSecret extends SideDrawer {
 
     async sendSecretsToServiceAccounts(vaultId : number, plaintextName : string, 
         plaintextValue : string, cipherName : Cipher, cipherValue : Cipher,
-        nameBlindIndex : ByteData) {
+        nameBlindIndex : ByteData, environmentId : number) {
 
         // Call back to the server and get the vault details including the
         // connected service accounts
@@ -92,7 +97,7 @@ class NewSecret extends SideDrawer {
         const vault = await call.response
         const createServiceRequest = await this.deriveServiceAccountSecrets(
             vault.serviceAccounts, 
-            plaintextName, plaintextValue, nameBlindIndex.b64)
+            plaintextName, plaintextValue, nameBlindIndex.b64, environmentId)
         
         const createCall = this.getVaultClient().createSecrets(createServiceRequest, this.getRpcOptions())
         await createCall.response
@@ -100,7 +105,8 @@ class NewSecret extends SideDrawer {
     }
 
     async deriveServiceAccountSecrets(serviceAccounts: ServiceAccount[],
-        plaintextName: string, plaintextValue: string, blindIndex: string)  : Promise<CreateSecretsRequest> {
+        plaintextName: string, plaintextValue: string, 
+        blindIndex: string, environmentId : number)  : Promise<CreateSecretsRequest> {
 
         const etherealKeyPair = await ECDHKeyPair.fromRandom()
         const etherealPublicKeyData = await etherealKeyPair.publicKey.export()
@@ -112,39 +118,45 @@ class NewSecret extends SideDrawer {
 
         for(var index = 0; index < serviceAccounts.length; index ++) {
             const serviceAccount = serviceAccounts[index]
-            // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
-            const serviceAccountECDHPublicKeyData = 
-                ByteData.fromB64(serviceAccount.publicEcdhKey)
-            const serviceAccountECDHPublicKey: ECDHPublicKey = 
-                await ECDHPublicKey.import(serviceAccountECDHPublicKeyData)
-            const aesKeyAgreement: AESKey = 
-                await etherealKeyPair.privateKey.deriveAESKey(serviceAccountECDHPublicKey)
-        
-            // Associated Data
-            const associatedData = new ByteData(new Uint8Array(4))
-            const view = new DataView(associatedData.arr.buffer)
-            view.setUint32(0, serviceAccount.serviceAccountId, true /* littleEndian */);
-        
-            const newEncryptedName = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextName), 
-                associatedData)
-            const newEncryptedValue = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextValue), 
-                associatedData)
-        
-            const secret : Secret = {
-                encryptedName: newEncryptedName.string,
-                encryptedSecretValue: newEncryptedValue.string,
-                nameBlindIndex: blindIndex
-            }
-        
-            const serviceAccountSecrets : ServiceAccountSecrets = {
-                serviceAccountId: serviceAccount.serviceAccountId,
-                secrets: [
-                    secret
-                ],
-                publicEcdhKey: etherealPublicKeyBase64
-            }
 
-            createSecretsRequest.accountSecrets.push(serviceAccountSecrets)
+            // Only send the secret if the service account environment corresponds to the
+            // environment this new secret is being added to.
+            if(environmentId == serviceAccount.environmentId) {
+                // Get a key agreement between the service account ECDH private key and the vault ECDH public key.
+                const serviceAccountECDHPublicKeyData = 
+                    ByteData.fromB64(serviceAccount.publicEcdhKey)
+                const serviceAccountECDHPublicKey: ECDHPublicKey = 
+                    await ECDHPublicKey.import(serviceAccountECDHPublicKeyData)
+                const aesKeyAgreement: AESKey = 
+                    await etherealKeyPair.privateKey.deriveAESKey(serviceAccountECDHPublicKey)
+            
+                // Associated Data
+                const associatedData = new ByteData(new Uint8Array(4))
+                const view = new DataView(associatedData.arr.buffer)
+                view.setUint32(0, serviceAccount.serviceAccountId, true /* littleEndian */);
+            
+                const newEncryptedName = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextName), 
+                    associatedData)
+                const newEncryptedValue = await aesKeyAgreement.aeadEncrypt(ByteData.fromText(plaintextValue), 
+                    associatedData)
+            
+                const secret : Secret = {
+                    encryptedName: newEncryptedName.string,
+                    encryptedSecretValue: newEncryptedValue.string,
+                    environmentId: environmentId,
+                    nameBlindIndex: blindIndex
+                }
+            
+                const serviceAccountSecrets : ServiceAccountSecrets = {
+                    serviceAccountId: serviceAccount.serviceAccountId,
+                    secrets: [
+                        secret
+                    ],
+                    publicEcdhKey: etherealPublicKeyBase64
+                }
+    
+                createSecretsRequest.accountSecrets.push(serviceAccountSecrets)
+            }
         }
 
         console.log(createSecretsRequest.accountSecrets.length)

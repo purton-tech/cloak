@@ -111,6 +111,7 @@ impl app::vault::vault_server::Vault for VaultService {
                 encrypted_name: s.name,
                 name_blind_index: s.name_blind_index,
                 encrypted_secret_value: s.secret,
+                environment_id: s.environment_id as u32
             })
             .collect();
 

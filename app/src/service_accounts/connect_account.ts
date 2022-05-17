@@ -47,9 +47,9 @@ class ConnectAccount extends SideDrawer {
                 },
                 this.getRpcOptions()
             )
-            const vault : GetVaultResponse = await call.response
+            const vault: GetVaultResponse = await call.response
 
-            await this.transferSecretsToServiceAccount(vault, serviceAccountId, 
+            await this.transferSecretsToServiceAccount(vault, serviceAccountId,
                 vaultId, environmentId, serviceAccountECDHPublicKey)
         } else {
             console.log("Didn't find needed element")
@@ -70,7 +70,7 @@ class ConnectAccount extends SideDrawer {
         const aesKey = await etherealKeyPair.privateKey.deriveAESKey(serviceAccountECDHPublicKey)
 
         const rencryptedSecrets = await this.decryptAndRencryptSecrets(vault,
-            vaultKey, aesKey, serviceAccountId)
+            vaultKey, aesKey, serviceAccountId, environmentId)
 
         // Send the encrypted payload back to the server
         const publicKeyExport = await etherealKeyPair.publicKey.export()
@@ -82,7 +82,7 @@ class ConnectAccount extends SideDrawer {
         const vaultClient = this.getVaultClient()
 
         if (
-            connectForm instanceof HTMLFormElement && 
+            connectForm instanceof HTMLFormElement &&
             connectFormVaultId instanceof HTMLInputElement &&
             connectFormEnvironmentId instanceof HTMLInputElement
         ) {
@@ -106,26 +106,29 @@ class ConnectAccount extends SideDrawer {
     }
 
     async decryptAndRencryptSecrets(vault: GetVaultResponse, vaultKey: AESKey,
-        agreementKey: AESKey, serviceAccountId: number): Promise<Secret[]> {
+        agreementKey: AESKey, serviceAccountId: number, environmentId : number): Promise<Secret[]> {
 
         const associatedData = this.getAssociatedData(serviceAccountId)
 
-        var secretList : Array<Secret> = []
+        var secretList: Array<Secret> = []
 
         // Process the secrets - re-encrypt them with the agreement key.
         for await (var secret of vault.secrets) {
-            const cipherName = Cipher.fromString(secret.encryptedName)
-            const plaintextName: ByteData = await vaultKey.decrypt(cipherName)
-            const newEncryptedName = await agreementKey.aeadEncrypt(plaintextName, associatedData)
-
-            secret.encryptedName = newEncryptedName.string
-            const cipherValue = Cipher.fromString(secret.encryptedSecretValue)
-            const plaintextValue: ByteData = await vaultKey.decrypt(cipherValue)
-
-            const newEncryptedValue = await agreementKey.aeadEncrypt(plaintextValue, associatedData)
-            secret.encryptedSecretValue = newEncryptedValue.string
-
-            secretList.push(secret)
+            if(secret.environmentId == environmentId) {
+                const cipherName = Cipher.fromString(secret.encryptedName)
+                const plaintextName: ByteData = await vaultKey.decrypt(cipherName)
+                const newEncryptedName = await agreementKey.aeadEncrypt(plaintextName, associatedData)
+    
+                secret.encryptedName = newEncryptedName.string
+                secret.environmentId = environmentId
+                const cipherValue = Cipher.fromString(secret.encryptedSecretValue)
+                const plaintextValue: ByteData = await vaultKey.decrypt(cipherValue)
+    
+                const newEncryptedValue = await agreementKey.aeadEncrypt(plaintextValue, associatedData)
+                secret.encryptedSecretValue = newEncryptedValue.string
+    
+                secretList.push(secret)
+            }            
         }
         return secretList
     }
@@ -144,7 +147,7 @@ class ConnectAccount extends SideDrawer {
         return new VaultClient(transport)
     }
 
-    private getRpcOptions() : RpcOptions {
+    private getRpcOptions(): RpcOptions {
         const meta = {}
         meta['authentication-type'] = 'cookie';
 
