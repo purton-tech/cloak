@@ -671,6 +671,14 @@ ALTER TABLE ONLY public.users_environments
 
 
 --
+-- Name: environments fk_vault; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.environments
+    ADD CONSTRAINT fk_vault FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
+
+
+--
 -- PostgreSQL database dump complete
 --
 

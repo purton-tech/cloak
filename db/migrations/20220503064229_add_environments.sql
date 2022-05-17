@@ -4,7 +4,11 @@ ALTER TABLE secrets ADD COLUMN environment_id INT NOT NULL DEFAULT 0;
 CREATE TABLE environments (
     id SERIAL PRIMARY KEY, 
     vault_id INT NOT NULL, 
-    name VARCHAR NOT NULL
+    name VARCHAR NOT NULL,
+    CONSTRAINT fk_vault
+        FOREIGN KEY (vault_id)
+        REFERENCES vaults(id) 
+        ON DELETE CASCADE
 );
 
 COMMENT ON TABLE environments IS 'Contains the environments of secrets we store in a vault';
