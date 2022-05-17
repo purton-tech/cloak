@@ -81,10 +81,10 @@ markup::define! {
                             "Select a user"
                         }
 
-                        label[for="name"] { "Which environments do you want the user to have access to?" }
+                        label[] { "Which environments do you want the user to have access to?" }
 
                         @for env in *environments {
-                            label[] {
+                            label[for=env.name.clone()] {
                                 input[type="checkbox", name="env", value=env.id] {  }
                                 {env.name}
                             }

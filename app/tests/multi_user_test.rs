@@ -116,6 +116,10 @@ async fn add_member_to_vault(driver: &WebDriver, email: &str) -> WebDriverResult
     let select = SelectElement::new(&vault_selector).await?;
     select.select_by_exact_text(email).await?;
 
+    // Check the development environment
+    let dev_label = driver.find_element(By::Css("label[for='Development']")).await?;
+    dev_label.click().await?;
+
     let submit_button = driver
         .find_element(By::Css(".a_button.auto.success"))
         .await?;
