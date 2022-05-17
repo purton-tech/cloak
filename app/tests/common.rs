@@ -223,12 +223,12 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
         .await?;
     submit_button.click().await?;
 
-    let attach_link = driver.find_element(By::LinkText("Attach to Vault")).await?;
+    let attach_link = driver.find_element(By::LinkText("Connect to Vault")).await?;
     attach_link.click().await?;
 
     let vault_selector = driver.find_element(By::Css("select:first-of-type")).await?;
     let select = SelectElement::new(&vault_selector).await?;
-    select.select_by_exact_text("My Vault").await?;
+    select.select_by_exact_text("Vault: My Vault, Environment: Development").await?;
 
     // Connect this account
     let connect_button = driver

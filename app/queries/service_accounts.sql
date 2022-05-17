@@ -1,38 +1,41 @@
---! connect(vault_id, id, current_user_id)
+--! connect(vault_id, environment_id, id, current_user_id)
  UPDATE service_accounts 
 SET 
-    vault_id = $1
+    vault_id = $1, environment_id = $2
 WHERE 
-    id = $2
+    id = $3
 AND 
     -- Make sure the user has access to the vault
-    $1 IN (SELECT vault_id from users_vaults WHERE user_id = $3)
-AND user_id = $3
+    $1 IN (SELECT vault_id from users_vaults WHERE user_id = $4)
+AND user_id = $4
 
 --! insert(user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
 INSERT INTO 
     service_accounts (user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
 VALUES($1, $2, $3, $4) 
 
---! get_all(user_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_all(user_id) { id, vault_id?, account_name, vault_name?, environment_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
 SELECT 
-    sa.id, sa.vault_id, sa.name, v.name as vault_name, 
+    sa.id, sa.vault_id, sa.name,
+    (SELECT name FROM vaults WHERE id = sa.vault_id) as vault_name,
+    (SELECT name FROM environments WHERE id = sa.environment_id) as environment_name,
     sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
     sa.updated_at, sa.created_at 
 FROM 
     service_accounts sa
-LEFT JOIN
-    vaults v
-ON 
-    v.id = sa.vault_id
 WHERE 
     sa.user_id = $1
 
---! get_by_vault(vault_id, current_user_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_by_vault(vault_id, current_user_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, environment_id?, updated_at, created_at } *
 SELECT 
-    sa.id, sa.vault_id, sa.name, v.name as vault_name, 
-    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
-    sa.updated_at, sa.created_at 
+    sa.id, sa.vault_id, 
+    sa.name, 
+    v.name as vault_name, 
+    sa.ecdh_public_key, 
+    sa.encrypted_ecdh_private_key,
+    sa.environment_id,
+    sa.updated_at, 
+    sa.created_at 
 FROM 
     service_accounts sa
 LEFT OUTER JOIN

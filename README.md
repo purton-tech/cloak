@@ -24,4 +24,5 @@
 | Hashicorp Vault  | https://www.vaultproject.io/ | No | No | Yes | Lots of Features | 
 | Conjur  | https://www.conjur.org/ | No | No | Yes |  | 
 | Doppler  | https://www.doppler.com/ | Yes | No | Yes |  | 
+| EnvKey | https://envkey.com/ | Yes | Yes | Yes | Expemsive |
 

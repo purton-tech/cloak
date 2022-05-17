@@ -1,4 +1,4 @@
-FROM ianpurton/rust-fullstack-devcontainer:latest
+FROM purtontech/rust-on-nails-devcontainer:1.0.5
 
 # Proto compiler and web grpc.
 RUN sudo apt update \

@@ -53,9 +53,23 @@ class AddMember extends SideDrawer {
                 const form = document.getElementById("add-team-member")
     
                 if(form instanceof HTMLFormElement) {
+                    this.parseEnvironments()
                     form.submit()
                 }
             }
+        }
+    }
+
+    private async parseEnvironments() {
+        var ids = ''
+        this.querySelectorAll("input[type='checkbox']:checked").forEach((item) => {
+            if(item instanceof HTMLInputElement) {
+                ids += item.value + ','
+            }
+        })
+        const envHiddenField = this.querySelector('#environments')
+        if(envHiddenField instanceof HTMLInputElement) {
+            envHiddenField.value = ids
         }
     }
 

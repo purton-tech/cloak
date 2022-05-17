@@ -12,6 +12,7 @@ use validator::Validate;
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct ConnectServiceAccount {
     pub vault_id: i32,
+    pub environment_id: i32,
     pub service_account_id: i32,
 }
 
@@ -25,6 +26,7 @@ pub async fn connect(
     queries::service_accounts::connect(
         &client,
         &connect_form.vault_id,
+        &connect_form.environment_id,
         &connect_form.service_account_id,
         &(current_user.user_id as i32),
     )
@@ -36,25 +38,35 @@ pub async fn connect(
 markup::define! {
     ConnectServiceAccountDrawer<'a>(
         service_account: &'a queries::service_accounts::GetAll,
-        vaults: &'a Vec<queries::vaults::GetAll>) {
+        environments_and_vaults: &'a Vec<queries::environments::GetEnvironmentsAndVaults>
+    ) {
 
-        connect_account[label=format!("View {}", service_account.account_name),
+        connect_account[label="Connect to Vault",
             "service-account-id"=format!("{}", service_account.id)] {
 
             template[slot="body"] {
-                fieldset {
-                    label[for="secret"] { "ECDH Public Key" }
-                    select[id=format!("vault-select-{}", service_account.id)] {
-                        option { {"Select..."} }
-                        @for vault in *vaults {
-                            option[value=vault.id] { {vault.name} }
-                        }
+                form.m_form {
+                    fieldset {
+                        label[for="secret"] { "Which Vault would you like to connect to?" }
+                        select[id=format!("vault-select-{}", service_account.id)] {
 
-                        input[id=format!("service-account-public-key-{}", service_account.id), type="hidden",
-                            value=service_account.ecdh_public_key.clone(),
-                            name="public_key"] {}
+                            option { {"Select..."} }
+
+                            @for environment in *environments_and_vaults {
+                                option[value=format!("{}:{}", environment.vault_id, environment.id)] { 
+                                    {format!("Vault: {}, Environment: {}", environment.vault_name, environment.name)} 
+                                }
+                            }
+    
+                            input[
+                                id=format!("service-account-public-key-{}", service_account.id), 
+                                type="hidden",
+                                value=service_account.ecdh_public_key.clone(),
+                                name="public_key"
+                            ] {}
+                        }
+                        span.a_help_text { "The key for this service account" }
                     }
-                    span.a_help_text { "The key for this service account" }
                 }
             }
 
@@ -71,6 +83,8 @@ markup::define! {
             id=format!("service-account-form-{}", service_account.id)] {
                 input[type="hidden", name="service_account_id",
                     value=format!("{}", service_account.id)] {}
+                input[type="hidden", name="environment_id",
+                    id=format!("service-account-form-environment-id-{}", service_account.id)] {}
                 input[type="hidden", name="vault_id",
                     id=format!("service-account-form-vault-id-{}", service_account.id)] {}
         }

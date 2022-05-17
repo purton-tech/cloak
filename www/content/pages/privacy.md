@@ -122,9 +122,9 @@ Each data subject shall have the right granted by the European legislator to obt
 
 the purposes of the processing;
 
-the categories of personal data concerned;
+the environments of personal data concerned;
 
-the recipients or categories of recipients to whom the personal data have been or will be disclosed, in particular recipients in third countries or international organisations;
+the recipients or environments of recipients to whom the personal data have been or will be disclosed, in particular recipients in third countries or international organisations;
 
 where possible, the envisaged period for which the personal data will be stored, or, if not possible, the criteria used to determine that period;
 

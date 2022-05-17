@@ -24,19 +24,22 @@ pub async fn index(
 
     let members = queries::user_vaults::get_users_dangerous(&client, &idor_vault_id).await?;
 
-    let team =
-        queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
+    let non_members =
+        queries::user_vaults::get_non_members_dangerous(&client, &idor_vault_id, &org.id).await?;
 
     let user_vault =
         queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
 
+    let environments =
+        queries::environments::get_all(&client, &user_vault.vault_id, &(current_user.user_id as i32))
+            .await?;
+
     let page = MembersPage {
-        _vault_name: "vaults".to_string(),
         members: &members,
     };
     let header = MembersHeader {
-        _vault_name: "vaults".to_string(),
-        team: &team,
+        environments: &environments,
+        non_members: &non_members,
         user_vault: &user_vault,
     };
 
@@ -51,18 +54,20 @@ pub async fn index(
 
 markup::define! {
     MembersHeader<'a>(
-        _vault_name: String,
         user_vault: &'a queries::user_vaults::Get,
-        team: &'a Vec<queries::organisations::GetUsers>)
-    {
-        @super::add_member::AddMemberDrawer {
-            user_vault: *user_vault,
-            team: *team
+        environments: &'a Vec<queries::environments::GetAll>,
+        non_members: &'a Vec<queries::user_vaults::GetNonMembersDangerous>
+    ) {
+        @if non_members.len() != 0 {
+            @super::add_member::AddMemberDrawer {
+                user_vault: *user_vault,
+                environments: *environments,
+                non_members: *non_members
+            }
+            button.a_button.mini.primary[id="add-member"] { "Add Member" }
         }
-        button.a_button.mini.primary[id="add-member"] { "Add Member" }
     }
     MembersPage<'a>(
-        _vault_name: String,
         members: &'a Vec<queries::user_vaults::GetUsersDangerous>)
     {
         div.m_card {
@@ -74,6 +79,7 @@ markup::define! {
                     thead {
                         tr {
                             th { "Name" }
+                            th { "Environments" }
                             th { "Action" }
                         }
                     }
@@ -83,6 +89,11 @@ markup::define! {
                                 td {
                                     span[class="cipher"] {
                                         {member.email}
+                                    }
+                                }
+                                td {
+                                    @if let Some(envs) = &member.environments {
+                                        {envs}
                                     }
                                 }
                                 td {

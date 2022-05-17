@@ -21,6 +21,10 @@
         font-weight: 600;
         padding-bottom: .25rem;
         display: block;
+
+        > input[type='checkbox'] {
+          margin-right: 1rem;
+        }
       }
 
       > label:first-of-type {
@@ -35,7 +39,7 @@
       }
 
       > span.error {
-        color: var(--geist-error);
+        color: var(--error);
       }
 
       &.action {

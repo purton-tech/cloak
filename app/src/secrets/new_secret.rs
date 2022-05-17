@@ -13,6 +13,7 @@ use validator::Validate;
 pub struct NewSecret {
     #[validate(length(min = 1, message = "The name is mandatory"))]
     pub name: String,
+    pub environment_id: i32,
     #[validate(length(min = 1, message = "The blind index is mandatory"))]
     pub name_blind_index: String,
     #[validate(length(min = 1, message = "The secret is mandatory"))]
@@ -36,6 +37,7 @@ pub async fn new(
         &new_secret.name,
         &new_secret.name_blind_index,
         &new_secret.secret,
+        &new_secret.environment_id,
     )
     .await?;
 
@@ -43,7 +45,10 @@ pub async fn new(
 }
 
 markup::define! {
-    NewSecretPage<'a>(user_vault: &'a queries::user_vaults::Get) {
+    NewSecretPage<'a>(
+        user_vault: &'a queries::user_vaults::Get, 
+        environments: &'a Vec<queries::environments::GetAll>
+    ) {
 
         form.m_form[id="add-secret-form", method = "post",
             action=super::new_route(user_vault.vault_id)] {
@@ -62,6 +67,14 @@ markup::define! {
                         label[for="secret"] { "Secret" }
                         textarea[rows="10", id="secret-value", type="text", autocomplete="off", required="", name="secret"] {}
 
+                        label[for="folder"] { "Environment" }
+                        select[id="environment_id", name="environment_id"] {
+                            @for environment in *environments {
+                                option[value=environment.id] {
+                                    {environment.name}
+                                }
+                            }
+                        }
                     }
 
                     // Store the encrypted vault key here, then we can use it in the client to

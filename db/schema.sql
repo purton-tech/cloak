@@ -10,6 +10,27 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: rowcount_all(text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.rowcount_all(schema_name text DEFAULT 'public'::text) RETURNS TABLE(table_name text, cnt bigint)
+    LANGUAGE plpgsql
+    AS $$
+declare
+ table_name text;
+begin
+  for table_name in SELECT c.relname FROM pg_class c
+    JOIN pg_namespace s ON (c.relnamespace=s.oid)
+    WHERE c.relkind = 'r' AND s.nspname=schema_name
+  LOOP
+    RETURN QUERY EXECUTE format('select cast(%L as text),count(*) from %I.%I',
+       table_name, schema_name, table_name);
+  END LOOP;
+end
+$$;
+
+
+--
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -45,6 +66,58 @@ $$;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: environments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.environments (
+    id integer NOT NULL,
+    vault_id integer NOT NULL,
+    name character varying NOT NULL
+);
+
+
+--
+-- Name: TABLE environments; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.environments IS 'Contains the environments of secrets we store in a vault';
+
+
+--
+-- Name: COLUMN environments.vault_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.environments.vault_id IS 'The vault these environments belong to';
+
+
+--
+-- Name: COLUMN environments.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.environments.name IS 'A user generated name for the environment';
+
+
+--
+-- Name: environments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.environments_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: environments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.environments_id_seq OWNED BY public.environments.id;
+
 
 --
 -- Name: invitations; Type: TABLE; Schema: public; Owner: -
@@ -143,7 +216,8 @@ CREATE TABLE public.secrets (
     secret character varying NOT NULL,
     name_blind_index character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    environment_id integer DEFAULT 0 NOT NULL
 );
 
 
@@ -215,7 +289,8 @@ CREATE TABLE public.service_accounts (
     encrypted_ecdh_private_key character varying NOT NULL,
     ecdh_public_key character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    environment_id integer
 );
 
 
@@ -294,6 +369,23 @@ CREATE TABLE public.users (
 
 
 --
+-- Name: users_environments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users_environments (
+    environment_id integer NOT NULL,
+    user_id integer NOT NULL
+);
+
+
+--
+-- Name: TABLE users_environments; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.users_environments IS 'Members of a vault have access to a selection of environments';
+
+
+--
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -359,6 +451,13 @@ ALTER SEQUENCE public.vaults_id_seq OWNED BY public.vaults.id;
 
 
 --
+-- Name: environments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.environments ALTER COLUMN id SET DEFAULT nextval('public.environments_id_seq'::regclass);
+
+
+--
 -- Name: invitations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -412,6 +511,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.vaults ALTER COLUMN id SET DEFAULT nextval('public.vaults_id_seq'::regclass);
+
+
+--
+-- Name: environments environments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.environments
+    ADD CONSTRAINT environments_pkey PRIMARY KEY (id);
 
 
 --
@@ -487,11 +594,27 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: users_environments users_environments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_environments
+    ADD CONSTRAINT users_environments_pkey PRIMARY KEY (environment_id, user_id);
+
+
+--
 -- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users_vaults users_vaults_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_vaults
+    ADD CONSTRAINT users_vaults_pkey PRIMARY KEY (user_id, vault_id);
 
 
 --
@@ -545,11 +668,59 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.vaults FOR EACH ROW EXECUT
 
 
 --
+-- Name: users_environments fk_environment; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_environments
+    ADD CONSTRAINT fk_environment FOREIGN KEY (environment_id) REFERENCES public.environments(id) ON DELETE CASCADE;
+
+
+--
 -- Name: invitations fk_organisation; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.invitations
     ADD CONSTRAINT fk_organisation FOREIGN KEY (organisation_id) REFERENCES public.organisations(id);
+
+
+--
+-- Name: secrets fk_secret_vault; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.secrets
+    ADD CONSTRAINT fk_secret_vault FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
+
+
+--
+-- Name: service_account_secrets fk_secrets_service_accounts; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.service_account_secrets
+    ADD CONSTRAINT fk_secrets_service_accounts FOREIGN KEY (service_account_id) REFERENCES public.service_accounts(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users_environments fk_user; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_environments
+    ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users_vaults fk_users_vaults_vaults; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_vaults
+    ADD CONSTRAINT fk_users_vaults_vaults FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
+
+
+--
+-- Name: environments fk_vault; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.environments
+    ADD CONSTRAINT fk_vault FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
 
 
 --
@@ -563,4 +734,7 @@ ALTER TABLE ONLY public.invitations
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155201'),
-    ('20220410155319');
+    ('20220410155319'),
+    ('20220503064229'),
+    ('20220512092812'),
+    ('20220513084444');

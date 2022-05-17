@@ -25,16 +25,11 @@ pub async fn new(
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
-    /***let vault = models::vault::NewVault {
-        name: new_vault.name,
-        encrypted_vault_key: new_vault.encrypted_vault_key,
-        ecdh_public_key: new_vault.public_key,
-    };
-
-    models::vault::Vault::create(&pool, &authentication, vault).await?;**/
 
     let vault_id =
         queries::vaults::insert(&client, &(current_user.user_id as i32), &new_vault.name).await?;
+
+    let envs = queries::environments::setup_environments(&client, &vault_id).await?;
 
     queries::vaults::insert_user_vaults(
         &client,
@@ -44,6 +39,15 @@ pub async fn new(
         &new_vault.encrypted_vault_key,
     )
     .await?;
+
+    for env in envs {
+        queries::environments::connect_environment_to_user(
+            &client,
+            &(current_user.user_id as i32),
+            &env.id,
+        )
+        .await?;
+    }
 
     crate::layout::redirect_and_snackbar(super::INDEX, "Vault Created")
 }
