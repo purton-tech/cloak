@@ -1,4 +1,3 @@
-import * as k8s from "@pulumi/kubernetes";
 import * as kx from "@pulumi/kubernetesx";
 import * as pulumi from "@pulumi/pulumi";
 import { service, deployment } from './util'
@@ -26,34 +25,6 @@ const envoyPod = new kx.PodBuilder({
         name: "envoy",
         image: ENVOY_IMAGE,
         ports: { http: 7100 }
-    }]
-})
-
-const cloudflaredPod = new kx.PodBuilder({
-    imagePullSecrets: [{ name: 'image-pull' }],
-    containers: [{
-        name: "tunnel",
-        image: "cloudflare/cloudflared:2021.11.0",
-        command: ["cloudflared", "tunnel"],
-        args: [
-            `--url=http://${ENVOY_NAME}:7100`,
-            `--hostname=tunnel.cloak.software`,
-            "--origincert=/etc/cloudflared/cert.pem",
-            "--no-autoupdate"
-        ],
-        volumeMounts: [{
-            name: "tunnel-secret-volume",
-            mountPath: "/etc/cloudflared/"
-        }],
-    }],
-    volumes: [{
-        name: "tunnel-secret-volume",
-        secret: {
-            secretName: `cloudflare-cert-${NAME_SPACE}`,
-            items: [
-                { key: "cert.pem", path: "cert.pem" }
-            ]
-        }
     }]
 })
 
@@ -136,7 +107,6 @@ const authPod = new kx.PodBuilder({
     }]
 })
 
-deployment("cloudflared", cloudflaredPod, NAME_SPACE)
 const envoyDeployment = deployment(ENVOY_NAME, envoyPod, NAME_SPACE)
 const wwwDeployment = deployment(WWW_NAME, wwwPod, NAME_SPACE)
 const authDeployment = deployment(AUTH_NAME, authPod, NAME_SPACE)
