@@ -113,6 +113,6 @@ const authDeployment = deployment(AUTH_NAME, authPod, NAME_SPACE)
 const appDeployment = deployment(APP_NAME, appPod, NAME_SPACE)
 
 service(APP_NAME, appDeployment, NAME_SPACE, 7103, 7103)
-service(WWW_NAME, wwwDeployment, NAME_SPACE, 7104, 80)
+service(WWW_NAME, wwwDeployment, NAME_SPACE, 80, 80)
 service(AUTH_NAME, authDeployment, NAME_SPACE, 9090, 9090)
 service(ENVOY_NAME, envoyDeployment, NAME_SPACE, 7100, 7100)
