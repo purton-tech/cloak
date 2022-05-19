@@ -18,6 +18,9 @@ COMMENT ON COLUMN environments.name IS 'A user generated name for the environmen
 GRANT SELECT, INSERT, UPDATE, DELETE ON environments TO cloak;
 GRANT USAGE, SELECT ON environments_id_seq TO cloak;
 
+GRANT SELECT ON environments TO cloak_readonly;
+GRANT SELECT ON environments_id_seq TO cloak_readonly;
+
 ALTER TABLE service_accounts ADD COLUMN environment_id INT;
 
 -- migrate:down

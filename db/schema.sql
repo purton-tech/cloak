@@ -10,27 +10,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: rowcount_all(text); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.rowcount_all(schema_name text DEFAULT 'public'::text) RETURNS TABLE(table_name text, cnt bigint)
-    LANGUAGE plpgsql
-    AS $$
-declare
- table_name text;
-begin
-  for table_name in SELECT c.relname FROM pg_class c
-    JOIN pg_namespace s ON (c.relnamespace=s.oid)
-    WHERE c.relkind = 'r' AND s.nspname=schema_name
-  LOOP
-    RETURN QUERY EXECUTE format('select cast(%L as text),count(*) from %I.%I',
-       table_name, schema_name, table_name);
-  END LOOP;
-end
-$$;
-
-
---
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -214,9 +193,9 @@ CREATE TABLE public.secrets (
     vault_id integer NOT NULL,
     name character varying NOT NULL,
     secret character varying NOT NULL,
-    name_blind_index character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    name_blind_index character varying NOT NULL,
     environment_id integer DEFAULT 0 NOT NULL
 );
 
@@ -250,10 +229,10 @@ CREATE TABLE public.service_account_secrets (
     service_account_id integer NOT NULL,
     name character varying NOT NULL,
     secret character varying NOT NULL,
-    name_blind_index character varying NOT NULL,
-    ecdh_public_key character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    name_blind_index character varying NOT NULL,
+    ecdh_public_key character varying NOT NULL
 );
 
 
@@ -322,7 +301,7 @@ CREATE TABLE public.sessions (
     id integer NOT NULL,
     session_verifier character varying NOT NULL,
     user_id integer NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
     otp_code_encrypted character varying NOT NULL,
     otp_code_attempts integer DEFAULT 0 NOT NULL,
     otp_code_confirmed boolean DEFAULT false NOT NULL,
@@ -363,8 +342,8 @@ CREATE TABLE public.users (
     ecdsa_public_key character varying NOT NULL,
     protected_ecdh_private_key character varying NOT NULL,
     ecdh_public_key character varying NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -412,8 +391,8 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 CREATE TABLE public.users_vaults (
     user_id integer NOT NULL,
     vault_id integer NOT NULL,
-    ecdh_public_key character varying NOT NULL,
-    encrypted_vault_key character varying NOT NULL
+    encrypted_vault_key character varying NOT NULL,
+    ecdh_public_key character varying NOT NULL
 );
 
 
@@ -546,14 +525,6 @@ ALTER TABLE ONLY public.organisations
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.schema_migrations
-    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
-
-
---
 -- Name: secrets secrets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -626,24 +597,10 @@ ALTER TABLE ONLY public.vaults
 
 
 --
--- Name: invitations set_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.invitations FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-
-
---
 -- Name: secrets set_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.secrets FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-
-
---
--- Name: service_account_secrets set_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.service_account_secrets FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 
 --
@@ -658,13 +615,6 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.service_accounts FOR EACH 
 --
 
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-
-
---
--- Name: vaults set_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.vaults FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 
 --

@@ -100,6 +100,7 @@ GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO cloak;
 
 -- Give access to readonly user
 GRANT SELECT ON ALL TABLES IN SCHEMA public TO cloak_readonly;
+GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO cloak_readonly;
 
 -- Give access to auth user
 GRANT SELECT, INSERT, UPDATE, DELETE ON sessions TO cloak_auth;
