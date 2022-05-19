@@ -17,7 +17,7 @@ ARG DBMATE_VERSION=1.15.0
 
 # Base images
 ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
-ARG NGINX=nginx:latest
+ARG NGINX=nginx:1.21.5
 
 # This file builds the following containers
 ARG APP_IMAGE_NAME=purtontech/cloak-server:latest
