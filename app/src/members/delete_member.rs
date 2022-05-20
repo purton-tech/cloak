@@ -39,27 +39,3 @@ pub async fn delete(
 
     crate::layout::redirect_and_snackbar(&url, "Member Removed From Vault")
 }
-
-markup::define! {
-    DeleteMemberForm<'a>(
-        user: &'a queries::user_vaults::GetUsersDangerous) {
-
-        form.m_form[method="post", action=super::delete_route(user.vault_id as u32)] {
-            side_drawer[label="Remove Member from Vault?",
-                id=format!("delete-member-drawer-{}", user.user_id)] {
-
-                template[slot="body"] {
-                    p {
-                        {format!("Are you sure you want to remove {}", user.email)}
-                    }
-                    input[type="hidden", name="user_id", value=user.user_id.to_string()] {}
-                    input[type="hidden", name="vault_id", value=user.vault_id.to_string()] {}
-                }
-                template[slot="footer"] {
-                    button.a_button.auto.danger[type = "submit"] { "Remove Member" }
-                }
-            }
-        }
-
-    }
-}

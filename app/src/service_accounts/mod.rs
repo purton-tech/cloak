@@ -2,7 +2,6 @@ mod connect_account;
 mod delete;
 mod index;
 mod new_account;
-mod view;
 
 use axum::{
     routing::{get, post},

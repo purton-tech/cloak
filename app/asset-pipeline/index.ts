@@ -9,8 +9,8 @@ import './cards'
 import '@github/time-elements/dist/relative-time-element';
 
 // Front end enhancement
-import '../src/vaults/new_vault'
-import '../src/vaults/delete_vault'
+import '../templates/vaults/new_vault'
+import '../templates/vaults/delete_vault'
 import '../src/secrets/new_secret'
 import '../src/service_accounts/new_account'
 import '../src/service_accounts/connect_account'

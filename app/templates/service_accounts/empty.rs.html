@@ -1,0 +1,16 @@
+@use super::super::layout_html;
+@use crate::layout::SideBar;
+
+@(title: &str)
+
+@:layout_html(title, {
+    <div class="empty_page">
+        <div>
+            <h2>This vault doesn't have any secrets yet</h2>
+            <h3>Create your first secret and add it to the vault</h3>
+            <button class="a_button mini primary" id="new-secret">Create A New Secret</button>
+        </div>
+    </div> 
+}, {
+    
+}, None, SideBar::ServiceAccounts)
