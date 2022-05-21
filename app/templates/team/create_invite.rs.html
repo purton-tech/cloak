@@ -1,6 +1,8 @@
+@use crate::team::CREATE;
+
 @()
 
-<form class="m_form" id="create-invite-form" method="post" action="/app/team/create_invite">
+<form class="m_form" id="create-invite-form" method="post" action="@CREATE">
     <invite-user label="Invite User">
         <template slot="body">
             <p>Invite people into your team.</p>
