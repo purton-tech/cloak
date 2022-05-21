@@ -34,7 +34,14 @@ pub async fn index(
             .await?;
 
     let mut buf = Vec::new();
-    crate::templates::service_accounts::empty_html(&mut buf, "Your Vaults").unwrap();
+    crate::templates::members::index_html(
+        &mut buf, 
+        "Your Vaults", 
+        user_vault,
+        members,
+        non_members,
+        environments
+    ).unwrap();
     let html = format!("{}", String::from_utf8_lossy(&buf));
 
     Ok(Html(html))
