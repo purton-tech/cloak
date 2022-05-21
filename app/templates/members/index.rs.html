@@ -6,6 +6,7 @@
 @use crate::cornucopia::queries::user_vaults::GetNonMembersDangerous;
 @use crate::cornucopia::queries::environments::GetAll;
 @use super::delete_html;
+@use super::add_member_html;
 
 @(title: &str, user_vault: Get, 
     members: Vec<GetUsersDangerous>, 
@@ -55,5 +56,8 @@
         @:delete_html(member)
     }
 }, {
-    
+    @if non_members.len() != 0 {
+        @:add_member_html(&user_vault, environments, non_members)
+        <button class="a_button mini primary" id="add-member">Add Member</button>
+    }
 }, Some(user_vault.vault_id), SideBar::Members)

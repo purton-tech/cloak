@@ -1,0 +1,56 @@
+@use super::super::layout_html;
+@use crate::layout::SideBar;
+@use crate::templates::statics::delete_svg;
+@use crate::cornucopia::queries::user_vaults::Get;
+@use crate::cornucopia::queries::user_vaults::GetUsersDangerous;
+@use crate::cornucopia::queries::user_vaults::GetNonMembersDangerous;
+@use crate::cornucopia::queries::environments::GetAll;
+@use super::delete_html;
+
+@(
+    user_vault: &Get, 
+    environments: Vec<GetAll>,
+    non_members: Vec<GetNonMembersDangerous>
+)
+
+<form class="m_form" method="post" action="@crate::members::add_route(user_vault.vault_id)">
+    <add-member>
+        <template slot="body">
+            <fieldset>
+                <label for="name"></label>
+                <select name="user-selection" id="user_id">
+                    @for user in non_members {
+                        <option value="@user.id" data-ecdh-pub-key="@user.ecdh_public_key">
+                            @user.email
+                        </option>
+                    }
+                </select>
+                <span class="a_help_text">Select a user</span>
+
+                <label>Which environments do you want the user to have access to?</label>
+
+                @for env in environments {
+                    <label for="@env.name">
+                        <input type="checkbox" name="env" id="@env.id" />
+                        @env.name
+                    </label>
+                }
+                <span class="a_help_text">Select at least one environment</span>
+            </fieldset>
+
+            <input type="hidden" value="@user_vault.encrypted_vault_key" id="encrypted-vault-key">
+            <input type="hidden" value="@user_vault.ecdh_public_key" id="user-vault-ecdh-public-key">
+            <input type="hidden" value="@user_vault.vault_id" id="vault_id">
+            
+            @* These hidden fields are populated by the add_member.ts *@
+            <input type="hidden" name="environments" id="environments" />
+            <input type="hidden" name="wrapped-vault-key" id="wrapped_vault_key" />
+            <input type="hidden" name="ecdh-public-key" id="ecdh_public_key" />
+
+        </template>
+        <template slot="footer">
+            <button class="a_button auto success">Update Members</button>
+            <button class="a_button auto danger">Cancel</button>
+        </template>
+    </add-member>
+</form>
