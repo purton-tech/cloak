@@ -9,27 +9,24 @@ class NewAccount extends SideDrawer {
 
         let newAccountButton = document.getElementById('new-account')
         newAccountButton.addEventListener('click', async event => {
-            let element = newAccountButton.previousElementSibling.firstChild
-            if (element instanceof SideDrawer) {
 
-                this.open = true
+            this.open = true
 
-                // We create a key pair wrapped with the users key.
-                // Only the user that creates a service account can view the keypair
-                const ecdhKeyPair = await ECDHKeyPair.fromRandom()
+            // We create a key pair wrapped with the users key.
+            // Only the user that creates a service account can view the keypair
+            const ecdhKeyPair = await ECDHKeyPair.fromRandom()
 
-                const userAesKey = await AESKey.fromBarricade()
-                const exportedECDHPrivateKey = await ecdhKeyPair.privateKey.export()
-                const wrappedECDHPrivateKey = await userAesKey.encrypt(exportedECDHPrivateKey)
+            const userAesKey = await AESKey.fromBarricade()
+            const exportedECDHPrivateKey = await ecdhKeyPair.privateKey.export()
+            const wrappedECDHPrivateKey = await userAesKey.encrypt(exportedECDHPrivateKey)
 
-                const publicKeyField = this.querySelector('#public-key')
-                const privateKeyField = this.querySelector('#private-key')
-    
-                if(publicKeyField instanceof HTMLInputElement &&
-                    privateKeyField instanceof HTMLInputElement) {
-                    publicKeyField.value = (await ecdhKeyPair.publicKey.export()).b64
-                    privateKeyField.value = wrappedECDHPrivateKey.string
-                }
+            const publicKeyField = this.querySelector('#public-key')
+            const privateKeyField = this.querySelector('#private-key')
+
+            if(publicKeyField instanceof HTMLInputElement &&
+                privateKeyField instanceof HTMLInputElement) {
+                publicKeyField.value = (await ecdhKeyPair.publicKey.export()).b64
+                privateKeyField.value = wrappedECDHPrivateKey.string
             }
         })
     }

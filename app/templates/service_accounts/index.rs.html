@@ -1,0 +1,70 @@
+@use super::super::layout_html;
+@use crate::layout::SideBar;
+@use super::new_account_html;
+@use crate::templates::statics::delete_svg;
+@use crate::cornucopia::queries::service_accounts::GetAll;
+@use crate::cornucopia::queries::environments::GetEnvironmentsAndVaults;
+
+@(title: &str, service_accounts: Vec<GetAll>, environments_and_vaults: Vec<GetEnvironmentsAndVaults>)
+
+@:layout_html(title, {
+
+    <div class="m_card">
+        <div class="header">
+            <span>Service Accounts</span>
+        </div>
+        <div class="body">
+            <table class="m_table">
+                <thead>
+                    <tr>
+                        <th>Service Account Name</th>
+                        <th>Vault</th>
+                        <th>Environment</th>
+                        <th>Updated</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for service_account in service_accounts {
+                        <tr>
+                            @if let Some(vault_name) = service_account.vault_name {
+                                <td id='@format!("service-account-view-{}", service_account.id)'>
+                                    <a href="#">@service_account.account_name</a>
+                                </td>
+                                <td>
+                                    @vault_name
+                                </td>
+                            } else {
+                                <td>
+                                    @service_account.account_name
+                                </td>
+                                <td id='@format!("service-account-row-{}", service_account.id)'>
+                                    <a href="#">Connect to Vault</a>
+                                </td>
+                            }
+                            @if let Some(env_name) = service_account.environment_name {
+                                <td>@env_name</td>
+                            } else {
+                                <td></td>
+                            }
+                            <td>
+                                <relative-time datetime="2022-05-19T08:43:32.325453Z"></relative-time>
+                            </td>
+                            <td>
+                                <relative-time datetime="2022-05-19T08:43:18.184877Z"></relative-time>
+                            </td>
+                            <td>
+                                <a id="delete-account-controller-5" href="#">
+                                    <img src="/static/@delete_svg.name" width="18"></img>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}, {
+    
+}, None, SideBar::ServiceAccounts)
