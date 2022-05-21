@@ -1,9 +1,86 @@
 @use super::super::layout_html;
 @use crate::layout::SideBar;
+@use crate::cornucopia::queries::organisations::GetUsers;
+@use crate::cornucopia::queries::invitations::GetAll;
+@use crate::cornucopia::queries::organisations::GetTeams;
+@use crate::templates::statics::delete_svg;
 
-@(title: &str)
+@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>, teams: Vec<GetTeams>)
 
 @:layout_html(title, {
+    <div class="m_card">
+        <div class="header">
+            <span>Team</span>
+        </div>
+        <div class="body">
+            <table class="m_table team_table">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for user in users {
+                        <tr>
+                            <td>
+                                @user.email
+                            </td>
+                            @if user.is_admin {
+                                <td>Administrator</td>
+                            } else {
+                                <td>Invitation Accepted</td>
+                            }
+                            <td>
+                                <a href="#" data-drawer-target='@format!("delete-member-drawer-{}-{}", user.organisation_id, user.id)'>
+                                    <img src="/static/@delete_svg.name" width="18"></img>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+
+                    @for invite in invites {
+                        <tr>
+                            <td>
+                                @invite.email
+                            </td>
+                            <td>Invitation Pending</td>
+                            <td>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="m_card">
+        <div class="header">
+            <span>Teams you are a member of</span>
+        </div>
+        <div class="body">
+            <table class="m_table memberships">
+                <thead>
+                    <tr>
+                        <th>Team Name</th>
+                        <th>Team Owner</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for team in teams {
+                        <tr>
+                            @if let Some(name) = team.organisation_name {
+                                <td>@name</td>
+                            } else {
+                                <td>Name not Set</td>
+                            }
+                            <td>@team.team_owner</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }, {
-    
+    <button class="a_button mini primary" id="invite-user">New User</button>
 }, None, SideBar::Team)

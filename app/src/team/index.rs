@@ -22,7 +22,7 @@ pub async fn index(
     let teams = queries::organisations::get_teams(&client, &(current_user.user_id as i32)).await?;
 
     let mut buf = Vec::new();
-    crate::templates::team::index_html(&mut buf, "Your Vaults").unwrap();
+    crate::templates::team::index_html(&mut buf, "Your Vaults", users, invites, teams).unwrap();
     let html = format!("{}", String::from_utf8_lossy(&buf));
 
     Ok(Html(html))
