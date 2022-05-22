@@ -36,7 +36,7 @@ class AddMember extends SideDrawer {
         if(userSelection instanceof HTMLSelectElement 
             && wrappedKeyInput instanceof HTMLInputElement
             && ecdhPublicKeyInput instanceof HTMLInputElement) {
-
+                
             const htmlOption = userSelection.item(userSelection.selectedIndex)
             if(htmlOption instanceof HTMLOptionElement) {
                 const selectedECDHPubKey = htmlOption.getAttribute("data-ecdh-pub-key")
