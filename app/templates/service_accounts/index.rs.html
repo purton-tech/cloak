@@ -1,6 +1,9 @@
 @use super::super::layout_html;
 @use crate::layout::SideBar;
 @use super::new_account_html;
+@use super::connect_account_html;
+@use super::delete_html;
+@use super::view_html;
 @use crate::templates::statics::delete_svg;
 @use crate::cornucopia::queries::service_accounts::GetAll;
 @use crate::cornucopia::queries::environments::GetEnvironmentsAndVaults;
@@ -26,9 +29,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for service_account in service_accounts {
+                    @for service_account in &service_accounts {
                         <tr>
-                            @if let Some(vault_name) = service_account.vault_name {
+                            @if let Some(vault_name) = &service_account.vault_name {
                                 <td id='@format!("service-account-view-{}", service_account.id)'>
                                     <a href="#">@service_account.account_name</a>
                                 </td>
@@ -43,7 +46,7 @@
                                     <a href="#">Connect to Vault</a>
                                 </td>
                             }
-                            @if let Some(env_name) = service_account.environment_name {
+                            @if let Some(env_name) = &service_account.environment_name {
                                 <td>@env_name</td>
                             } else {
                                 <td></td>
@@ -65,6 +68,15 @@
             </table>
         </div>
     </div>
+
+    @for service_account in &service_accounts {
+        @if service_account.vault_id.is_none() {
+            @:connect_account_html(service_account, &environments_and_vaults)
+        } else {
+            @:view_html(service_account)
+        }
+        @:delete_html(service_account.id, &service_account.account_name)
+    }
 }, {
     
 }, None, SideBar::ServiceAccounts)
