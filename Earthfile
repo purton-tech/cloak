@@ -58,7 +58,7 @@ npm-deps:
 npm-build:
     FROM +npm-deps
     COPY $APP_FOLDER/asset-pipeline $APP_FOLDER/asset-pipeline
-    COPY $APP_FOLDER/src $APP_FOLDER/src
+    COPY $APP_FOLDER/templates $APP_FOLDER/templates
     # Protos needed for typescript web gRPC.
     COPY protos protos
     COPY +npm-deps/node_modules $APP_FOLDER/node_modules
@@ -80,7 +80,7 @@ build-cache:
     SAVE IMAGE --cache-hint
 
 build:
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/queries $APP_FOLDER/asset-pipeline $APP_FOLDER
+    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/templates $APP_FOLDER/queries $APP_FOLDER/asset-pipeline $APP_FOLDER
     COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
     COPY --dir db Cargo.lock Cargo.toml protos .
     COPY +build-cache/cargo_home $CARGO_HOME

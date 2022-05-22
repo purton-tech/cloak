@@ -9,15 +9,13 @@
 )
 
 <form class="m_form" method="post" action="@crate::members::add_route(user_vault.vault_id)">
-    <add-member>
+    <add-member label="Add Member">
         <template slot="body">
             <fieldset>
                 <label for="name"></label>
                 <select name="user-selection" id="user_id">
                     @for user in non_members {
-                        <option value="@user.id" data-ecdh-pub-key="@user.ecdh_public_key">
-                            @user.email
-                        </option>
+                        <option value="@user.id" data-ecdh-pub-key="@user.ecdh_public_key">@user.email</option>
                     }
                 </select>
                 <span class="a_help_text">Select a user</span>

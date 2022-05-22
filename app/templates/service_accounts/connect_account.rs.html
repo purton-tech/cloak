@@ -15,9 +15,7 @@
                 <select id='@format!("vault-select-{}", service_account.id)'>
                     <option>Select...</option>
                     @for environment in environments_and_vaults {
-                        <option value='@format!("{}:{}", environment.vault_id, environment.id)'>
-                            @format!("Vault: {}, Environment: {}", environment.vault_name, environment.name)
-                        </option>
+                        <option value='@format!("{}:{}", environment.vault_id, environment.id)'>@format!("Vault: {}, Environment: {}", environment.vault_name, environment.name)</option>
                     }
 
                     <input 
