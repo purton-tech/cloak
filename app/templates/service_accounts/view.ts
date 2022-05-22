@@ -1,5 +1,5 @@
 import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
-import { Vault, ECDHPublicKey, ECDHKeyPair, AESKey, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
+import { AESKey, Cipher, ByteData } from '../../asset-pipeline/cryptography/vault'
 
 class ViewAccount extends SideDrawer {
 

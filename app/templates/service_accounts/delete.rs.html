@@ -5,7 +5,7 @@
 <form class="m_form" method="post" action="@DELETE">
     <side-drawer 
         id='@format!("delete-account-drawer-{}", service_account_id)' 
-        label="@format!("Delete Service Account ({})?", service_account_name)">
+        label='@format!("Delete Service Account ({})?", service_account_name)'>
         <template slot="body">
             <input type="hidden" name="service_account_id" value="@service_account_id" />
         </template>

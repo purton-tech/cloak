@@ -2,11 +2,10 @@
 
 @(service_account: &GetAll)
 
-<form 
-    class="m_form" 
-    label='@format!("View {}", service_account.account_name)'
-    service-account-id='@format!("{}", service_account.id)'>
-    <view-account>
+<form class="m_form">
+    <view-account 
+        service-account-id='@format!("{}", service_account.id)' 
+        label='@format!("View {}", service_account.account_name)'>
         <template slot="body">
             <fieldset>
                 <label for="public_key">ECDH Public Key</label>
@@ -15,7 +14,7 @@
                     name="public_key" 
                     readonly
                     id='@format!("ecdh-public-key-{}", service_account.id)' 
-                    rows="6">service_account.ecdh_public_key</textarea>
+                    rows="6">@service_account.ecdh_public_key</textarea>
             </fieldset>
 
             <label for="encrypted_private_key">ECDH Private Key</label>
@@ -23,7 +22,7 @@
                 name="encrypted_private_key" 
                 readonly
                 id='@format!("wrapped-ecdh-private-key-{}", service_account.id)' 
-                rows="8">service_account.ecdh_public_key</textarea>
+                rows="8">@service_account.ecdh_public_key</textarea>
             <span class="a_help_text">The key for this service account</span>
 
         </template>

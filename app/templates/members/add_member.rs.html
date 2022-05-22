@@ -1,11 +1,6 @@
-@use super::super::layout_html;
-@use crate::layout::SideBar;
-@use crate::templates::statics::delete_svg;
 @use crate::cornucopia::queries::user_vaults::Get;
-@use crate::cornucopia::queries::user_vaults::GetUsersDangerous;
 @use crate::cornucopia::queries::user_vaults::GetNonMembersDangerous;
 @use crate::cornucopia::queries::environments::GetAll;
-@use super::delete_html;
 
 @(
     user_vault: &Get, 

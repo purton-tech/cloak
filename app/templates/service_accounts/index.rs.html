@@ -58,7 +58,7 @@
                                 <relative-time datetime="2022-05-19T08:43:18.184877Z"></relative-time>
                             </td>
                             <td>
-                                <a id="delete-account-controller-5" href="#">
+                                <a id='@format!("delete-account-controller-{}", service_account.id)' href="#">
                                     <img src="/static/@delete_svg.name" width="18"></img>
                                 </a>
                             </td>
@@ -78,5 +78,6 @@
         @:delete_html(service_account.id, &service_account.account_name)
     }
 }, {
-    
+    @:new_account_html()
+    <button class="a_button mini primary" id="new-account">Add Service Account</button>
 }, None, SideBar::ServiceAccounts)
