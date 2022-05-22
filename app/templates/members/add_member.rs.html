@@ -24,7 +24,7 @@
 
                 @for env in environments {
                     <label for="@env.name">
-                        <input type="checkbox" name="env" id="@env.id" />
+                        <input type="checkbox" name="env" id="@env.name" />
                         @env.name
                     </label>
                 }
