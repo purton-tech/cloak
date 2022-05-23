@@ -1,0 +1,27 @@
+@use crate::service_accounts::NEW;
+
+@()
+
+<form class="m_form" method="post" action="@NEW">
+    <new-account label="Add Service Accounts">
+        <template slot="body">
+            <p>
+                To allow applications to access secrets without human intervention,
+                We support service accounts. A service account is a non-human account 
+                that is tied to one or more vaults.
+            </p>
+            <fieldset>
+                <label for="name">Name</label>
+                <input id="secret-name", type="text", required="", name="name", autocomplete="off">
+                </input>
+                <input id="public-key", type="hidden", required="", name="public_key">
+                </input>
+                <input required="", type="hidden", readonly="", name="encrypted_private_key", id="private-key">
+                </input>
+            </fieldset>
+        </template>
+        <template slot="footer">
+            <button class="a_button auto success" type="submit">Create Service Account</button>
+        </template>
+    </new-account>
+</form>

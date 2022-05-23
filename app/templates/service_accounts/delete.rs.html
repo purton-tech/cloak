@@ -1,0 +1,16 @@
+@use crate::service_accounts::DELETE;
+
+@(service_account_id: i32, service_account_name: &str)
+
+<form class="m_form" method="post" action="@DELETE">
+    <side-drawer 
+        id='@format!("delete-account-drawer-{}", service_account_id)' 
+        label='@format!("Delete Service Account ({})?", service_account_name)'>
+        <template slot="body">
+            <input type="hidden" name="service_account_id" value="@service_account_id" />
+        </template>
+        <template slot="footer">
+            <button class="a_button auto danger" type="submit">Delete Service Account</button>
+        </template>
+    </side-drawer>
+</form>

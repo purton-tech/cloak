@@ -4,8 +4,10 @@ import { SideDrawer } from './side-drawer'
 document.querySelectorAll('[data-drawer-target]').forEach(async (row) => {
     // Detect when a user clicks a row
     row.addEventListener('click', (event) => {
+
         event.stopImmediatePropagation()
         const drawer = document.getElementById(row.getAttribute('data-drawer-target'))
+        console.log(drawer)
         if (drawer instanceof SideDrawer) {
             drawer.open = true
         }

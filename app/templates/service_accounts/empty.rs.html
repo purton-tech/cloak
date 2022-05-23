@@ -1,0 +1,18 @@
+@use super::super::layout_html;
+@use crate::layout::SideBar;
+@use super::new_account_html;
+
+@(title: &str)
+
+@:layout_html(title, {
+    <div class="empty_page">
+        <div>
+            <h2>You don't have any service accounts yet</h2>
+            <h3>Service accounts give you access to secrets held in vaults</h3>
+            @:new_account_html()
+            <button class="a_button mini primary" id="new-account">Add Service Account</button>
+        </div>
+    </div> 
+}, {
+    
+}, None, SideBar::ServiceAccounts)

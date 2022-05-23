@@ -1,0 +1,20 @@
+@use crate::team::CREATE;
+
+@()
+
+<form class="m_form" id="create-invite-form" method="post" action="@CREATE">
+    <invite-user label="Invite User">
+        <template slot="body">
+            <p>Invite people into your team.</p>
+            <fieldset>
+                <label for="email">Email</label>
+                <input type="email" autocomplete="off" required="" name="email">
+                </input>
+            </fieldset>
+        </template>
+        <template slot="footer">
+            <button class="a_button auto success" type="submit">Create Invitation</button>
+            <button class="a_button auto danger">Cancel</button>
+        </template>
+    </invite-user>
+</form>

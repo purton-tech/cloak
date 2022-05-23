@@ -9,7 +9,7 @@ class NewVault extends SideDrawer {
 
         let newVaultButton = document.getElementById('new-vault')
         newVaultButton.addEventListener('click', async event => {
-            let element = newVaultButton.previousElementSibling.firstChild
+            let element = document.getElementById('new-vault-drawer')
             if (element instanceof SideDrawer) {
                 element.open = true
     

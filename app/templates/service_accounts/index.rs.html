@@ -1,0 +1,84 @@
+@use super::super::layout_html;
+@use crate::layout::SideBar;
+@use super::new_account_html;
+@use super::connect_account_html;
+@use super::delete_html;
+@use super::view_html;
+@use crate::templates::statics::delete_svg;
+@use crate::cornucopia::queries::service_accounts::GetAll;
+@use crate::cornucopia::queries::environments::GetEnvironmentsAndVaults;
+@use time::format_description::well_known::Rfc3339;
+
+@(title: &str, service_accounts: Vec<GetAll>, environments_and_vaults: Vec<GetEnvironmentsAndVaults>)
+
+@:layout_html(title, {
+
+    <div class="m_card">
+        <div class="header">
+            <span>Service Accounts</span>
+        </div>
+        <div class="body">
+            <table class="m_table">
+                <thead>
+                    <tr>
+                        <th>Service Account Name</th>
+                        <th>Vault</th>
+                        <th>Environment</th>
+                        <th>Updated</th>
+                        <th>Created</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for service_account in &service_accounts {
+                        <tr>
+                            @if let Some(vault_name) = &service_account.vault_name {
+                                <td id='@format!("service-account-view-{}", service_account.id)'>
+                                    <a href="#">@service_account.account_name</a>
+                                </td>
+                                <td>
+                                    @vault_name
+                                </td>
+                            } else {
+                                <td>
+                                    @service_account.account_name
+                                </td>
+                                <td id='@format!("service-account-row-{}", service_account.id)'>
+                                    <a href="#">Connect to Vault</a>
+                                </td>
+                            }
+                            @if let Some(env_name) = &service_account.environment_name {
+                                <td>@env_name</td>
+                            } else {
+                                <td></td>
+                            }
+                            <td>
+                                <relative-time datetime="@service_account.updated_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
+                            </td>
+                            <td>
+                                <relative-time datetime=@service_account.created_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
+                            </td>
+                            <td>
+                                <a id='@format!("delete-account-controller-{}", service_account.id)' href="#">
+                                    <img src="/static/@delete_svg.name" width="18"></img>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @for service_account in &service_accounts {
+        @if service_account.vault_id.is_none() {
+            @:connect_account_html(service_account, &environments_and_vaults)
+        } else {
+            @:view_html(service_account)
+        }
+        @:delete_html(service_account.id, &service_account.account_name)
+    }
+}, {
+    @:new_account_html()
+    <button class="a_button mini primary" id="new-account">Add Service Account</button>
+}, None, SideBar::ServiceAccounts)

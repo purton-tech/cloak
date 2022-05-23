@@ -37,35 +37,3 @@ pub async fn new(
 
     Ok(Redirect::to(super::INDEX.parse().unwrap()))
 }
-
-markup::define! {
-    ServiceAccountForm {
-
-        form.m_form[method = "post", action=super::NEW] {
-            new_account[label="Add Service Accounts"] {
-                template[slot="body"] {
-                    p {
-                        "To allow applications to access secrets without human intervention,
-                        We support service accounts. A service account is a non-human account 
-                        that is tied to one or more vaults."
-                    }
-
-                    fieldset {
-                        label[for="name"] { "Name" }
-                        input[id="secret-name", type="text", required="", name="name", autocomplete="off"] {}
-
-                        input[id="public-key", type="hidden", required="", name="public_key"] {}
-
-                        input[rows="8", required="", type="hidden", readonly="", name="encrypted_private_key", id="private-key"] {}
-
-                    }
-                }
-
-                template[slot="footer"] {
-                    button.a_button.auto.success[type = "submit"] { "Create Service Account" }
-                }
-            }
-        }
-
-    }
-}

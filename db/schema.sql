@@ -193,9 +193,9 @@ CREATE TABLE public.secrets (
     vault_id integer NOT NULL,
     name character varying NOT NULL,
     secret character varying NOT NULL,
+    name_blind_index character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    name_blind_index character varying NOT NULL,
     environment_id integer DEFAULT 0 NOT NULL
 );
 
@@ -229,10 +229,10 @@ CREATE TABLE public.service_account_secrets (
     service_account_id integer NOT NULL,
     name character varying NOT NULL,
     secret character varying NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     name_blind_index character varying NOT NULL,
-    ecdh_public_key character varying NOT NULL
+    ecdh_public_key character varying NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -301,7 +301,7 @@ CREATE TABLE public.sessions (
     id integer NOT NULL,
     session_verifier character varying NOT NULL,
     user_id integer NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
     otp_code_encrypted character varying NOT NULL,
     otp_code_attempts integer DEFAULT 0 NOT NULL,
     otp_code_confirmed boolean DEFAULT false NOT NULL,
@@ -342,8 +342,8 @@ CREATE TABLE public.users (
     ecdsa_public_key character varying NOT NULL,
     protected_ecdh_private_key character varying NOT NULL,
     ecdh_public_key character varying NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -391,8 +391,8 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 CREATE TABLE public.users_vaults (
     user_id integer NOT NULL,
     vault_id integer NOT NULL,
-    encrypted_vault_key character varying NOT NULL,
-    ecdh_public_key character varying NOT NULL
+    ecdh_public_key character varying NOT NULL,
+    encrypted_vault_key character varying NOT NULL
 );
 
 
@@ -597,10 +597,24 @@ ALTER TABLE ONLY public.vaults
 
 
 --
+-- Name: invitations set_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.invitations FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+
+--
 -- Name: secrets set_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.secrets FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+
+--
+-- Name: service_account_secrets set_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.service_account_secrets FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 
 --
@@ -615,6 +629,13 @@ CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.service_accounts FOR EACH 
 --
 
 CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.users FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+
+
+--
+-- Name: vaults set_updated_at; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.vaults FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
 
 
 --

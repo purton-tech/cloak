@@ -26,6 +26,6 @@ pub fn add_route(vault_id: i32) -> String {
     format!("/app/vault/{}/members/add", vault_id)
 }
 
-pub fn delete_route(vault_id: u32) -> String {
+pub fn delete_route(vault_id: i32) -> String {
     format!("/app/vault/{}/members/delete", vault_id)
 }

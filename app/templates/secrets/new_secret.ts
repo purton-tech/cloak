@@ -98,7 +98,7 @@ class NewSecret extends SideDrawer {
         const createServiceRequest = await this.deriveServiceAccountSecrets(
             vault.serviceAccounts, 
             plaintextName, plaintextValue, nameBlindIndex.b64, environmentId)
-        
+            
         const createCall = this.getVaultClient().createSecrets(createServiceRequest, this.getRpcOptions())
         await createCall.response
         await this.submitForm(cipherName, cipherValue, nameBlindIndex)

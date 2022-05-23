@@ -12,9 +12,13 @@ mod service_accounts;
 mod team;
 mod vaults;
 
-use axum::extract::Extension;
+use axum::extract::{Extension, Path};
+use axum::http::{Response, StatusCode, header, HeaderValue};
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
+use crate::templates::statics::StaticFile;
+use axum::body::{self, Empty, Body};
+use axum::{response::IntoResponse, routing::get};
 
 #[tokio::main]
 async fn main() {
@@ -31,14 +35,13 @@ async fn main() {
     let pool = config.create_pool();
 
     let axum_make_service = axum::Router::new()
+        .route("/static/*path", get(static_path))
         .merge(vaults::routes())
         .merge(secrets::routes())
         .merge(team::routes())
         .merge(members::routes())
         .merge(service_accounts::routes())
         .merge(registration_handler::routes())
-        .merge(statics::asset_pipeline_routes())
-        .merge(statics::image_routes())
         .layer(TraceLayer::new_for_http())
         .layer(Extension(config))
         .layer(Extension(pool.clone()))
@@ -60,12 +63,28 @@ async fn main() {
     }
 }
 
-// Error here disabled with "rust-analyzer.diagnostics.disabled": ["macro-error"]
-// in .vscode/settings.json
-pub mod statics {
-    include!(concat!(env!("OUT_DIR"), "/statics.rs"));
+async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
+    let path = path.trim_start_matches('/');
+
+    if let Some(data) = StaticFile::get(path) {
+        Response::builder()
+            .status(StatusCode::OK)
+            .header(
+                header::CONTENT_TYPE,
+                HeaderValue::from_str(data.mime.as_ref()).unwrap(),
+            )
+            .body(body::boxed(Body::from(data.content)))
+            .unwrap()
+    } else {
+        Response::builder()
+            .status(StatusCode::NOT_FOUND)
+            .body(body::boxed(Empty::new()))
+            .unwrap()
+    }
 }
 
 pub mod cornucopia {
     include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 }
+
+include!(concat!(env!("OUT_DIR"), "/ructe/templates.rs"));

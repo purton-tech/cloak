@@ -1,0 +1,18 @@
+@use crate::team::DELETE;
+
+@(organisation_id: i32, user_id: i32, email: &str)
+
+<form class="m_form" method="post" action="@DELETE">
+    <side-drawer 
+        id='@format!("delete-member-drawer-{}-{}", organisation_id, user_id)' 
+        label="Remove this user?">
+        <template slot="body">
+            <p>@format!("Are you sure you want to remove {} from the team?", email)</p>
+            <input type="hidden" name="organisation_id" value="@organisation_id" />
+            <input type="hidden" name="user_id" value="@user_id" />
+        </template>
+        <template slot="footer">
+            <button class="a_button auto danger" type="submit">Remove User</button>
+        </template>
+    </side-drawer>
+</form>

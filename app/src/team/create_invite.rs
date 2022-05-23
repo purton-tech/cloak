@@ -87,28 +87,3 @@ pub async fn create(
 
     Ok((invitation_verifier_base64, invitation_selector_base64))
 }
-
-markup::define! {
-    InviteUserPage {
-        form.m_form[id="create-invite-form", method = "post",
-            action=super::CREATE_INVITE] {
-            invite_user[label="Invite User"] {
-                template[slot="body"] {
-                    p {
-                        "Invite people into your team."
-                    }
-
-                    fieldset {
-                        label[for="email"] { "Email" }
-                        input[type="email", autocomplete="off", required="", name="email"] {}
-                    }
-                }
-
-                template[slot="footer"] {
-                    button.a_button.auto.success[type="submit"] { "Create Invitation" }
-                    button.a_button.auto.danger { "Cancel" }
-                }
-            }
-        }
-    }
-}

@@ -1,0 +1,18 @@
+@use super::super::layout_html;
+@use super::new_vault_html;
+@use crate::layout::SideBar;
+
+@(title: &str)
+
+@:layout_html(title, {
+    <div class="empty_page">
+        <div>
+            <h2>No Vaults Created</h2>
+            <h3>Create your first vault to get started with Cloak</h3>
+            @:new_vault_html()
+            <button class="a_button mini primary" id="new-vault">Create A New Vault</button>
+        </div>
+    </div> 
+}, {
+    
+}, None, SideBar::Vaults)

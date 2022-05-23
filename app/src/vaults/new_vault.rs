@@ -51,37 +51,3 @@ pub async fn new(
 
     crate::layout::redirect_and_snackbar(super::INDEX, "Vault Created")
 }
-
-markup::define! {
-    VaultForm {
-
-        form.m_form[method = "post", action=super::NEW] {
-            new_vault[label="Add Vault"] {
-                template[slot="body"] {
-                    p {
-                        "Vaults keep related secrets together.
-                        For example you could have a vault called My Project with all
-                        the secrets related to your project."
-                    }
-
-                    fieldset {
-                        label[for="name"] { "Name *" }
-                        input[type="text", required="", name="name"] {}
-                        span.a_help_text { "Give your vault a name" }
-
-                        input[required="", type="hidden",
-                            name="encrypted_vault_key",
-                            id="new-vault-key", autocomplete="off"] {}
-
-                        input[id="public-key", type="hidden", required="", name="public_key"] {}
-                    }
-                }
-
-                template[slot="footer"] {
-                    button.a_button.auto.success[type = "submit"] { "Create Vault" }
-                }
-            }
-        }
-
-    }
-}

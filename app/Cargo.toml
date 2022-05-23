@@ -20,9 +20,6 @@ tower-http = { version = "0", default-features = false, features = ["fs", "trace
 # Used for our request parser user_id
 futures = "0.3"
 
-# HTML generation
-markup = "0"
-
 # gRPC dependencies
 tonic = "0"
 prost = "0"
@@ -48,9 +45,12 @@ lettre = { version = "0.10.0-rc.4", default-features = false,  features = ["rust
 p256 = { version = "0.10", default-features = false, features = ["ecdsa", "pem"] } 
 base64 = "0" # So we encode DER public key to base64
 
+# Used by ructe for image mime type detection
+mime = "0.3.0"
+
 [build-dependencies]
-sha1 = "0.6"  # Use by build.rs for cache busting.
 tonic-build = "0"
+ructe = { version="0.14.0", features = ["mime03"] }
 
 [dev-dependencies]
 # WebDriver Library for UI testing.
