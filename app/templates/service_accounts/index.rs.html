@@ -7,6 +7,7 @@
 @use crate::templates::statics::delete_svg;
 @use crate::cornucopia::queries::service_accounts::GetAll;
 @use crate::cornucopia::queries::environments::GetEnvironmentsAndVaults;
+@use time::format_description::well_known::Rfc3339;
 
 @(title: &str, service_accounts: Vec<GetAll>, environments_and_vaults: Vec<GetEnvironmentsAndVaults>)
 
@@ -52,10 +53,10 @@
                                 <td></td>
                             }
                             <td>
-                                <relative-time datetime="2022-05-19T08:43:32.325453Z"></relative-time>
+                                <relative-time datetime="@service_account.updated_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
                             </td>
                             <td>
-                                <relative-time datetime="2022-05-19T08:43:18.184877Z"></relative-time>
+                                <relative-time datetime=@service_account.created_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
                             </td>
                             <td>
                                 <a id='@format!("delete-account-controller-{}", service_account.id)' href="#">

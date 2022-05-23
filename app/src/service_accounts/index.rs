@@ -3,7 +3,6 @@ use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{extract::Extension, response::Html};
 use deadpool_postgres::Pool;
-use time::format_description::well_known::Rfc3339;
 
 pub async fn index(
     current_user: Authentication,

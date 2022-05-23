@@ -6,7 +6,6 @@ use axum::{
     response::Html,
 };
 use deadpool_postgres::Pool;
-use time::format_description::well_known::Rfc3339;
 
 pub async fn index(
     Path(idor_vault_id): Path<i32>,
