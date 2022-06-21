@@ -525,6 +525,14 @@ ALTER TABLE ONLY public.organisations
 
 
 --
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
+
+
+--
 -- Name: secrets secrets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
