@@ -1,10 +1,10 @@
 config:
-  keyvault:cloak-db-migrations: sha256:208472b19715012896eee750f1c0e8c857c3eb39a317026c58d1b272c1be121d
-  keyvault:cloak-envoy: sha256:9b3bcba9fc37982d87cbf3ff2015130d10a2063ffeb53a1dc78c4c4d2793782a
-  keyvault:cloak-server: sha256:956c0174d2a96d0401dc6194935a669c7f2fa64634c61f87ff2dac23539e178d
-  keyvault:cloak-website: sha256:f2c907c05c8abb66816d780c201ab4abde90bfb314af0dfc59330391abbf6a77
+  keyvault:cloak-db-migrations: sha256:4b6d3ab8ed7e339aa99c2ea56e295c6c63fb1b77b461c195b4e267fa2d3e7f89
+  keyvault:cloak-envoy: sha256:99bee8ec94eefe29d9c0fc1f4da11dfdc6556958ec2fbd686b3fbbf84e01bfca
+  keyvault:cloak-server: sha256:657c288301b2429c21dc96a7686bff518dcc2ecb4467cf5cd6f3f642da201f22
+  keyvault:cloak-website: sha256:5cb656cae2f9baa3be5dbfb273eea00c3f63367c75b10563310a879ba4f2f6a6
   keyvault:secret_key:
     secure: AAABAFnoTpfMg3QrjakcPdI6+nvu3KAKTX8y2CzzXMyPgIfLF/uKrYD7wuxdv82414SE5lYZYWH6KHjIP+vF5L4D9OKlNVTSiDqVCATyCu3/UtCz/Vitkwn9ppCCzugJ
   keyvault:sendgrid_api_key:
     secure: AAABAAxs3pnysfX3G7G2Y5PsKhGrzHaLtnP6Mrk09SSN3qTUz7NALkdileBoKRLiVhVubZ2aayS/Jl2PNFsJ1Yz/kycoR+v2k7d8+n+4LQlth2Zw9agzYt/xRGc5tmALJzataTg=
-  keyvault:version: 1.12.2
+  keyvault:version: 1.12.3
