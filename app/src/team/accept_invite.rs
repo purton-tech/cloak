@@ -28,7 +28,7 @@ pub async fn invite(
     )
     .await?;
 
-    Ok(Redirect::to("/app/team".parse()?))
+    Ok(Redirect::to("/app/team"))
 }
 
 pub async fn accept_invitation(

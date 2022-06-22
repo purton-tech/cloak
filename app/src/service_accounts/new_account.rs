@@ -35,5 +35,5 @@ pub async fn new(
     )
     .await?;
 
-    Ok(Redirect::to(super::INDEX.parse().unwrap()))
+    Ok(Redirect::to(super::INDEX))
 }

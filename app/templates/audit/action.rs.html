@@ -1,0 +1,15 @@
+@use crate::cornucopia::types::public::AuditAction;
+
+@(event: AuditAction)
+
+@match event {
+    AuditAction::Logon => {
+        Logon
+    }
+    AuditAction::AccessSecrets => {
+        Access Secrets
+    }
+    AuditAction::Logout => {
+        Logout
+    }
+  }

@@ -4,6 +4,7 @@ use hyper::{Body, StatusCode};
 
 #[derive(PartialEq, Eq)]
 pub enum SideBar {
+    Audit,
     Vaults,
     Secrets,
     Members,

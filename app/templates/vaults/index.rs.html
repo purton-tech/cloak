@@ -2,6 +2,7 @@
 @use crate::vaults::VaultSummary;
 @use super::new_vault_html;
 @use crate::layout::SideBar;
+@use time::format_description::well_known::Rfc3339;
 
 @(title: &str, vaults: Vec<VaultSummary>)
 
@@ -11,8 +12,9 @@
             <div class="body m-vault-card-body">
                 <div>
                     <h4 class="title">@vault.name</h4>
-                    <div class="created">Created <relative-time datetime="2022-02-08T13:47:10.140764Z">
-                        </relative-time>
+                    <div class="created">
+                        Created
+                        <relative-time datetime="@vault.created_at.format(&Rfc3339).unwrap()"></relative-time>
                     </div>
                 </div>
                 <div>

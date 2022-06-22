@@ -42,5 +42,5 @@ pub async fn post_registration(
         .await?;
     }
 
-    Ok(Redirect::to(REDIRECT_URL.parse()?))
+    Ok(Redirect::to(REDIRECT_URL))
 }

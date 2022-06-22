@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAction, AuditEntity};
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -41,5 +42,13 @@ pub async fn new(
     )
     .await?;
 
-    Ok(Redirect::to(super::secret_route(id).parse()?))
+    queries::audit::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &AuditAction::AccessSecrets,
+        &AuditEntity::ServiceAccount,
+    )
+    .await?;
+
+    Ok(Redirect::to(&super::secret_route(id)))
 }

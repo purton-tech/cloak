@@ -30,7 +30,7 @@
 		"bungcip.better-toml",
 		"vadimcn.vscode-lldb",
 		"mutantdino.resourcemonitor",
-		"matklad.rust-analyzer",
+		"rust-lang.rust-analyzer",
 		"zxh404.vscode-proto3"
 	],
 

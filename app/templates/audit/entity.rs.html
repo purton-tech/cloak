@@ -1,0 +1,15 @@
+@use crate::cornucopia::types::public::AuditEntity;
+
+@(entity: AuditEntity)
+
+@match entity {
+    AuditEntity::Vault => {
+        Vault
+    }
+    AuditEntity::ServiceAccount => {
+        Service Account
+    }
+    AuditEntity::UserManagement => {
+        User Management
+    }
+  }
