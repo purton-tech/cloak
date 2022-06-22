@@ -11,6 +11,7 @@ use rand::Rng;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use validator::Validate;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct NewInvite {
@@ -19,6 +20,7 @@ pub struct NewInvite {
 }
 
 pub async fn create_invite(
+    current_user: Authentication,
     Extension(pool): Extension<Pool>,
     Extension(config): Extension<crate::config::Config>,
     Form(new_invite): Form<NewInvite>,
@@ -53,6 +55,16 @@ pub async fn create_invite(
 
         crate::email::send_email(&config, email)
     }
+
+    let client = pool.get().await?;
+    queries::audit::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &AuditAction::CreateInvite,
+        &AuditAccessType::Web,
+        &format!("{} invited", &new_invite.email)
+    )
+    .await?;
 
     crate::layout::redirect_and_snackbar(super::INDEX, "Invitation Created")
 }

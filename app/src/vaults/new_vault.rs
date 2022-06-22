@@ -8,6 +8,7 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct NewVault {
@@ -37,6 +38,15 @@ pub async fn new(
         &vault_id,
         &new_vault.public_key,
         &new_vault.encrypted_vault_key,
+    )
+    .await?;
+
+    queries::audit::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &AuditAction::CreateVault,
+        &AuditAccessType::Web,
+        &format!("{} vault created", &new_vault.name)
     )
     .await?;
 

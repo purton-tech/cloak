@@ -1,6 +1,7 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 use axum::{
     extract::{Extension, Form},
     response::{IntoResponse, Redirect},
@@ -29,6 +30,15 @@ pub async fn connect(
         &connect_form.environment_id,
         &connect_form.service_account_id,
         &(current_user.user_id as i32),
+    )
+    .await?;
+
+    queries::audit::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &AuditAction::ConnectServiceAccount,
+        &AuditAccessType::Web,
+        &format!("Service account {} connected", &connect_form.service_account_id)
     )
     .await?;
 

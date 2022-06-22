@@ -8,6 +8,7 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteMember {
@@ -27,6 +28,15 @@ pub async fn delete(
         &delete_member.user_id,
         &delete_member.organisation_id,
         &(current_user.user_id as i32),
+    )
+    .await?;
+
+    queries::audit::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &AuditAction::CreateInvite,
+        &AuditAccessType::Web,
+        &format!("{} removed from team", &delete_member.user_id)
     )
     .await?;
 

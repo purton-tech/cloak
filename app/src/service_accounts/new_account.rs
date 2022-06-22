@@ -8,6 +8,7 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct NewServiceAccount {
@@ -32,6 +33,15 @@ pub async fn new(
         &new_service_account.name,
         &new_service_account.public_key,
         &new_service_account.encrypted_private_key,
+    )
+    .await?;
+
+    queries::audit::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &AuditAction::NewServiceAccount,
+        &AuditAccessType::Web,
+        "Service account created"
     )
     .await?;
 

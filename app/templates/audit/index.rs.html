@@ -16,18 +16,22 @@
             <table class="m_table team_table">
                 <thead>
                     <tr>
-                        <th>Time</th>
+                        <th>When</th>
+                        <th>User</th>
                         <th>Access Type</th>
                         <th>Action</th>
-                        <th>User</th>
+                        <th>Description</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        @for audit in audits {
+                    @for audit in audits {
+                        <tr>
     
                             <td>
                                 <relative-time datetime="@audit.created_at.format(&Rfc3339).unwrap()"></relative-time>
+                            </td>
+                            <td>
+                                @audit.user_id
                             </td>
                             <td>
                                 @:client_html(audit.access_type)
@@ -36,10 +40,10 @@
                                 @:action_html(audit.action)
                             </td>
                             <td>
-                                @audit.user_id
+                                @audit.description
                             </td>
-                        }
-                    </tr>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </div>

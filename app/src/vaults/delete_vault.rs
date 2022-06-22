@@ -8,6 +8,7 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteVault {
@@ -34,6 +35,15 @@ pub async fn delete(
             &client,
             &idor_delete_vault.vault_id,
             &(current_user.user_id as i32),
+        )
+        .await?;
+
+        queries::audit::insert(
+            &client,
+            &(current_user.user_id as i32),
+            &AuditAction::DeleteVault,
+            &AuditAccessType::Web,
+            &format!("{} vault deleted", vault.name)
         )
         .await?;
     } else {
