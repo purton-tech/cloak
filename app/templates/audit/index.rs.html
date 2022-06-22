@@ -1,7 +1,7 @@
 @use super::super::layout_html;
 @use crate::layout::SideBar;
 @use super::action_html;
-@use super::entity_html;
+@use super::client_html;
 @use crate::cornucopia::queries::audit::Audit;
 @use time::format_description::well_known::Rfc3339;
 
@@ -17,7 +17,7 @@
                 <thead>
                     <tr>
                         <th>Time</th>
-                        <th>Entity</th>
+                        <th>Access Type</th>
                         <th>Action</th>
                         <th>User</th>
                     </tr>
@@ -30,7 +30,7 @@
                                 <relative-time datetime="@audit.created_at.format(&Rfc3339).unwrap()"></relative-time>
                             </td>
                             <td>
-                                @:entity_html(audit.entity)
+                                @:client_html(audit.access_type)
                             </td>
                             <td>
                                 @:action_html(audit.action)

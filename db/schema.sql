@@ -10,24 +10,33 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: audit_action; Type: TYPE; Schema: public; Owner: -
+-- Name: audit_access_type; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE public.audit_action AS ENUM (
-    'AccessSecrets',
-    'Logon',
-    'Logout'
+CREATE TYPE public.audit_access_type AS ENUM (
+    'CLI',
+    'ServiceAccount',
+    'Web'
 );
 
 
 --
--- Name: audit_entity; Type: TYPE; Schema: public; Owner: -
+-- Name: audit_action; Type: TYPE; Schema: public; Owner: -
 --
 
-CREATE TYPE public.audit_entity AS ENUM (
-    'Vault',
-    'ServiceAccount',
-    'UserManagement'
+CREATE TYPE public.audit_action AS ENUM (
+    'AddMember',
+    'DeleteMember',
+    'AddSecret',
+    'DeleteSecret',
+    'AccessSecrets',
+    'NewServiceAccount',
+    'DeleteServiceAccount',
+    'ConnectServiceAccount',
+    'CreateInvite',
+    'RemoveTeamMember',
+    'CreateVault',
+    'DeleteVault'
 );
 
 
@@ -74,8 +83,9 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.audit_trail (
     id integer NOT NULL,
-    entity public.audit_entity NOT NULL,
+    access_type public.audit_access_type NOT NULL,
     action public.audit_action NOT NULL,
+    description character varying NOT NULL,
     user_id integer NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -89,10 +99,10 @@ COMMENT ON TABLE public.audit_trail IS 'Log all accesses to the system';
 
 
 --
--- Name: COLUMN audit_trail.entity; Type: COMMENT; Schema: public; Owner: -
+-- Name: COLUMN audit_trail.access_type; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.audit_trail.entity IS 'The part of the system we are adding an audit entry for';
+COMMENT ON COLUMN public.audit_trail.access_type IS 'How was the system accessed i.e. by the CLI or web interface etc.';
 
 
 --
@@ -100,6 +110,13 @@ COMMENT ON COLUMN public.audit_trail.entity IS 'The part of the system we are ad
 --
 
 COMMENT ON COLUMN public.audit_trail.action IS 'The action committed. i.e. deleting a secret etc.';
+
+
+--
+-- Name: COLUMN audit_trail.description; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.audit_trail.description IS 'A text description of what happened';
 
 
 --

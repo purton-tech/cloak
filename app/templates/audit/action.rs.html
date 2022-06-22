@@ -3,13 +3,40 @@
 @(event: AuditAction)
 
 @match event {
-    AuditAction::Logon => {
-        Logon
+    AuditAction::AddMember => {
+        AddMember
+    }
+    AuditAction::DeleteMember => {
+        DeleteMember
+    }
+    AuditAction::AddSecret => {
+        AddSecret
+    }
+    AuditAction::DeleteSecret => {
+        DeleteSecret
     }
     AuditAction::AccessSecrets => {
-        Access Secrets
+        AccessSecrets
     }
-    AuditAction::Logout => {
-        Logout
+    AuditAction::NewServiceAccount => {
+        NewServiceAccount
     }
-  }
+    AuditAction::DeleteServiceAccount => {
+        DeleteServiceAccount
+    }
+    AuditAction::ConnectServiceAccount => {
+        ConnectServiceAccount
+    }
+    AuditAction::CreateInvite => {
+        CreateInvite
+    }
+    AuditAction::RemoveTeamMember => {
+        RemoveTeamMember
+    }
+    AuditAction::CreateVault => {
+        CreateVault
+    }
+    AuditAction::DeleteVault => {
+        DeleteVault
+    }
+}
