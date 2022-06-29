@@ -47,7 +47,7 @@ pub async fn new(
         &(current_user.user_id as i32),
         &AuditAction::AddSecret,
         &AuditAccessType::Web,
-        &format!("Secret {} created", new_secret.name)
+        &format!("Secret created for Vault with ID {}", id)
     )
     .await?;
 

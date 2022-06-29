@@ -1,6 +1,6 @@
---! audit() { user_id, created_at, action,  access_type, description } *
+--! audit() { email, created_at, action,  access_type, description } *
 SELECT 
-    user_id,
+    (SELECT email from users WHERE id = user_id) as email,
     created_at,
     action, 
     access_type, 

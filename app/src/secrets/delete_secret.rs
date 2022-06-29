@@ -42,7 +42,7 @@ pub async fn delete(
         &(current_user.user_id as i32),
         &AuditAction::DeleteSecret,
         &AuditAccessType::Web,
-        &format!("Secret {} deleted", secret.name)
+        &format!("Secret deleted from Vault with ID {}", vault_id)
     )
     .await?;
 

@@ -31,13 +31,13 @@
                                 <relative-time datetime="@audit.created_at.format(&Rfc3339).unwrap()"></relative-time>
                             </td>
                             <td>
-                                @audit.user_id
+                                @audit.email
                             </td>
                             <td>
-                                @:client_html(audit.access_type)
+                                <span class="a_badge a_badge--success">@:client_html(audit.access_type)</span>
                             </td>
                             <td>
-                                @:action_html(audit.action)
+                                <span class="a_badge a_badge--success">@:action_html(audit.action)</span>
                             </td>
                             <td>
                                 @audit.description
