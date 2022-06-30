@@ -209,6 +209,16 @@ build-cli-osx:
     COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
     COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
     COPY --dir db Cargo.lock Cargo.toml protos .
+    RUN apt-get update \
+        && apt-get install -y --no-install-recommends \
+            protobuf-compiler \
+        #
+        #
+        # Clean up
+        && apt-get autoremove -y \
+        && apt-get clean -y \
+        && rm -r /var/cache/* /var/lib/apt/lists/*
+
     RUN cd cli \ 
         && CC=o64-clang \
         CXX=o64-clang++ \
