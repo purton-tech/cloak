@@ -23,8 +23,17 @@ export class SnackBar extends HTMLElement {
                 const p = document.createElement('p')
                 const text = document.createTextNode(message);
                 p.appendChild(text)
-                div.appendChild(p)
+                div.prepend(p)
                 this.deleteCookie(COOKIE_NAME)
+
+                const actionButton = document.createElement('button');
+                actionButton.className = 'action';
+                actionButton.innerHTML ='DISMISS';
+                actionButton.setAttribute('aria-label', 'Dismiss, Description for Screen Readers');
+                actionButton.addEventListener('click', function() {
+                    div.classList.add('close')
+                })
+                div.appendChild(actionButton)
             }
 
             setInterval(() => {
@@ -36,7 +45,7 @@ export class SnackBar extends HTMLElement {
 
     }
 
-    getCookie(name: string): string {
+    getCookie(name: string): string | null {
         const nameLenPlus = (name.length + 1);
         return document.cookie
             .split(';')
