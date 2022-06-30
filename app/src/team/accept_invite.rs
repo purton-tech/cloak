@@ -20,7 +20,6 @@ pub async fn invite(
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
-    dbg!(&invite);
     accept_invitation(
         &pool,
         &current_user,
@@ -51,8 +50,6 @@ pub async fn accept_invitation(
 
     if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
         let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
-
-        dbg!(&user);
 
         // Make sure the user accepting the invitation is the user that we emailed
         if user.email == invitation.email {

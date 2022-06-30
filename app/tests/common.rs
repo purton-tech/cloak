@@ -265,8 +265,6 @@ pub async fn count_service_account_secrets(config: &Config, email: &str) -> i64 
     let rows = client.query(&stmt, &[&email]).await.unwrap();
     let vault_id: i32 = rows[0].get(0);
 
-    dbg!(&vault_id);
-
     let stmt = client
         .prepare_cached(
             "

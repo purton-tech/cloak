@@ -36,7 +36,6 @@ pub async fn index(
         crate::templates::secrets::index_html(&mut buf, "Your Secrets", &user_vault, environments, secrets).unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));
 
-
         queries::audit::insert(
             &client,
             &(current_user.user_id as i32),
