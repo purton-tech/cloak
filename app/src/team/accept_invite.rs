@@ -9,7 +9,7 @@ use deadpool_postgres::Pool;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Invite {
     invite_selector: String,
     invite_validator: String,
@@ -20,6 +20,7 @@ pub async fn invite(
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
+    dbg!(&invite);
     accept_invitation(
         &pool,
         &current_user,
@@ -37,11 +38,12 @@ pub async fn accept_invitation(
     invitation_selector: &str,
     invitation_verifier: &str,
 ) -> Result<(), CustomError> {
-    let invitation_verifier = base64::decode_config(invitation_verifier, base64::URL_SAFE)
+
+    let invitation_verifier = base64::decode_config(invitation_verifier, base64::URL_SAFE_NO_PAD)
         .map_err(|e| CustomError::FaultySetup(e.to_string()))?;
     let invitation_verifier_hash = Sha256::digest(&invitation_verifier);
     let invitation_verifier_hash_base64 =
-        base64::encode_config(invitation_verifier_hash, base64::URL_SAFE);
+        base64::encode_config(invitation_verifier_hash, base64::URL_SAFE_NO_PAD);
 
     let client = pool.get().await?;
 
@@ -49,6 +51,8 @@ pub async fn accept_invitation(
 
     if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
         let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+
+        dbg!(&user);
 
         // Make sure the user accepting the invitation is the user that we emailed
         if user.email == invitation.email {

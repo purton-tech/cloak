@@ -58,4 +58,5 @@ thirtyfour = { version = "0", default-features = false, features = [ "reqwest-ru
 tokio = { version = "1", features = ["macros"] }
 rand = "0"
 reqwest = { version = "0", default-features = false }
+quoted_printable = "0"
 
