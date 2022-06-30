@@ -7,7 +7,7 @@ SELECT
     description 
 FROM audit_trail
 WHERE user_id IN
-    -- Make sure the current user is an admin for this team
+    -- Bring back the audit items this user has access to.
     (SELECT 
         user_id 
     FROM 
