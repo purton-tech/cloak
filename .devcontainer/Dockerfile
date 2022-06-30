@@ -1,4 +1,4 @@
-FROM purtontech/rust-on-nails-devcontainer:1.0.5 AS development
+FROM purtontech/rust-on-nails-devcontainer:1.0.9 AS development
 
 COPY *.bash ./
 
@@ -20,10 +20,6 @@ RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSI
     && sudo chmod +x /usr/bin/zola
 
 ARG USERNAME=vscode
-
-# Pulumi
-RUN curl -fsSL https://get.pulumi.com | sudo -E bash -
-RUN sudo chown -R $USERNAME:$USERNAME /home/$USERNAME/.pulumi
 
 # Install az
 RUN sudo apt-get update --allow-releaseinfo-change && curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash

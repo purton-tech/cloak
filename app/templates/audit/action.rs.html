@@ -1,0 +1,42 @@
+@use crate::cornucopia::types::public::AuditAction;
+
+@(event: AuditAction)
+
+@match event {
+    AuditAction::AddMember => {
+        AddMember
+    }
+    AuditAction::DeleteMember => {
+        DeleteMember
+    }
+    AuditAction::AddSecret => {
+        AddSecret
+    }
+    AuditAction::DeleteSecret => {
+        DeleteSecret
+    }
+    AuditAction::AccessSecrets => {
+        AccessSecrets
+    }
+    AuditAction::NewServiceAccount => {
+        NewServiceAccount
+    }
+    AuditAction::DeleteServiceAccount => {
+        DeleteServiceAccount
+    }
+    AuditAction::ConnectServiceAccount => {
+        ConnectServiceAccount
+    }
+    AuditAction::CreateInvite => {
+        CreateInvite
+    }
+    AuditAction::RemoveTeamMember => {
+        RemoveTeamMember
+    }
+    AuditAction::CreateVault => {
+        CreateVault
+    }
+    AuditAction::DeleteVault => {
+        DeleteVault
+    }
+}

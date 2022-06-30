@@ -54,5 +54,5 @@ pub async fn add(
             .await?;
     }
 
-    Ok(Redirect::to(super::member_route(id).parse()?))
+    Ok(Redirect::to(&super::member_route(id)))
 }

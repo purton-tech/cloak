@@ -9,7 +9,7 @@ use deadpool_postgres::Pool;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 pub struct Invite {
     invite_selector: String,
     invite_validator: String,
@@ -28,7 +28,7 @@ pub async fn invite(
     )
     .await?;
 
-    Ok(Redirect::to("/app/team".parse()?))
+    Ok(Redirect::to("/app/team"))
 }
 
 pub async fn accept_invitation(
@@ -37,11 +37,12 @@ pub async fn accept_invitation(
     invitation_selector: &str,
     invitation_verifier: &str,
 ) -> Result<(), CustomError> {
-    let invitation_verifier = base64::decode_config(invitation_verifier, base64::URL_SAFE)
+
+    let invitation_verifier = base64::decode_config(invitation_verifier, base64::URL_SAFE_NO_PAD)
         .map_err(|e| CustomError::FaultySetup(e.to_string()))?;
     let invitation_verifier_hash = Sha256::digest(&invitation_verifier);
     let invitation_verifier_hash_base64 =
-        base64::encode_config(invitation_verifier_hash, base64::URL_SAFE);
+        base64::encode_config(invitation_verifier_hash, base64::URL_SAFE_NO_PAD);
 
     let client = pool.get().await?;
 

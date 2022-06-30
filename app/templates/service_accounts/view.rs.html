@@ -15,15 +15,16 @@
                     readonly
                     id='@format!("ecdh-public-key-{}", service_account.id)' 
                     rows="6">@service_account.ecdh_public_key</textarea>
+                    <span class="a_help_text">The public key for this service account</span>
+                    
+                <label for="encrypted_private_key">ECDH Private Key</label>
+                <textarea 
+                    name="encrypted_private_key" 
+                    readonly
+                    id='@format!("wrapped-ecdh-private-key-{}", service_account.id)' 
+                    rows="8">@service_account.ecdh_public_key</textarea>
+                <span class="a_help_text">The key for this service account</span>
             </fieldset>
-
-            <label for="encrypted_private_key">ECDH Private Key</label>
-            <textarea 
-                name="encrypted_private_key" 
-                readonly
-                id='@format!("wrapped-ecdh-private-key-{}", service_account.id)' 
-                rows="8">@service_account.ecdh_public_key</textarea>
-            <span class="a_help_text">The key for this service account</span>
 
         </template>
 

@@ -10,6 +10,37 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: audit_access_type; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.audit_access_type AS ENUM (
+    'CLI',
+    'ServiceAccount',
+    'Web'
+);
+
+
+--
+-- Name: audit_action; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.audit_action AS ENUM (
+    'AddMember',
+    'DeleteMember',
+    'AddSecret',
+    'DeleteSecret',
+    'AccessSecrets',
+    'NewServiceAccount',
+    'DeleteServiceAccount',
+    'ConnectServiceAccount',
+    'CreateInvite',
+    'RemoveTeamMember',
+    'CreateVault',
+    'DeleteVault'
+);
+
+
+--
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -45,6 +76,68 @@ $$;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: audit_trail; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.audit_trail (
+    id integer NOT NULL,
+    access_type public.audit_access_type NOT NULL,
+    action public.audit_action NOT NULL,
+    description character varying NOT NULL,
+    user_id integer NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: TABLE audit_trail; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.audit_trail IS 'Log all accesses to the system';
+
+
+--
+-- Name: COLUMN audit_trail.access_type; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.audit_trail.access_type IS 'How was the system accessed i.e. by the CLI or web interface etc.';
+
+
+--
+-- Name: COLUMN audit_trail.action; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.audit_trail.action IS 'The action committed. i.e. deleting a secret etc.';
+
+
+--
+-- Name: COLUMN audit_trail.description; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.audit_trail.description IS 'A text description of what happened';
+
+
+--
+-- Name: audit_trail_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.audit_trail_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: audit_trail_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.audit_trail_id_seq OWNED BY public.audit_trail.id;
+
 
 --
 -- Name: environments; Type: TABLE; Schema: public; Owner: -
@@ -430,6 +523,13 @@ ALTER SEQUENCE public.vaults_id_seq OWNED BY public.vaults.id;
 
 
 --
+-- Name: audit_trail id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audit_trail ALTER COLUMN id SET DEFAULT nextval('public.audit_trail_id_seq'::regclass);
+
+
+--
 -- Name: environments id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -490,6 +590,14 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 --
 
 ALTER TABLE ONLY public.vaults ALTER COLUMN id SET DEFAULT nextval('public.vaults_id_seq'::regclass);
+
+
+--
+-- Name: audit_trail audit_trail_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audit_trail
+    ADD CONSTRAINT audit_trail_pkey PRIMARY KEY (id);
 
 
 --
@@ -687,6 +795,14 @@ ALTER TABLE ONLY public.users_environments
 
 
 --
+-- Name: audit_trail fk_user; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audit_trail
+    ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+
+
+--
 -- Name: users_vaults fk_users_vaults_vaults; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -716,4 +832,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155319'),
     ('20220503064229'),
     ('20220512092812'),
-    ('20220513084444');
+    ('20220513084444'),
+    ('20220621094035');

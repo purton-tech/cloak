@@ -1,6 +1,7 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 use axum::{
     extract::{Extension, Path},
     response::Html,
@@ -26,14 +27,23 @@ pub async fn index(
 
     if secrets.is_empty() {
         let mut buf = Vec::new();
-        crate::templates::secrets::empty_html(&mut buf, "Your Secrets", user_vault, environments).unwrap();
+        crate::templates::secrets::empty_html(&mut buf, "Your Secrets", &user_vault, environments).unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));
     
         Ok(Html(html))
     } else {
         let mut buf = Vec::new();
-        crate::templates::secrets::index_html(&mut buf, "Your Secrets", user_vault, environments, secrets).unwrap();
+        crate::templates::secrets::index_html(&mut buf, "Your Secrets", &user_vault, environments, secrets).unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));
+
+        queries::audit::insert(
+            &client,
+            &(current_user.user_id as i32),
+            &AuditAction::AccessSecrets,
+            &AuditAccessType::Web,
+            &format!("Secrets  accesed from vault {}", &user_vault.vault_id)
+        )
+        .await?;
     
         Ok(Html(html))
     }

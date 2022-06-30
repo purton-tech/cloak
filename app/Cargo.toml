@@ -26,10 +26,10 @@ prost = "0"
 
 # Access to the database https://github.com/LouisGariepy/cornucopia
 deadpool-postgres = { version = "0", features = ["serde"] }
-#postgres-types = { version = "0", features = ["derive"] }
 tokio-postgres = { version = "0.7", features = [
     "with-time-0_3",
 ] }
+postgres-types = { version = "0", features = ["derive"] }
 tokio-postgres-rustls = "0"
 time = { version = "0", default-features = false,  features = ["formatting"] }
 cornucopia_client = "0"
@@ -58,4 +58,5 @@ thirtyfour = { version = "0", default-features = false, features = [ "reqwest-ru
 tokio = { version = "1", features = ["macros"] }
 rand = "0"
 reqwest = { version = "0", default-features = false }
+quoted_printable = "0"
 

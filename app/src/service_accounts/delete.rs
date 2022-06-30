@@ -8,6 +8,7 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteServiceAccount {
@@ -28,12 +29,14 @@ pub async fn delete(
     )
     .await?;
 
-    // TODO - Danger this is an IDOR issue
-    queries::service_accounts::delete_service_account_secrets(
+    queries::audit::insert(
         &client,
-        &idor_delete_service_account.service_account_id,
+        &(current_user.user_id as i32),
+        &AuditAction::ConnectServiceAccount,
+        &AuditAccessType::Web,
+        &format!("Service account {} deleted", idor_delete_service_account.service_account_id)
     )
     .await?;
 
-    Ok(Redirect::to(super::INDEX.parse().unwrap()))
+    Ok(Redirect::to(super::INDEX))
 }

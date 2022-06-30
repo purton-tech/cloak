@@ -4,6 +4,7 @@ mod config;
 mod email;
 mod errors;
 mod hybrid;
+mod audit;
 mod layout;
 mod members;
 mod registration_handler;
@@ -18,7 +19,7 @@ use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
 use crate::templates::statics::StaticFile;
 use axum::body::{self, Empty, Body};
-use axum::{response::IntoResponse, routing::get};
+use axum::{response::{IntoResponse, Html}, routing::get};
 
 #[tokio::main]
 async fn main() {
@@ -36,6 +37,7 @@ async fn main() {
 
     let axum_make_service = axum::Router::new()
         .route("/static/*path", get(static_path))
+        .merge(audit::routes())
         .merge(vaults::routes())
         .merge(secrets::routes())
         .merge(team::routes())
@@ -61,6 +63,17 @@ async fn main() {
     if let Err(e) = server.await {
         tracing::error!("server error: {}", e);
     }
+}
+
+pub fn render<F>(f: F) -> Html<&'static str>
+where
+    F: FnOnce(&mut Vec<u8>) -> Result<(), std::io::Error>,
+{
+    let mut buf = Vec::new();
+    f(&mut buf).expect("Error rendering template");
+    let html: String = String::from_utf8_lossy(&buf).into();
+
+    Html(Box::leak(html.into_boxed_str()))
 }
 
 async fn static_path(Path(path): Path<String>) -> impl IntoResponse {

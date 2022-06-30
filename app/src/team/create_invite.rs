@@ -11,6 +11,7 @@ use rand::Rng;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use validator::Validate;
+use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct NewInvite {
@@ -19,6 +20,7 @@ pub struct NewInvite {
 }
 
 pub async fn create_invite(
+    current_user: Authentication,
     Extension(pool): Extension<Pool>,
     Extension(config): Extension<crate::config::Config>,
     Form(new_invite): Form<NewInvite>,
@@ -26,8 +28,8 @@ pub async fn create_invite(
 ) -> Result<impl IntoResponse, CustomError> {
     let invite_hash = create(&pool, &authentication, &new_invite.email).await?;
 
-    let invitation_selector_base64 = invite_hash.1;
     let invitation_verifier_base64 = invite_hash.0;
+    let invitation_selector_base64 = invite_hash.1;
 
     if let Some(smtp_config) = &config.smtp_config {
         let url = format!(
@@ -35,24 +37,34 @@ pub async fn create_invite(
             smtp_config.domain, invitation_selector_base64, invitation_verifier_base64
         );
 
+        let body = format!(
+            "
+                Click {} to accept the invite
+            ",
+            url
+        )
+        .trim()
+        .to_string();
+
         let email = Message::builder()
             .from(smtp_config.from_email.clone())
             .to(new_invite.email.parse().unwrap())
-            .subject("You to a Cloak Team")
-            .body(
-                format!(
-                    "
-                        Click {} to accept the invite
-                    ",
-                    url
-                )
-                .trim()
-                .to_string(),
-            )
+            .subject("You are invited to a Cloak Team")
+            .body(body)
             .unwrap();
 
         crate::email::send_email(&config, email)
     }
+
+    let client = pool.get().await?;
+    queries::audit::insert(
+        &client,
+        &(current_user.user_id as i32),
+        &AuditAction::CreateInvite,
+        &AuditAccessType::Web,
+        &format!("{} invited", &new_invite.email)
+    )
+    .await?;
 
     crate::layout::redirect_and_snackbar(super::INDEX, "Invitation Created")
 }
@@ -69,12 +81,12 @@ pub async fn create(
             .await?;
 
     let invitation_selector = rand::thread_rng().gen::<[u8; 8]>();
-    let invitation_selector_base64 = base64::encode_config(invitation_selector, base64::URL_SAFE);
+    let invitation_selector_base64 = base64::encode_config(invitation_selector, base64::URL_SAFE_NO_PAD);
     let invitation_verifier = rand::thread_rng().gen::<[u8; 24]>();
     let invitation_verifier_hash = Sha256::digest(&invitation_verifier);
     let invitation_verifier_hash_base64 =
-        base64::encode_config(invitation_verifier_hash, base64::URL_SAFE);
-    let invitation_verifier_base64 = base64::encode_config(invitation_verifier, base64::URL_SAFE);
+        base64::encode_config(invitation_verifier_hash, base64::URL_SAFE_NO_PAD);
+    let invitation_verifier_base64 = base64::encode_config(invitation_verifier, base64::URL_SAFE_NO_PAD);
 
     queries::invitations::insert_invitation(
         &client,
