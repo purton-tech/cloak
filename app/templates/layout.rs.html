@@ -96,11 +96,11 @@
         <h2>Account</h2>
         
         <ul>
-          <li class='@layout::get_menu_class(&side_bar, &SideBar::Team, false)'>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::Switch, false)'>
               <img alt="Menu Item" width="24px" src="/static/@users_svg.name"></img>
-              <a href="@crate::team::INDEX">Switch Teams</a>
+              <a href="@crate::team::SWITCH">Switch Teams</a>
           </li>
-          <li class='@layout::get_menu_class(&side_bar, &SideBar::Team, false)'>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::None, false)'>
               <img alt="Menu Item" width="24px" src="/static/@users_svg.name"></img>
               <a data-drawer-target="logout-drawer" href="#">Your Profile</a>
           </li>

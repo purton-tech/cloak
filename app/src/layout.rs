@@ -4,12 +4,14 @@ use hyper::{Body, StatusCode};
 
 #[derive(PartialEq, Eq)]
 pub enum SideBar {
+    None,
     Audit,
     Vaults,
     Secrets,
     Members,
     ServiceAccounts,
     Team,
+    Switch
 }
 
 pub fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: bool) -> String {
