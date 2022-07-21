@@ -3,8 +3,9 @@
 @use super::new_vault_html;
 @use crate::layout::SideBar;
 @use time::format_description::well_known::Rfc3339;
+@use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, vaults: Vec<VaultSummary>)
+@(title: &str, vaults: Vec<VaultSummary>, organisation: Organisation)
 
 @:layout_html(title, {
     @for vault in vaults {
@@ -56,4 +57,4 @@
 }, {
     @:new_vault_html()
     <button class="a_button mini primary" id="new-vault">Create A New Vault</button>
-}, None, SideBar::Vaults)
+}, organisation, None, SideBar::Vaults)

@@ -1,3 +1,11 @@
+--! organisation(org_id) { id, name? }
+SELECT 
+    id, name
+FROM 
+    organisations
+WHERE
+    id = $1
+    
 --! get_primary_organisation(created_by_user_id) { id, name? }
 SELECT 
     id, name

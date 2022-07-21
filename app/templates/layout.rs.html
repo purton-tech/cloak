@@ -1,8 +1,15 @@
 @use super::statics::*;
 @use crate::layout;
 @use crate::layout::SideBar;
+@use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, content: Content, header: Content, vault_id: Option<i32>, side_bar: SideBar)
+@(
+  title: &str, 
+  content: Content, 
+  header: Content, 
+  organisation: Organisation, 
+  vault_id: Option<i32>, side_bar: SideBar
+)
 
   <!DOCTYPE html>
   <html lang="en">
@@ -53,13 +60,18 @@
       <nav class="sidenav">
         <h1><a href="/app/vaults">Cloak</a></h1>
 
-        <div class="team-name"><strong>Team : </strong><a href="@crate::team::INDEX">My Team</a></div>
+        <div class="team-name">
+          <strong>Team : </strong>
+          <a href="@crate::team::index_route(organisation.id)">Your Team</a>
+        </div>
 
         <h2>Application</h2>
 
         <ul>
-          <li class='@layout::get_menu_class(&side_bar, &SideBar::Vaults, false)'><img alt="Menu Item" width="24px"
-              src="/static/@vault_svg.name"></img><a href="@crate::vaults::INDEX">Vaults</a></li>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::Vaults, false)'>
+            <img alt="Menu Item" width="24px" src="/static/@vault_svg.name"></img>
+            <a href="@crate::vaults::index_route(organisation.id)">Vaults</a>
+          </li>
 
           @if let Some(vault_id) = vault_id {
             <li class='@layout::get_menu_class(&side_bar, &SideBar::Secrets, true)'>
@@ -75,12 +87,12 @@
 
           <li class='@layout::get_menu_class(&side_bar, &SideBar::ServiceAccounts, false)'>
               <img alt="Menu Item" width="24px" src="/static/@accounts_svg.name"></img>
-              <a href="@crate::service_accounts::INDEX">Service Accounts</a>
+              <a href="@crate::service_accounts::index_route(organisation.id)">Service Accounts</a>
           </li>
 
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Audit, false)'>
               <img alt="Menu Item" width="24px" src="/static/@audit_svg.name"></img>
-              <a href="@crate::audit::INDEX">Audit Trail</a>
+              <a href="@crate::audit::index_route(organisation.id)">Audit Trail</a>
           </li>
         </ul>
   
@@ -89,7 +101,7 @@
         <ul>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Team, false)'>
               <img alt="Menu Item" width="24px" src="/static/@users_svg.name"></img>
-              <a href="@crate::team::INDEX">Team</a>
+              <a href="@crate::team::index_route(organisation.id)">Team</a>
           </li>
         </ul>
   
@@ -98,7 +110,7 @@
         <ul>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Switch, false)'>
               <img alt="Menu Item" width="24px" src="/static/@users_svg.name"></img>
-              <a href="@crate::team::SWITCH">Switch Teams</a>
+              <a href="@crate::team::switch_route(organisation.id)">Switch Teams</a>
           </li>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::None, false)'>
               <img alt="Menu Item" width="24px" src="/static/@users_svg.name"></img>

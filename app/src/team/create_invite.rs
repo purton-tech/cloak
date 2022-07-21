@@ -2,7 +2,7 @@ use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{
-    extract::{Extension, Form},
+    extract::{Extension, Form, Path},
     response::IntoResponse,
 };
 use deadpool_postgres::Pool;
@@ -20,6 +20,7 @@ pub struct NewInvite {
 }
 
 pub async fn create_invite(
+    Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Extension(pool): Extension<Pool>,
     Extension(config): Extension<crate::config::Config>,
@@ -66,7 +67,9 @@ pub async fn create_invite(
     )
     .await?;
 
-    crate::layout::redirect_and_snackbar(super::INDEX, "Invitation Created")
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+
+    crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Invitation Created")
 }
 
 pub async fn create(

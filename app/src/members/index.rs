@@ -8,11 +8,14 @@ use axum::{
 use deadpool_postgres::Pool;
 
 pub async fn index(
+    Path(organisation_id): Path<i32>,
     Path(idor_vault_id): Path<i32>,
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<Html<String>, CustomError> {
     let client = pool.get().await?;
+
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let org =
         queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
@@ -40,7 +43,8 @@ pub async fn index(
         user_vault,
         members,
         non_members,
-        environments
+        environments,
+        team
     ).unwrap();
     let html = format!("{}", String::from_utf8_lossy(&buf));
 

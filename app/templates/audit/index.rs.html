@@ -4,8 +4,9 @@
 @use super::client_html;
 @use crate::cornucopia::queries::audit::Audit;
 @use time::format_description::well_known::Rfc3339;
+@use crate::cornucopia::queries::organisations::Organisation;
 
-@(audits: Vec<Audit>)
+@(audits: Vec<Audit>, organisation: Organisation)
 
 @:layout_html("Audit Trail", {
     <div class="m_card">
@@ -49,4 +50,4 @@
         </div>
     </div>
 }, {
-}, None, SideBar::Audit)
+}, organisation, None, SideBar::Audit)

@@ -16,6 +16,7 @@ pub struct DeleteMember {
 }
 
 pub async fn delete(
+    Path(organisation_id): Path<i32>,
     Path(vault_id): Path<i32>,
     current_user: Authentication,
     Form(delete_member): Form<DeleteMember>,
@@ -30,9 +31,11 @@ pub async fn delete(
     )
     .await?;
 
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+
     // If we remove ourself, redirect to vaults page.
     let url = if delete_member.user_id == (current_user.user_id as i32) {
-        crate::vaults::INDEX.to_string()
+        crate::vaults::index_route(team.id)
     } else {
         super::member_route(vault_id)
     };

@@ -2,7 +2,7 @@ use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{
-    extract::{Extension, Form},
+    extract::{Extension, Form, Path},
     response::IntoResponse,
 };
 use deadpool_postgres::Pool;
@@ -21,11 +21,14 @@ pub struct NewVault {
 }
 
 pub async fn new(
+    Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Form(new_vault): Form<NewVault>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
+
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let vault_id =
         queries::vaults::insert(&client, &(current_user.user_id as i32), &new_vault.name).await?;
@@ -59,5 +62,5 @@ pub async fn new(
         .await?;
     }
 
-    crate::layout::redirect_and_snackbar(super::INDEX, "Vault Created")
+    crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Vault Created")
 }

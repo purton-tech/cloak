@@ -1,8 +1,9 @@
 @use super::super::layout_html;
 @use crate::layout::SideBar;
 @use super::new_account_html;
+@use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str)
+@(title: &str, organisation: Organisation)
 
 @:layout_html(title, {
     <div class="empty_page">
@@ -15,4 +16,4 @@
     </div> 
 }, {
     
-}, None, SideBar::ServiceAccounts)
+}, organisation, None, SideBar::ServiceAccounts)

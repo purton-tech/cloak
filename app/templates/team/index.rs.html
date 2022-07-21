@@ -3,10 +3,11 @@
 @use super::delete_html;
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::GetUsers;
+@use crate::cornucopia::queries::organisations::Organisation;
 @use crate::cornucopia::queries::invitations::GetAll;
 @use crate::templates::statics::delete_svg;
 
-@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>)
+@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>, organisation: Organisation)
 
 @:layout_html(title, {
 
@@ -63,4 +64,4 @@
 }, {
     @:create_invite_html()
     <button class="a_button mini primary" id="invite-user">New User</button>
-}, None, SideBar::Team)
+}, organisation, None, SideBar::Team)

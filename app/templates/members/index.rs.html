@@ -5,13 +5,15 @@
 @use crate::cornucopia::queries::user_vaults::GetUsersDangerous;
 @use crate::cornucopia::queries::user_vaults::GetNonMembersDangerous;
 @use crate::cornucopia::queries::environments::GetAll;
+@use crate::cornucopia::queries::organisations::Organisation;
 @use super::delete_html;
 @use super::add_member_html;
 
 @(title: &str, user_vault: Get, 
     members: Vec<GetUsersDangerous>, 
     non_members: Vec<GetNonMembersDangerous>, 
-    environments: Vec<GetAll>
+    environments: Vec<GetAll>,
+    organisation: Organisation
 )
 
 @:layout_html(title, {
@@ -60,4 +62,4 @@
         @:add_member_html(&user_vault, environments, non_members)
         <button class="a_button mini primary" id="add-member">Add Member</button>
     }
-}, Some(user_vault.vault_id), SideBar::Members)
+}, organisation, Some(user_vault.vault_id), SideBar::Members)

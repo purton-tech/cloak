@@ -2,6 +2,7 @@ use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
+use axum::extract::Path;
 use axum::{
     extract::{Extension, Form},
     response::{IntoResponse, Redirect},
@@ -18,11 +19,14 @@ pub struct ConnectServiceAccount {
 }
 
 pub async fn connect(
+    Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Form(connect_form): Form<ConnectServiceAccount>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
+
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     queries::service_accounts::connect(
         &client,
@@ -42,5 +46,5 @@ pub async fn connect(
     )
     .await?;
 
-    Ok(Redirect::to(super::INDEX))
+    Ok(Redirect::to(&super::index_route(team.id)))
 }

@@ -8,8 +8,14 @@
 @use crate::cornucopia::queries::service_accounts::GetAll;
 @use crate::cornucopia::queries::environments::GetEnvironmentsAndVaults;
 @use time::format_description::well_known::Rfc3339;
+@use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, service_accounts: Vec<GetAll>, environments_and_vaults: Vec<GetEnvironmentsAndVaults>)
+@(
+    title: &str, 
+    service_accounts: Vec<GetAll>, 
+    environments_and_vaults: Vec<GetEnvironmentsAndVaults>,
+    organisation: Organisation
+)
 
 @:layout_html(title, {
 
@@ -81,4 +87,4 @@
 }, {
     @:new_account_html()
     <button class="a_button mini primary" id="new-account">Add Service Account</button>
-}, None, SideBar::ServiceAccounts)
+}, organisation, None, SideBar::ServiceAccounts)

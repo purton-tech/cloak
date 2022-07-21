@@ -1,21 +1,24 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
-use axum::{extract::Extension, response::Html};
+use axum::{extract::{Extension, Path}, response::Html};
 use deadpool_postgres::Pool;
 use super::VaultSummary;
 
 pub async fn index(
+    Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Extension(pool): Extension<Pool>,
 ) -> Result<Html<String>, CustomError> {
     let client = pool.get().await?;
 
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+
     let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
     
     if vaults.is_empty() {
         let mut buf = Vec::new();
-        crate::templates::vaults::empty_html(&mut buf, "Your Vaults").unwrap();
+        crate::templates::vaults::empty_html(&mut buf, "Your Vaults", team).unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));
     
         Ok(Html(html))
@@ -39,7 +42,7 @@ pub async fn index(
         }
     
         let mut buf = Vec::new();
-        crate::templates::vaults::index_html(&mut buf, "Your Vaults", summary_vaults).unwrap();
+        crate::templates::vaults::index_html(&mut buf, "Your Vaults", summary_vaults, team).unwrap();
         
         let html = format!("{}", String::from_utf8_lossy(&buf));
     

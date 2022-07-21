@@ -2,7 +2,7 @@ use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{
-    extract::{Extension, Form},
+    extract::{Extension, Form, Path},
     response::IntoResponse,
 };
 use deadpool_postgres::Pool;
@@ -17,11 +17,14 @@ pub struct DeleteVault {
 }
 
 pub async fn delete(
+    Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Form(idor_delete_vault): Form<DeleteVault>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
+
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let vault = queries::vaults::get(
         &client,
@@ -47,8 +50,8 @@ pub async fn delete(
         )
         .await?;
     } else {
-        return crate::layout::redirect_and_snackbar(super::INDEX, "Name did not match");
+        return crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Name did not match");
     }
 
-    crate::layout::redirect_and_snackbar(super::INDEX, "Vault Deleted")
+    crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Vault Deleted")
 }

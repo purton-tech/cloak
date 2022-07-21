@@ -2,7 +2,7 @@ use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{
-    extract::{Extension, Form},
+    extract::{Extension, Form, Path},
     response::{IntoResponse, Redirect},
 };
 use deadpool_postgres::Pool;
@@ -21,11 +21,14 @@ pub struct NewServiceAccount {
 }
 
 pub async fn new(
+    Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Form(new_service_account): Form<NewServiceAccount>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
+
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     queries::service_accounts::insert(
         &client,
@@ -45,5 +48,5 @@ pub async fn new(
     )
     .await?;
 
-    Ok(Redirect::to(super::INDEX))
+    Ok(Redirect::to(&super::index_route(team.id)))
 }

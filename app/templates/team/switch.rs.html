@@ -3,8 +3,9 @@
 @use super::delete_html;
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::GetTeams;
+@use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, teams: Vec<GetTeams>)
+@(title: &str, teams: Vec<GetTeams>, organisation: Organisation)
 
 @:layout_html(title, {
 
@@ -36,4 +37,4 @@
         </div>
     </div>
 }, {
-}, None, SideBar::Switch)
+}, organisation, None, SideBar::Switch)
