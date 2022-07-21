@@ -44,7 +44,7 @@ pub async fn index(
         members,
         non_members,
         environments,
-        team
+        &team
     ).unwrap();
     let html = format!("{}", String::from_utf8_lossy(&buf));
 

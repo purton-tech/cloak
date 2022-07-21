@@ -26,7 +26,7 @@ pub async fn index(
     let invites = queries::invitations::get_all(&client, &org.id).await?;
 
     let mut buf = Vec::new();
-    crate::templates::team::index_html(&mut buf, "Your Vaults", users, invites, team).unwrap();
+    crate::templates::team::index_html(&mut buf, "Your Vaults", users, invites, &team).unwrap();
     let html = format!("{}", String::from_utf8_lossy(&buf));
 
     Ok(Html(html))

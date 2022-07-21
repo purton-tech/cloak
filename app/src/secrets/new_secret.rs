@@ -22,6 +22,7 @@ pub struct NewSecret {
 }
 
 pub async fn new(
+    Path(organisation_id): Path<i32>,
     Path(id): Path<i32>,
     current_user: Authentication,
     Form(new_secret): Form<NewSecret>,
@@ -51,5 +52,7 @@ pub async fn new(
     )
     .await?;
 
-    Ok(Redirect::to(&super::secret_route(id)))
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+
+    Ok(Redirect::to(&super::index_route(id, team.id)))
 }

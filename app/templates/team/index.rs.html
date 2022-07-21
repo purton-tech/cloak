@@ -7,7 +7,7 @@
 @use crate::cornucopia::queries::invitations::GetAll;
 @use crate::templates::statics::delete_svg;
 
-@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>, organisation: Organisation)
+@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>, organisation: &Organisation)
 
 @:layout_html(title, {
 

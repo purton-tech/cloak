@@ -18,7 +18,7 @@ pub async fn index(
     
     if vaults.is_empty() {
         let mut buf = Vec::new();
-        crate::templates::vaults::empty_html(&mut buf, "Your Vaults", team).unwrap();
+        crate::templates::vaults::empty_html(&mut buf, "Your Vaults", &team).unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));
     
         Ok(Html(html))
@@ -42,7 +42,7 @@ pub async fn index(
         }
     
         let mut buf = Vec::new();
-        crate::templates::vaults::index_html(&mut buf, "Your Vaults", summary_vaults, team).unwrap();
+        crate::templates::vaults::index_html(&mut buf, "Your Vaults", summary_vaults, &team).unwrap();
         
         let html = format!("{}", String::from_utf8_lossy(&buf));
     

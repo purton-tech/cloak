@@ -16,12 +16,15 @@ pub struct DeleteSecret {
 }
 
 pub async fn delete(
-    Path(vault_id): Path<u32>,
+    Path(organisation_id): Path<i32>,
+    Path(vault_id): Path<i32>,
     current_user: Authentication,
     Form(delete_secret): Form<DeleteSecret>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     let client = pool.get().await?;
+
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let secret = queries::secrets::get(
         &client,
@@ -49,5 +52,5 @@ pub async fn delete(
     queries::secrets::delete_service_account(&client, &secret.name_blind_index, &secret.vault_id)
         .await?;
 
-    crate::layout::redirect_and_snackbar(&super::secret_route(vault_id as i32), "Secret Deleted")
+    crate::layout::redirect_and_snackbar(&super::index_route(vault_id, team.id), "Secret Deleted")
 }

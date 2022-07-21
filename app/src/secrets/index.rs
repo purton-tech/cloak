@@ -9,23 +9,22 @@ use axum::{
 use deadpool_postgres::Pool;
 
 pub async fn index(
-    Path(organisation_id): Path<i32>,
-    Path(idor_vault_id): Path<i32>,
+    Path(params): Path<(i32, i32)>,
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<Html<String>, CustomError> {
     let client = pool.get().await?;
 
-    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+    let team = queries::organisations::organisation(&client, &params.0).await?;
 
     let secrets =
-        queries::secrets::get_all(&client, &idor_vault_id, &(current_user.user_id as i32)).await?;
+        queries::secrets::get_all(&client, &params.1, &(current_user.user_id as i32)).await?;
 
     let user_vault =
-        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
+        queries::user_vaults::get(&client, &(current_user.user_id as i32), &params.1).await?;
 
     let environments =
-        queries::environments::get_all(&client, &idor_vault_id, &(current_user.user_id as i32))
+        queries::environments::get_all(&client, &params.1, &(current_user.user_id as i32))
             .await?;
 
     if secrets.is_empty() {
@@ -35,7 +34,7 @@ pub async fn index(
             "Your Secrets",
             &user_vault,
             environments,
-            team,
+            &team,
         )
         .unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));
@@ -49,7 +48,7 @@ pub async fn index(
             &user_vault,
             environments,
             secrets,
-            team,
+            &team,
         )
         .unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));

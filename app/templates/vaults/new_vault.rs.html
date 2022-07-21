@@ -1,8 +1,8 @@
-@use crate::vaults::NEW;
+@use crate::vaults::new_route;
 
-@()
+@(team_id: &i32)
 
-<form class="m_form" method="post" action=@NEW>
+<form class="m_form" method="post" action="@new_route(*team_id)">
     <new-vault id="new-vault-drawer" label="Add Vault">
         <template slot="body">
             <p>

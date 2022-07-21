@@ -16,6 +16,6 @@ pub async fn index(
     let audits = queries::audit::audit(&client , &(current_user.user_id as i32)).await?;
 
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, audits, team)
+        crate::templates::audit::index_html(buf, audits, &team)
     }))
 }

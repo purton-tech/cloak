@@ -3,7 +3,7 @@
 @use super::new_account_html;
 @use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, organisation: Organisation)
+@(title: &str, organisation: &Organisation)
 
 @:layout_html(title, {
     <div class="empty_page">

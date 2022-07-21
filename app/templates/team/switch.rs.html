@@ -1,11 +1,9 @@
 @use super::super::layout_html;
-@use super::create_invite_html;
-@use super::delete_html;
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::GetTeams;
 @use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, teams: Vec<GetTeams>, organisation: Organisation)
+@(title: &str, teams: Vec<GetTeams>, organisation: &Organisation)
 
 @:layout_html(title, {
 

@@ -7,25 +7,21 @@ use axum::{
     Router,
 };
 
-pub static INDEX: &str = "/app/vault/:id/secrets";
-pub static NEW: &str = "/app/vault/:id/secrets/new";
-pub static DELETE: &str = "/app/vault/:id/secrets/delete";
-
 pub fn routes() -> Router {
     Router::new()
-        .route(INDEX, get(index::index))
-        .route(NEW, post(new_secret::new))
-        .route(DELETE, post(delete_secret::delete))
+        .route("/app/team/:organisation_id/vault/:id/secrets", get(index::index))
+        .route("/app/team/:organisation_id/vault/:id/secrets/new", post(new_secret::new))
+        .route("/app/team/:organisation_id/vault/:id/secrets/delete", post(delete_secret::delete))
 }
 
-pub fn secret_route(vault_id: i32) -> String {
-    format!("/app/vault/{}/secrets", vault_id)
+pub fn index_route(organisation_id: i32, vault_id: i32) -> String {
+    format!("/app/team/{}/vault/{}/secrets", organisation_id, vault_id)
 }
 
-pub fn new_route(vault_id: i32) -> String {
-    format!("/app/vault/{}/secrets/new", vault_id)
+pub fn new_route(organisation_id: i32, vault_id: i32) -> String {
+    format!("/app/team/{}/vault/{}/secrets/new", organisation_id, vault_id)
 }
 
-pub fn delete_route(vault_id: i32) -> String {
-    format!("/app/vault/{}/secrets/delete", vault_id)
+pub fn delete_route(organisation_id: i32, vault_id: i32) -> String {
+    format!("/app/team/{}/vault/{}/secrets/delete", organisation_id, vault_id)
 }
