@@ -1,8 +1,8 @@
-@use crate::service_accounts::DELETE;
+@use crate::service_accounts::delete_route;
 
-@(service_account_id: i32, service_account_name: &str)
+@(service_account_id: i32, service_account_name: &str, team_id: &i32)
 
-<form class="m_form" method="post" action="@DELETE">
+<form class="m_form" method="post" action="@delete_route(*team_id)">
     <side-drawer 
         id='@format!("delete-account-drawer-{}", service_account_id)' 
         label='@format!("Delete Service Account ({})?", service_account_name)'>

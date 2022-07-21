@@ -1,8 +1,8 @@
-@use crate::service_accounts::NEW;
+@use crate::service_accounts::new_route;
 
-@()
+@(team_id: &i32)
 
-<form class="m_form" method="post" action="@NEW">
+<form class="m_form" method="post" action="@new_route(*team_id)">
     <new-account label="Add Service Accounts">
         <template slot="body">
             <p>
