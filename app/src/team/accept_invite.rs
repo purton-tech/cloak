@@ -20,7 +20,7 @@ pub async fn invite(
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
-    accept_invitation(
+    let team_id = accept_invitation(
         &pool,
         &current_user,
         &invite.invite_selector,
@@ -28,7 +28,7 @@ pub async fn invite(
     )
     .await?;
 
-    Ok(Redirect::to("/app/team"))
+    Ok(Redirect::to(&super::switch_route(team_id)))
 }
 
 pub async fn accept_invitation(
@@ -36,7 +36,7 @@ pub async fn accept_invitation(
     current_user: &Authentication,
     invitation_selector: &str,
     invitation_verifier: &str,
-) -> Result<(), CustomError> {
+) -> Result<i32, CustomError> {
 
     let invitation_verifier = base64::decode_config(invitation_verifier, base64::URL_SAFE_NO_PAD)
         .map_err(|e| CustomError::FaultySetup(e.to_string()))?;
@@ -71,5 +71,5 @@ pub async fn accept_invitation(
         }
     }
 
-    Ok(())
+    Ok(invitation.organisation_id)
 }

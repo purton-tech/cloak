@@ -12,7 +12,7 @@
 @:layout_html(title, {
 
     @for user in &users {
-        @:delete_html(user.organisation_id, user.id, &user.email)
+        @:delete_html(user.organisation_id, user.id, &user.email, &organisation.id)
     }
 
     <div class="m_card">
@@ -62,6 +62,6 @@
         </div>
     </div>
 }, {
-    @:create_invite_html()
+    @:create_invite_html(&organisation.id)
     <button class="a_button mini primary" id="invite-user">New User</button>
 }, organisation, None, SideBar::Team)

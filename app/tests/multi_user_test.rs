@@ -160,6 +160,8 @@ async fn add_team_member(
     let invitation_url = get_invite_url_from_email(config).await?;
 
     sign_in_user(driver, team_member, config).await?;
+
+    // Accept the invitation
     driver.get(invitation_url).await?;
 
     let table_cell = driver

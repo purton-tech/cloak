@@ -1,8 +1,8 @@
-@use crate::team::CREATE;
+@use crate::team::create_route;
 
-@()
+@(team_id: &i32)
 
-<form class="m_form" id="create-invite-form" method="post" action="@CREATE">
+<form class="m_form" id="create-invite-form" method="post" action="@create_route(*team_id)">
     <invite-user label="Invite User">
         <template slot="body">
             <p>Invite people into your team.</p>
