@@ -1,8 +1,8 @@
 @use crate::cornucopia::queries::user_vaults::GetUsersDangerous;
 
-@(user: GetUsersDangerous)
+@(user: GetUsersDangerous, team_id: &i32)
 
-<form method="post" action="@crate::members::delete_route(user.vault_id)">
+<form method="post" action="@crate::members::delete_route(user.vault_id, *team_id)">
     <side-drawer label="Remove Member from Vault?" id='@format!("delete-member-drawer-{}", user.user_id)'>
         <template slot="body">
             <p>

@@ -55,11 +55,11 @@
     </div>
 
     @for member in members {
-        @:delete_html(member)
+        @:delete_html(member, &organisation.id)
     }
 }, {
     @if non_members.len() != 0 {
-        @:add_member_html(&user_vault, environments, non_members)
+        @:add_member_html(&user_vault, environments, non_members, &organisation.id)
         <button class="a_button mini primary" id="add-member">Add Member</button>
     }
 }, organisation, Some(user_vault.vault_id), SideBar::Members)

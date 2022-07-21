@@ -8,29 +8,28 @@ use axum::{
 use deadpool_postgres::Pool;
 
 pub async fn index(
-    Path(organisation_id): Path<i32>,
-    Path(idor_vault_id): Path<i32>,
+    Path((team_id, vault_id)): Path<(i32, i32)>,
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<Html<String>, CustomError> {
     let client = pool.get().await?;
 
-    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+    let team = queries::organisations::organisation(&client, &team_id).await?;
 
     let org =
         queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
             .await?;
 
     // Blow up if the user doesn't have access to the vault
-    queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
+    queries::user_vaults::get(&client, &(current_user.user_id as i32), &vault_id).await?;
 
-    let members = queries::user_vaults::get_users_dangerous(&client, &idor_vault_id).await?;
+    let members = queries::user_vaults::get_users_dangerous(&client, &vault_id).await?;
 
     let non_members =
-        queries::user_vaults::get_non_members_dangerous(&client, &idor_vault_id, &org.id).await?;
+        queries::user_vaults::get_non_members_dangerous(&client, &vault_id, &org.id).await?;
 
     let user_vault =
-        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
+        queries::user_vaults::get(&client, &(current_user.user_id as i32), &vault_id).await?;
 
     let environments =
         queries::environments::get_all(&client, &user_vault.vault_id, &(current_user.user_id as i32))

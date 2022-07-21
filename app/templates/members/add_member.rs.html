@@ -5,10 +5,11 @@
 @(
     user_vault: &Get, 
     environments: Vec<GetAll>,
-    non_members: Vec<GetNonMembersDangerous>
+    non_members: Vec<GetNonMembersDangerous>,
+    team_id: &i32
 )
 
-<form class="m_form" id="add-team-member" method="post" action="@crate::members::add_route(user_vault.vault_id)">
+<form class="m_form" id="add-team-member" method="post" action="@crate::members::add_route(user_vault.vault_id, *team_id)">
     <add-member label="Add Member">
         <template slot="body">
             <fieldset>

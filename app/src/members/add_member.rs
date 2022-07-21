@@ -20,7 +20,7 @@ pub struct AddMember {
 }
 
 pub async fn add(
-    Path(id): Path<i32>,
+    Path((organisation_id, vault_id)): Path<(i32, i32)>,
     current_user: Authentication,
     Form(add_member): Form<AddMember>,
     Extension(pool): Extension<Pool>,
@@ -38,12 +38,12 @@ pub async fn add(
 
     // Do an IDOR check, does this user have access to the vault. This will
     // blow up if we don't
-    queries::vaults::get(&client, &id, &(current_user.user_id as i32)).await?;
+    queries::vaults::get(&client, &vault_id, &(current_user.user_id as i32)).await?;
 
     queries::user_vaults::insert(
         &client,
         &add_member.user_id,
-        &id,
+        &vault_id,
         &add_member.ecdh_public_key,
         &add_member.wrapped_vault_key,
     )
@@ -54,5 +54,5 @@ pub async fn add(
             .await?;
     }
 
-    Ok(Redirect::to(&super::member_route(id)))
+    Ok(Redirect::to(&super::member_route(organisation_id, vault_id)))
 }

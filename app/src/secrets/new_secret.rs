@@ -22,8 +22,7 @@ pub struct NewSecret {
 }
 
 pub async fn new(
-    Path(organisation_id): Path<i32>,
-    Path(id): Path<i32>,
+    Path((organisation_id, id)): Path<(i32, i32)>,
     current_user: Authentication,
     Form(new_secret): Form<NewSecret>,
     Extension(pool): Extension<Pool>,

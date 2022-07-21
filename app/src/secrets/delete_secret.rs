@@ -16,8 +16,7 @@ pub struct DeleteSecret {
 }
 
 pub async fn delete(
-    Path(organisation_id): Path<i32>,
-    Path(vault_id): Path<i32>,
+    Path((organisation_id, vault_id)): Path<(i32, i32)>,
     current_user: Authentication,
     Form(delete_secret): Form<DeleteSecret>,
     Extension(pool): Extension<Pool>,
