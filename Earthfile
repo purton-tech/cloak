@@ -154,7 +154,7 @@ integration-test:
     COPY .devcontainer/docker-compose.yml ./ 
     COPY .devcontainer/docker-compose.earthly.yml ./ 
     ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/cloak?sslmode=disable
-    ARG APP_DATABASE_URL=postgresql://cloak:testpassword@db:5432/cloak
+    ARG APP_DATABASE_URL=postgresql://application:testpassword@db:5432/cloak
     # We expose selenium to localhost
     ARG WEB_DRIVER_URL='http://localhost:4444' 
     # The selenium container will connect to the envoy container

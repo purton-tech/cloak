@@ -38,21 +38,21 @@ DO $$
 BEGIN
   CREATE ROLE application LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role cloak -- it already exists';
+  RAISE NOTICE 'not creating role application -- it already exists';
 END
 $$;
 DO $$
 BEGIN
   CREATE ROLE authentication LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role cloak_auth -- it already exists';
+  RAISE NOTICE 'not creating role authentication -- it already exists';
 END
 $$;
 DO $$
 BEGIN
   CREATE ROLE readonly LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role cloak_readonly -- it already exists';
+  RAISE NOTICE 'not creating role readonly -- it already exists';
 END
 $$;
 
