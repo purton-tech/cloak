@@ -1,6 +1,6 @@
---! insert(user_id, name)
+--! insert(organisation_id, name)
 INSERT INTO 
-    vaults (user_id, name)
+    vaults (organisation_id, name)
 VALUES($1, $2) 
 RETURNING id
 
@@ -33,7 +33,7 @@ IN
     WHERE
         user_id = $2)
 
---! get_all(current_user_id) { id, name, updated_at, created_at } *
+--! get_all(current_user_id, organisation_id) { id, name, updated_at, created_at } *
 SELECT 
     v.id, v.name, v.updated_at, v.created_at
 FROM 
@@ -41,6 +41,8 @@ FROM
 LEFT JOIN users_vaults uv ON uv.vault_id = v.id
 WHERE
     uv.user_id = $1
+AND
+    v.organisation_id = $2
 
 --! user_vault_count(vault_id)
 SELECT count(*) FROM users_vaults WHERE vault_id = $1

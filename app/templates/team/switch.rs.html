@@ -23,9 +23,9 @@
                     @for team in teams {
                         <tr>
                             @if let Some(name) = team.organisation_name {
-                                <td>@name</td>
+                                <td><a href="@crate::vaults::index_route(team.id)">@name</a></td>
                             } else {
-                                <td>Name not Set</td>
+                                <td><a href="@crate::vaults::index_route(team.id)">Name not Set</a></td>
                             }
                             <td>@team.team_owner</td>
                         </tr>

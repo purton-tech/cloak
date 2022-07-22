@@ -42,6 +42,7 @@ pub async fn new(
     queries::audit::insert(
         &client,
         &(current_user.user_id as i32),
+        &organisation_id,
         &AuditAction::NewServiceAccount,
         &AuditAccessType::Web,
         "Service account created"

@@ -36,7 +36,6 @@ pub async fn post_registration(
             &client,
             &(current_user.user_id as i32),
             &inserted_org_id,
-            &true,
         )
         .await?;
         return Ok(Redirect::to(&crate::vaults::index_route(inserted_org_id)))

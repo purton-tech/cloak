@@ -47,6 +47,7 @@ pub async fn new(
     queries::audit::insert(
         &client,
         &(current_user.user_id as i32),
+        &organisation_id,
         &AuditAction::CreateVault,
         &AuditAccessType::Web,
         &format!("{} vault created", &new_vault.name)

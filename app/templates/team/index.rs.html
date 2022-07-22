@@ -34,11 +34,7 @@
                             <td>
                                 @user.email
                             </td>
-                            @if user.is_admin {
-                                <td><span class="a_badge a_badge--success">Administrator</span></td>
-                            } else {
                                 <td><span class="a_badge a_badge--success">Invitation Accepted</span></td>
-                            }
                             <td>
                                 <a href="#" data-drawer-target='@format!("delete-member-drawer-{}-{}", user.organisation_id, user.id)'>
                                     <img src="/static/@delete_svg.name" width="18"></img>

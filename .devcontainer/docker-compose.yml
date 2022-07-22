@@ -76,15 +76,15 @@ services:
       - infra_node_modules:/workspace/infra/node_modules # Set target as a volume for performance. 
 
     environment:
-      # The following is used by the migrations and also for SQLX at compile time.
+      # The following is used by the migrations and also for cornucopia at compile time.
       DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak?sslmode=disable
       # A less privelaged role for basic INSERTS, SELECT etc.
-      APP_DATABASE_URL: postgresql://cloak:testpassword@db:5432/cloak
+      APP_DATABASE_URL: postgresql://application:testpassword@db:5432/cloak
       VAULT_SERVER_URL: http://localhost:7103
       VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103
 
       INVITE_DOMAIN: http://envoy:7100
-      INVITE_FROM_EMAIL_ADDRESS: support@cloak.com
+      INVITE_FROM_EMAIL_ADDRESS: support@application.com
       SMTP_HOST: smtp
       SMTP_PORT: 1025
       SMTP_USERNAME: thisisnotused

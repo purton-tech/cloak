@@ -14,7 +14,7 @@ pub async fn index(
 
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
-    let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
+    let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32), &organisation_id).await?;
     
     if vaults.is_empty() {
         let mut buf = Vec::new();

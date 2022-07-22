@@ -27,13 +27,13 @@ pub async fn delete(
         &client,
         &delete_member.user_id,
         &delete_member.organisation_id,
-        &(current_user.user_id as i32),
     )
     .await?;
 
     queries::audit::insert(
         &client,
         &(current_user.user_id as i32),
+        &delete_member.organisation_id,
         &AuditAction::CreateInvite,
         &AuditAccessType::Web,
         &format!("{} removed from team", &delete_member.user_id)

@@ -34,12 +34,14 @@ pub async fn connect(
         &connect_form.environment_id,
         &connect_form.service_account_id,
         &(current_user.user_id as i32),
+        &organisation_id
     )
     .await?;
 
     queries::audit::insert(
         &client,
         &(current_user.user_id as i32),
+        &organisation_id,
         &AuditAction::ConnectServiceAccount,
         &AuditAccessType::Web,
         &format!("Service account {} connected", &connect_form.service_account_id)

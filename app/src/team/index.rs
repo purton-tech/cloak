@@ -17,7 +17,7 @@ pub async fn index(
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let org =
-        queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
+        queries::organisations::get_primary_organisation(&client, &organisation_id)
             .await?;
 
     let users =

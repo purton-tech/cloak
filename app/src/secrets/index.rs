@@ -56,6 +56,7 @@ pub async fn index(
         queries::audit::insert(
             &client,
             &(current_user.user_id as i32),
+            &team.id,
             &AuditAction::AccessSecrets,
             &AuditAccessType::Web,
             &format!("Secrets  accesed from vault {}", &user_vault.vault_id),

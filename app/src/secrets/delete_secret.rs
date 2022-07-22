@@ -42,6 +42,7 @@ pub async fn delete(
     queries::audit::insert(
         &client,
         &(current_user.user_id as i32),
+        &organisation_id,
         &AuditAction::DeleteSecret,
         &AuditAccessType::Web,
         &format!("Secret deleted from Vault with ID {}", vault_id)

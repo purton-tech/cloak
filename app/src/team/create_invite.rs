@@ -61,6 +61,7 @@ pub async fn create_invite(
     queries::audit::insert(
         &client,
         &(current_user.user_id as i32),
+        &organisation_id,
         &AuditAction::CreateInvite,
         &AuditAccessType::Web,
         &format!("{} invited", &new_invite.email)
