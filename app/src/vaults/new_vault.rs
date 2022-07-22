@@ -31,7 +31,7 @@ pub async fn new(
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let vault_id =
-        queries::vaults::insert(&client, &(current_user.user_id as i32), &new_vault.name).await?;
+        queries::vaults::insert(&client, &organisation_id, &new_vault.name).await?;
 
     let envs = queries::environments::setup_environments(&client, &vault_id).await?;
 

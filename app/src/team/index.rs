@@ -16,14 +16,14 @@ pub async fn index(
 
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
-    let org =
-        queries::organisations::get_primary_organisation(&client, &organisation_id)
-            .await?;
+    let users = queries::organisations::get_users(
+        &client,
+        &(current_user.user_id as i32),
+        &organisation_id,
+    )
+    .await?;
 
-    let users =
-        queries::organisations::get_users(&client, &(current_user.user_id as i32), &org.id).await?;
-
-    let invites = queries::invitations::get_all(&client, &org.id).await?;
+    let invites = queries::invitations::get_all(&client, &organisation_id).await?;
 
     let mut buf = Vec::new();
     crate::templates::team::index_html(&mut buf, "Your Vaults", users, invites, &team).unwrap();

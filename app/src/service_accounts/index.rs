@@ -17,7 +17,7 @@ pub async fn index(
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let service_accounts =
-        queries::service_accounts::get_all(&client, &(current_user.user_id as i32)).await?;
+        queries::service_accounts::get_all(&client, &organisation_id).await?;
 
     //let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
     let environments_and_vaults =

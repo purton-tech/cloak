@@ -32,7 +32,7 @@ pub async fn new(
 
     queries::service_accounts::insert(
         &client,
-        &(current_user.user_id as i32),
+        &organisation_id,
         &new_service_account.name,
         &new_service_account.public_key,
         &new_service_account.encrypted_private_key,

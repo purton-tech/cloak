@@ -6,10 +6,10 @@ SELECT
     access_type, 
     description 
 FROM audit_trail
-WHERE user_id IN
+WHERE organisation_id IN
     -- Bring back the audit items this user has access to.
     (SELECT 
-        user_id 
+        organisation_id 
     FROM 
         organisation_users 
     WHERE
