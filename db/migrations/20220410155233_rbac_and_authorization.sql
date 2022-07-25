@@ -9,12 +9,8 @@ CREATE TYPE role AS ENUM (
     'SystemAdministrator'
 );
 
-/*
-
--- If required we could extend with permissions
-
 CREATE TYPE permission AS ENUM (
-    'InviteUsers'
+    'CanInviteUsers'
 );
 
 CREATE TABLE roles_permissions (
@@ -24,7 +20,9 @@ CREATE TABLE roles_permissions (
     PRIMARY KEY (role, permission)
 );
 
-*/
+INSERT INTO roles_permissions VALUES('Administrator', 'CanInviteUsers');
 
 -- migrate:down
+DROP TABLE roles_permissions;
 DROP TYPE role;
+DROP TYPE permission;
