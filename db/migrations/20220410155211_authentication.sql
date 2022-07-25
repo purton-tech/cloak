@@ -4,6 +4,8 @@
 CREATE TABLE users (
     id SERIAL PRIMARY KEY, 
     email VARCHAR NOT NULL UNIQUE, 
+    first_name VARCHAR, 
+    last_name VARCHAR, 
     master_password_hash VARCHAR NOT NULL, 
     protected_symmetric_key VARCHAR NOT NULL, 
     protected_ecdsa_private_key VARCHAR NOT NULL, 
@@ -15,6 +17,8 @@ CREATE TABLE users (
 );
 
 COMMENT ON TABLE users IS 'Contains users and their private and public keys';
+COMMENT ON COLUMN users.first_name IS 'The first name, not captured on registration for faster on boarding.';
+COMMENT ON COLUMN users.last_name IS 'The last name, not captured on registration for faster on boarding.';
 COMMENT ON COLUMN users.master_password_hash IS 'Hash of the users master password for authentication';
 COMMENT ON COLUMN users.protected_symmetric_key IS 'Wrapped AES-GCM key for symmetric encryption and decryption';
 COMMENT ON COLUMN users.protected_ecdsa_private_key IS 'Wrapped ECDSA key for signing';

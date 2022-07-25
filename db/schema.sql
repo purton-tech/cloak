@@ -565,6 +565,8 @@ ALTER SEQUENCE public.sessions_id_seq OWNED BY public.sessions.id;
 CREATE TABLE public.users (
     id integer NOT NULL,
     email character varying NOT NULL,
+    first_name character varying,
+    last_name character varying,
     master_password_hash character varying NOT NULL,
     protected_symmetric_key character varying NOT NULL,
     protected_ecdsa_private_key character varying NOT NULL,
@@ -581,6 +583,20 @@ CREATE TABLE public.users (
 --
 
 COMMENT ON TABLE public.users IS 'Contains users and their private and public keys';
+
+
+--
+-- Name: COLUMN users.first_name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.first_name IS 'The first name, not captured on registration for faster on boarding.';
+
+
+--
+-- Name: COLUMN users.last_name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.last_name IS 'The last name, not captured on registration for faster on boarding.';
 
 
 --
