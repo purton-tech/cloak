@@ -55,20 +55,12 @@ CREATE TYPE public.audit_action AS ENUM (
 
 
 --
--- Name: permission; Type: TYPE; Schema: public; Owner: -
---
-
-CREATE TYPE public.permission AS ENUM (
-    'InviteUsers'
-);
-
-
---
 -- Name: role; Type: TYPE; Schema: public; Owner: -
 --
 
 CREATE TYPE public.role AS ENUM (
     'Administrator',
+    'Collaborator',
     'SystemAdministrator'
 );
 
@@ -372,16 +364,6 @@ CREATE SEQUENCE public.organisations_id_seq
 --
 
 ALTER SEQUENCE public.organisations_id_seq OWNED BY public.organisations.id;
-
-
---
--- Name: roles_permissions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.roles_permissions (
-    role public.role NOT NULL,
-    permission public.permission NOT NULL
-);
 
 
 --
@@ -747,14 +729,6 @@ ALTER TABLE ONLY public.organisation_users
 
 ALTER TABLE ONLY public.organisations
     ADD CONSTRAINT organisations_pkey PRIMARY KEY (id);
-
-
---
--- Name: roles_permissions roles_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.roles_permissions
-    ADD CONSTRAINT roles_permissions_pkey PRIMARY KEY (role, permission);
 
 
 --
