@@ -24,13 +24,14 @@ WHERE
 AND
     organisation_id = $2
 
---! get_all(organisation_id) { id, email, invitation_selector, invitation_verifier_hash, organisation_id, created_at} *
+--! get_all(organisation_id) { id, email, invitation_selector, invitation_verifier_hash, organisation_id, roles, created_at} *
 SELECT  
     id, 
     email,
     invitation_selector, 
     invitation_verifier_hash,
     organisation_id,
+    roles,
     created_at  
 FROM 
     invitations 

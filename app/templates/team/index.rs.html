@@ -1,6 +1,7 @@
 @use super::super::layout_html;
 @use super::create_invite_html;
 @use super::delete_html;
+@use super::role_html;
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::GetUsers;
 @use crate::cornucopia::queries::organisations::Organisation;
@@ -24,7 +25,7 @@
                 <thead>
                     <tr>
                         <th>Email</th>
-                        <th>Special Privelages</th>
+                        <th>Special Priveleges</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -34,7 +35,14 @@
                             <td>
                                 @user.email
                             </td>
-                                <td>Not implemented</td>
+                                <td>
+                                    @for (index, role) in user.roles.into_iter().enumerate() {
+                                        @if index > 0 {
+                                            and
+                                        }
+                                        <span>@:role_html(role)</span>
+                                    }
+                                </td>
                             <td>
                                 <a href="#" data-drawer-target='@format!("delete-member-drawer-{}-{}", user.organisation_id, user.id)'>
                                     <img src="/static/@delete_svg.name" width="18"></img>
@@ -49,7 +57,14 @@
                                 @invite.email
                                 <span class="a_badge a_badge--success">Invited</span>
                             </td>
-                            <td>Not Implemented</td>
+                            <td>
+                                @for (index, role) in invite.roles.into_iter().enumerate() {
+                                    @if index > 0 {
+                                        and
+                                    }
+                                    <span>@:role_html(role)</span>
+                                }
+                            </td>
                             <td>
                             </td>
                         </tr>

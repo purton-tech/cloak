@@ -30,9 +30,9 @@ INSERT INTO
     organisation_users (user_id, organisation_id, roles)
 VALUES($1, $2, $3) 
 
---! get_users(user_id, organisation_id) { id, organisation_id, email, ecdh_public_key} *
+--! get_users(user_id, organisation_id) { id, organisation_id, email, ecdh_public_key, roles} *
 SELECT 
-    u.id, ou.organisation_id, u.email, u.ecdh_public_key
+    u.id, ou.organisation_id, u.email, u.ecdh_public_key, ou.roles
 FROM 
     organisation_users ou
 LEFT JOIN users u ON u.id = ou.user_id
