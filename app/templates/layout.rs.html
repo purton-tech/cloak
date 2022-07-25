@@ -42,7 +42,7 @@
   
         <div>
           @* The icon to bring up the profile page *@
-          <a class="profile" data-drawer-target="logout-drawer">
+          <a class="profile" data-drawer-target="profile-drawer">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="42px">
               <circle cx="32" cy="32" r="32" />
               <text style="font: 2rem sans-serif" stroke="white" fill="white" text-anchor="middle"
@@ -118,22 +118,46 @@
           </li>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::None, false)'>
               <img alt="Menu Item" width="24px" src="/static/@profile_svg.name"></img>
-              <a data-drawer-target="logout-drawer" href="#">Your Profile</a>
+              <a data-drawer-target="profile-drawer" href="#">Your Profile</a>
           </li>
         </ul>
 
         <div class="profile">
-          <form class="m_form" method="post" action="/auth/sign_out">
-            <side-drawer label="Logout ?" id="logout-drawer">
+            <side-drawer label="Your Profile" id="profile-drawer">
               <template slot="body">
-                <p>Are you sure you want to Logout?</p>
+
+                <div class="m_card">
+                  <div class="header">Update Your Details</div>  
+                  <div class="body">
+                    <form class="m_form" method="post" action="@crate::profile::set_details_route(organisation.id)">
+                      <fieldset>
+                          <label for="name">First Name</label>
+                          <input type="text" autocomplete="off" required="" id="name" name="first_name">
+                          </input>
+                          <span class="a_help_text">Your first name</span>
+                          <label for="last_name">Last Name</label>
+                          <input type="text" autocomplete="off" id="last_name" required="" name="last_name">
+                          </input>
+                          <span class="a_help_text">Your last name</span>
+                          <button class="a_button auto danger" type="submit">Save Details</button>
+                      </fieldset>
+                    </form>
+                  </div>
+                </div>
+
+                <div class="m_card">
+                  <div class="header">Logout?</div> 
+                  <div class="body">
+                    <form class="m_form" method="post" action="/auth/sign_out">
+                      <p>Are you sure you want to Logout?</p>
+                      <button class="a_button auto danger" type="submit">Logout</button>
+                    </form>
+                  </div> 
+                </div>
               </template>
               <template slot="footer">
-                <button class="a_button auto danger" slot="footer"
-                  type="submit">Logout</button>
-                </template>
+              </template>
             </side-drawer>
-          </form>
         </div>
       </nav>
       <main class="container">
@@ -154,7 +178,7 @@
               <label for="name">Name</label>
               <input type="text" autocomplete="off" required="" name="name">
               </input>
-         
+          </fieldset>
         </template>
         <template slot="footer">
           <button class="a_button auto danger" slot="footer"
