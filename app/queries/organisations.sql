@@ -14,10 +14,10 @@ FROM
 WHERE
     created_by_user_id = $1
 
---! add_user_to_organisation(user_id, organisation_id)
+--! add_user_to_organisation(user_id, organisation_id, roles)
 INSERT INTO 
-    organisation_users (user_id, organisation_id)
-VALUES($1, $2) 
+    organisation_users (user_id, organisation_id, roles)
+VALUES($1, $2, $3) 
 
 --! insert_organisation(created_by_user_id) 
 INSERT INTO 

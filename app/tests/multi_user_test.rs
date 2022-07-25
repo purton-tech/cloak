@@ -150,11 +150,11 @@ async fn add_team_member(
 
     let table_cell = driver
         .find_element(By::XPath(
-            "//table[@class='m_table team_table']/tbody/tr[last()]/td[2]",
+            "//table[@class='m_table team_table']/tbody/tr[last()]/td[1]/span",
         ))
         .await?;
 
-    assert_eq!(table_cell.text().await?, "Invitation Pending");
+    assert_eq!(table_cell.text().await?, "Invited");
 
     // Get the invite from mailhog
     let invitation_url = get_invite_url_from_email(config).await?;

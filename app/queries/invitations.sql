@@ -3,13 +3,14 @@ INSERT INTO
     invitations (organisation_id, email, invitation_selector, invitation_verifier_hash, roles)
     VALUES($1, $2, $3, $4, $5)
 
---! get_invitation(invitation_selector) { id, organisation_id, email, invitation_selector, invitation_verifier_hash, created_at}
+--! get_invitation(invitation_selector) { id, organisation_id, email, invitation_selector, invitation_verifier_hash, roles, created_at}
 SELECT 
     id, 
     organisation_id, 
     email, 
     invitation_selector, 
     invitation_verifier_hash,
+    roles,
     created_at
 FROM 
     invitations 

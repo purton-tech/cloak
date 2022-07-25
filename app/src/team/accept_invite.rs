@@ -59,6 +59,7 @@ pub async fn accept_invitation(
                 &client,
                 &user.id,
                 &invitation.organisation_id,
+                &invitation.roles
             )
             .await?;
 
