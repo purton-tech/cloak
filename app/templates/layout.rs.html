@@ -57,11 +57,16 @@
 
       @* Navigation shown as a side menu *@
       <nav class="sidenav">
-        <h1><a href="/app/vaults">Cloak</a></h1>
+        <h1><a href="@crate::vaults::index_route(organisation.id)">Cloak</a></h1>
 
         <div class="team-name">
           <strong>Team : </strong>
-          <a href="@crate::team::index_route(organisation.id)">Your Team</a>
+
+          @if let Some(name) = &organisation.name {
+            <a href="@crate::team::index_route(organisation.id)">@name</a>
+          } else {
+            Name Not Set <a data-drawer-target="set-name-drawer" href="#">Set Name</a>
+          }
         </div>
 
         <h2>Application</h2>
@@ -140,6 +145,23 @@
       </main>
     </div>
     <snack-bar></snack-bar>
+
+    <form class="m_form" method="post" action="@crate::team::set_name_route(organisation.id)">
+      <side-drawer label="Set Team Name" id="set-name-drawer">
+        <template slot="body">
+          <p>Set your team name</p>
+          <fieldset>
+              <label for="name">Name</label>
+              <input type="text" autocomplete="off" required="" name="name">
+              </input>
+         
+        </template>
+        <template slot="footer">
+          <button class="a_button auto danger" slot="footer"
+            type="submit">Set Name</button>
+          </template>
+      </side-drawer>
+    </form>
   </body>
 
   </html>

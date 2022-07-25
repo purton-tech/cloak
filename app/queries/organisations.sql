@@ -5,6 +5,18 @@ FROM
     organisations
 WHERE
     id = $1
+
+--! set_name(user_id, org_id, name)
+UPDATE
+    organisations
+SET 
+    name = $3 
+WHERE
+    id = $2
+AND
+    -- Make sure the user has access to this org
+    $1 IN (SELECT user_id FROM organisation_users WHERE organisation_id = $2)
+
     
 --! get_primary_organisation(created_by_user_id) { id, name? }
 SELECT 

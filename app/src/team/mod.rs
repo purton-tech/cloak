@@ -1,6 +1,7 @@
 mod accept_invite;
 mod create_invite;
 mod delete_member;
+mod set_name;
 mod index;
 mod switch;
 
@@ -16,6 +17,7 @@ pub fn routes() -> Router {
         .route("/app/team/accept_invite", get(accept_invite::invite))
         .route("/app/team/:organisation_id/create_invite", post(create_invite::create_invite))
         .route("/app/team/:organisation_id/delete", post(delete_member::delete))
+        .route("/app/team/:organisation_id/set_name", post(set_name::set_name))
 }
 
 pub fn index_route(organisation_id: i32) -> String {
@@ -32,4 +34,8 @@ pub fn create_route(organisation_id: i32) -> String {
 
 pub fn delete_route(organisation_id: i32) -> String {
     format!("/app/team/{}/delete", organisation_id)
+}
+
+pub fn set_name_route(organisation_id: i32) -> String {
+    format!("/app/team/{}/set_name", organisation_id)
 }
