@@ -1,4 +1,5 @@
 use crate::cornucopia::queries;
+use crate::cornucopia::types;
 use crate::{authentication::Authentication, errors::CustomError};
 use axum::{
     extract::Extension,
@@ -32,10 +33,13 @@ pub async fn post_registration(
             queries::organisations::insert_organisation(&client, &(current_user.user_id as i32))
                 .await?;
 
+        let roles = vec!(types::public::Role::Administrator, types::public::Role::Collaborator);
+
         queries::organisations::insert_user_into_org(
             &client,
             &(current_user.user_id as i32),
             &inserted_org_id,
+            &roles
         )
         .await?;
         return Ok(Redirect::to(&crate::vaults::index_route(inserted_org_id)))

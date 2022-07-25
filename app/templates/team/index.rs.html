@@ -24,7 +24,7 @@
                 <thead>
                     <tr>
                         <th>Email</th>
-                        <th>Status</th>
+                        <th>Special Privelages</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -34,7 +34,7 @@
                             <td>
                                 @user.email
                             </td>
-                                <td><span class="a_badge a_badge--success">Invitation Accepted</span></td>
+                                <td>Not implemented</td>
                             <td>
                                 <a href="#" data-drawer-target='@format!("delete-member-drawer-{}-{}", user.organisation_id, user.id)'>
                                     <img src="/static/@delete_svg.name" width="18"></img>
@@ -47,8 +47,9 @@
                         <tr>
                             <td>
                                 @invite.email
+                                <span class="a_badge a_badge--success">Invited</span>
                             </td>
-                            <td>Invitation Pending</td>
+                            <td>Not Implemented</td>
                             <td>
                             </td>
                         </tr>

@@ -13,15 +13,18 @@ COMMENT ON COLUMN organisations.created_by_user_id IS 'The action committed. i.e
 CREATE TABLE organisation_users (
     user_id INT NOT NULL, 
     organisation_id INT NOT NULL,
+    roles role ARRAY NOT NULL,
     PRIMARY KEY (user_id, organisation_id)
 );
 
 COMMENT ON TABLE organisation_users IS 'A User can belong to multiple organisations (teams).';
+COMMENT ON COLUMN organisation_users.roles IS 'The RBAC privelages the user has for this team.';
 
 CREATE TABLE invitations (
     id SERIAL PRIMARY KEY, 
     organisation_id INT NOT NULL, 
     email VARCHAR NOT NULL,
+    roles role ARRAY NOT NULL,
     invitation_selector VARCHAR NOT NULL,
     invitation_verifier_hash VARCHAR NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -32,6 +35,7 @@ CREATE TABLE invitations (
 
 COMMENT ON TABLE invitations IS 'Invitations are generated so users can join teams (organisations)';
 COMMENT ON COLUMN invitations.organisation_id IS 'The organisation that the user will join if they acccept the invite';
+COMMENT ON COLUMN invitations.roles IS 'The RBAC privelages the user will receive on joining the team (organisation).';
 COMMENT ON COLUMN invitations.invitation_selector IS 'To avoid timing attacks the inviation secret is split into a lookup then a verfication.';
 COMMENT ON COLUMN invitations.email IS 'After we lookup the invite we check that the hash is correct';
 

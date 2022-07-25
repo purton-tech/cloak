@@ -25,10 +25,10 @@ INSERT INTO
 VALUES($1) 
 RETURNING id
 
---! insert_user_into_org(user_id, organisation_id)
+--! insert_user_into_org(user_id, organisation_id, roles)
 INSERT INTO 
-    organisation_users (user_id, organisation_id)
-VALUES($1, $2) 
+    organisation_users (user_id, organisation_id, roles)
+VALUES($1, $2, $3) 
 
 --! get_users(user_id, organisation_id) { id, organisation_id, email, ecdh_public_key} *
 SELECT 

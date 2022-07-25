@@ -232,6 +232,7 @@ CREATE TABLE public.invitations (
     id integer NOT NULL,
     organisation_id integer NOT NULL,
     email character varying NOT NULL,
+    roles public.role[] NOT NULL,
     invitation_selector character varying NOT NULL,
     invitation_verifier_hash character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL
@@ -257,6 +258,13 @@ COMMENT ON COLUMN public.invitations.organisation_id IS 'The organisation that t
 --
 
 COMMENT ON COLUMN public.invitations.email IS 'After we lookup the invite we check that the hash is correct';
+
+
+--
+-- Name: COLUMN invitations.roles; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invitations.roles IS 'The RBAC privelages the user will receive on joining the team (organisation).';
 
 
 --
@@ -287,23 +295,13 @@ ALTER SEQUENCE public.invitations_id_seq OWNED BY public.invitations.id;
 
 
 --
--- Name: organisation_user_roles; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.organisation_user_roles (
-    user_id integer NOT NULL,
-    organisation_id integer NOT NULL,
-    role public.role NOT NULL
-);
-
-
---
 -- Name: organisation_users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.organisation_users (
     user_id integer NOT NULL,
-    organisation_id integer NOT NULL
+    organisation_id integer NOT NULL,
+    roles public.role[] NOT NULL
 );
 
 
@@ -312,6 +310,13 @@ CREATE TABLE public.organisation_users (
 --
 
 COMMENT ON TABLE public.organisation_users IS 'A User can belong to multiple organisations (teams).';
+
+
+--
+-- Name: COLUMN organisation_users.roles; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organisation_users.roles IS 'The RBAC privelages the user has for this team.';
 
 
 --
@@ -501,6 +506,20 @@ CREATE TABLE public.sessions (
 
 
 --
+-- Name: TABLE sessions; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.sessions IS 'Contains active sessions';
+
+
+--
+-- Name: COLUMN sessions.session_verifier; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.sessions.session_verifier IS 'Session key used for authentication';
+
+
+--
 -- Name: sessions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -536,6 +555,55 @@ CREATE TABLE public.users (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+
+--
+-- Name: TABLE users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.users IS 'Contains users and their private and public keys';
+
+
+--
+-- Name: COLUMN users.master_password_hash; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.master_password_hash IS 'Hash of the users master password for authentication';
+
+
+--
+-- Name: COLUMN users.protected_symmetric_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.protected_symmetric_key IS 'Wrapped AES-GCM key for symmetric encryption and decryption';
+
+
+--
+-- Name: COLUMN users.protected_ecdsa_private_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.protected_ecdsa_private_key IS 'Wrapped ECDSA key for signing';
+
+
+--
+-- Name: COLUMN users.ecdsa_public_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.ecdsa_public_key IS 'Public ECDSA key for signature verification';
+
+
+--
+-- Name: COLUMN users.protected_ecdh_private_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.protected_ecdh_private_key IS 'Wrapped ECDH key for public key encryption and key negotiation';
+
+
+--
+-- Name: COLUMN users.ecdh_public_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.ecdh_public_key IS 'Public ECDH key for public key encryption and key negotiation';
 
 
 --
@@ -705,14 +773,6 @@ ALTER TABLE ONLY public.environments
 
 ALTER TABLE ONLY public.invitations
     ADD CONSTRAINT invitations_pkey PRIMARY KEY (id);
-
-
---
--- Name: organisation_user_roles organisation_user_roles_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.organisation_user_roles
-    ADD CONSTRAINT organisation_user_roles_pkey PRIMARY KEY (user_id, organisation_id);
 
 
 --
@@ -945,8 +1005,8 @@ ALTER TABLE ONLY public.environments
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155201'),
-    ('20220410155251'),
+    ('20220410155211'),
+    ('20220410155233'),
     ('20220410155252'),
-    ('20220410155253'),
     ('20220410155319'),
     ('20220621094035');
