@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types;
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -17,6 +18,7 @@ use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 pub struct NewInvite {
     #[validate(length(min = 1, message = "The email is mandatory"))]
     pub email: String,
+    pub admin: Option<String>
 }
 
 pub async fn create_invite(
@@ -27,7 +29,7 @@ pub async fn create_invite(
     Form(new_invite): Form<NewInvite>,
     authentication: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
-    let invite_hash = create(&pool, &authentication, &new_invite.email).await?;
+    let invite_hash = create(&pool, &authentication, &new_invite).await?;
 
     let invitation_verifier_base64 = invite_hash.0;
     let invitation_selector_base64 = invite_hash.1;
@@ -76,7 +78,7 @@ pub async fn create_invite(
 pub async fn create(
     pool: &Pool,
     current_user: &Authentication,
-    email: &str,
+    new_invite: &NewInvite,
 ) -> Result<(String, String), CustomError> {
     let client = pool.get().await?;
 
@@ -84,20 +86,27 @@ pub async fn create(
         queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
             .await?;
 
-    let invitation_selector = rand::thread_rng().gen::<[u8; 8]>();
+    let invitation_selector = rand::thread_rng().gen::<[u8; 6]>();
     let invitation_selector_base64 = base64::encode_config(invitation_selector, base64::URL_SAFE_NO_PAD);
-    let invitation_verifier = rand::thread_rng().gen::<[u8; 24]>();
+    let invitation_verifier = rand::thread_rng().gen::<[u8; 8]>();
     let invitation_verifier_hash = Sha256::digest(&invitation_verifier);
     let invitation_verifier_hash_base64 =
         base64::encode_config(invitation_verifier_hash, base64::URL_SAFE_NO_PAD);
     let invitation_verifier_base64 = base64::encode_config(invitation_verifier, base64::URL_SAFE_NO_PAD);
 
+    let roles = if new_invite.admin.is_some() {
+        vec!(types::public::Role::Administrator, types::public::Role::Collaborator)
+    } else {
+        vec!(types::public::Role::Collaborator)
+    };
+
     queries::invitations::insert_invitation(
         &client,
         &org.id,
-        &email,
+        &new_invite.email,
         &invitation_selector_base64,
         &invitation_verifier_hash_base64,
+        &roles
     )
     .await?;
 
