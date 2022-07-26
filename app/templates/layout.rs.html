@@ -44,7 +44,7 @@
   
         <div>
           @* The icon to bring up the profile page *@
-          <a class="profile" data-drawer-target="profile-drawer">
+          <a class="profile" href="@crate::profile::index_route(organisation.id)">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="42px">
               <circle cx="32" cy="32" r="32" />
               <text style="font: 2rem sans-serif" stroke="white" fill="white" text-anchor="middle"
