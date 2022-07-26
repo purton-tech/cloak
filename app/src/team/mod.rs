@@ -4,6 +4,7 @@ mod delete_member;
 mod set_name;
 mod index;
 mod switch;
+mod new_team;
 
 use axum::{
     routing::{get, post},
@@ -18,6 +19,7 @@ pub fn routes() -> Router {
         .route("/app/team/:organisation_id/create_invite", post(create_invite::create_invite))
         .route("/app/team/:organisation_id/delete", post(delete_member::delete))
         .route("/app/team/:organisation_id/set_name", post(set_name::set_name))
+        .route("/app/team/:organisation_id/new", post(new_team::new_team))
 }
 
 pub fn index_route(organisation_id: i32) -> String {
@@ -38,4 +40,8 @@ pub fn delete_route(organisation_id: i32) -> String {
 
 pub fn set_name_route(organisation_id: i32) -> String {
     format!("/app/team/{}/set_name", organisation_id)
+}
+
+pub fn new_team_route(organisation_id: i32) -> String {
+    format!("/app/team/{}/new", organisation_id)
 }

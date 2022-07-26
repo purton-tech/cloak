@@ -1,4 +1,5 @@
 @use super::super::layout_html;
+@use super::new_team_html;
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::GetTeams;
 @use crate::cornucopia::queries::organisations::Organisation;
@@ -35,4 +36,6 @@
         </div>
     </div>
 }, {
+    @:new_team_html(organisation.id)
+    <button class="a_button mini primary" data-drawer-target="create-new-team">Create a New Team</button>
 }, organisation, None, SideBar::Switch)
