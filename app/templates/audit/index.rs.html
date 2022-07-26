@@ -29,7 +29,7 @@
                         <tr>
     
                             <td>
-                                <relative-time datetime="@audit.created_at.format(&Rfc3339).unwrap()"></relative-time>
+                                <relative-time datetime='@audit.created_at.format(&Rfc3339).unwrap_or("".to_string())'></relative-time>
                             </td>
                             <td>
                                 @audit.email
