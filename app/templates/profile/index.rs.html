@@ -3,9 +3,9 @@
 @use crate::cornucopia::queries::organisations::Organisation;
 @use crate::cornucopia::queries::users::GetDangerous;
 
-@(organisation: &Organisation, user: &GetDangerous)
+@(initials: &str, organisation: &Organisation, user: &GetDangerous)
 
-@:layout_html("Your Profile", {
+@:layout_html("Your Profile", initials, {
     <div class="m_card">
       <div class="header">Update Your Details</div>  
       <div class="body">

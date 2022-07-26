@@ -5,9 +5,9 @@
 @use time::format_description::well_known::Rfc3339;
 @use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, vaults: Vec<VaultSummary>, organisation: &Organisation)
+@(title: &str, initials: &str, vaults: Vec<VaultSummary>, organisation: &Organisation)
 
-@:layout_html(title, {
+@:layout_html(title, initials, {
     @for vault in vaults {
         <div class="m_card vault-card clickable" href="@crate::secrets::index_route(vault.id, organisation.id)">
             <div class="body m-vault-card-body">

@@ -9,9 +9,16 @@
 @use crate::cornucopia::queries::users::GetDangerous;
 @use crate::templates::statics::delete_svg;
 
-@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>, organisation: &Organisation, user: &GetDangerous)
+@(
+    title: &str, 
+    initials: &str, 
+    users: Vec<GetUsers>, 
+    invites: Vec<GetAll>, 
+    organisation: &Organisation, 
+    user: &GetDangerous
+)
 
-@:layout_html(title, {
+@:layout_html(title, initials, {
 
     @for user in &users {
         @:delete_html(user.organisation_id, user.id, &user.email, &organisation.id)

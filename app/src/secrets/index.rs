@@ -27,11 +27,15 @@ pub async fn index(
         queries::environments::get_all(&client, &vault_id, &(current_user.user_id as i32))
             .await?;
 
+    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+    let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
+
     if secrets.is_empty() {
         let mut buf = Vec::new();
         crate::templates::secrets::empty_html(
             &mut buf,
             "Your Secrets",
+            &initials,
             &user_vault,
             environments,
             &team,
@@ -45,6 +49,7 @@ pub async fn index(
         crate::templates::secrets::index_html(
             &mut buf,
             "Your Secrets",
+            &initials,
             &user_vault,
             environments,
             secrets,

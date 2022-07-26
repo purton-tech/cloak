@@ -27,7 +27,9 @@ pub async fn index(
 
     let invites = queries::invitations::get_all(&client, &organisation_id).await?;
 
+    let initials = crate::layout::initials(&user.email, user.first_name.clone(), user.last_name.clone());
+
     Ok(crate::render(|buf| {
-        crate::templates::team::index_html(buf, "Team", users, invites, &team, &user)
+        crate::templates::team::index_html(buf, "Team", &initials, users, invites, &team, &user)
     }))
 }

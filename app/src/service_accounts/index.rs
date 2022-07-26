@@ -24,9 +24,12 @@ pub async fn index(
         queries::environments::get_environments_and_vaults(&client, &(current_user.user_id as i32))
             .await?;
 
+    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+    let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
+
     if service_accounts.is_empty() {
         let mut buf = Vec::new();
-        crate::templates::service_accounts::empty_html(&mut buf, "Your Vaults", &team).unwrap();
+        crate::templates::service_accounts::empty_html(&mut buf, "Your Vaults", &initials, &team).unwrap();
         let html = format!("{}", String::from_utf8_lossy(&buf));
 
         Ok(Html(html))
@@ -35,6 +38,7 @@ pub async fn index(
         crate::templates::service_accounts::index_html(
             &mut buf,
             "Your Vaults",
+            &initials,
             service_accounts,
             environments_and_vaults,
             &team,

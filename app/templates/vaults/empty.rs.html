@@ -3,9 +3,9 @@
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, organisation: &Organisation)
+@(title: &str, initials: &str, organisation: &Organisation)
 
-@:layout_html(title, {
+@:layout_html(title, initials, {
     <div class="empty_page">
         <div>
             <h2>No Vaults Created</h2>

@@ -5,10 +5,12 @@
 
 @(
   title: &str, 
+  initials: &str,
   content: Content, 
   header: Content, 
   organisation: &Organisation, 
-  vault_id: Option<i32>, side_bar: SideBar
+  vault_id: Option<i32>, 
+  side_bar: SideBar
 )
 
   <!DOCTYPE html>
@@ -46,7 +48,7 @@
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="42px">
               <circle cx="32" cy="32" r="32" />
               <text style="font: 2rem sans-serif" stroke="white" fill="white" text-anchor="middle"
-                dominant-baseline="central" x="50%" y="50%">IP</text>
+                dominant-baseline="central" x="50%" y="50%">@initials</text>
             </svg>
           </a>
         </div>

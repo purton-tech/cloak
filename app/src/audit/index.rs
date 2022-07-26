@@ -11,11 +11,14 @@ pub async fn index(
 ) -> Result<Html<&'static str>, CustomError> {
     let client = pool.get().await?;
 
+    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+    let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
+
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
 
     let audits = queries::audit::audit(&client , &(current_user.user_id as i32), &organisation_id).await?;
 
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, audits, &team)
+        crate::templates::audit::index_html(buf, &initials, audits, &team)
     }))
 }

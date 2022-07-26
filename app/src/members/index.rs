@@ -35,10 +35,14 @@ pub async fn index(
         queries::environments::get_all(&client, &user_vault.vault_id, &(current_user.user_id as i32))
             .await?;
 
+    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+    let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
+
     let mut buf = Vec::new();
     crate::templates::members::index_html(
         &mut buf, 
-        "Your Vaults", 
+        &initials,
+        "Members", 
         user_vault,
         members,
         non_members,

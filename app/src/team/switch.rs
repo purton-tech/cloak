@@ -18,8 +18,11 @@ pub async fn switch(
 
     let teams = queries::organisations::get_teams(&client, &(current_user.user_id as i32)).await?;
 
+    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+    let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
+
     let mut buf = Vec::new();
-    crate::templates::team::switch_html(&mut buf, "Your Vaults", teams, &team).unwrap();
+    crate::templates::team::switch_html(&mut buf, "Your Vaults", &initials, teams, &team).unwrap();
     let html = format!("{}", String::from_utf8_lossy(&buf));
 
     Ok(Html(html))
