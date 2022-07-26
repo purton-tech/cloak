@@ -11,15 +11,25 @@
       <div class="body">
         <form class="m_form" method="post" action="@crate::profile::set_details_route(organisation.id)">
           <fieldset>
-              <label for="name">First Name</label>
-              <input type="text" autocomplete="off" required="" id="name" name="first_name", value="@user.first_name">
-              </input>
-              <span class="a_help_text">Your first name</span>
-              <label for="last_name">Last Name</label>
-              <input type="text" autocomplete="off" id="last_name" required="" name="last_name", value="@user.last_name">
-              </input>
+              @if let (Some(first_name), Some(last_name)) = (&user.first_name, &user.last_name) {
+                <label for="name">First Name</label>
+                <input type="text" autocomplete="off" required="" id="name" name="first_name", value="@first_name">
+                </input>
+                <span class="a_help_text">Your first name</span>
+                <label for="last_name">Last Name</label>
+                <input type="text" autocomplete="off" id="last_name" required="" name="last_name", value="@last_name">
+                </input>
+              } else {
+                <label for="name">First Name</label>
+                <input type="text" autocomplete="off" required="" id="name" name="first_name">
+                </input>
+                <span class="a_help_text">Your first name</span>
+                <label for="last_name">Last Name</label>
+                <input type="text" autocomplete="off" id="last_name" required="" name="last_name">
+                </input>
+              }
               <span class="a_help_text">Your last name</span>
-              <button class="a_button auto danger" type="submit">Save Details</button>
+              <button class="a_button auto danger mt-1" type="submit">Save Details</button>
           </fieldset>
         </form>
       </div>
