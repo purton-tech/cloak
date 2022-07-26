@@ -6,9 +6,10 @@
 @use crate::cornucopia::queries::organisations::GetUsers;
 @use crate::cornucopia::queries::organisations::Organisation;
 @use crate::cornucopia::queries::invitations::GetAll;
+@use crate::cornucopia::queries::users::GetDangerous;
 @use crate::templates::statics::delete_svg;
 
-@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>, organisation: &Organisation)
+@(title: &str, users: Vec<GetUsers>, invites: Vec<GetAll>, organisation: &Organisation, user: &GetDangerous)
 
 @:layout_html(title, {
 
@@ -21,6 +22,17 @@
             <span>Team</span>
         </div>
         <div class="body">
+            @if user.first_name.is_none() || organisation.name.is_none() {
+                <div class="m_callout">
+                    <h3>Before you are able to invite people to your team you will need to do the following</h3>
+                    @if organisation.name.is_none() {
+                        <p>Please set your <a data-drawer-target="set-name-drawer" href="#">teams name </a></p>
+                    }
+                    @if user.first_name.is_none() {
+                        <p>Please set your <a href="@crate::profile::index_route(organisation.id)">name </a></p>
+                    }
+                </div>
+            }
             <table class="m_table team_table">
                 <thead>
                     <tr>
@@ -74,6 +86,8 @@
         </div>
     </div>
 }, {
-    @:create_invite_html(&organisation.id)
-    <button class="a_button mini primary" id="invite-user">Invite a New Team Member</button>
+    @if user.first_name.is_some() && organisation.name.is_some() {
+        @:create_invite_html(&organisation.id)
+        <button class="a_button mini primary" id="invite-user">Invite a New Team Member</button>
+    }
 }, organisation, None, SideBar::Team)

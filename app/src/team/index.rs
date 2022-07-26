@@ -11,7 +11,7 @@ pub async fn index(
     Path(organisation_id): Path<i32>,
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
-) -> Result<Html<String>, CustomError> {
+) -> Result<Html<&'static str>, CustomError> {
     let client = pool.get().await?;
 
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
@@ -23,11 +23,11 @@ pub async fn index(
     )
     .await?;
 
+    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+
     let invites = queries::invitations::get_all(&client, &organisation_id).await?;
 
-    let mut buf = Vec::new();
-    crate::templates::team::index_html(&mut buf, "Your Vaults", users, invites, &team).unwrap();
-    let html = format!("{}", String::from_utf8_lossy(&buf));
-
-    Ok(Html(html))
+    Ok(crate::render(|buf| {
+        crate::templates::team::index_html(buf, "Team", users, invites, &team, &user)
+    }))
 }
