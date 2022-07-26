@@ -40,7 +40,7 @@ pub async fn create_invite(
 
     if let Some(smtp_config) = &config.smtp_config {
         let url = format!(
-            "{}/app/team/accept_invite/?invite_selector={}&invite_validator={}",
+            "{}/app/invite/{}/{}",
             smtp_config.domain, invitation_selector_base64, invitation_verifier_base64
         );
 
