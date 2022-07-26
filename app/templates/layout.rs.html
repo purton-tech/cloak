@@ -158,13 +158,13 @@
         <template slot="body">
           <p>Set your team name</p>
           <fieldset>
-              <label for="name">Name</label>
-              <input type="text" autocomplete="off" required="" name="name">
+              <label for="org-name">Name</label>
+              <input type="text" autocomplete="off" id="org-name" required="" name="name">
               </input>
           </fieldset>
         </template>
         <template slot="footer">
-          <button class="a_button auto danger" slot="footer"
+          <button class="a_button auto success" id="save-org-name" slot="footer"
             type="submit">Set Name</button>
           </template>
       </side-drawer>
