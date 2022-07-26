@@ -3,9 +3,9 @@
 @use crate::cornucopia::queries::organisations::GetTeams;
 @use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, initials: &str, teams: Vec<GetTeams>, organisation: &Organisation)
+@(initials: &str, teams: Vec<GetTeams>, organisation: &Organisation)
 
-@:layout_html(title, initials, {
+@:layout_html("Switch Teams", initials, {
 
     <div class="m_card">
         <div class="header">

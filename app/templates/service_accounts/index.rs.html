@@ -11,14 +11,13 @@
 @use crate::cornucopia::queries::organisations::Organisation;
 
 @(
-    title: &str, 
     initials: &str, 
     service_accounts: Vec<GetAll>, 
     environments_and_vaults: Vec<GetEnvironmentsAndVaults>,
     organisation: &Organisation
 )
 
-@:layout_html(title, initials, {
+@:layout_html("Service Accounts", initials, {
 
     <div class="m_card">
         <div class="header">

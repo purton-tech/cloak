@@ -11,7 +11,7 @@ pub async fn index(
     Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Extension(pool): Extension<Pool>,
-) -> Result<Html<String>, CustomError> {
+) -> Result<Html<&'static str>, CustomError> {
     let client = pool.get().await?;
 
     let team = queries::organisations::organisation(&client, &organisation_id).await?;
@@ -28,24 +28,19 @@ pub async fn index(
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     if service_accounts.is_empty() {
-        let mut buf = Vec::new();
-        crate::templates::service_accounts::empty_html(&mut buf, "Your Vaults", &initials, &team).unwrap();
-        let html = format!("{}", String::from_utf8_lossy(&buf));
-
-        Ok(Html(html))
+        Ok(crate::render(|buf| {
+            crate::templates::service_accounts::empty_html(buf, &initials, &team)
+        }))
     } else {
-        let mut buf = Vec::new();
-        crate::templates::service_accounts::index_html(
-            &mut buf,
-            "Your Vaults",
-            &initials,
-            service_accounts,
-            environments_and_vaults,
-            &team,
-        )
-        .unwrap();
-        let html = format!("{}", String::from_utf8_lossy(&buf));
 
-        Ok(Html(html))
+        Ok(crate::render(|buf| {
+            crate::templates::service_accounts::index_html(
+                buf,
+                &initials,
+                service_accounts,
+                environments_and_vaults,
+                &team,
+            )
+        }))
     }
 }

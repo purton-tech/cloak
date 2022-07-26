@@ -10,7 +10,6 @@
 @use crate::templates::statics::delete_svg;
 
 @(
-    title: &str, 
     initials: &str, 
     users: Vec<GetUsers>, 
     invites: Vec<GetAll>, 
@@ -18,7 +17,7 @@
     user: &GetDangerous
 )
 
-@:layout_html(title, initials, {
+@:layout_html("Team", initials, {
 
     @for user in &users {
         @:delete_html(user.organisation_id, user.id, &user.email, &organisation.id)

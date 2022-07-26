@@ -30,6 +30,6 @@ pub async fn index(
     let initials = crate::layout::initials(&user.email, user.first_name.clone(), user.last_name.clone());
 
     Ok(crate::render(|buf| {
-        crate::templates::team::index_html(buf, "Team", &initials, users, invites, &team, &user)
+        crate::templates::team::index_html(buf, &initials, users, invites, &team, &user)
     }))
 }
