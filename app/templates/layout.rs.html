@@ -120,6 +120,10 @@
               <img alt="Menu Item" width="24px" src="/static/@profile_svg.name"></img>
               <a href="@crate::profile::index_route(organisation.id)">Your Profile</a>
           </li>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::None, false)'>
+              <img alt="Menu Item" width="22px" src="/static/@logout_svg.name"></img>
+              <a class="clickable" data-drawer-target="logout-drawer" hre="#">Logout</a>
+          </li>
         </ul>
 
       </nav>
@@ -133,6 +137,22 @@
     </div>
     <snack-bar></snack-bar>
 
+    @* Logout conirmation form *@
+    <div class="profile">
+      <form class="m_form" method="post" action="/auth/sign_out">
+        <side-drawer label="Logout ?" id="logout-drawer">
+          <template slot="body">
+            <p>Are you sure you want to Logout?</p>
+          </template>
+          <template slot="footer">
+            <button class="a_button auto danger" slot="footer"
+              type="submit">Logout</button>
+            </template>
+        </side-drawer>
+      </form>
+    </div>
+
+    @* Form to set the team name *@
     <form class="m_form" method="post" action="@crate::team::set_name_route(organisation.id)">
       <side-drawer label="Set Team Name" id="set-name-drawer">
         <template slot="body">
