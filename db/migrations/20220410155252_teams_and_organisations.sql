@@ -24,6 +24,8 @@ CREATE TABLE invitations (
     id SERIAL PRIMARY KEY, 
     organisation_id INT NOT NULL, 
     email VARCHAR NOT NULL,
+    first_name VARCHAR NOT NULL,
+    last_name VARCHAR NOT NULL,
     roles role ARRAY NOT NULL,
     invitation_selector VARCHAR NOT NULL,
     invitation_verifier_hash VARCHAR NOT NULL,

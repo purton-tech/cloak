@@ -18,6 +18,10 @@ use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 pub struct NewInvite {
     #[validate(length(min = 1, message = "The email is mandatory"))]
     pub email: String,
+    #[validate(length(min = 1, message = "The first name is mandatory"))]
+    pub first_name: String,
+    #[validate(length(min = 1, message = "The last name is mandatory"))]
+    pub last_name: String,
     pub admin: Option<String>
 }
 
@@ -104,6 +108,8 @@ pub async fn create(
         &client,
         &org.id,
         &new_invite.email,
+        &new_invite.first_name,
+        &new_invite.last_name,
         &invitation_selector_base64,
         &invitation_verifier_hash_base64,
         &roles

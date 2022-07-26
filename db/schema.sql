@@ -241,6 +241,8 @@ CREATE TABLE public.invitations (
     id integer NOT NULL,
     organisation_id integer NOT NULL,
     email character varying NOT NULL,
+    first_name character varying NOT NULL,
+    last_name character varying NOT NULL,
     roles public.role[] NOT NULL,
     invitation_selector character varying NOT NULL,
     invitation_verifier_hash character varying NOT NULL,

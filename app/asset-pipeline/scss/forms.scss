@@ -13,7 +13,7 @@
       > * {
         width: 100%;
       }
-      > label {
+      label {
         margin-top: 1rem;
         font-size: 0.75rem;
         line-height: 1.5;
@@ -27,18 +27,18 @@
         }
       }
 
-      > label:first-of-type {
+      label:first-of-type {
         margin-top: 0;
       }
 
-      > span.a_help_text, span.error {
+      span.a_help_text, span.error {
         font-size: 0.75rem;
         line-height: 1.5;
         padding-top: 4px;
         color: #69707D;
       }
 
-      > span.error {
+      span.error {
         color: var(--error);
       }
 
