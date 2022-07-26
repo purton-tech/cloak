@@ -11,6 +11,7 @@ pub enum SideBar {
     Members,
     ServiceAccounts,
     Team,
+    Profile,
     Switch
 }
 

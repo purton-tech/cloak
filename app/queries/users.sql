@@ -1,6 +1,6 @@
---! get_dangerous(id) { id, email, ecdsa_public_key }
+--! get_dangerous(id) { id, email, ecdsa_public_key, first_name, last_name }
 SELECT 
-    id, email, ecdsa_public_key
+    id, email, ecdsa_public_key, first_name, last_name
 FROM 
     users
 WHERE
