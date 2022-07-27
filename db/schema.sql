@@ -59,7 +59,7 @@ CREATE TYPE public.audit_action AS ENUM (
 --
 
 CREATE TYPE public.permission AS ENUM (
-    'CanInviteUsers'
+    'ManageTeam'
 );
 
 

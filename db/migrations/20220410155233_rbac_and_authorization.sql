@@ -10,7 +10,9 @@ CREATE TYPE role AS ENUM (
 );
 
 CREATE TYPE permission AS ENUM (
-    'CanInviteUsers'
+    -- The ManageTeam permission gives the user thee ability to invite team members, 
+    -- delete team members and chnage the team name
+    'ManageTeam'
 );
 
 CREATE TABLE roles_permissions (
@@ -20,7 +22,14 @@ CREATE TABLE roles_permissions (
     PRIMARY KEY (role, permission)
 );
 
-INSERT INTO roles_permissions VALUES('Administrator', 'CanInviteUsers');
+INSERT INTO roles_permissions VALUES('Administrator', 'ManageTeam');
+
+
+-- Give access to the application user.
+GRANT SELECT, INSERT, UPDATE, DELETE ON roles_permissions TO application;
+
+-- Give access to the readonly user
+GRANT SELECT ON roles_permissions TO readonly;
 
 -- migrate:down
 DROP TABLE roles_permissions;
