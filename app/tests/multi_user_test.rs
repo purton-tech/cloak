@@ -41,6 +41,8 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     )
     .await?;
 
+    set_profile_details(driver).await?;
+
     add_team_member(driver, &team_member, &account_owner, config).await?;
 
     sign_in_user(driver, &account_owner, config).await?;
@@ -105,6 +107,41 @@ async fn sign_in_user(
     Ok(())
 }
 
+// Before we ivite people we have to have a team name and set our own name
+async fn set_profile_details(driver: &WebDriver) -> WebDriverResult<()> {
+    driver
+        .find_element(By::XPath(
+            "//a[@data-drawer-target='set-name-drawer']",
+        ))
+        .await?
+        .click()
+        .await?;
+
+    let name_field = driver.find_element(By::Id("org-name")).await?;
+    name_field.send_keys("Testing Team").await?;
+
+    let submit_button = driver
+        .find_element(By::Id("save-org-name"))
+        .await?;
+    submit_button.click().await?;
+
+    let sa_link = driver.find_element(By::LinkText("Your Profile")).await?;
+    sa_link.click().await?;
+
+    let name_field = driver.find_element(By::Css("input[name='first_name']")).await?;
+    name_field.send_keys("David").await?;
+
+    let name_field = driver.find_element(By::Css("input[name='last_name']")).await?;
+    name_field.send_keys("Jason").await?;
+
+    let submit_button = driver
+        .find_element(By::Id("save-details-button"))
+        .await?;
+    submit_button.click().await?;
+
+    Ok(())
+}
+
 async fn add_member_to_vault(driver: &WebDriver, email: &str) -> WebDriverResult<()> {
     let sa_link = driver.find_element(By::LinkText("Members")).await?;
     sa_link.click().await?;
@@ -117,7 +154,9 @@ async fn add_member_to_vault(driver: &WebDriver, email: &str) -> WebDriverResult
     select.select_by_exact_text(email).await?;
 
     // Check the development environment
-    let dev_label = driver.find_element(By::Css("label[for='Development']")).await?;
+    let dev_label = driver
+        .find_element(By::Css("label[for='Development']"))
+        .await?;
     dev_label.click().await?;
 
     let submit_button = driver
@@ -143,6 +182,12 @@ async fn add_team_member(
     let name_field = driver.find_element(By::Css("input[name='email']")).await?;
     name_field.send_keys(team_member).await?;
 
+    let name_field = driver.find_element(By::Css("input[name='first_name']")).await?;
+    name_field.send_keys("Trevor").await?;
+
+    let name_field = driver.find_element(By::Css("input[name='last_name']")).await?;
+    name_field.send_keys("Invitable").await?;
+
     let submit_button = driver
         .find_element(By::Css(".a_button.auto.success"))
         .await?;
@@ -150,16 +195,18 @@ async fn add_team_member(
 
     let table_cell = driver
         .find_element(By::XPath(
-            "//table[@class='m_table team_table']/tbody/tr[last()]/td[2]",
+            "//table[@class='m_table team_table']/tbody/tr[last()]/td[1]/span",
         ))
         .await?;
 
-    assert_eq!(table_cell.text().await?, "Invitation Pending");
+    assert_eq!(table_cell.text().await?, "Invited");
 
     // Get the invite from mailhog
     let invitation_url = get_invite_url_from_email(config).await?;
 
     sign_in_user(driver, team_member, config).await?;
+
+    // Accept the invitation
     driver.get(invitation_url).await?;
 
     let table_cell = driver
@@ -188,7 +235,6 @@ async fn get_invite_url_from_email(config: &common::Config) -> WebDriverResult<S
 
     let url = url.replace("\\u0026", "&");
     let url = url.replace("=\\r\\n", "");
-    
 
     dbg!(&url);
 

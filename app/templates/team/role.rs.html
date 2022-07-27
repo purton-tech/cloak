@@ -1,0 +1,15 @@
+@use crate::cornucopia::types::public::Role;
+
+@(role: Role)
+
+@match role {
+    Role::Administrator => {
+        Administrator
+    }
+    Role::Collaborator => {
+        Collaborator
+    }
+    Role::SystemAdministrator => {
+        SystemAdministrator
+    }
+}

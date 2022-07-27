@@ -10,6 +10,20 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+--
 -- Name: audit_access_type; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -37,6 +51,26 @@ CREATE TYPE public.audit_action AS ENUM (
     'RemoveTeamMember',
     'CreateVault',
     'DeleteVault'
+);
+
+
+--
+-- Name: permission; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.permission AS ENUM (
+    'ManageTeam'
+);
+
+
+--
+-- Name: role; Type: TYPE; Schema: public; Owner: -
+--
+
+CREATE TYPE public.role AS ENUM (
+    'Administrator',
+    'Collaborator',
+    'SystemAdministrator'
 );
 
 
@@ -83,10 +117,11 @@ SET default_table_access_method = heap;
 
 CREATE TABLE public.audit_trail (
     id integer NOT NULL,
+    user_id integer NOT NULL,
     access_type public.audit_access_type NOT NULL,
     action public.audit_action NOT NULL,
     description character varying NOT NULL,
-    user_id integer NOT NULL,
+    organisation_id integer NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
@@ -96,6 +131,13 @@ CREATE TABLE public.audit_trail (
 --
 
 COMMENT ON TABLE public.audit_trail IS 'Log all accesses to the system';
+
+
+--
+-- Name: COLUMN audit_trail.user_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.audit_trail.user_id IS 'The user that accessed the system';
 
 
 --
@@ -199,11 +241,48 @@ CREATE TABLE public.invitations (
     id integer NOT NULL,
     organisation_id integer NOT NULL,
     email character varying NOT NULL,
+    first_name character varying NOT NULL,
+    last_name character varying NOT NULL,
+    roles public.role[] NOT NULL,
     invitation_selector character varying NOT NULL,
     invitation_verifier_hash character varying NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+
+--
+-- Name: TABLE invitations; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.invitations IS 'Invitations are generated so users can join teams (organisations)';
+
+
+--
+-- Name: COLUMN invitations.organisation_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invitations.organisation_id IS 'The organisation that the user will join if they acccept the invite';
+
+
+--
+-- Name: COLUMN invitations.email; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invitations.email IS 'After we lookup the invite we check that the hash is correct';
+
+
+--
+-- Name: COLUMN invitations.roles; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invitations.roles IS 'The RBAC privelages the user will receive on joining the team (organisation).';
+
+
+--
+-- Name: COLUMN invitations.invitation_selector; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.invitations.invitation_selector IS 'To avoid timing attacks the inviation secret is split into a lookup then a verfication.';
 
 
 --
@@ -233,8 +312,22 @@ ALTER SEQUENCE public.invitations_id_seq OWNED BY public.invitations.id;
 CREATE TABLE public.organisation_users (
     user_id integer NOT NULL,
     organisation_id integer NOT NULL,
-    is_admin boolean DEFAULT false NOT NULL
+    roles public.role[] NOT NULL
 );
+
+
+--
+-- Name: TABLE organisation_users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.organisation_users IS 'A User can belong to multiple organisations (teams).';
+
+
+--
+-- Name: COLUMN organisation_users.roles; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organisation_users.roles IS 'The RBAC privelages the user has for this team.';
 
 
 --
@@ -246,6 +339,27 @@ CREATE TABLE public.organisations (
     name character varying,
     created_by_user_id integer NOT NULL
 );
+
+
+--
+-- Name: TABLE organisations; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.organisations IS 'An organisation is created for everyone that signs up. It could also have been called teams.';
+
+
+--
+-- Name: COLUMN organisations.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organisations.name IS 'The name of the organisation i.e. Microsoft or perhaps a persons name';
+
+
+--
+-- Name: COLUMN organisations.created_by_user_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.organisations.created_by_user_id IS 'The action committed. i.e. deleting a secret etc.';
 
 
 --
@@ -269,6 +383,16 @@ ALTER SEQUENCE public.organisations_id_seq OWNED BY public.organisations.id;
 
 
 --
+-- Name: roles_permissions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.roles_permissions (
+    role public.role NOT NULL,
+    permission public.permission NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -284,12 +408,12 @@ CREATE TABLE public.schema_migrations (
 CREATE TABLE public.secrets (
     id integer NOT NULL,
     vault_id integer NOT NULL,
+    environment_id integer NOT NULL,
     name character varying NOT NULL,
     secret character varying NOT NULL,
     name_blind_index character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    environment_id integer DEFAULT 0 NOT NULL
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -355,14 +479,14 @@ ALTER SEQUENCE public.service_account_secrets_id_seq OWNED BY public.service_acc
 
 CREATE TABLE public.service_accounts (
     id integer NOT NULL,
-    user_id integer NOT NULL,
+    organisation_id integer NOT NULL,
     vault_id integer,
+    environment_id integer,
     name character varying NOT NULL,
     encrypted_ecdh_private_key character varying NOT NULL,
     ecdh_public_key character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    environment_id integer
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -403,6 +527,20 @@ CREATE TABLE public.sessions (
 
 
 --
+-- Name: TABLE sessions; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.sessions IS 'Contains active sessions';
+
+
+--
+-- Name: COLUMN sessions.session_verifier; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.sessions.session_verifier IS 'Session key used for authentication';
+
+
+--
 -- Name: sessions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -429,6 +567,8 @@ ALTER SEQUENCE public.sessions_id_seq OWNED BY public.sessions.id;
 CREATE TABLE public.users (
     id integer NOT NULL,
     email character varying NOT NULL,
+    first_name character varying,
+    last_name character varying,
     master_password_hash character varying NOT NULL,
     protected_symmetric_key character varying NOT NULL,
     protected_ecdsa_private_key character varying NOT NULL,
@@ -441,6 +581,69 @@ CREATE TABLE public.users (
 
 
 --
+-- Name: TABLE users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.users IS 'Contains users and their private and public keys';
+
+
+--
+-- Name: COLUMN users.first_name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.first_name IS 'The first name, not captured on registration for faster on boarding.';
+
+
+--
+-- Name: COLUMN users.last_name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.last_name IS 'The last name, not captured on registration for faster on boarding.';
+
+
+--
+-- Name: COLUMN users.master_password_hash; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.master_password_hash IS 'Hash of the users master password for authentication';
+
+
+--
+-- Name: COLUMN users.protected_symmetric_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.protected_symmetric_key IS 'Wrapped AES-GCM key for symmetric encryption and decryption';
+
+
+--
+-- Name: COLUMN users.protected_ecdsa_private_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.protected_ecdsa_private_key IS 'Wrapped ECDSA key for signing';
+
+
+--
+-- Name: COLUMN users.ecdsa_public_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.ecdsa_public_key IS 'Public ECDSA key for signature verification';
+
+
+--
+-- Name: COLUMN users.protected_ecdh_private_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.protected_ecdh_private_key IS 'Wrapped ECDH key for public key encryption and key negotiation';
+
+
+--
+-- Name: COLUMN users.ecdh_public_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users.ecdh_public_key IS 'Public ECDH key for public key encryption and key negotiation';
+
+
+--
 -- Name: users_environments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -448,13 +651,6 @@ CREATE TABLE public.users_environments (
     environment_id integer NOT NULL,
     user_id integer NOT NULL
 );
-
-
---
--- Name: TABLE users_environments; Type: COMMENT; Schema: public; Owner: -
---
-
-COMMENT ON TABLE public.users_environments IS 'Members of a vault have access to a selection of environments';
 
 
 --
@@ -495,7 +691,7 @@ CREATE TABLE public.users_vaults (
 
 CREATE TABLE public.vaults (
     id integer NOT NULL,
-    user_id integer NOT NULL,
+    organisation_id integer NOT NULL,
     name character varying NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
@@ -633,6 +829,14 @@ ALTER TABLE ONLY public.organisations
 
 
 --
+-- Name: roles_permissions roles_permissions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.roles_permissions
+    ADD CONSTRAINT roles_permissions_pkey PRIMARY KEY (role, permission);
+
+
+--
 -- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -713,13 +917,6 @@ ALTER TABLE ONLY public.vaults
 
 
 --
--- Name: invitations set_updated_at; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER set_updated_at BEFORE UPDATE ON public.invitations FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-
-
---
 -- Name: secrets set_updated_at; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -771,19 +968,43 @@ ALTER TABLE ONLY public.invitations
 
 
 --
--- Name: secrets fk_secret_vault; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: vaults fk_organisation; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.secrets
-    ADD CONSTRAINT fk_secret_vault FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.vaults
+    ADD CONSTRAINT fk_organisation FOREIGN KEY (organisation_id) REFERENCES public.organisations(id) ON DELETE CASCADE;
 
 
 --
--- Name: service_account_secrets fk_secrets_service_accounts; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: service_accounts fk_organisation; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.service_accounts
+    ADD CONSTRAINT fk_organisation FOREIGN KEY (organisation_id) REFERENCES public.organisations(id) ON DELETE CASCADE;
+
+
+--
+-- Name: audit_trail fk_organisation; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.audit_trail
+    ADD CONSTRAINT fk_organisation FOREIGN KEY (organisation_id) REFERENCES public.organisations(id) ON DELETE CASCADE;
+
+
+--
+-- Name: service_account_secrets fk_service_account; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.service_account_secrets
-    ADD CONSTRAINT fk_secrets_service_accounts FOREIGN KEY (service_account_id) REFERENCES public.service_accounts(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_service_account FOREIGN KEY (service_account_id) REFERENCES public.service_accounts(id) ON DELETE CASCADE;
+
+
+--
+-- Name: users_vaults fk_user; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.users_vaults
+    ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
 
 
 --
@@ -795,19 +1016,19 @@ ALTER TABLE ONLY public.users_environments
 
 
 --
--- Name: audit_trail fk_user; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: secrets fk_vault; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.audit_trail
-    ADD CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES public.users(id) ON DELETE CASCADE;
+ALTER TABLE ONLY public.secrets
+    ADD CONSTRAINT fk_vault FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
 
 
 --
--- Name: users_vaults fk_users_vaults_vaults; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: users_vaults fk_vault; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.users_vaults
-    ADD CONSTRAINT fk_users_vaults_vaults FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_vault FOREIGN KEY (vault_id) REFERENCES public.vaults(id) ON DELETE CASCADE;
 
 
 --
@@ -829,8 +1050,8 @@ ALTER TABLE ONLY public.environments
 
 INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155201'),
+    ('20220410155211'),
+    ('20220410155233'),
+    ('20220410155252'),
     ('20220410155319'),
-    ('20220503064229'),
-    ('20220512092812'),
-    ('20220513084444'),
     ('20220621094035');

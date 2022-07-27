@@ -1,10 +1,11 @@
 @use crate::cornucopia::queries::service_accounts::GetAll;
 @use crate::cornucopia::queries::environments::GetEnvironmentsAndVaults;
-@use crate::service_accounts::CONNECT;
+@use crate::service_accounts::connect_route;
 
 @(
     service_account: &GetAll,
-    environments_and_vaults: &Vec<GetEnvironmentsAndVaults>
+    environments_and_vaults: &Vec<GetEnvironmentsAndVaults>,
+    team_id: &i32
 )
 
 <connect-account label="Connect to Vault" service-account-id='@format!("{}", service_account.id)'>
@@ -33,7 +34,7 @@
     </template>
 </connect-account>
 
-<form class="m_form" method="post" action="@CONNECT" id='@format!("service-account-form-{}", service_account.id)'>
+<form class="m_form" method="post" action="@connect_route(*team_id)" id='@format!("service-account-form-{}", service_account.id)'>
     <input type="hidden" name="service_account_id" value='@format!("{}", service_account.id)' />
     <input type="hidden" name="environment_id" id='@format!("service-account-form-environment-id-{}", service_account.id)' />
     <input type="hidden" name="vault_id" id='@format!("service-account-form-vault-id-{}", service_account.id)' />

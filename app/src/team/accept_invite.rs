@@ -2,7 +2,7 @@ use crate::authentication::Authentication;
 use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{
-    extract::{Extension, Query},
+    extract::{Extension, Path},
     response::{IntoResponse, Redirect},
 };
 use deadpool_postgres::Pool;
@@ -16,11 +16,11 @@ pub struct Invite {
 }
 
 pub async fn invite(
-    Query(invite): Query<Invite>,
+    Path(invite): Path<Invite>,
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
-    accept_invitation(
+    let team_id = accept_invitation(
         &pool,
         &current_user,
         &invite.invite_selector,
@@ -28,7 +28,7 @@ pub async fn invite(
     )
     .await?;
 
-    Ok(Redirect::to("/app/team"))
+    Ok(Redirect::to(&super::switch_route(team_id)))
 }
 
 pub async fn accept_invitation(
@@ -36,8 +36,7 @@ pub async fn accept_invitation(
     current_user: &Authentication,
     invitation_selector: &str,
     invitation_verifier: &str,
-) -> Result<(), CustomError> {
-
+) -> Result<i32, CustomError> {
     let invitation_verifier = base64::decode_config(invitation_verifier, base64::URL_SAFE_NO_PAD)
         .map_err(|e| CustomError::FaultySetup(e.to_string()))?;
     let invitation_verifier_hash = Sha256::digest(&invitation_verifier);
@@ -59,8 +58,20 @@ pub async fn accept_invitation(
                 &client,
                 &user.id,
                 &invitation.organisation_id,
+                &invitation.roles,
             )
             .await?;
+
+            // I the user has not set their name yet, we do it for them based on the invitation.
+            if (None, None) == (user.first_name, user.last_name) {
+                queries::users::set_name(
+                    &client,
+                    &(current_user.user_id as i32),
+                    &invitation.first_name,
+                    &invitation.last_name,
+                )
+                .await?;
+            }
 
             queries::invitations::delete_invitation(
                 &client,
@@ -71,5 +82,5 @@ pub async fn accept_invitation(
         }
     }
 
-    Ok(())
+    Ok(invitation.organisation_id)
 }

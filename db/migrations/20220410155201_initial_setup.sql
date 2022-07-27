@@ -31,34 +31,37 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+-- These roles are only created in development. In production they will
+-- have already been cfreated by the infrastructure as code and have secret passwords.
+
 DO $$
 BEGIN
-  CREATE ROLE cloak LOGIN ENCRYPTED PASSWORD 'testpassword';
+  CREATE ROLE application LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role cloak -- it already exists';
+  RAISE NOTICE 'not creating role application -- it already exists';
 END
 $$;
 DO $$
 BEGIN
-  CREATE ROLE cloak_auth LOGIN ENCRYPTED PASSWORD 'testpassword';
+  CREATE ROLE authentication LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role cloak_auth -- it already exists';
+  RAISE NOTICE 'not creating role authentication -- it already exists';
 END
 $$;
 DO $$
 BEGIN
-  CREATE ROLE cloak_readonly LOGIN ENCRYPTED PASSWORD 'testpassword';
+  CREATE ROLE readonly LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role cloak_readonly -- it already exists';
+  RAISE NOTICE 'not creating role readonly -- it already exists';
 END
 $$;
 
 -- migrate:down
-DROP OWNED BY cloak;
-DROP OWNED BY cloak_auth;
-DROP OWNED BY cloak_readonly;
+DROP OWNED BY application;
+DROP OWNED BY authentication;
+DROP OWNED BY readonly;
 
-DROP USER cloak;
-DROP USER cloak_auth;
-DROP USER cloak_readonly;
+DROP USER application;
+DROP USER authentication;
+DROP USER readonly;
 

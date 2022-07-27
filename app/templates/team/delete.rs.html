@@ -1,8 +1,8 @@
-@use crate::team::DELETE;
+@use crate::team::delete_route;
 
-@(organisation_id: i32, user_id: i32, email: &str)
+@(organisation_id: i32, user_id: i32, email: &str, team_id: &i32)
 
-<form class="m_form" method="post" action="@DELETE">
+<form class="m_form" method="post" action="@delete_route(*team_id)">
     <side-drawer 
         id='@format!("delete-member-drawer-{}-{}", organisation_id, user_id)' 
         label="Remove this user?">

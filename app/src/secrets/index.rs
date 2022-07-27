@@ -1,7 +1,7 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 use axum::{
     extract::{Extension, Path},
     response::Html,
@@ -9,42 +9,58 @@ use axum::{
 use deadpool_postgres::Pool;
 
 pub async fn index(
-    Path(idor_vault_id): Path<i32>,
+    Path((team_id, vault_id)): Path<(i32, i32)>,
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
-) -> Result<Html<String>, CustomError> {
+) -> Result<Html<&'static str>, CustomError> {
     let client = pool.get().await?;
 
+    let team = queries::organisations::organisation(&client, &team_id).await?;
+
     let secrets =
-        queries::secrets::get_all(&client, &idor_vault_id, &(current_user.user_id as i32)).await?;
+        queries::secrets::get_all(&client, &vault_id, &(current_user.user_id as i32)).await?;
 
     let user_vault =
-        queries::user_vaults::get(&client, &(current_user.user_id as i32), &idor_vault_id).await?;
+        queries::user_vaults::get(&client, &(current_user.user_id as i32), &vault_id).await?;
 
     let environments =
-        queries::environments::get_all(&client, &idor_vault_id, &(current_user.user_id as i32))
+        queries::environments::get_all(&client, &vault_id, &(current_user.user_id as i32))
             .await?;
 
+    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+    let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
+
     if secrets.is_empty() {
-        let mut buf = Vec::new();
-        crate::templates::secrets::empty_html(&mut buf, "Your Secrets", &user_vault, environments).unwrap();
-        let html = format!("{}", String::from_utf8_lossy(&buf));
-    
-        Ok(Html(html))
+        Ok(crate::render(|buf| {
+            crate::templates::secrets::empty_html(
+                buf,
+                &initials,
+                &user_vault,
+                environments,
+                &team,
+            )
+        }))
     } else {
-        let mut buf = Vec::new();
-        crate::templates::secrets::index_html(&mut buf, "Your Secrets", &user_vault, environments, secrets).unwrap();
-        let html = format!("{}", String::from_utf8_lossy(&buf));
 
         queries::audit::insert(
             &client,
             &(current_user.user_id as i32),
+            &team.id,
             &AuditAction::AccessSecrets,
             &AuditAccessType::Web,
-            &format!("Secrets  accesed from vault {}", &user_vault.vault_id)
+            &format!("Secrets  accesed from vault {}", &user_vault.vault_id),
         )
         .await?;
-    
-        Ok(Html(html))
+
+        Ok(crate::render(|buf| {
+            crate::templates::secrets::index_html(
+                buf,
+                &initials,
+                &user_vault,
+                environments,
+                secrets,
+                &team,
+            )
+        }))
     }
 }

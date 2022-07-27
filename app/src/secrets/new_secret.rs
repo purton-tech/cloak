@@ -22,7 +22,7 @@ pub struct NewSecret {
 }
 
 pub async fn new(
-    Path(id): Path<i32>,
+    Path((organisation_id, id)): Path<(i32, i32)>,
     current_user: Authentication,
     Form(new_secret): Form<NewSecret>,
     Extension(pool): Extension<Pool>,
@@ -45,11 +45,14 @@ pub async fn new(
     queries::audit::insert(
         &client,
         &(current_user.user_id as i32),
+        &organisation_id,
         &AuditAction::AddSecret,
         &AuditAccessType::Web,
         &format!("Secret created for Vault with ID {}", id)
     )
     .await?;
 
-    Ok(Redirect::to(&super::secret_route(id)))
+    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+
+    Ok(Redirect::to(&super::index_route(id, team.id)))
 }

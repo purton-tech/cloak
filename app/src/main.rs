@@ -11,6 +11,7 @@ mod registration_handler;
 mod secrets;
 mod service_accounts;
 mod team;
+mod profile;
 mod vaults;
 
 use axum::extract::{Extension, Path};
@@ -42,6 +43,7 @@ async fn main() {
         .merge(secrets::routes())
         .merge(team::routes())
         .merge(members::routes())
+        .merge(profile::routes())
         .merge(service_accounts::routes())
         .merge(registration_handler::routes())
         .layer(TraceLayer::new_for_http())

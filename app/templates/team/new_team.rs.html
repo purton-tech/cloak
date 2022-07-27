@@ -1,0 +1,20 @@
+@use crate::team::new_team_route;
+
+@(organisation_id: i32)
+
+<form class="m_form" method="post" action="@new_team_route(organisation_id)">
+    <side-drawer 
+        id='create-new-team' 
+        label="Create a new team?">
+        <template slot="body">
+            <fieldset>
+                <label for="name">Name *</label>
+                <input type="text" required name="name" />
+                <span class="a_help_text">Give your new team a name</span>
+            </fieldset>
+        </template>
+        <template slot="footer">
+            <button class="a_button auto success" type="submit">Create Team</button>
+        </template>
+    </side-drawer>
+</form>

@@ -8,7 +8,6 @@ use axum::{
     Router,
 };
 
-
 pub struct VaultSummary {
     pub id: i32,
     pub name: String,
@@ -18,13 +17,21 @@ pub struct VaultSummary {
     pub updated_at: OffsetDateTime,
 }
 
-pub static INDEX: &str = "/app/vaults";
-pub static NEW: &str = "/app/new_vault";
-pub static DELETE: &str = "/app/vaults/delete";
-
 pub fn routes() -> Router {
     Router::new()
-        .route(INDEX, get(index::index))
-        .route(NEW, post(new_vault::new))
-        .route(DELETE, post(delete_vault::delete))
+        .route("/app/team/:organisation_id/vaults", get(index::index))
+        .route("/app/team/:organisation_id/new_vault", post(new_vault::new))
+        .route("/app/team/:organisation_id/vaults/delete", post(delete_vault::delete))
+}
+
+pub fn index_route(organisation_id: i32) -> String {
+    format!("/app/team/{}/vaults", organisation_id)
+}
+
+pub fn new_route(organisation_id: i32) -> String {
+    format!("/app/team/{}/new_vault", organisation_id)
+}
+
+pub fn delete_route(organisation_id: i32) -> String {
+    format!("/app/team/{}/vaults/delete", organisation_id)
 }

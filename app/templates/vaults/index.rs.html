@@ -3,18 +3,19 @@
 @use super::new_vault_html;
 @use crate::layout::SideBar;
 @use time::format_description::well_known::Rfc3339;
+@use crate::cornucopia::queries::organisations::Organisation;
 
-@(title: &str, vaults: Vec<VaultSummary>)
+@(initials: &str, vaults: Vec<VaultSummary>, organisation: &Organisation)
 
-@:layout_html(title, {
+@:layout_html("Vaults", initials, {
     @for vault in vaults {
-        <div class="m_card vault-card clickable" href=@format!("/app/vault/{}/secrets", vault.id)>
+        <div class="m_card vault-card clickable" href="@crate::secrets::index_route(vault.id, organisation.id)">
             <div class="body m-vault-card-body">
                 <div>
                     <h4 class="title">@vault.name</h4>
                     <div class="created">
                         Created
-                        <relative-time datetime="@vault.created_at.format(&Rfc3339).unwrap()"></relative-time>
+                        <relative-time datetime='@vault.created_at.format(&Rfc3339).unwrap_or("".to_string())'></relative-time>
                     </div>
                 </div>
                 <div>
@@ -26,12 +27,12 @@
                     <p>@vault.secrets_count</p>
                 </div>
                 <div class="settings">
-                    <button class="a_button ghost danger" id=@format!("delete-vault-{}", vault.id) href="#">Delete
+                    <button class="a_button ghost danger" id='@format!("delete-vault-{}", vault.id)' href="#">Delete
                     </button>
                 </div>
             </div>
         </div>
-        <form class="m_form" method="post" action="/app/vaults/delete">
+        <form class="m_form" method="post" action="@crate::vaults::delete_route(organisation.id)">
             <side-drawer label="Delete Vault ?" id=@format!("delete-vault-drawer-{}", vault.id)>
                 <template slot="body">
                     <p>Are you sure you want to delete this vault?</p>
@@ -54,6 +55,6 @@
         </form>
     }
 }, {
-    @:new_vault_html()
+    @:new_vault_html(&organisation.id)
     <button class="a_button mini primary" id="new-vault">Create A New Vault</button>
-}, None, SideBar::Vaults)
+}, organisation, None, SideBar::Vaults)

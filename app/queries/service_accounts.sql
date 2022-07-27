@@ -1,5 +1,5 @@
---! connect(vault_id, environment_id, id, current_user_id)
- UPDATE service_accounts 
+--! connect(vault_id, environment_id, id, current_user_id, organisation_id)
+UPDATE service_accounts 
 SET 
     vault_id = $1, environment_id = $2
 WHERE 
@@ -7,14 +7,14 @@ WHERE
 AND 
     -- Make sure the user has access to the vault
     $1 IN (SELECT vault_id from users_vaults WHERE user_id = $4)
-AND user_id = $4
+AND organisation_id = $5
 
---! insert(user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
+--! insert(organisation_id, name, ecdh_public_key, encrypted_ecdh_private_key)
 INSERT INTO 
-    service_accounts (user_id, name, ecdh_public_key, encrypted_ecdh_private_key)
+    service_accounts (organisation_id, name, ecdh_public_key, encrypted_ecdh_private_key)
 VALUES($1, $2, $3, $4) 
 
---! get_all(user_id) { id, vault_id?, account_name, vault_name?, environment_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_all(organisation_id) { id, vault_id?, account_name, vault_name?, environment_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
 SELECT 
     sa.id, sa.vault_id, sa.name,
     (SELECT name FROM vaults WHERE id = sa.vault_id) as vault_name,
@@ -24,7 +24,7 @@ SELECT
 FROM 
     service_accounts sa
 WHERE 
-    sa.user_id = $1
+    sa.organisation_id = $1
 
 --! get_by_vault(vault_id, current_user_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, environment_id?, updated_at, created_at } *
 SELECT 
@@ -80,13 +80,23 @@ ON
 WHERE
     sa.id = $1
 
---! delete_service_account(id, current_user_id)
+--! delete_service_account(id, organisation_id, current_user_id)
 DELETE FROM
     service_accounts
 WHERE
     id = $1
 AND
-    user_id = $2
+    organisation_id = $2
+AND 
+    $3 IN
+    -- Bring back the service_accounts this user has access to.
+    (SELECT 
+        user_id 
+    FROM 
+        organisation_users 
+    WHERE
+        organisation_id = $2 and user_id = $1
+    )
 
 --! delete_service_account_secrets(service_account_id)
 DELETE FROM
