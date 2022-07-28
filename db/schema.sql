@@ -1040,6 +1040,107 @@ ALTER TABLE ONLY public.environments
 
 
 --
+-- Name: audit_trail; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.audit_trail ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: environments; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.environments ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: audit_trail multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.audit_trail USING ((organisation_id IN ( SELECT organisation_users.organisation_id
+   FROM public.organisation_users
+  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+
+
+--
+-- Name: environments multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.environments USING ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.users_vaults)));
+
+
+--
+-- Name: secrets multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.secrets USING ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.users_vaults)));
+
+
+--
+-- Name: service_account_secrets multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.service_account_secrets USING ((service_account_id IN ( SELECT service_account_secrets.service_account_id
+   FROM public.service_accounts)));
+
+
+--
+-- Name: service_accounts multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.service_accounts USING ((organisation_id IN ( SELECT organisation_users.organisation_id
+   FROM public.organisation_users
+  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+
+
+--
+-- Name: users_vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.users_vaults USING ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.vaults)));
+
+
+--
+-- Name: vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.vaults USING ((organisation_id IN ( SELECT organisation_users.organisation_id
+   FROM public.organisation_users
+  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+
+
+--
+-- Name: secrets; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.secrets ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: service_account_secrets; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.service_account_secrets ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: service_accounts; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.service_accounts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: users_vaults; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.users_vaults ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: vaults; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.vaults ENABLE ROW LEVEL SECURITY;
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -1054,4 +1155,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155233'),
     ('20220410155252'),
     ('20220410155319'),
-    ('20220621094035');
+    ('20220621094035'),
+    ('20220728091159');

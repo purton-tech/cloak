@@ -36,8 +36,6 @@ pub async fn new(
     let vault_id =
         queries::vaults::insert(&transaction, &organisation_id, &new_vault.name).await?;
 
-    let envs = queries::environments::setup_environments(&transaction, &vault_id).await?;
-
     queries::vaults::insert_user_vaults(
         &transaction,
         &(current_user.user_id as i32),
@@ -57,6 +55,7 @@ pub async fn new(
     )
     .await?;
 
+    let envs = queries::environments::setup_environments(&transaction, &vault_id).await?;
     for env in envs {
         queries::environments::connect_environment_to_user(
             &transaction,

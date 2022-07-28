@@ -19,17 +19,13 @@ pub async fn index(
 
     let team = queries::organisations::organisation(&transaction, &team_id).await?;
 
-    let org =
-        queries::organisations::get_primary_organisation(&transaction, &(current_user.user_id as i32))
-            .await?;
-
     // Blow up if the user doesn't have access to the vault
     queries::user_vaults::get(&transaction, &(current_user.user_id as i32), &vault_id).await?;
 
     let members = queries::user_vaults::get_users_dangerous(&transaction, &vault_id).await?;
 
     let non_members =
-        queries::user_vaults::get_non_members_dangerous(&transaction, &vault_id, &org.id).await?;
+        queries::user_vaults::get_non_members_dangerous(&transaction, &vault_id, &team_id).await?;
 
     let user_vault =
         queries::user_vaults::get(&transaction, &(current_user.user_id as i32), &vault_id).await?;
