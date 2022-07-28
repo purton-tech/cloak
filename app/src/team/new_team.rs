@@ -22,10 +22,13 @@ pub async fn new_team(
     Form(new_team): Form<NewTeam>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     let org_id =
-        queries::organisations::insert_organisation(&client, &(current_user.user_id as i32))
+        queries::organisations::insert_organisation(&transaction, &(current_user.user_id as i32))
             .await?;
 
     let roles = vec![
@@ -34,7 +37,7 @@ pub async fn new_team(
     ];
 
     queries::organisations::insert_user_into_org(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &org_id,
         &roles,
@@ -42,12 +45,14 @@ pub async fn new_team(
     .await?;
 
     queries::organisations::set_name(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &org_id,
         &new_team.name,
     )
     .await?;
+
+    transaction.commit().await?;
 
     crate::layout::redirect_and_snackbar(&super::switch_route(organisation_id), "New Team Created")
 }

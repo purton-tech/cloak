@@ -22,16 +22,20 @@ pub async fn set_name(
     Form(set_name): Form<SetName>,
 ) -> Result<impl IntoResponse, CustomError> {
 
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     queries::organisations::set_name(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &organisation_id,
         &set_name.name,
     )
     .await?;
 
+    transaction.commit().await?;
 
     crate::layout::redirect_and_snackbar(&super::index_route(organisation_id), "Team Name Updated")
 }

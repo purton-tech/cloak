@@ -27,13 +27,16 @@ pub async fn new(
     Form(new_secret): Form<NewSecret>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     // This will blow up if the user doesn't have access to the vault
-    queries::vaults::get(&client, &id, &(current_user.user_id as i32)).await?;
+    queries::vaults::get(&transaction, &id, &(current_user.user_id as i32)).await?;
 
     queries::secrets::insert(
-        &client,
+        &transaction,
         &id,
         &new_secret.name,
         &new_secret.name_blind_index,
@@ -43,7 +46,7 @@ pub async fn new(
     .await?;
 
     queries::audit::insert(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &organisation_id,
         &AuditAction::AddSecret,
@@ -52,7 +55,9 @@ pub async fn new(
     )
     .await?;
 
-    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+
+    transaction.commit().await?;
 
     Ok(Redirect::to(&super::index_route(id, team.id)))
 }

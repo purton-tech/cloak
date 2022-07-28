@@ -13,28 +13,31 @@ pub async fn index(
     Extension(pool): Extension<Pool>,
     current_user: Authentication,
 ) -> Result<Html<&'static str>, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
 
     let users = queries::organisations::get_users(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &organisation_id,
     )
     .await?;
 
     let permissions: Vec<queries::rbac::Permissions> =
-        queries::rbac::permissions(&client, &(current_user.user_id as i32), &organisation_id)
+        queries::rbac::permissions(&transaction, &(current_user.user_id as i32), &organisation_id)
             .await?;
 
     let can_manage_team = permissions
         .iter()
         .any(|p| p.permission == types::public::Permission::ManageTeam);
 
-    let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+    let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;
 
-    let invites = queries::invitations::get_all(&client, &organisation_id).await?;
+    let invites = queries::invitations::get_all(&transaction, &organisation_id).await?;
 
     let initials =
         crate::layout::initials(&user.email, user.first_name.clone(), user.last_name.clone());

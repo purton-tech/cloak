@@ -26,17 +26,20 @@ pub async fn new(
     Form(new_vault): Form<NewVault>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
 
     let vault_id =
-        queries::vaults::insert(&client, &organisation_id, &new_vault.name).await?;
+        queries::vaults::insert(&transaction, &organisation_id, &new_vault.name).await?;
 
-    let envs = queries::environments::setup_environments(&client, &vault_id).await?;
+    let envs = queries::environments::setup_environments(&transaction, &vault_id).await?;
 
     queries::vaults::insert_user_vaults(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &vault_id,
         &new_vault.public_key,
@@ -45,7 +48,7 @@ pub async fn new(
     .await?;
 
     queries::audit::insert(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &organisation_id,
         &AuditAction::CreateVault,
@@ -56,12 +59,14 @@ pub async fn new(
 
     for env in envs {
         queries::environments::connect_environment_to_user(
-            &client,
+            &transaction,
             &(current_user.user_id as i32),
             &env.id,
         )
         .await?;
     }
+
+    transaction.commit().await?;
 
     crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Vault Created")
 }

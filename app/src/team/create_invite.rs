@@ -63,9 +63,13 @@ pub async fn create_invite(
         crate::email::send_email(&config, email)
     }
 
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
+
     queries::audit::insert(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &organisation_id,
         &AuditAction::CreateInvite,
@@ -74,7 +78,7 @@ pub async fn create_invite(
     )
     .await?;
 
-    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
 
     crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Invitation Created")
 }
@@ -84,10 +88,13 @@ pub async fn create(
     current_user: &Authentication,
     new_invite: &NewInvite,
 ) -> Result<(String, String), CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     let org =
-        queries::organisations::get_primary_organisation(&client, &(current_user.user_id as i32))
+        queries::organisations::get_primary_organisation(&transaction, &(current_user.user_id as i32))
             .await?;
 
     let invitation_selector = rand::thread_rng().gen::<[u8; 6]>();
@@ -105,7 +112,7 @@ pub async fn create(
     };
 
     queries::invitations::insert_invitation(
-        &client,
+        &transaction,
         &org.id,
         &new_invite.email,
         &new_invite.first_name,
@@ -115,6 +122,8 @@ pub async fn create(
         &roles
     )
     .await?;
+
+    transaction.commit().await?;
 
     Ok((invitation_verifier_base64, invitation_selector_base64))
 }

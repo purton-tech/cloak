@@ -21,16 +21,19 @@ pub async fn delete(
     Form(delete_member): Form<DeleteMember>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
     queries::user_vaults::remove_user_from_vault(
-        &client,
+        &transaction,
         &delete_member.user_id,
         &delete_member.vault_id,
         &(current_user.user_id as i32),
     )
     .await?;
 
-    let team = queries::organisations::organisation(&client, &params.0).await?;
+    let team = queries::organisations::organisation(&transaction, &params.0).await?;
 
     // If we remove ourself, redirect to vaults page.
     let url = if delete_member.user_id == (current_user.user_id as i32) {
@@ -38,6 +41,8 @@ pub async fn delete(
     } else {
         super::member_route(params.1, params.0)
     };
+
+    transaction.commit().await?;
 
     crate::layout::redirect_and_snackbar(&url, "Member Removed From Vault")
 }
