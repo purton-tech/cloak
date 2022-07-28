@@ -14,27 +14,39 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         request: Request<GetServiceAccountRequest>,
     ) -> Result<Response<GetServiceAccountResponse>, Status> {
+        let authenticated_user = authenticate(&request).await?;
         let req = request.into_inner();
-        let client = self
+
+        // Create a transaction and setup RLS
+        let mut client = self
             .pool
             .get()
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
+        let transaction = client
+            .transaction()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
+        super::rls::set_row_level_security_user(&transaction, &authenticated_user)
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let service_account =
-            queries::service_accounts::get_by_ecdh_public_key(&client, &req.ecdh_public_key)
+            queries::service_accounts::get_by_ecdh_public_key(&transaction, &req.ecdh_public_key)
                 .await
                 .map_err(|e| CustomError::Database(e.to_string()))?;
 
         if let Some(vault_id) = service_account.vault_id {
-            queries::vaults::get_dangerous(&client, &vault_id)
+            queries::vaults::get_dangerous(&transaction, &vault_id)
                 .await
                 .map_err(|e| CustomError::Database(e.to_string()))?;
 
-            let secrets =
-                queries::service_account_secrets::get_all_dangerous(&client, &service_account.id)
-                    .await
-                    .map_err(|e| CustomError::Database(e.to_string()))?;
+            let secrets = queries::service_account_secrets::get_all_dangerous(
+                &transaction,
+                &service_account.id,
+            )
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
             let secrets = secrets
                 .into_iter()
@@ -67,14 +79,22 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let req = request.into_inner();
 
-        let client = self
+        // Create a transaction and setup RLS
+        let mut client = self
             .pool
             .get()
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
+        let transaction = client
+            .transaction()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
+        super::rls::set_row_level_security_user(&transaction, &authenticated_user)
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let secrets = queries::secrets::get_all(
-            &client,
+            &transaction,
             &(req.vault_id as i32),
             &(authenticated_user.user_id as i32),
         )
@@ -82,7 +102,7 @@ impl app::vault::vault_server::Vault for VaultService {
         .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let vault = queries::vaults::get(
-            &client,
+            &transaction,
             &(req.vault_id as i32),
             &(authenticated_user.user_id as i32),
         )
@@ -90,7 +110,7 @@ impl app::vault::vault_server::Vault for VaultService {
         .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let user_vault = queries::user_vaults::get(
-            &client,
+            &transaction,
             &(authenticated_user.user_id as i32),
             &(req.vault_id as i32),
         )
@@ -98,7 +118,7 @@ impl app::vault::vault_server::Vault for VaultService {
         .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let service_accounts = queries::service_accounts::get_by_vault(
-            &client,
+            &transaction,
             &(req.vault_id as i32),
             &(authenticated_user.user_id as i32),
         )
@@ -111,7 +131,7 @@ impl app::vault::vault_server::Vault for VaultService {
                 encrypted_name: s.name,
                 name_blind_index: s.name_blind_index,
                 encrypted_secret_value: s.secret,
-                environment_id: s.environment_id as u32
+                environment_id: s.environment_id as u32,
             })
             .collect();
 
@@ -122,10 +142,10 @@ impl app::vault::vault_server::Vault for VaultService {
                     return Some(ServiceAccount {
                         service_account_id: s.id as u32,
                         environment_id: env_id as u32,
-                        public_ecdh_key: s.ecdh_public_key
-                    })
+                        public_ecdh_key: s.ecdh_public_key,
+                    });
                 } else {
-                    return None
+                    return None;
                 };
             })
             .filter(|s| s.is_some())
@@ -147,20 +167,28 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         request: Request<CreateSecretsRequest>,
     ) -> Result<Response<CreateSecretsResponse>, Status> {
-        let client = self
+        let authenticated_user = authenticate(&request).await?;
+
+        // Create a transaction and setup RLS
+        let mut client = self
             .pool
             .get()
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
-
-        let authenticated_user = authenticate(&request).await?;
+        let transaction = client
+            .transaction()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
+        super::rls::set_row_level_security_user(&transaction, &authenticated_user)
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let service_account = request.into_inner();
 
         for account_secret in service_account.account_secrets {
             // Get the service account this request is trying to access
             let sa = queries::service_accounts::get_dangerous(
-                &client,
+                &transaction,
                 &(account_secret.service_account_id as i32),
             )
             .await
@@ -171,7 +199,7 @@ impl app::vault::vault_server::Vault for VaultService {
             if let Some(vault_id) = sa.vault_id {
                 // Blow up, if the user doesn't have access to the vault.
                 queries::service_account_secrets::get_users_vaults(
-                    &client,
+                    &transaction,
                     &(authenticated_user.user_id as i32),
                     &vault_id,
                 )
@@ -182,7 +210,7 @@ impl app::vault::vault_server::Vault for VaultService {
             // If yes, save the secret
             for secret in account_secret.secrets {
                 queries::service_account_secrets::insert(
-                    &client,
+                    &transaction,
                     &(account_secret.service_account_id as i32),
                     &secret.encrypted_name,
                     &secret.name_blind_index,
@@ -193,6 +221,11 @@ impl app::vault::vault_server::Vault for VaultService {
                 .map_err(|e| CustomError::Database(e.to_string()))?;
             }
         }
+
+        transaction
+            .commit()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let response = CreateSecretsResponse {};
 
