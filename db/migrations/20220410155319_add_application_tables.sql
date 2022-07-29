@@ -112,7 +112,8 @@ CREATE TABLE users_environments (
 );
 
 -- Give access to application user
-GRANT SELECT, INSERT, UPDATE, DELETE ON environments, users_environments, vaults, secrets, service_accounts, service_account_secrets, users_vaults TO application;
+GRANT SELECT, INSERT, UPDATE, DELETE ON environments, vaults, secrets, service_accounts, service_account_secrets TO application;
+GRANT SELECT, INSERT, DELETE ON users_environments, users_vaults TO application;
 GRANT USAGE, SELECT ON environments_id_seq, vaults_id_seq, secrets_id_seq, service_accounts_id_seq, service_account_secrets_id_seq TO application;
 
 -- Give access to readonly user

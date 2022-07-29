@@ -26,7 +26,7 @@ INSERT INTO roles_permissions VALUES('Administrator', 'ManageTeam');
 
 
 -- Give access to the application user.
-GRANT SELECT, INSERT, UPDATE, DELETE ON roles_permissions TO application;
+GRANT SELECT ON roles_permissions TO application;
 
 -- Give access to the readonly user
 GRANT SELECT ON roles_permissions TO readonly;

@@ -42,19 +42,16 @@ COMMENT ON COLUMN sessions.session_verifier IS 'Session key used for authenticat
 
 -- Give access to the application user, the application user has no access to 
 -- The sessions table and therefore cannot fake a login.
-GRANT SELECT, INSERT, UPDATE, DELETE ON users TO application;
-GRANT USAGE, SELECT ON users_id_seq TO application;
+GRANT SELECT, UPDATE ON users TO application;
+GRANT SELECT ON users_id_seq TO application;
 
 -- Give access to the readonly user
-GRANT SELECT ON sessions TO readonly;
-GRANT SELECT ON sessions_id_seq TO readonly;
-GRANT SELECT ON users TO readonly;
-GRANT SELECT ON users_id_seq TO readonly;
+GRANT SELECT ON sessions, users, sessions_id_seq TO readonly;
 
 -- Give access to authentication user
 GRANT SELECT, INSERT, UPDATE, DELETE ON sessions TO authentication;
 GRANT USAGE, SELECT ON sessions_id_seq TO authentication;
-GRANT SELECT, INSERT, UPDATE, DELETE ON users TO authentication;
+GRANT SELECT, INSERT, UPDATE ON users TO authentication;
 GRANT USAGE, SELECT ON users_id_seq TO authentication;
 
 -- Manage the updated_at column

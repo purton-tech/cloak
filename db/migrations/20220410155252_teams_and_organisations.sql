@@ -43,7 +43,9 @@ COMMENT ON COLUMN invitations.email IS 'After we lookup the invite we check that
 
 -- Give access to the application user, the application user has no access to 
 -- The sessions table and therefore cannot fake a login.
-GRANT SELECT, INSERT, UPDATE, DELETE ON invitations, organisations, organisation_users TO application;
+GRANT SELECT, INSERT ON organisation_users TO application;
+GRANT SELECT, INSERT, UPDATE ON organisations TO application;
+GRANT SELECT, INSERT, DELETE ON invitations TO application;
 GRANT USAGE, SELECT ON invitations_id_seq, organisations_id_seq TO application;
 
 -- Give access to the readonly user

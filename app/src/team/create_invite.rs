@@ -33,7 +33,7 @@ pub async fn create_invite(
     Form(new_invite): Form<NewInvite>,
     authentication: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
-    let invite_hash = create(&pool, &authentication, &new_invite).await?;
+    let invite_hash = create(&pool, &authentication, &new_invite, organisation_id).await?;
 
     let invitation_verifier_base64 = invite_hash.0;
     let invitation_selector_base64 = invite_hash.1;
@@ -87,15 +87,12 @@ pub async fn create(
     pool: &Pool,
     current_user: &Authentication,
     new_invite: &NewInvite,
+    organisation_id: i32
 ) -> Result<(String, String), CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
-
-    let org =
-        queries::organisations::get_primary_organisation(&transaction, &(current_user.user_id as i32))
-            .await?;
 
     let invitation_selector = rand::thread_rng().gen::<[u8; 6]>();
     let invitation_selector_base64 = base64::encode_config(invitation_selector, base64::URL_SAFE_NO_PAD);
@@ -113,7 +110,7 @@ pub async fn create(
 
     queries::invitations::insert_invitation(
         &transaction,
-        &org.id,
+        &organisation_id,
         &new_invite.email,
         &new_invite.first_name,
         &new_invite.last_name,
