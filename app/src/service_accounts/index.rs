@@ -22,9 +22,8 @@ pub async fn index(
     let service_accounts =
         queries::service_accounts::get_all(&transaction, &organisation_id).await?;
 
-    //let vaults = queries::vaults::get_all(&client, &(current_user.user_id as i32)).await?;
     let environments_and_vaults =
-        queries::environments::get_environments_and_vaults(&transaction, &(current_user.user_id as i32))
+        queries::environments::get_environments_and_vaults(&transaction)
             .await?;
 
     let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;

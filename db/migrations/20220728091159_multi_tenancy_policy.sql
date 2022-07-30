@@ -138,10 +138,22 @@ CREATE POLICY multi_tenancy_policy ON secrets
     );
 
 ALTER TABLE environments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY multi_tenancy_policy ON environments
-    FOR ALL
+CREATE POLICY multi_tenancy_policy_select ON environments
+    FOR SELECT
     USING (
-       vault_id IN (SELECT vault_id FROM users_vaults)
+       vault_id IN (SELECT vault_id FROM users_vaults 
+       WHERE user_id = current_setting('row_level_security.user_id')::integer)
+       --AND
+       --id IN (SELECT environment_id FROM users_environments
+       --WHERE user_id = current_setting('row_level_security.user_id')::integer)
+    );
+
+ALTER TABLE environments ENABLE ROW LEVEL SECURITY;
+CREATE POLICY multi_tenancy_policy_insert ON environments
+    FOR INSERT
+    WITH CHECK (
+       vault_id IN (SELECT vault_id FROM users_vaults 
+       WHERE user_id = current_setting('row_level_security.user_id')::integer)
     );
 
 ALTER TABLE service_account_secrets ENABLE ROW LEVEL SECURITY;
@@ -171,7 +183,8 @@ DROP POLICY multi_tenancy_policy ON users_vaults;
 ALTER TABLE secrets DISABLE ROW LEVEL SECURITY;
 DROP POLICY multi_tenancy_policy ON secrets;
 ALTER TABLE environments DISABLE ROW LEVEL SECURITY;
-DROP POLICY multi_tenancy_policy ON environments;
+DROP POLICY multi_tenancy_policy_insert ON environments;
+DROP POLICY multi_tenancy_policy_select ON environments;
 ALTER TABLE service_account_secrets DISABLE ROW LEVEL SECURITY;
 DROP POLICY multi_tenancy_policy ON service_account_secrets;
 

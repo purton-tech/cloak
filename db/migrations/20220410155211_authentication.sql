@@ -37,8 +37,12 @@ CREATE TABLE sessions (
     otp_code_sent BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE sessions IS 'Contains active sessions';
-COMMENT ON COLUMN sessions.session_verifier IS 'Session key used for authentication';
+COMMENT ON TABLE sessions IS 'The users login sessions';
+COMMENT ON COLUMN sessions.session_verifier IS ' The session is a 32 byte random number stored in their cookie. This is the sha256 hash of that value.';
+COMMENT ON COLUMN sessions.otp_code_encrypted IS 'A 6 digit code that is encrypted here to prevent attackers with read access to the database being able to use it.';
+COMMENT ON COLUMN sessions.otp_code_attempts IS 'We count OTP attempts to prevent brute forcing.';
+COMMENT ON COLUMN sessions.otp_code_confirmed IS 'Once the user enters the correct value this gets set to true.';
+COMMENT ON COLUMN sessions.otp_code_sent IS 'Have we sent the OTP code?';
 
 -- Give access to the application user, the application user has no access to 
 -- The sessions table and therefore cannot fake a login.

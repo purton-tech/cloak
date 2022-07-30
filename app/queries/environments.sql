@@ -1,24 +1,8 @@
---! get_all(vault_id, current_user_id) { id, name } *
+--! get_all(vault_id) { id, name } *
 SELECT  
     id, 
     name
 FROM environments WHERE vault_id = $1
-AND
-    vault_id 
-IN
-    (SELECT vault_id 
-    FROM
-        users_vaults
-    WHERE
-        user_id = $2)
-AND 
-    id
-IN
-    (SELECT environment_id 
-    FROM
-        users_environments
-    WHERE
-        user_id = $2)
 ORDER BY name
 
 --! connect_environment_to_user(user_id, environment_id)
@@ -33,17 +17,11 @@ VALUES
     ($1, 'Production')
 RETURNING id, name;
 
---! get_environments_and_vaults(current_user_id) { id, name, vault_name, vault_id } *
+--! get_environments_and_vaults() { id, name, vault_name, vault_id } *
 SELECT  
     id, 
     name,
     (SELECT name from vaults v WHERE vault_id = v.id) as vault_name,
     vault_id
-FROM environments WHERE vault_id 
-    IN
-        (SELECT vault_id 
-        FROM
-            users_vaults
-        WHERE
-            user_id = $1)
+FROM environments
 ORDER BY name

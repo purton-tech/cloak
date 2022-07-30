@@ -32,7 +32,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- These roles are only created in development. In production they will
--- have already been cfreated by the infrastructure as code and have secret passwords.
+-- have already been created by the infrastructure as code and have unguessable passwords.
 
 DO $$
 BEGIN
@@ -55,6 +55,9 @@ BEGIN
   RAISE NOTICE 'not creating role readonly -- it already exists';
 END
 $$;
+
+-- Needed so we can do backups.
+GRANT SELECT ON schema_migrations TO readonly;
 
 -- migrate:down
 DROP OWNED BY application;
