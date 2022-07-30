@@ -2,7 +2,18 @@
 SELECT  
     id, 
     name
-FROM environments WHERE vault_id = $1
+FROM 
+    environments 
+WHERE 
+    vault_id = $1
+AND 
+    id
+IN
+    (SELECT environment_id 
+    FROM
+        users_environments
+    WHERE
+        user_id = current_setting('row_level_security.user_id')::integer)
 ORDER BY name
 
 --! connect_environment_to_user(user_id, environment_id)
@@ -23,5 +34,14 @@ SELECT
     name,
     (SELECT name from vaults v WHERE vault_id = v.id) as vault_name,
     vault_id
-FROM environments
+FROM 
+    environments
+WHERE
+    id
+IN
+    (SELECT environment_id 
+    FROM
+        users_environments
+    WHERE
+        user_id = current_setting('row_level_security.user_id')::integer)
 ORDER BY name
