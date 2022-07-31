@@ -13,7 +13,7 @@ IN
     FROM
         users_environments
     WHERE
-        user_id = current_setting('row_level_security.user_id')::integer)
+        user_id = current_app_user())
 ORDER BY name
 
 --! connect_environment_to_user(user_id, environment_id)
@@ -43,5 +43,5 @@ IN
     FROM
         users_environments
     WHERE
-        user_id = current_setting('row_level_security.user_id')::integer)
+        user_id = current_app_user())
 ORDER BY name

@@ -96,7 +96,6 @@ impl app::vault::vault_server::Vault for VaultService {
         let secrets = queries::secrets::get_all(
             &transaction,
             &(req.vault_id as i32),
-            &(authenticated_user.user_id as i32),
         )
         .await
         .map_err(|e| CustomError::Database(e.to_string()))?;
@@ -120,7 +119,6 @@ impl app::vault::vault_server::Vault for VaultService {
         let service_accounts = queries::service_accounts::get_by_vault(
             &transaction,
             &(req.vault_id as i32),
-            &(authenticated_user.user_id as i32),
         )
         .await
         .map_err(|e| CustomError::Database(e.to_string()))?;

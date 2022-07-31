@@ -29,7 +29,6 @@ pub async fn set_name(
 
     queries::organisations::set_name(
         &transaction,
-        &(current_user.user_id as i32),
         &organisation_id,
         &set_name.name,
     )

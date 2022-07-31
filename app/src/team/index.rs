@@ -22,7 +22,6 @@ pub async fn index(
 
     let users = queries::organisations::get_users(
         &transaction,
-        &(current_user.user_id as i32),
         &organisation_id,
     )
     .await?;

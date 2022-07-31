@@ -6,16 +6,13 @@ FROM
 WHERE
     id = $1
 
---! set_name(user_id, org_id, name)
+--! set_name(org_id, name)
 UPDATE
     organisations
 SET 
-    name = $3 
+    name = $2 
 WHERE
-    id = $2
-AND
-    -- Make sure the user has access to this org
-    $1 IN (SELECT user_id FROM organisation_users WHERE organisation_id = $2)
+    id = $1
 
     
 --! get_primary_organisation(created_by_user_id) { id, name? }
@@ -42,17 +39,14 @@ INSERT INTO
     organisation_users (user_id, organisation_id, roles)
 VALUES($1, $2, $3) 
 
---! get_users(user_id, organisation_id) { id, organisation_id, email, ecdh_public_key, roles} *
+--! get_users(organisation_id) { id, organisation_id, email, ecdh_public_key, roles} *
 SELECT 
     u.id, ou.organisation_id, u.email, u.ecdh_public_key, ou.roles
 FROM 
     organisation_users ou
 LEFT JOIN users u ON u.id = ou.user_id
 WHERE
-    ou.organisation_id = $2
-AND
-    -- Make sure the user has access to this org
-    $1 IN (SELECT user_id FROM organisation_users WHERE organisation_id = $2)
+    ou.organisation_id = $1
 
 --! get_teams(user_id) { id, organisation_name?, team_owner } *
 SELECT 

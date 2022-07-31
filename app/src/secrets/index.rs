@@ -21,7 +21,7 @@ pub async fn index(
     let team = queries::organisations::organisation(&transaction, &team_id).await?;
 
     let secrets =
-        queries::secrets::get_all(&transaction, &vault_id, &(current_user.user_id as i32)).await?;
+        queries::secrets::get_all(&transaction, &vault_id).await?;
 
     let user_vault =
         queries::user_vaults::get(&transaction, &(current_user.user_id as i32), &vault_id).await?;

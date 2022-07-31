@@ -31,7 +31,6 @@ pub async fn delete(
     queries::service_accounts::delete_service_account(
         &transaction,
         &idor_delete_service_account.service_account_id,
-        &(current_user.user_id as i32),
         &organisation_id
     )
     .await?;

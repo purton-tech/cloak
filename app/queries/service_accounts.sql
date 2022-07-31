@@ -26,7 +26,7 @@ FROM
 WHERE 
     sa.organisation_id = $1
 
---! get_by_vault(vault_id, current_user_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, environment_id?, updated_at, created_at } *
+--! get_by_vault(vault_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, environment_id?, updated_at, created_at } *
 SELECT 
     sa.id, sa.vault_id, 
     sa.name, 
@@ -44,14 +44,6 @@ ON
     v.id = sa.vault_id
 WHERE 
     sa.vault_id = $1
-    -- Make sure the user actually as access to this vault
-    AND
-        $2 IN
-            (SELECT user_id 
-            FROM
-                users_vaults
-            WHERE
-                vault_id = $1)
 
 --! get_by_ecdh_public_key(ecdh_public_key) { id, vault_id?, account_name, vault_name, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at }
 SELECT 
@@ -80,23 +72,13 @@ ON
 WHERE
     sa.id = $1
 
---! delete_service_account(id, organisation_id, current_user_id)
+--! delete_service_account(id, organisation_id)
 DELETE FROM
     service_accounts
 WHERE
     id = $1
 AND
     organisation_id = $2
-AND 
-    $3 IN
-    -- Bring back the service_accounts this user has access to.
-    (SELECT 
-        user_id 
-    FROM 
-        organisation_users 
-    WHERE
-        organisation_id = $2 and user_id = $1
-    )
 
 --! delete_service_account_secrets(service_account_id)
 DELETE FROM

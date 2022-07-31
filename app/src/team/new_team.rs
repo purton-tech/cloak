@@ -46,7 +46,6 @@ pub async fn new_team(
 
     queries::organisations::set_name(
         &transaction,
-        &(current_user.user_id as i32),
         &org_id,
         &new_team.name,
     )

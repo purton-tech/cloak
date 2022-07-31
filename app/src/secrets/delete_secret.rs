@@ -31,14 +31,12 @@ pub async fn delete(
     let secret = queries::secrets::get(
         &transaction,
         &delete_secret.secret_id,
-        &(current_user.user_id as i32),
     )
     .await?;
 
     queries::secrets::delete_secret(
         &transaction,
         &delete_secret.secret_id,
-        &(current_user.user_id as i32),
     )
     .await?;
 

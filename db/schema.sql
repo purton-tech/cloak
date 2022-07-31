@@ -89,6 +89,82 @@ COMMENT ON TYPE public.role IS 'Users have roles, they can be managers or admini
 
 
 --
+-- Name: current_app_user(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.current_app_user() RETURNS integer
+    LANGUAGE sql
+    AS $$
+    SELECT
+        NULLIF(
+        current_setting(
+            'row_level_security.user_id',
+            TRUE
+        ),
+        ''
+        )::INTEGER
+$$;
+
+
+--
+-- Name: org_check(integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.org_check(_organisation_id integer) RETURNS boolean
+    LANGUAGE sql
+    AS $$
+    SELECT
+        EXISTS(
+            SELECT
+                1
+            FROM
+                organisations
+            WHERE
+                id = _organisation_id
+        )
+$$;
+
+
+--
+-- Name: rls_bypass_check_if_we_are_creator(integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.rls_bypass_check_if_we_are_creator(_organisation_id integer) RETURNS boolean
+    LANGUAGE sql
+    AS $$
+    SELECT
+        EXISTS(
+            SELECT id
+            FROM
+                organisations
+            WHERE
+                created_by_user_id =  current_app_user()
+        )
+$$;
+
+
+--
+-- Name: rls_bypass_org_check(integer); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.rls_bypass_org_check(_organisation_id integer) RETURNS boolean
+    LANGUAGE sql
+    AS $$
+    SELECT
+        EXISTS(
+            SELECT
+                1
+            FROM
+                organisation_users
+            WHERE
+                user_id = current_app_user()
+                AND
+                organisation_id = _organisation_id
+        )
+$$;
+
+
+--
 -- Name: set_updated_at(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1264,9 +1340,14 @@ ALTER TABLE public.invitations ENABLE ROW LEVEL SECURITY;
 -- Name: audit_trail multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.audit_trail USING ((organisation_id IN ( SELECT organisation_users.organisation_id
-   FROM public.organisation_users
-  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+CREATE POLICY multi_tenancy_policy ON public.audit_trail USING (public.org_check(organisation_id));
+
+
+--
+-- Name: organisations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.organisations USING ((public.rls_bypass_org_check(id) OR (created_by_user_id = public.current_app_user())));
 
 
 --
@@ -1289,9 +1370,7 @@ CREATE POLICY multi_tenancy_policy ON public.service_account_secrets USING ((ser
 -- Name: service_accounts multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.service_accounts USING ((organisation_id IN ( SELECT organisation_users.organisation_id
-   FROM public.organisation_users
-  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+CREATE POLICY multi_tenancy_policy ON public.service_accounts USING (public.org_check(organisation_id));
 
 
 --
@@ -1306,25 +1385,21 @@ CREATE POLICY multi_tenancy_policy ON public.users_vaults USING ((vault_id IN ( 
 -- Name: vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.vaults USING ((organisation_id IN ( SELECT organisation_users.organisation_id
-   FROM public.organisation_users
-  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+CREATE POLICY multi_tenancy_policy ON public.vaults USING (public.org_check(organisation_id));
 
 
 --
 -- Name: invitations multi_tenancy_policy_delete; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_delete ON public.invitations FOR DELETE USING ((organisation_id IN ( SELECT organisation_users.organisation_id
-   FROM public.organisation_users
-  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+CREATE POLICY multi_tenancy_policy_delete ON public.invitations FOR DELETE USING (public.org_check(organisation_id));
 
 
 --
 -- Name: organisation_users multi_tenancy_policy_delete; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE USING (true);
+CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE USING (public.rls_bypass_org_check(organisation_id));
 
 
 --
@@ -1333,16 +1408,14 @@ CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELET
 
 CREATE POLICY multi_tenancy_policy_insert ON public.environments FOR INSERT WITH CHECK ((vault_id IN ( SELECT users_vaults.vault_id
    FROM public.users_vaults
-  WHERE (users_vaults.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+  WHERE (users_vaults.user_id = public.current_app_user()))));
 
 
 --
 -- Name: invitations multi_tenancy_policy_insert; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_insert ON public.invitations FOR INSERT WITH CHECK ((organisation_id IN ( SELECT organisation_users.organisation_id
-   FROM public.organisation_users
-  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+CREATE POLICY multi_tenancy_policy_insert ON public.invitations FOR INSERT WITH CHECK (public.org_check(organisation_id));
 
 
 --
@@ -1350,9 +1423,7 @@ CREATE POLICY multi_tenancy_policy_insert ON public.invitations FOR INSERT WITH 
 --
 
 CREATE POLICY multi_tenancy_policy_insert ON public.organisation_users FOR INSERT WITH CHECK (((organisation_id IN ( SELECT invitations.organisation_id
-   FROM public.invitations)) OR (organisation_id IN ( SELECT organisations.id
-   FROM public.organisations
-  WHERE (organisations.created_by_user_id = (current_setting('row_level_security.user_id'::text))::integer)))));
+   FROM public.invitations)) OR public.rls_bypass_check_if_we_are_creator(organisation_id)));
 
 
 --
@@ -1361,25 +1432,23 @@ CREATE POLICY multi_tenancy_policy_insert ON public.organisation_users FOR INSER
 
 CREATE POLICY multi_tenancy_policy_select ON public.environments FOR SELECT USING ((vault_id IN ( SELECT users_vaults.vault_id
    FROM public.users_vaults
-  WHERE (users_vaults.user_id = (current_setting('row_level_security.user_id'::text))::integer))));
+  WHERE (users_vaults.user_id = public.current_app_user()))));
 
 
 --
 -- Name: invitations multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_select ON public.invitations FOR SELECT USING (((organisation_id IN ( SELECT organisation_users.organisation_id
-   FROM public.organisation_users
-  WHERE (organisation_users.user_id = (current_setting('row_level_security.user_id'::text))::integer))) OR ((email)::text IN ( SELECT users.email
+CREATE POLICY multi_tenancy_policy_select ON public.invitations FOR SELECT USING ((public.org_check(organisation_id) OR ((email)::text IN ( SELECT users.email
    FROM public.users
-  WHERE (users.id = (current_setting('row_level_security.user_id'::text))::integer)))));
+  WHERE (users.id = public.current_app_user())))));
 
 
 --
 -- Name: organisation_users multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT USING (true);
+CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT USING (public.rls_bypass_org_check(organisation_id));
 
 
 --
@@ -1387,6 +1456,12 @@ CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELEC
 --
 
 ALTER TABLE public.organisation_users ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: organisations; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.organisations ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: secrets; Type: ROW SECURITY; Schema: public; Owner: -
