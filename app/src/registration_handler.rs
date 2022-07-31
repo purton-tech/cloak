@@ -35,11 +35,7 @@ pub async fn post_registration(
     if let Ok(org) = org {
         return Ok(Redirect::to(&crate::vaults::index_route(org.id)));
     } else {
-        let inserted_org_id = queries::organisations::insert_organisation(
-            &transaction,
-            &(current_user.user_id as i32),
-        )
-        .await?;
+        let inserted_org_id = queries::organisations::insert_organisation(&transaction).await?;
 
         let roles = vec![
             types::public::Role::Administrator,

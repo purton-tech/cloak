@@ -28,10 +28,10 @@ INSERT INTO
     organisation_users (user_id, organisation_id, roles)
 VALUES($1, $2, $3) 
 
---! insert_organisation(created_by_user_id) 
+--! insert_organisation() 
 INSERT INTO 
     organisations (created_by_user_id)
-VALUES($1) 
+VALUES(current_app_user()) 
 RETURNING id
 
 --! insert_user_into_org(user_id, organisation_id, roles)
