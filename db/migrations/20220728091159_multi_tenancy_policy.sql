@@ -86,6 +86,7 @@ CREATE POLICY multi_tenancy_policy_select ON organisation_users
     FOR SELECT
     USING (
         true
+        -- Makes a stack depth error
         --rls_bypass_org_check(organisation_id)
     );
 

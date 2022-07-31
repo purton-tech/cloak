@@ -891,6 +891,13 @@ CREATE TABLE public.users_environments (
 
 
 --
+-- Name: TABLE users_environments; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.users_environments IS 'When we add a user to a vault we can select which environemnts they are allowed to see.';
+
+
+--
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
