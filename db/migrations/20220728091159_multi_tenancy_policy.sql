@@ -93,8 +93,7 @@ ALTER TABLE organisation_users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy_delete ON organisation_users
     FOR DELETE
     USING (
-        true
-        --rls_bypass_org_check(organisation_id)
+        org_check(organisation_id)
     );
 
 -- Only users who are members of an organsiation can create invites.

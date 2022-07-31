@@ -1399,7 +1399,7 @@ CREATE POLICY multi_tenancy_policy_delete ON public.invitations FOR DELETE USING
 -- Name: organisation_users multi_tenancy_policy_delete; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE USING (public.rls_bypass_org_check(organisation_id));
+CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE USING (public.org_check(organisation_id));
 
 
 --
@@ -1448,7 +1448,7 @@ CREATE POLICY multi_tenancy_policy_select ON public.invitations FOR SELECT USING
 -- Name: organisation_users multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT USING (public.rls_bypass_org_check(organisation_id));
+CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT USING (true);
 
 
 --
