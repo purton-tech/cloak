@@ -61,10 +61,8 @@ ALTER TABLE organisations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy ON organisations
     FOR ALL
     USING (
-        -- Either we have been given access to this org
         rls_bypass_org_check(id)
         OR
-        -- Or we are the creator and we haven't connected it yet
         created_by_user_id = current_app_user()
     );
 
@@ -99,16 +97,8 @@ CREATE POLICY multi_tenancy_policy_delete ON organisation_users
 
 -- Only users who are members of an organsiation can create invites.
 ALTER TABLE invitations ENABLE ROW LEVEL SECURITY;
-CREATE POLICY multi_tenancy_policy_insert ON invitations
-    FOR INSERT
-    WITH CHECK (
-        -- Is this invitation from an org we have access to?
-        org_check(organisation_id)
-        -- Implement TeamManager permission somehow.
-    );
-
-CREATE POLICY multi_tenancy_policy_select ON invitations
-    FOR SELECT
+CREATE POLICY multi_tenancy_policy ON invitations
+    FOR ALL
     USING (
         -- Is this invitation from an org we have access to?
         org_check(organisation_id)
@@ -118,13 +108,11 @@ CREATE POLICY multi_tenancy_policy_select ON invitations
                 SELECT email FROM users WHERE id = current_app_user()
             )
         )
-    );
-
-CREATE POLICY multi_tenancy_policy_delete ON invitations
-    FOR DELETE
-    USING (
+    )
+    WITH CHECK (
         -- Is this invitation from an org we have access to?
         org_check(organisation_id)
+        -- Implement TeamManager permission somehow.
     );
 
 -- Restrict audit trail access to the organisations a user has access to.
@@ -168,19 +156,15 @@ CREATE POLICY multi_tenancy_policy ON secrets
     );
 
 ALTER TABLE environments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY multi_tenancy_policy_select ON environments
-    FOR SELECT
+CREATE POLICY multi_tenancy_policy ON environments
+    FOR ALL
     USING (
        vault_id IN (SELECT vault_id FROM users_vaults 
        WHERE user_id = current_app_user())
        --AND
        --id IN (SELECT environment_id FROM users_environments
        --WHERE user_id = current_setting('row_level_security.user_id')::integer)
-    );
-
-ALTER TABLE environments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY multi_tenancy_policy_insert ON environments
-    FOR INSERT
+    )
     WITH CHECK (
        vault_id IN (SELECT vault_id FROM users_vaults 
        WHERE user_id = current_app_user())
@@ -201,9 +185,7 @@ DROP POLICY multi_tenancy_policy_insert ON organisation_users;
 DROP POLICY multi_tenancy_policy_select ON organisation_users;
 DROP POLICY multi_tenancy_policy_delete ON organisation_users;
 ALTER TABLE invitations DISABLE ROW LEVEL SECURITY;
-DROP POLICY multi_tenancy_policy_insert ON invitations;
-DROP POLICY multi_tenancy_policy_delete ON invitations;
-DROP POLICY multi_tenancy_policy_select ON invitations;
+DROP POLICY multi_tenancy_policy ON invitations;
 ALTER TABLE audit_trail DISABLE ROW LEVEL SECURITY;
 DROP POLICY multi_tenancy_policy ON audit_trail;
 ALTER TABLE service_accounts DISABLE ROW LEVEL SECURITY;
@@ -215,8 +197,7 @@ DROP POLICY multi_tenancy_policy ON users_vaults;
 ALTER TABLE secrets DISABLE ROW LEVEL SECURITY;
 DROP POLICY multi_tenancy_policy ON secrets;
 ALTER TABLE environments DISABLE ROW LEVEL SECURITY;
-DROP POLICY multi_tenancy_policy_insert ON environments;
-DROP POLICY multi_tenancy_policy_select ON environments;
+DROP POLICY multi_tenancy_policy ON environments;
 ALTER TABLE service_account_secrets DISABLE ROW LEVEL SECURITY;
 DROP POLICY multi_tenancy_policy ON service_account_secrets;
 

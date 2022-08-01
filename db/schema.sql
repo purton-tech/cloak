@@ -1351,6 +1351,26 @@ CREATE POLICY multi_tenancy_policy ON public.audit_trail USING (public.org_check
 
 
 --
+-- Name: environments multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.environments USING ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.users_vaults
+  WHERE (users_vaults.user_id = public.current_app_user())))) WITH CHECK ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.users_vaults
+  WHERE (users_vaults.user_id = public.current_app_user()))));
+
+
+--
+-- Name: invitations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.invitations USING ((public.org_check(organisation_id) OR ((email)::text IN ( SELECT users.email
+   FROM public.users
+  WHERE (users.id = public.current_app_user()))))) WITH CHECK (public.org_check(organisation_id));
+
+
+--
 -- Name: organisations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -1396,33 +1416,10 @@ CREATE POLICY multi_tenancy_policy ON public.vaults USING (public.org_check(orga
 
 
 --
--- Name: invitations multi_tenancy_policy_delete; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY multi_tenancy_policy_delete ON public.invitations FOR DELETE USING (public.org_check(organisation_id));
-
-
---
 -- Name: organisation_users multi_tenancy_policy_delete; Type: POLICY; Schema: public; Owner: -
 --
 
 CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE USING (public.org_check(organisation_id));
-
-
---
--- Name: environments multi_tenancy_policy_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY multi_tenancy_policy_insert ON public.environments FOR INSERT WITH CHECK ((vault_id IN ( SELECT users_vaults.vault_id
-   FROM public.users_vaults
-  WHERE (users_vaults.user_id = public.current_app_user()))));
-
-
---
--- Name: invitations multi_tenancy_policy_insert; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY multi_tenancy_policy_insert ON public.invitations FOR INSERT WITH CHECK (public.org_check(organisation_id));
 
 
 --
@@ -1431,24 +1428,6 @@ CREATE POLICY multi_tenancy_policy_insert ON public.invitations FOR INSERT WITH 
 
 CREATE POLICY multi_tenancy_policy_insert ON public.organisation_users FOR INSERT WITH CHECK (((organisation_id IN ( SELECT invitations.organisation_id
    FROM public.invitations)) OR public.rls_bypass_check_if_we_are_creator(organisation_id)));
-
-
---
--- Name: environments multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY multi_tenancy_policy_select ON public.environments FOR SELECT USING ((vault_id IN ( SELECT users_vaults.vault_id
-   FROM public.users_vaults
-  WHERE (users_vaults.user_id = public.current_app_user()))));
-
-
---
--- Name: invitations multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY multi_tenancy_policy_select ON public.invitations FOR SELECT USING ((public.org_check(organisation_id) OR ((email)::text IN ( SELECT users.email
-   FROM public.users
-  WHERE (users.id = public.current_app_user())))));
 
 
 --
