@@ -1,28 +1,12 @@
-## Tech Stack and Mono Repo Structure
+## End 2 End Encrypted Secrets Manager for Operations and Development
 
-| Folder | Description | Docker Container |
-| ---- | ---- | ---- | 
-| `.devcontainer` | Version controlled [Development Environment](https://code.visualstudio.com/docs/remote/containers)|purtontech/cloak-envoy|
-| `.github` | Continuous integration pipeline calls out to [Earthly](https://earthly.dev)||
-| `/app` | Web and gRPC Server. Written in Rust using [Axum](https://github.com/tokio-rs/axumtomni) and [Tonic](https://github.com/hyperium/tonic)|purtontech/cloak-server|
-| `/app/asset-pipeline` | [Parcel](https://parceljs.org/) builder for [Typescript](https://www.typescriptlang.org/) and [SCSS](https://sass-lang.com/) assets.||
-| `/cli` | Command Line Interface. Written in Rust.||
-| `/infra` | Infrastructure as Code using [Pulumi](https://www.pulumi.com/).||
-| `/protos` | [gRPC](https://grpc.io/) schema for the API.||
-| `/db/migrations` | Database migrations for building the Postgres Database.|purtontech/cloak-db-migrations|
-| `/www` | The website. Built with [Zola](https://www.getzola.org) static site generator.|purtontech/cloak-website|
-| `Earthfile` |[Earthly](https://earthly.dev) Builds our containers and executables||
-| `.releaserc.json`|[Semantic Releases](https://github.com/semantic-release/semantic-release)||
+* Uses standard encryption algorithms so that we never see your secrets.
+* CLI tool to bring secrets from the vault to you local environemnt.
+* Hosted by us or on your own infrastructure, runs as docker containers.
+* Permissive licence.
+* User interface to manage teams, add secrets and manage service accounts.
+* Role based access control, give users admin access to manage their own teams.
 
-## Alternatives
+## Developers
 
-| Name  | URL | SaaS? | E2E?| CLI? | Notes |
-| ---- | ---- | ---- | ---- | ---- | --- |
-| 1Password  | https://1password.com/secrets/  | yes | ? | ? | |
-| SecretHub  | https://secrethub.io/ | Yes | Yes | Yes | Now part of 1Password | 
-| Akeyless  | https://www.akeyless.io/ | Yes | No | Yes |  | 
-| Hashicorp Vault  | https://www.vaultproject.io/ | No | No | Yes | Lots of Features | 
-| Conjur  | https://www.conjur.org/ | No | No | Yes |  | 
-| Doppler  | https://www.doppler.com/ | Yes | No | Yes |  | 
-| EnvKey | https://envkey.com/ | Yes | Yes | Yes | Expemsive |
-
+Cloak is a [Rust on Nails](https://rust-on-nails.com/) project. You can read how the project is put together and maintained.
