@@ -104,6 +104,13 @@ $$;
 
 
 --
+-- Name: FUNCTION current_app_user(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.current_app_user() IS 'These needs to be set by the application before accessing the database.';
+
+
+--
 -- Name: get_orgs_app_user_created(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -117,6 +124,13 @@ CREATE FUNCTION public.get_orgs_app_user_created() RETURNS SETOF integer
     WHERE
         created_by_user_id = current_app_user()
 $$;
+
+
+--
+-- Name: FUNCTION get_orgs_app_user_created(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.get_orgs_app_user_created() IS 'All the orgs a user created.';
 
 
 --
@@ -136,6 +150,13 @@ $$;
 
 
 --
+-- Name: FUNCTION get_orgs_for_app_user(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.get_orgs_for_app_user() IS 'All the orgs a user has been invited to.';
+
+
+--
 -- Name: get_users_for_app_user(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -149,6 +170,13 @@ CREATE FUNCTION public.get_users_for_app_user() RETURNS SETOF integer
     WHERE
         organisation_id IN (SELECT get_orgs_for_app_user())
 $$;
+
+
+--
+-- Name: FUNCTION get_users_for_app_user(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.get_users_for_app_user() IS 'All the users from all the orgs this user has been invited to.';
 
 
 --
@@ -1358,10 +1386,24 @@ CREATE POLICY multi_tenancy_policy ON public.invitations USING (((organisation_i
 
 
 --
+-- Name: POLICY multi_tenancy_policy ON invitations; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy ON public.invitations IS 'A users can access inviation from one of the orgs or if it has the same email address';
+
+
+--
 -- Name: organisations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
 CREATE POLICY multi_tenancy_policy ON public.organisations USING (((id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)) OR (created_by_user_id = public.current_app_user())));
+
+
+--
+-- Name: POLICY multi_tenancy_policy ON organisations; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy ON public.organisations IS 'A user can see all the orgs they have created or been invited to.';
 
 
 --
@@ -1419,10 +1461,24 @@ CREATE POLICY multi_tenancy_policy_insert ON public.organisation_users FOR INSER
 
 
 --
+-- Name: POLICY multi_tenancy_policy_insert ON organisation_users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy_insert ON public.organisation_users IS 'A user on connect users with orgs it created or where an invite exists.';
+
+
+--
 -- Name: organisation_users multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
 --
 
 CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT USING (true);
+
+
+--
+-- Name: POLICY multi_tenancy_policy_select ON organisation_users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy_select ON public.organisation_users IS 'Only disconnect a user from an org if we have access to that org.';
 
 
 --
