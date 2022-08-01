@@ -7,13 +7,10 @@ ALTER ROLE readonly BYPASSRLS;
 CREATE FUNCTION current_app_user() RETURNS INTEGER AS 
 $$ 
     SELECT
-        NULLIF(
         current_setting(
             'row_level_security.user_id',
-            TRUE
-        ),
-        ''
-        )::INTEGER 
+            false
+        )::integer 
 $$ LANGUAGE SQL;
 
 CREATE FUNCTION rls_bypass_check_if_we_are_creator(_organisation_id INTEGER) RETURNS bool AS 

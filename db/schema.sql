@@ -96,13 +96,10 @@ CREATE FUNCTION public.current_app_user() RETURNS integer
     LANGUAGE sql
     AS $$
     SELECT
-        NULLIF(
         current_setting(
             'row_level_security.user_id',
-            TRUE
-        ),
-        ''
-        )::INTEGER
+            false
+        )::integer
 $$;
 
 
