@@ -1,3 +1,5 @@
+![Alt text](www/static/secrets-screenshot.png "Secrets Screenshot")
+
 ## End 2 End Encrypted Secrets Manager for Operations and Development
 
 * Uses standard encryption algorithms so that we never see your secrets.
@@ -9,4 +11,4 @@
 
 ## Developers
 
-Cloak is a [Rust on Nails](https://rust-on-nails.com/) project. You can read how the project is put together and maintained.
+Cloak uses [Rust on Nails](https://rust-on-nails.com/) architecture.
