@@ -74,7 +74,7 @@ CREATE POLICY multi_tenancy_policy_select ON organisation_users
     USING (
         true
         -- Makes a stack depth error
-        --rls_bypass_org_check(organisation_id)
+        --organisation_id IN (SELECT get_orgs_for_app_user())
     );
 
 ALTER TABLE organisation_users ENABLE ROW LEVEL SECURITY;
