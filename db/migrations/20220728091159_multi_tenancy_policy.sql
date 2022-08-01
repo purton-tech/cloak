@@ -13,52 +13,42 @@ $$
         )::integer 
 $$ LANGUAGE SQL;
 
-CREATE FUNCTION rls_bypass_check_if_we_are_creator(_organisation_id INTEGER) RETURNS bool AS 
+CREATE FUNCTION get_orgs_for_app_user() RETURNS setof integer AS 
 $$ 
     SELECT
-        EXISTS(
-            SELECT id 
-            FROM 
-                organisations 
-            WHERE 
-                created_by_user_id =  current_app_user()
-        ) 
+        organisation_id
+    FROM
+        organisation_users
+    WHERE
+        user_id = current_app_user()
 $$ LANGUAGE SQL SECURITY INVOKER;
 
-CREATE FUNCTION rls_bypass_org_check(_organisation_id INTEGER) RETURNS bool AS 
+CREATE FUNCTION get_orgs_app_user_created() RETURNS setof integer AS 
 $$ 
     SELECT
-        EXISTS(
-            SELECT
-                1
-            FROM
-                organisation_users
-            WHERE
-                user_id = current_app_user()
-                AND
-                organisation_id = _organisation_id
-        ) 
+        id
+    FROM
+        organisations
+    WHERE
+        created_by_user_id = current_app_user()
 $$ LANGUAGE SQL SECURITY INVOKER;
 
-CREATE FUNCTION org_check(_organisation_id INTEGER) RETURNS bool AS 
+CREATE FUNCTION get_users_for_app_user() RETURNS setof integer AS 
 $$ 
     SELECT
-        EXISTS(
-            SELECT
-                1
-            FROM
-                organisations
-            WHERE
-                id = _organisation_id
-        ) 
-$$ LANGUAGE SQL;
+        user_id
+    FROM
+        organisation_users
+    WHERE
+        organisation_id IN (SELECT get_orgs_for_app_user())
+$$ LANGUAGE SQL SECURITY INVOKER;
 
 -- We must have been given access to the org or be the orgs creator
 ALTER TABLE organisations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy ON organisations
     FOR ALL
     USING (
-        rls_bypass_org_check(id)
+        id IN (SELECT get_orgs_for_app_user())
         OR
         created_by_user_id = current_app_user()
     );
@@ -73,7 +63,9 @@ CREATE POLICY multi_tenancy_policy_insert ON organisation_users
             SELECT organisation_id FROM invitations 
         )
         OR 
-        rls_bypass_check_if_we_are_creator(organisation_id)
+        organisation_id IN (
+            SELECT get_orgs_app_user_created()
+        )
     );
 
 ALTER TABLE organisation_users ENABLE ROW LEVEL SECURITY;
@@ -89,7 +81,7 @@ ALTER TABLE organisation_users ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy_delete ON organisation_users
     FOR DELETE
     USING (
-        org_check(organisation_id)
+        organisation_id IN (SELECT get_orgs_for_app_user())
     );
 
 -- Only users who are members of an organsiation can create invites.
@@ -98,7 +90,7 @@ CREATE POLICY multi_tenancy_policy ON invitations
     FOR ALL
     USING (
         -- Is this invitation from an org we have access to?
-        org_check(organisation_id)
+        organisation_id IN (SELECT get_orgs_for_app_user())
         -- If the invite is not accepted yet, then we check against the users email address.
         OR (
             email IN (
@@ -108,7 +100,7 @@ CREATE POLICY multi_tenancy_policy ON invitations
     )
     WITH CHECK (
         -- Is this invitation from an org we have access to?
-        org_check(organisation_id)
+        organisation_id IN (SELECT get_orgs_for_app_user())
         -- Implement TeamManager permission somehow.
     );
 
@@ -117,7 +109,7 @@ ALTER TABLE audit_trail ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy ON audit_trail
     FOR ALL
     USING (
-        org_check(organisation_id)
+        organisation_id IN (SELECT get_orgs_for_app_user())
     );
 
 --! Restrict service_accounts access to the organisations a user has access to.
@@ -125,7 +117,7 @@ ALTER TABLE service_accounts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy ON service_accounts
     FOR ALL
     USING (
-        org_check(organisation_id)
+        organisation_id IN (SELECT get_orgs_for_app_user())
     );
 
 --! Restrict vaults access to the organisations a user has access to.
@@ -133,7 +125,7 @@ ALTER TABLE vaults ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy ON vaults
     FOR ALL
     USING (
-        org_check(organisation_id)
+        organisation_id IN (SELECT get_orgs_for_app_user())
     );
 
 -- Tables indirectly connected to the org, i.e. connected to the tables above.
@@ -143,6 +135,8 @@ CREATE POLICY multi_tenancy_policy ON users_vaults
     FOR ALL
     USING (
         vault_id IN (SELECT vault_id FROM vaults)
+        AND
+        user_id IN (SELECT get_users_for_app_user())
     );
 
 ALTER TABLE secrets ENABLE ROW LEVEL SECURITY;
@@ -171,7 +165,10 @@ ALTER TABLE service_account_secrets ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy ON service_account_secrets
     FOR ALL
     USING (
-       service_account_id IN (SELECT service_account_id FROM service_accounts)
+       service_account_id IN (
+            SELECT service_account_id 
+            FROM service_accounts
+            WHERE organisation_id IN (SELECT get_orgs_for_app_user()))
     );
 
 -- migrate:down
@@ -199,9 +196,9 @@ ALTER TABLE service_account_secrets DISABLE ROW LEVEL SECURITY;
 DROP POLICY multi_tenancy_policy ON service_account_secrets;
 
 DROP FUNCTION current_app_user;
-DROP FUNCTION rls_bypass_org_check;
-DROP FUNCTION rls_bypass_check_if_we_are_creator;
-DROP FUNCTION org_check;
+DROP FUNCTION get_orgs_for_app_user;
+DROP FUNCTION get_users_for_app_user;
+DROP FUNCTION get_orgs_app_user_created;
 
 ALTER ROLE authentication NOBYPASSRLS; 
 ALTER ROLE readonly NOBYPASSRLS; 
