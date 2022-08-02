@@ -34,7 +34,7 @@ pub async fn index(
         .await?;
 
     let non_members = queries::user_vaults::get_non_members_dangerous()
-        .bind(&transaction, &vault_id, &team_id)
+        .bind(&transaction, &team_id, &vault_id)
         .all()
         .await?;
 

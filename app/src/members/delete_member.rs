@@ -28,8 +28,8 @@ pub async fn delete(
     queries::user_vaults::remove_user_from_vault()
         .bind(
             &transaction,
-            &delete_member.user_id,
             &delete_member.vault_id,
+            &delete_member.user_id,
             &(current_user.user_id as i32),
         )
         .await?;

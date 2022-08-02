@@ -43,7 +43,7 @@ WHERE
     uv.vault_id = :vault_id;
 
 -- Fetch members of the team that have not been added to this vault
---! get_non_members_dangerous(vault_id, organisation_id)
+--! get_non_members_dangerous(organisation_id, vault_id)
 SELECT 
     u.id, 
     u.email,
@@ -54,7 +54,7 @@ WHERE
 AND
     u.id NOT IN (SELECT user_id FROM users_vaults WHERE vault_id = :vault_id);
 
---! remove_user_from_vault(user_id, vault_id, current_user)
+--! remove_user_from_vault(vault_id, user_id, current_user)
 DELETE FROM
     users_vaults
 WHERE
