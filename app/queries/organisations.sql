@@ -59,6 +59,7 @@ LEFT JOIN organisations o ON o.id = ou.organisation_id
 LEFT JOIN users u ON u.id = o.created_by_user_id
 WHERE
     ou.user_id = $1
+ORDER BY o.name ASC
 
 --! remove_user(user_id_to_remove, organisation_id)
 DELETE FROM

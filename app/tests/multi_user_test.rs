@@ -211,7 +211,7 @@ async fn add_team_member(
 
     let table_cell = driver
         .find_element(By::XPath(
-            "//table[@class='m_table memberships']/tbody/tr[last()]/td[2]",
+            "//table[@class='m_table memberships']/tbody/tr[first()]/td[2]",
         ))
         .await?;
 
