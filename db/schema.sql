@@ -89,6 +89,33 @@ COMMENT ON TYPE public.role IS 'Users have roles, they can be managers or admini
 
 
 --
+-- Name: create_org(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.create_org() RETURNS integer
+    LANGUAGE sql
+    AS $$
+    INSERT INTO users (
+        email,
+        master_password_hash,
+        protected_symmetric_key,
+        protected_ecdsa_private_key,
+        ecdsa_public_key,
+        protected_ecdh_private_key,
+        ecdh_public_key
+    ) VALUES (
+        random()::text,
+        'NOT SET',
+        'NOT SET',
+        'NOT SET',
+        'NOT SET',
+        'NOT SET',
+        'NOT SET'
+    ) RETURNING id;
+$$;
+
+
+--
 -- Name: current_app_user(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -1431,6 +1458,20 @@ CREATE POLICY multi_tenancy_policy ON public.service_accounts USING ((organisati
 
 
 --
+-- Name: users multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.users USING ((id IN ( SELECT public.get_users_for_app_user() AS get_users_for_app_user)));
+
+
+--
+-- Name: POLICY multi_tenancy_policy ON users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy ON public.users IS 'A user can see all the users for orgs they have created or been invited to.';
+
+
+--
 -- Name: users_vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -1510,6 +1551,12 @@ ALTER TABLE public.service_account_secrets ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.service_accounts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: users; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 
 --
 -- Name: users_vaults; Type: ROW SECURITY; Schema: public; Owner: -

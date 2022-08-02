@@ -47,6 +47,15 @@ $$
 $$ LANGUAGE SQL SECURITY INVOKER;
 COMMENT ON FUNCTION get_users_for_app_user IS 'All the users from all the orgs this user has been invited to.';
 
+-- Only see users we have access to
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+CREATE POLICY multi_tenancy_policy ON users
+    FOR ALL
+    USING (
+        id IN (SELECT get_users_for_app_user())
+    );
+COMMENT ON POLICY multi_tenancy_policy ON users IS 'A user can see all the users for orgs they have created or been invited to.';
+
 -- We must have been given access to the org or be the orgs creator
 ALTER TABLE organisations ENABLE ROW LEVEL SECURITY;
 CREATE POLICY multi_tenancy_policy ON organisations
@@ -181,6 +190,8 @@ CREATE POLICY multi_tenancy_policy ON service_account_secrets
     );
 
 -- migrate:down
+ALTER TABLE users DISABLE ROW LEVEL SECURITY;
+DROP POLICY multi_tenancy_policy ON users;
 ALTER TABLE organisations DISABLE ROW LEVEL SECURITY;
 DROP POLICY multi_tenancy_policy ON organisations;
 ALTER TABLE organisation_users DISABLE ROW LEVEL SECURITY;
