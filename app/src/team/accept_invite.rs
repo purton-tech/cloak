@@ -43,19 +43,22 @@ pub async fn accept_invitation(
     let invitation_verifier_hash_base64 =
         base64::encode_config(invitation_verifier_hash, base64::URL_SAFE_NO_PAD);
 
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let invitation = queries::invitations::get_invitation(&client, invitation_selector).await?;
+    let invitation = queries::invitations::get_invitation(&transaction, invitation_selector).await?;
 
     if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
-        let user = queries::users::get_dangerous(&client, &(current_user.user_id as i32)).await?;
+        let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;
 
         // Make sure the user accepting the invitation is the user that we emailed
         if user.email == invitation.email {
-            let user = queries::users::get_by_email_dangerous(&client, &user.email).await?;
+            let user = queries::users::get_by_email_dangerous(&transaction, &user.email).await?;
 
             queries::organisations::add_user_to_organisation(
-                &client,
+                &transaction,
                 &user.id,
                 &invitation.organisation_id,
                 &invitation.roles,
@@ -65,7 +68,7 @@ pub async fn accept_invitation(
             // I the user has not set their name yet, we do it for them based on the invitation.
             if (None, None) == (user.first_name, user.last_name) {
                 queries::users::set_name(
-                    &client,
+                    &transaction,
                     &(current_user.user_id as i32),
                     &invitation.first_name,
                     &invitation.last_name,
@@ -74,13 +77,15 @@ pub async fn accept_invitation(
             }
 
             queries::invitations::delete_invitation(
-                &client,
+                &transaction,
                 &invitation.email,
                 &invitation.organisation_id,
             )
             .await?;
         }
     }
+
+    transaction.commit().await?;
 
     Ok(invitation.organisation_id)
 }

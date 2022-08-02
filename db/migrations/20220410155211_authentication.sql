@@ -37,24 +37,25 @@ CREATE TABLE sessions (
     otp_code_sent BOOLEAN NOT NULL DEFAULT false
 );
 
-COMMENT ON TABLE sessions IS 'Contains active sessions';
-COMMENT ON COLUMN sessions.session_verifier IS 'Session key used for authentication';
+COMMENT ON TABLE sessions IS 'The users login sessions';
+COMMENT ON COLUMN sessions.session_verifier IS ' The session is a 32 byte random number stored in their cookie. This is the sha256 hash of that value.';
+COMMENT ON COLUMN sessions.otp_code_encrypted IS 'A 6 digit code that is encrypted here to prevent attackers with read access to the database being able to use it.';
+COMMENT ON COLUMN sessions.otp_code_attempts IS 'We count OTP attempts to prevent brute forcing.';
+COMMENT ON COLUMN sessions.otp_code_confirmed IS 'Once the user enters the correct value this gets set to true.';
+COMMENT ON COLUMN sessions.otp_code_sent IS 'Have we sent the OTP code?';
 
 -- Give access to the application user, the application user has no access to 
 -- The sessions table and therefore cannot fake a login.
-GRANT SELECT, INSERT, UPDATE, DELETE ON users TO application;
-GRANT USAGE, SELECT ON users_id_seq TO application;
+GRANT SELECT, UPDATE ON users TO application;
+GRANT SELECT ON users_id_seq TO application;
 
 -- Give access to the readonly user
-GRANT SELECT ON sessions TO readonly;
-GRANT SELECT ON sessions_id_seq TO readonly;
-GRANT SELECT ON users TO readonly;
-GRANT SELECT ON users_id_seq TO readonly;
+GRANT SELECT ON sessions, users, sessions_id_seq TO readonly;
 
 -- Give access to authentication user
 GRANT SELECT, INSERT, UPDATE, DELETE ON sessions TO authentication;
 GRANT USAGE, SELECT ON sessions_id_seq TO authentication;
-GRANT SELECT, INSERT, UPDATE, DELETE ON users TO authentication;
+GRANT SELECT, INSERT, UPDATE ON users TO authentication;
 GRANT USAGE, SELECT ON users_id_seq TO authentication;
 
 -- Manage the updated_at column

@@ -8,12 +8,14 @@ CREATE TYPE role AS ENUM (
     'Collaborator', 
     'SystemAdministrator'
 );
+COMMENT ON TYPE role IS 'Users have roles, they can be managers or administrators etc.';
 
 CREATE TYPE permission AS ENUM (
     -- The ManageTeam permission gives the user thee ability to invite team members, 
     -- delete team members and chnage the team name
     'ManageTeam'
 );
+COMMENT ON TYPE permission IS 'A permission gives the user the ability to do something. i.e. Manage users.';
 
 CREATE TABLE roles_permissions (
     role role NOT NULL,
@@ -21,12 +23,13 @@ CREATE TABLE roles_permissions (
 
     PRIMARY KEY (role, permission)
 );
+COMMENT ON TABLE roles_permissions IS 'Maps roles to permissions. i.e. a role can have multiple permissions.';
 
 INSERT INTO roles_permissions VALUES('Administrator', 'ManageTeam');
 
 
 -- Give access to the application user.
-GRANT SELECT, INSERT, UPDATE, DELETE ON roles_permissions TO application;
+GRANT SELECT ON roles_permissions TO application;
 
 -- Give access to the readonly user
 GRANT SELECT ON roles_permissions TO readonly;

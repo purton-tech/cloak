@@ -26,12 +26,15 @@ pub async fn new(
     Form(new_service_account): Form<NewServiceAccount>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&client, &organisation_id).await?;
+    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
 
     queries::service_accounts::insert(
-        &client,
+        &transaction,
         &organisation_id,
         &new_service_account.name,
         &new_service_account.public_key,
@@ -40,7 +43,7 @@ pub async fn new(
     .await?;
 
     queries::audit::insert(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &organisation_id,
         &AuditAction::NewServiceAccount,
@@ -48,6 +51,8 @@ pub async fn new(
         "Service account created"
     )
     .await?;
+    
+    transaction.commit().await?;
 
     Ok(Redirect::to(&super::index_route(team.id)))
 }

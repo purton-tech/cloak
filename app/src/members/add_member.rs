@@ -25,7 +25,10 @@ pub async fn add(
     Form(add_member): Form<AddMember>,
     Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     // The environments we have selected for the ser come in as a comma
     // separated list of ids.
@@ -38,10 +41,10 @@ pub async fn add(
 
     // Do an IDOR check, does this user have access to the vault. This will
     // blow up if we don't
-    queries::vaults::get(&client, &vault_id, &(current_user.user_id as i32)).await?;
+    queries::vaults::get(&transaction, &vault_id, &(current_user.user_id as i32)).await?;
 
     queries::user_vaults::insert(
-        &client,
+        &transaction,
         &add_member.user_id,
         &vault_id,
         &add_member.ecdh_public_key,
@@ -50,9 +53,11 @@ pub async fn add(
     .await?;
 
     for env in envs {
-        queries::environments::connect_environment_to_user(&client, &add_member.user_id, &env)
+        queries::environments::connect_environment_to_user(&transaction, &add_member.user_id, &env)
             .await?;
     }
+
+    transaction.commit().await?;
 
     Ok(Redirect::to(&super::member_route(organisation_id, vault_id)))
 }

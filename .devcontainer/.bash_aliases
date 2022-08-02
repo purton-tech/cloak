@@ -21,6 +21,7 @@ alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/www/content:/workdir tmai
 alias nrs='npm run start'
 
 alias db='psql $DATABASE_URL'
+alias adb='psql $APP_DATABASE_URL'
 
 # Leave a line below or the files will cat together
 

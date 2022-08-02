@@ -64,6 +64,13 @@ CREATE TYPE public.permission AS ENUM (
 
 
 --
+-- Name: TYPE permission; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TYPE public.permission IS 'A permission gives the user the ability to do something. i.e. Manage users.';
+
+
+--
 -- Name: role; Type: TYPE; Schema: public; Owner: -
 --
 
@@ -72,6 +79,131 @@ CREATE TYPE public.role AS ENUM (
     'Collaborator',
     'SystemAdministrator'
 );
+
+
+--
+-- Name: TYPE role; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TYPE public.role IS 'Users have roles, they can be managers or administrators etc.';
+
+
+--
+-- Name: create_org(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.create_org() RETURNS integer
+    LANGUAGE sql
+    AS $$
+    INSERT INTO users (
+        email,
+        master_password_hash,
+        protected_symmetric_key,
+        protected_ecdsa_private_key,
+        ecdsa_public_key,
+        protected_ecdh_private_key,
+        ecdh_public_key
+    ) VALUES (
+        random()::text,
+        'NOT SET',
+        'NOT SET',
+        'NOT SET',
+        'NOT SET',
+        'NOT SET',
+        'NOT SET'
+    ) RETURNING id;
+$$;
+
+
+--
+-- Name: current_app_user(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.current_app_user() RETURNS integer
+    LANGUAGE sql
+    AS $$
+    SELECT
+        current_setting(
+            'row_level_security.user_id',
+            false
+        )::integer
+$$;
+
+
+--
+-- Name: FUNCTION current_app_user(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.current_app_user() IS 'These needs to be set by the application before accessing the database.';
+
+
+--
+-- Name: get_orgs_app_user_created(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_orgs_app_user_created() RETURNS SETOF integer
+    LANGUAGE sql
+    AS $$
+    SELECT
+        id
+    FROM
+        organisations
+    WHERE
+        created_by_user_id = current_app_user()
+$$;
+
+
+--
+-- Name: FUNCTION get_orgs_app_user_created(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.get_orgs_app_user_created() IS 'All the orgs a user created.';
+
+
+--
+-- Name: get_orgs_for_app_user(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_orgs_for_app_user() RETURNS SETOF integer
+    LANGUAGE sql
+    AS $$
+    SELECT
+        organisation_id
+    FROM
+        organisation_users
+    WHERE
+        user_id = current_app_user()
+$$;
+
+
+--
+-- Name: FUNCTION get_orgs_for_app_user(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.get_orgs_for_app_user() IS 'All the orgs a user has been invited to.';
+
+
+--
+-- Name: get_users_for_app_user(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.get_users_for_app_user() RETURNS SETOF integer
+    LANGUAGE sql
+    AS $$
+    SELECT
+        user_id
+    FROM
+        organisation_users
+    WHERE
+        organisation_id IN (SELECT get_orgs_for_app_user())
+$$;
+
+
+--
+-- Name: FUNCTION get_users_for_app_user(); Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON FUNCTION public.get_users_for_app_user() IS 'All the users from all the orgs this user has been invited to.';
 
 
 --
@@ -196,21 +328,21 @@ CREATE TABLE public.environments (
 -- Name: TABLE environments; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON TABLE public.environments IS 'Contains the environments of secrets we store in a vault';
+COMMENT ON TABLE public.environments IS 'Vaults are further divided into environments.';
 
 
 --
 -- Name: COLUMN environments.vault_id; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.environments.vault_id IS 'The vault these environments belong to';
+COMMENT ON COLUMN public.environments.vault_id IS 'Environments are connected to vaults.';
 
 
 --
 -- Name: COLUMN environments.name; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.environments.name IS 'A user generated name for the environment';
+COMMENT ON COLUMN public.environments.name IS 'A name such as Prod, Dev, CICD etc.';
 
 
 --
@@ -393,6 +525,13 @@ CREATE TABLE public.roles_permissions (
 
 
 --
+-- Name: TABLE roles_permissions; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.roles_permissions IS 'Maps roles to permissions. i.e. a role can have multiple permissions.';
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -415,6 +554,48 @@ CREATE TABLE public.secrets (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+
+--
+-- Name: TABLE secrets; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.secrets IS 'Secrets are encrypted name value pairs.';
+
+
+--
+-- Name: COLUMN secrets.vault_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.secrets.vault_id IS 'Secrets belong to vaults';
+
+
+--
+-- Name: COLUMN secrets.environment_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.secrets.environment_id IS 'Secrets a re partioned into environments i.e. Dev, Production, CICD etc.';
+
+
+--
+-- Name: COLUMN secrets.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.secrets.name IS 'The name of the secret encrypted with the vault key';
+
+
+--
+-- Name: COLUMN secrets.secret; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.secrets.secret IS 'The value of the secret encrypted with the vault key';
+
+
+--
+-- Name: COLUMN secrets.name_blind_index; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.secrets.name_blind_index IS 'A blind index generated from the secrets name.';
 
 
 --
@@ -454,6 +635,34 @@ CREATE TABLE public.service_account_secrets (
 
 
 --
+-- Name: TABLE service_account_secrets; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.service_account_secrets IS 'When a service account is connected to a vault a copy of the secrets will be stored here.';
+
+
+--
+-- Name: COLUMN service_account_secrets.service_account_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_account_secrets.service_account_id IS 'Service accounts secrets are connect to service accounts.';
+
+
+--
+-- Name: COLUMN service_account_secrets.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_account_secrets.name IS 'A blind index of the secrets name.';
+
+
+--
+-- Name: COLUMN service_account_secrets.ecdh_public_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_account_secrets.ecdh_public_key IS 'ECDH public key used to encrypt secrets.';
+
+
+--
 -- Name: service_account_secrets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -488,6 +697,48 @@ CREATE TABLE public.service_accounts (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+
+--
+-- Name: TABLE service_accounts; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.service_accounts IS 'If a user is a member of a vault they can create a service account which will recieve a copy of the secrets.';
+
+
+--
+-- Name: COLUMN service_accounts.organisation_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_accounts.organisation_id IS 'Service accounts belong to organisations.';
+
+
+--
+-- Name: COLUMN service_accounts.vault_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_accounts.vault_id IS 'The vault this service account will recieve secrets from.';
+
+
+--
+-- Name: COLUMN service_accounts.environment_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_accounts.environment_id IS 'The environment in the vault this service account will recieve secrets from.';
+
+
+--
+-- Name: COLUMN service_accounts.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_accounts.name IS 'The name of this service account.';
+
+
+--
+-- Name: COLUMN service_accounts.encrypted_ecdh_private_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.service_accounts.encrypted_ecdh_private_key IS 'A wrapped ECDH private key, used to decrypt the secrets for this service account.';
 
 
 --
@@ -530,14 +781,42 @@ CREATE TABLE public.sessions (
 -- Name: TABLE sessions; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON TABLE public.sessions IS 'Contains active sessions';
+COMMENT ON TABLE public.sessions IS 'The users login sessions';
 
 
 --
 -- Name: COLUMN sessions.session_verifier; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON COLUMN public.sessions.session_verifier IS 'Session key used for authentication';
+COMMENT ON COLUMN public.sessions.session_verifier IS ' The session is a 32 byte random number stored in their cookie. This is the sha256 hash of that value.';
+
+
+--
+-- Name: COLUMN sessions.otp_code_encrypted; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.sessions.otp_code_encrypted IS 'A 6 digit code that is encrypted here to prevent attackers with read access to the database being able to use it.';
+
+
+--
+-- Name: COLUMN sessions.otp_code_attempts; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.sessions.otp_code_attempts IS 'We count OTP attempts to prevent brute forcing.';
+
+
+--
+-- Name: COLUMN sessions.otp_code_confirmed; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.sessions.otp_code_confirmed IS 'Once the user enters the correct value this gets set to true.';
+
+
+--
+-- Name: COLUMN sessions.otp_code_sent; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.sessions.otp_code_sent IS 'Have we sent the OTP code?';
 
 
 --
@@ -654,6 +933,13 @@ CREATE TABLE public.users_environments (
 
 
 --
+-- Name: TABLE users_environments; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.users_environments IS 'When we add a user to a vault we can select which environemnts they are allowed to see.';
+
+
+--
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -686,6 +972,27 @@ CREATE TABLE public.users_vaults (
 
 
 --
+-- Name: TABLE users_vaults; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.users_vaults IS 'Connects users to vaults and holds a copy of the vault key encrypted with their AES key.';
+
+
+--
+-- Name: COLUMN users_vaults.ecdh_public_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users_vaults.ecdh_public_key IS 'An ECDH public key used to encrypt the vaults secrets for this user.';
+
+
+--
+-- Name: COLUMN users_vaults.encrypted_vault_key; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.users_vaults.encrypted_vault_key IS 'A wrapped ECDH private key, used to decrypt the secrets for this user.';
+
+
+--
 -- Name: vaults; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -696,6 +1003,27 @@ CREATE TABLE public.vaults (
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+
+--
+-- Name: TABLE vaults; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON TABLE public.vaults IS 'Vaults allow users to divide secrets into logical groupings.';
+
+
+--
+-- Name: COLUMN vaults.organisation_id; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.vaults.organisation_id IS 'Vaults belong to an organisation';
+
+
+--
+-- Name: COLUMN vaults.name; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON COLUMN public.vaults.name IS 'The user supplied name of the vault';
 
 
 --
@@ -1040,6 +1368,209 @@ ALTER TABLE ONLY public.environments
 
 
 --
+-- Name: audit_trail; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.audit_trail ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: environments; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.environments ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: invitations; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.invitations ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: audit_trail multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.audit_trail USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+
+
+--
+-- Name: environments multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.environments USING ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.users_vaults
+  WHERE (users_vaults.user_id = public.current_app_user())))) WITH CHECK ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.users_vaults
+  WHERE (users_vaults.user_id = public.current_app_user()))));
+
+
+--
+-- Name: invitations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.invitations USING (((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)) OR ((email)::text IN ( SELECT users.email
+   FROM public.users
+  WHERE (users.id = public.current_app_user()))))) WITH CHECK ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+
+
+--
+-- Name: POLICY multi_tenancy_policy ON invitations; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy ON public.invitations IS 'A users can access inviation from one of the orgs or if it has the same email address';
+
+
+--
+-- Name: organisations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.organisations USING (((id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)) OR (created_by_user_id = public.current_app_user())));
+
+
+--
+-- Name: POLICY multi_tenancy_policy ON organisations; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy ON public.organisations IS 'A user can see all the orgs they have created or been invited to.';
+
+
+--
+-- Name: secrets multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.secrets USING ((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.users_vaults)));
+
+
+--
+-- Name: service_account_secrets multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.service_account_secrets USING ((service_account_id IN ( SELECT service_account_secrets.service_account_id
+   FROM public.service_accounts
+  WHERE (service_accounts.organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)))));
+
+
+--
+-- Name: service_accounts multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.service_accounts USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+
+
+--
+-- Name: users multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.users USING ((id IN ( SELECT public.get_users_for_app_user() AS get_users_for_app_user)));
+
+
+--
+-- Name: POLICY multi_tenancy_policy ON users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy ON public.users IS 'A user can see all the users for orgs they have created or been invited to.';
+
+
+--
+-- Name: users_vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.users_vaults USING (((vault_id IN ( SELECT users_vaults.vault_id
+   FROM public.vaults)) AND (user_id IN ( SELECT public.get_users_for_app_user() AS get_users_for_app_user))));
+
+
+--
+-- Name: vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy ON public.vaults USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+
+
+--
+-- Name: organisation_users multi_tenancy_policy_delete; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+
+
+--
+-- Name: organisation_users multi_tenancy_policy_insert; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy_insert ON public.organisation_users FOR INSERT WITH CHECK (((organisation_id IN ( SELECT invitations.organisation_id
+   FROM public.invitations)) OR (organisation_id IN ( SELECT public.get_orgs_app_user_created() AS get_orgs_app_user_created))));
+
+
+--
+-- Name: POLICY multi_tenancy_policy_insert ON organisation_users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy_insert ON public.organisation_users IS 'A user on connect users with orgs it created or where an invite exists.';
+
+
+--
+-- Name: organisation_users multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT USING (true);
+
+
+--
+-- Name: POLICY multi_tenancy_policy_select ON organisation_users; Type: COMMENT; Schema: public; Owner: -
+--
+
+COMMENT ON POLICY multi_tenancy_policy_select ON public.organisation_users IS 'Only disconnect a user from an org if we have access to that org.';
+
+
+--
+-- Name: organisation_users; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.organisation_users ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: organisations; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.organisations ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: secrets; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.secrets ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: service_account_secrets; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.service_account_secrets ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: service_accounts; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.service_accounts ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: users; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: users_vaults; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.users_vaults ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: vaults; Type: ROW SECURITY; Schema: public; Owner: -
+--
+
+ALTER TABLE public.vaults ENABLE ROW LEVEL SECURITY;
+
+--
 -- PostgreSQL database dump complete
 --
 
@@ -1054,4 +1585,5 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155233'),
     ('20220410155252'),
     ('20220410155319'),
-    ('20220621094035');
+    ('20220621094035'),
+    ('20220728091159');

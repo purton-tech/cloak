@@ -24,16 +24,20 @@ pub async fn set_details(
     Form(set_name): Form<SetDetails>,
 ) -> Result<impl IntoResponse, CustomError> {
 
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     queries::users::set_name(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &set_name.first_name,
         &set_name.last_name,
     )
     .await?;
 
+    transaction.commit().await?;
 
     crate::layout::redirect_and_snackbar(&crate::profile::index_route(organisation_id), "Details Updated")
 }

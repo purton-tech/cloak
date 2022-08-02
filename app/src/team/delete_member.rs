@@ -21,17 +21,20 @@ pub async fn delete(
     Extension(pool): Extension<Pool>,
     Form(delete_member): Form<DeleteMember>,
 ) -> Result<impl IntoResponse, CustomError> {
-    let client = pool.get().await?;
+    // Create a transaction and setup RLS
+    let mut client = pool.get().await?;
+    let transaction = client.transaction().await?;
+    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     queries::organisations::remove_user(
-        &client,
+        &transaction,
         &delete_member.user_id,
         &delete_member.organisation_id,
     )
     .await?;
 
     queries::audit::insert(
-        &client,
+        &transaction,
         &(current_user.user_id as i32),
         &delete_member.organisation_id,
         &AuditAction::CreateInvite,
@@ -39,6 +42,8 @@ pub async fn delete(
         &format!("{} removed from team", &delete_member.user_id)
     )
     .await?;
+
+    transaction.commit().await?;
 
     crate::layout::redirect_and_snackbar("/app/team", "User Removed")
 }
