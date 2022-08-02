@@ -35,6 +35,10 @@ DO github.com/earthly/lib+INSTALL_DIND
 
 USER vscode
 
+dev:
+    BUILD +pull-request
+    BUILD + check-selenium-failure
+
 pull-request:
     BUILD +init-container
     BUILD +app-container
@@ -198,12 +202,13 @@ integration-test:
     END
     SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
 
+check-selenium-failure:
     # https://github.com/earthly/earthly/issues/988
     # If we failed in selenium a fail file will have been created
-    # Comment this out to get the build to pass and see the chrome video
-    #IF [ -f ./tmp/fail ]
-    #    RUN echo "cargo test has failed." && exit 1
-    #END
+    # to get build to pass and see video, run +pull-request
+    IF [ -f ./tmp/fail ]
+        RUN echo "cargo test has failed." && exit 1
+    END
 
 build-cli-osx:
     FROM joseluisq/rust-linux-darwin-builder:1.59.0
