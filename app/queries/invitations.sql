@@ -1,4 +1,4 @@
---! insert_invitation(organisation_id, first_name, last_name, email, invitation_selector, invitation_verifier_hash, roles) 
+--! insert_invitation(organisation_id, email, first_name, last_name, invitation_selector, invitation_verifier_hash, roles) 
 INSERT INTO 
     invitations (
         organisation_id, 
