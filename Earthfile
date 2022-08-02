@@ -37,7 +37,7 @@ USER vscode
 
 dev:
     BUILD +pull-request
-    BUILD + check-selenium-failure
+    BUILD +check-selenium-failure
 
 pull-request:
     BUILD +init-container
