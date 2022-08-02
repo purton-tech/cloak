@@ -41,23 +41,31 @@ pub async fn add(
 
     // Do an IDOR check, does this user have access to the vault. This will
     // blow up if we don't
-    queries::vaults::get(&transaction, &vault_id, &(current_user.user_id as i32)).await?;
+    queries::vaults::get()
+        .bind(&transaction, &vault_id, &(current_user.user_id as i32))
+        .one()
+        .await?;
 
-    queries::user_vaults::insert(
-        &transaction,
-        &add_member.user_id,
-        &vault_id,
-        &add_member.ecdh_public_key,
-        &add_member.wrapped_vault_key,
-    )
-    .await?;
+    queries::user_vaults::insert()
+        .bind(
+            &transaction,
+            &add_member.user_id,
+            &vault_id,
+            &add_member.ecdh_public_key.as_ref(),
+            &add_member.wrapped_vault_key.as_ref(),
+        )
+        .await?;
 
     for env in envs {
-        queries::environments::connect_environment_to_user(&transaction, &add_member.user_id, &env)
+        queries::environments::connect_environment_to_user()
+            .bind(&transaction, &add_member.user_id, &env)
             .await?;
     }
 
     transaction.commit().await?;
 
-    Ok(Redirect::to(&super::member_route(organisation_id, vault_id)))
+    Ok(Redirect::to(&super::member_route(
+        organisation_id,
+        vault_id,
+    )))
 }

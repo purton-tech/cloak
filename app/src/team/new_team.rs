@@ -27,22 +27,28 @@ pub async fn new_team(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let org_id = queries::organisations::insert_organisation(&transaction).await?;
+    let org_id = queries::organisations::insert_organisation()
+        .bind(&transaction)
+        .one()
+        .await?;
 
     let roles = vec![
         types::public::Role::Administrator,
         types::public::Role::Collaborator,
     ];
 
-    queries::organisations::insert_user_into_org(
-        &transaction,
-        &(current_user.user_id as i32),
-        &org_id,
-        &roles,
-    )
-    .await?;
+    queries::organisations::add_user_to_organisation()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &org_id,
+            &roles.as_ref(),
+        )
+        .await?;
 
-    queries::organisations::set_name(&transaction, &org_id, &new_team.name).await?;
+    queries::organisations::set_name()
+        .bind(&transaction, &new_team.name.as_ref(), &org_id)
+        .await?;
 
     transaction.commit().await?;
 

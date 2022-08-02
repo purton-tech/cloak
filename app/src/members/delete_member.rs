@@ -25,15 +25,19 @@ pub async fn delete(
     let mut client = pool.get().await?;
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
-    queries::user_vaults::remove_user_from_vault(
-        &transaction,
-        &delete_member.user_id,
-        &delete_member.vault_id,
-        &(current_user.user_id as i32),
-    )
-    .await?;
+    queries::user_vaults::remove_user_from_vault()
+        .bind(
+            &transaction,
+            &delete_member.user_id,
+            &delete_member.vault_id,
+            &(current_user.user_id as i32),
+        )
+        .await?;
 
-    let team = queries::organisations::organisation(&transaction, &params.0).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &params.0)
+        .one()
+        .await?;
 
     // If we remove ourself, redirect to vaults page.
     let url = if delete_member.user_id == (current_user.user_id as i32) {

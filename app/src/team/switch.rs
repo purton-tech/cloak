@@ -17,11 +17,20 @@ pub async fn switch(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
-    let teams = queries::organisations::get_teams(&transaction, &(current_user.user_id as i32)).await?;
+    let teams = queries::organisations::get_teams()
+        .bind(&transaction, &(current_user.user_id as i32))
+        .all()
+        .await?;
 
-    let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;
+    let user = queries::users::get_dangerous()
+        .bind(&transaction, &(current_user.user_id as i32))
+        .one()
+        .await?;
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     Ok(crate::render(|buf| {

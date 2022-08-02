@@ -17,35 +17,52 @@ pub async fn index(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &team_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &team_id)
+        .one()
+        .await?;
 
     // Blow up if the user doesn't have access to the vault
-    queries::user_vaults::get(&transaction, &(current_user.user_id as i32), &vault_id).await?;
+    queries::user_vaults::get()
+        .bind(&transaction, &(current_user.user_id as i32), &vault_id)
+        .one()
+        .await?;
 
-    let members = queries::user_vaults::get_users_dangerous(&transaction, &vault_id).await?;
+    let members = queries::user_vaults::get_users_dangerous()
+        .bind(&transaction, &vault_id)
+        .all()
+        .await?;
 
-    let non_members =
-        queries::user_vaults::get_non_members_dangerous(&transaction, &vault_id, &team_id).await?;
+    let non_members = queries::user_vaults::get_non_members_dangerous()
+        .bind(&transaction, &vault_id, &team_id)
+        .all()
+        .await?;
 
-    let user_vault =
-        queries::user_vaults::get(&transaction, &(current_user.user_id as i32), &vault_id).await?;
+    let user_vault = queries::user_vaults::get()
+        .bind(&transaction, &(current_user.user_id as i32), &vault_id)
+        .one()
+        .await?;
 
-    let environments =
-        queries::environments::get_all(&transaction, &user_vault.vault_id)
-            .await?;
+    let environments = queries::environments::get_all()
+        .bind(&transaction, &user_vault.vault_id)
+        .all()
+        .await?;
 
-    let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;
+    let user = queries::users::get_dangerous()
+        .bind(&transaction, &(current_user.user_id as i32))
+        .one()
+        .await?;
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     Ok(crate::render(|buf| {
         crate::templates::members::index_html(
-            buf, 
+            buf,
             &initials,
             user_vault,
             members,
             non_members,
             environments,
-            &team
+            &team,
         )
     }))
 }

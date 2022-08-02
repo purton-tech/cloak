@@ -1,6 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -33,29 +33,37 @@ pub async fn new(
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     // This will blow up if the user doesn't have access to the vault
-    queries::vaults::get(&transaction, &id, &(current_user.user_id as i32)).await?;
+    queries::vaults::get()
+        .bind(&transaction, &id, &(current_user.user_id as i32))
+        .one()
+        .await?;
 
-    queries::secrets::insert(
-        &transaction,
-        &id,
-        &new_secret.name,
-        &new_secret.name_blind_index,
-        &new_secret.secret,
-        &new_secret.environment_id,
-    )
-    .await?;
+    queries::secrets::insert()
+        .bind(
+            &transaction,
+            &id,
+            &new_secret.name.as_ref(),
+            &new_secret.name_blind_index.as_ref(),
+            &new_secret.secret.as_ref(),
+            &new_secret.environment_id,
+        )
+        .await?;
 
-    queries::audit::insert(
-        &transaction,
-        &(current_user.user_id as i32),
-        &organisation_id,
-        &AuditAction::AddSecret,
-        &AuditAccessType::Web,
-        &format!("Secret created for Vault with ID {}", id)
-    )
-    .await?;
+    queries::audit::insert()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &organisation_id,
+            &AuditAction::AddSecret,
+            &AuditAccessType::Web,
+            &format!("Secret created for Vault with ID {}", id).as_ref(),
+        )
+        .await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
     transaction.commit().await?;
 

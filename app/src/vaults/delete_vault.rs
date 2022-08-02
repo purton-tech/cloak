@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -8,7 +9,6 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteVault {
@@ -27,36 +27,46 @@ pub async fn delete(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
-    let vault = queries::vaults::get(
-        &transaction,
-        &idor_delete_vault.vault_id,
-        &(current_user.user_id as i32),
-    )
-    .await?;
-
-    if vault.name == idor_delete_vault.name {
-        queries::vaults::delete(
+    let vault = queries::vaults::get()
+        .bind(
             &transaction,
             &idor_delete_vault.vault_id,
             &(current_user.user_id as i32),
         )
+        .one()
         .await?;
 
-        queries::audit::insert(
-            &transaction,
-            &(current_user.user_id as i32),
-            &organisation_id,
-            &AuditAction::DeleteVault,
-            &AuditAccessType::Web,
-            &format!("{} vault deleted", vault.name)
-        )
-        .await?;
+    if vault.name == idor_delete_vault.name {
+        queries::vaults::delete()
+            .bind(
+                &transaction,
+                &idor_delete_vault.vault_id,
+                &(current_user.user_id as i32),
+            )
+            .await?;
+
+        queries::audit::insert()
+            .bind(
+                &transaction,
+                &(current_user.user_id as i32),
+                &organisation_id,
+                &AuditAction::DeleteVault,
+                &AuditAccessType::Web,
+                &format!("{} vault deleted", vault.name).as_ref(),
+            )
+            .await?;
 
         transaction.commit().await?;
     } else {
-        return crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Name did not match");
+        return crate::layout::redirect_and_snackbar(
+            &super::index_route(team.id),
+            "Name did not match",
+        );
     }
 
     crate::layout::redirect_and_snackbar(&super::index_route(team.id), "Vault Deleted")

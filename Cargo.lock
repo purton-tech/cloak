@@ -67,7 +67,7 @@ version = "0.1.0"
 dependencies = [
  "axum",
  "base64",
- "cornucopia_client",
+ "cornucopia_async",
  "deadpool-postgres",
  "futures",
  "hyper",
@@ -388,15 +388,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e4c78c047431fee22c1a7bb92e00ad095a02a983affe4d8a72e2a2c62c1b94f3"
 
 [[package]]
-name = "cornucopia_client"
-version = "0.2.2"
+name = "cornucopia_async"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "48ef849bf6ca73ece1605e5b3dc4a957007839700892627a2f2dc506510d7af8"
+checksum = "8af15bf74f6840a6d014342fd959319e724399aaf71a28432b153772c6056e3f"
 dependencies = [
  "async-trait",
+ "cornucopia_client_core",
  "deadpool-postgres",
- "tokio",
  "tokio-postgres",
+]
+
+[[package]]
+name = "cornucopia_client_core"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d973326eaff446dc4550618de07771d0b5bb2649cd2ae83b07e6c4e5f55b9d42"
+dependencies = [
+ "fallible-iterator",
+ "postgres-protocol",
+ "postgres-types",
 ]
 
 [[package]]
@@ -1821,15 +1832,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "signal-hook-registry"
-version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e51e73328dc4ac0c7ccbda3a494dfa03df1de2f46018127f60c693f2648455b0"
-dependencies = [
- "libc",
-]
-
-[[package]]
 name = "signature"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2061,9 +2063,7 @@ dependencies = [
  "mio",
  "num_cpus",
  "once_cell",
- "parking_lot 0.12.1",
  "pin-project-lite",
- "signal-hook-registry",
  "socket2",
  "tokio-macros",
  "winapi",

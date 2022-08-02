@@ -48,40 +48,52 @@ pub async fn accept_invitation(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let invitation = queries::invitations::get_invitation(&transaction, invitation_selector).await?;
+    let invitation = queries::invitations::get_invitation()
+        .bind(&transaction, &invitation_selector)
+        .one()
+        .await?;
 
     if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
-        let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;
+        let user = queries::users::get_dangerous()
+            .bind(&transaction, &(current_user.user_id as i32))
+            .one()
+            .await?;
 
         // Make sure the user accepting the invitation is the user that we emailed
         if user.email == invitation.email {
-            let user = queries::users::get_by_email_dangerous(&transaction, &user.email).await?;
+            let user = queries::users::get_by_email_dangerous()
+                .bind(&transaction, &user.email.as_ref())
+                .one()
+                .await?;
 
-            queries::organisations::add_user_to_organisation(
-                &transaction,
-                &user.id,
-                &invitation.organisation_id,
-                &invitation.roles,
-            )
-            .await?;
+            queries::organisations::add_user_to_organisation()
+                .bind(
+                    &transaction,
+                    &user.id,
+                    &invitation.organisation_id,
+                    &invitation.roles.as_ref(),
+                )
+                .await?;
 
             // I the user has not set their name yet, we do it for them based on the invitation.
             if (None, None) == (user.first_name, user.last_name) {
-                queries::users::set_name(
-                    &transaction,
-                    &(current_user.user_id as i32),
-                    &invitation.first_name,
-                    &invitation.last_name,
-                )
-                .await?;
+                queries::users::set_name()
+                    .bind(
+                        &transaction,
+                        &invitation.first_name.as_ref(),
+                        &invitation.last_name.as_ref(),
+                        &(current_user.user_id as i32),
+                    )
+                    .await?;
             }
 
-            queries::invitations::delete_invitation(
-                &transaction,
-                &invitation.email,
-                &invitation.organisation_id,
-            )
-            .await?;
+            queries::invitations::delete_invitation()
+                .bind(
+                    &transaction,
+                    &invitation.email.as_ref(),
+                    &invitation.organisation_id,
+                )
+                .await?;
         }
     }
 

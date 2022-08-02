@@ -45,11 +45,11 @@ fn cornucopia() -> Result<()> {
 
     // Call cornucopia. Use whatever CLI command you need.
     let output = std::process::Command::new("cornucopia")
-        .arg("generate")
+        .arg("-q")
+        .arg(queries_path)
         .arg("-d")
         .arg(file_path)
         .arg("live")
-        .arg("--url")
         .arg(db_url)
         .output()?;
 

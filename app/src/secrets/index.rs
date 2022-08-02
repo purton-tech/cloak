@@ -18,42 +18,47 @@ pub async fn index(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &team_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &team_id)
+        .one()
+        .await?;
 
-    let secrets =
-        queries::secrets::get_all(&transaction, &vault_id).await?;
+    let secrets = queries::secrets::get_all()
+        .bind(&transaction, &vault_id)
+        .all()
+        .await?;
 
-    let user_vault =
-        queries::user_vaults::get(&transaction, &(current_user.user_id as i32), &vault_id).await?;
+    let user_vault = queries::user_vaults::get()
+        .bind(&transaction, &(current_user.user_id as i32), &vault_id)
+        .one()
+        .await?;
 
-    let environments =
-        queries::environments::get_all(&transaction, &vault_id)
-            .await?;
+    let environments = queries::environments::get_all()
+        .bind(&transaction, &vault_id)
+        .all()
+        .await?;
 
-    let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;
+    let user = queries::users::get_dangerous()
+        .bind(&transaction, &(current_user.user_id as i32))
+        .one()
+        .await?;
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     if secrets.is_empty() {
         Ok(crate::render(|buf| {
-            crate::templates::secrets::empty_html(
-                buf,
-                &initials,
-                &user_vault,
-                environments,
-                &team,
-            )
+            crate::templates::secrets::empty_html(buf, &initials, &user_vault, environments, &team)
         }))
     } else {
-
-        queries::audit::insert(
-            &transaction,
-            &(current_user.user_id as i32),
-            &team.id,
-            &AuditAction::AccessSecrets,
-            &AuditAccessType::Web,
-            &format!("Secrets  accesed from vault {}", &user_vault.vault_id),
-        )
-        .await?;
+        queries::audit::insert()
+            .bind(
+                &transaction,
+                &(current_user.user_id as i32),
+                &team.id,
+                &AuditAction::AccessSecrets,
+                &AuditAccessType::Web,
+                &format!("Secrets  accesed from vault {}", &user_vault.vault_id).as_ref(),
+            )
+            .await?;
 
         Ok(crate::render(|buf| {
             crate::templates::secrets::index_html(

@@ -1,4 +1,4 @@
---! permissions(current_user_id, organisation_id) { permission } *
+--! permissions(current_user_id, organisation_id)
 SELECT 
     permission
 FROM 
@@ -6,4 +6,7 @@ FROM
 WHERE 
     role
 IN 
-    (SELECT UNNEST(roles) FROM organisation_users WHERE user_id = $1 AND organisation_id = $2)
+    (
+        SELECT UNNEST(roles) 
+        FROM organisation_users 
+        WHERE user_id = :current_user_id AND organisation_id = :organisation_id);
