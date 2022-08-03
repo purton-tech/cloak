@@ -6,31 +6,37 @@ class ViewAccount extends SideDrawer {
     constructor() {
         super()
 
-        const serviceAccountId = parseInt(this.getAttribute('service-account-id'))
-    
-        let viewAccountLink = document.getElementById('service-account-view-' + serviceAccountId)
-        viewAccountLink.addEventListener('click', async event => {
+        const serviceAccountAttr = this.getAttribute('service-account-id')
 
-            // Decrypt the ECDH private key
-            try {
-                const input = this.querySelector('#wrapped-ecdh-private-key-' + serviceAccountId)
-                if (input instanceof HTMLTextAreaElement) {
-                    const cipher = Cipher.fromString(input.value)
-                    const usersAesKey = await AESKey.fromBarricade()
-                    const decryptedKey = await usersAesKey.decrypt(cipher)
-                    input.value = decryptedKey.toPem('PRIVATE')
-                }
-                const pubKey = this.querySelector('#ecdh-public-key-' + serviceAccountId)
-                if (pubKey instanceof HTMLTextAreaElement) {
-                    const data = ByteData.fromB64(pubKey.value)
-                    pubKey.value = data.toPem('PUBLIC')
-                }
-            } catch (e) {
-                console.log(e)
+        if(serviceAccountAttr != null) {
+            const serviceAccountId = parseInt(serviceAccountAttr)
+        
+            let viewAccountLink = document.getElementById('service-account-view-' + serviceAccountId)
+            if(viewAccountLink != null) {
+                viewAccountLink.addEventListener('click', async event => {
+        
+                    // Decrypt the ECDH private key
+                    try {
+                        const input = this.querySelector('#wrapped-ecdh-private-key-' + serviceAccountId)
+                        if (input instanceof HTMLTextAreaElement) {
+                            const cipher = Cipher.fromString(input.value)
+                            const usersAesKey = await AESKey.fromBarricade()
+                            const decryptedKey = await usersAesKey.decrypt(cipher)
+                            input.value = decryptedKey.toPem('PRIVATE')
+                        }
+                        const pubKey = this.querySelector('#ecdh-public-key-' + serviceAccountId)
+                        if (pubKey instanceof HTMLTextAreaElement) {
+                            const data = ByteData.fromB64(pubKey.value)
+                            pubKey.value = data.toPem('PUBLIC')
+                        }
+                    } catch (e) {
+                        console.log(e)
+                    }
+        
+                    this.open = true
+                })
             }
-
-            this.open = true
-        })
+        }
     }
 }
 
