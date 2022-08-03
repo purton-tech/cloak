@@ -59,7 +59,7 @@
                 <thead>
                     <tr>
                         <th>Email</th>
-                        <th>Special Privileges</th>
+                        <th class="hide-on-phones">Special Privileges</th>
                         @if can_manage_team {
                             <th>Action</th>
                         }
@@ -71,7 +71,7 @@
                             <td>
                                 @user.email
                             </td>
-                            <td>
+                            <td class="hide-on-phones">
                                 @for (index, role) in user.roles.into_iter().enumerate() {
                                     @if index > 0 {
                                         and
@@ -95,7 +95,7 @@
                                 @invite.email
                                 <span class="a_badge a_badge--success">Invited</span>
                             </td>
-                            <td>
+                            <td class="hide-on-phones">
                                 @for (index, role) in invite.roles.into_iter().enumerate() {
                                     @if index > 0 {
                                         and

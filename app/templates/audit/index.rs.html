@@ -17,30 +17,30 @@
             <table class="m_table team_table">
                 <thead>
                     <tr>
-                        <th>When</th>
+                        <th class="hide-on-phones">When</th>
                         <th>User</th>
-                        <th>Access Type</th>
+                        <th class="hide-on-phones">Access Type</th>
                         <th>Action</th>
-                        <th>Description</th>
+                        <th class="hide-on-phones">Description</th>
                     </tr>
                 </thead>
                 <tbody>
                     @for audit in audits {
                         <tr>
     
-                            <td>
+                            <td class="hide-on-phones">
                                 <relative-time datetime='@audit.created_at.format(&Rfc3339).unwrap_or("".to_string())'></relative-time>
                             </td>
                             <td>
                                 @audit.email
                             </td>
-                            <td>
+                            <td class="hide-on-phones">
                                 <span class="a_badge a_badge--success">@:client_html(audit.access_type)</span>
                             </td>
                             <td>
                                 <span class="a_badge a_badge--success">@:action_html(audit.action)</span>
                             </td>
-                            <td>
+                            <td class="hide-on-phones">
                                 @audit.description
                             </td>
                         </tr>

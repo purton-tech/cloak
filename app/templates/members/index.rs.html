@@ -28,7 +28,7 @@
                 <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Environments</th>
+                        <th class="hide-on-phones">Environments</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -38,7 +38,7 @@
                             <td>
                                 <span class="cipher">@member.email</span>
                             </td>
-                            <td>
+                            <td class="hide-on-phones">
                                 @if let Some(envs) = &member.environments {
                                     @envs
                                 }

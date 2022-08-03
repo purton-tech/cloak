@@ -29,9 +29,9 @@
                     <tr>
                         <th>Service Account Name</th>
                         <th>Vault</th>
-                        <th>Environment</th>
-                        <th>Updated</th>
-                        <th>Created</th>
+                        <th class="hide-on-phones">Environment</th>
+                        <th class="hide-on-phones">Updated</th>
+                        <th class="hide-on-phones">Created</th>
                         <th>Action</th>
                     </tr>
                 </thead>
@@ -54,14 +54,14 @@
                                 </td>
                             }
                             @if let Some(env_name) = &service_account.environment_name {
-                                <td><span class="a_badge a_badge--success">@env_name</span></td>
+                                <td class="hide-on-phones"><span class="a_badge a_badge--success">@env_name</span></td>
                             } else {
-                                <td></td>
+                                <td class="hide-on-phones"></td>
                             }
-                            <td>
+                            <td class="hide-on-phones">
                                 <relative-time datetime="@service_account.updated_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
                             </td>
-                            <td>
+                            <td class="hide-on-phones">
                                 <relative-time datetime=@service_account.created_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
                             </td>
                             <td>

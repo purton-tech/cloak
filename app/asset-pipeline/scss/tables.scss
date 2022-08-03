@@ -3,7 +3,10 @@
     width: 100%; 
     border-spacing: 0;
     
-    th {
+    th, td {
+        &.hide-on-phones {
+            display: none;
+        }
         text-align: left;
     }
 
@@ -37,6 +40,13 @@
                 line-height: 1.5;
                 font-weight: 600;
                 border-bottom: 1px solid var(--accents-3);
+            }
+        }
+    }
+    @include for-tablet-landscape-up {
+        th, td {
+            &.hide-on-phones {
+                display: table-cell;
             }
         }
     }
