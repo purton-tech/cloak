@@ -1,4 +1,6 @@
---! insert_invitation(organisation_id, email, first_name, last_name, invitation_selector, invitation_verifier_hash, roles) 
+--: Invitation()
+
+--! insert_invitation
 INSERT INTO 
     invitations (
         organisation_id, 
@@ -17,8 +19,8 @@ INSERT INTO
         :invitation_verifier_hash, 
         :roles);
 
---! get_invitation(invitation_selector)
-SELECT 
+--! get_invitation : Invitation
+SELECT
     id, 
     organisation_id, 
     email, 
@@ -33,7 +35,7 @@ FROM
 WHERE
     invitation_selector = :invitation_selector;
 
---! delete_invitation(email, organisation_id)
+--! delete_invitation
 DELETE FROM
     invitations
 WHERE
@@ -41,7 +43,7 @@ WHERE
 AND
     organisation_id = :organisation_id;
 
---! get_all(organisation_id)
+--! get_all : Invitation
 SELECT  
     id, 
     email,
