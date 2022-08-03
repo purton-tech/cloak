@@ -1,4 +1,4 @@
---! insert(vault_id, name, name_blind_index, secret, environment_id)
+--! insert
 INSERT INTO 
     secrets (vault_id, name, name_blind_index, secret, environment_id)
 VALUES(
@@ -9,7 +9,7 @@ VALUES(
     :environment_id
 );
 
---! get_all(vault_id)
+--! get_all
 SELECT  
     id, 
     vault_id, 
@@ -23,19 +23,19 @@ SELECT
 FROM secrets WHERE vault_id = :vault_id
 ORDER BY environment_name;
 
---! get(id)
+--! get
 SELECT  
     id, vault_id, name, name_blind_index, secret,
     updated_at, created_at  
 FROM secrets WHERE id = :id;
 
---! delete_secret(id)
+--! delete_secret
 DELETE FROM
     secrets
 WHERE
     id = :id;
 
---! delete_service_account(name_blind_index, vault_id)
+--! delete_service_account
 DELETE FROM
     service_account_secrets
 WHERE

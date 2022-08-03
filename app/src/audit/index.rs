@@ -17,7 +17,7 @@ pub async fn index(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let user = queries::users::get_dangerous()
+    let user = queries::users::get()
         .bind(&transaction, &(current_user.user_id as i32))
         .one()
         .await?;

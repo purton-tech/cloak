@@ -1,4 +1,4 @@
---! get_all(vault_id)
+--! get_all
 SELECT  
     id, 
     name
@@ -16,10 +16,10 @@ IN
         user_id = current_app_user())
 ORDER BY name;
 
---! connect_environment_to_user(user_id, environment_id)
+--! connect_environment_to_user
 INSERT INTO users_environments (user_id, environment_id) VALUES(:user_id, :environment_id);
 
---! setup_environments(vault_id)
+--! setup_environments
 INSERT INTO 
     environments (vault_id, name)
 VALUES

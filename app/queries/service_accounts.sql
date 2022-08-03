@@ -1,4 +1,4 @@
---! connect(vault_id, environment_id, id, current_user_id, organisation_id)
+--! connect
 UPDATE service_accounts 
 SET 
     vault_id = :vault_id, environment_id = :environment_id
@@ -9,7 +9,7 @@ AND
     :vault_id IN (SELECT vault_id from users_vaults WHERE user_id = :current_user_id)
 AND organisation_id = :organisation_id;
 
---! insert(organisation_id, name, ecdh_public_key, encrypted_ecdh_private_key)
+--! insert
 INSERT INTO 
     service_accounts (organisation_id, name, ecdh_public_key, encrypted_ecdh_private_key)
 VALUES(
@@ -19,7 +19,7 @@ VALUES(
     :encrypted_ecdh_private_key
 );
 
---! get_all(organisation_id) : (vault_id?, vault_name?, environment_name?)
+--! get_all : (vault_id?, vault_name?, environment_name?)
 SELECT 
     sa.id, 
     sa.vault_id, 
@@ -35,7 +35,7 @@ FROM
 WHERE 
     sa.organisation_id = :organisation_id;
 
---! get_by_vault(vault_id) : (vault_id?, environment_id?)
+--! get_by_vault : (vault_id?, environment_id?)
 SELECT 
     sa.id as id, 
     sa.vault_id as vault_id, 
@@ -55,7 +55,7 @@ ON
 WHERE 
     sa.vault_id = :vault_id;
 
---! get_by_ecdh_public_key(ecdh_public_key) : (vault_id?, vault_name?)
+--! get_by_ecdh_public_key : (vault_id?, vault_name?)
 SELECT 
     sa.id, 
     sa.vault_id, 
@@ -73,7 +73,7 @@ ON
     v.id = sa.vault_id
 WHERE sa.ecdh_public_key = :ecdh_public_key;
 
---! get_dangerous(id) : (vault_id?, vault_name?)
+--! get_dangerous : (vault_id?, vault_name?)
 SELECT
     sa.id, 
     sa.vault_id, 
@@ -92,7 +92,7 @@ ON
 WHERE
     sa.id = :id;
 
---! delete_service_account(id, organisation_id)
+--! delete_service_account
 DELETE FROM
     service_accounts
 WHERE
@@ -100,7 +100,7 @@ WHERE
 AND
     organisation_id = :organisation_id;
 
---! delete_service_account_secrets(service_account_id)
+--! delete_service_account_secrets
 DELETE FROM
     service_account_secrets
 WHERE

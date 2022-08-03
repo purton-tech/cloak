@@ -28,12 +28,12 @@ pub async fn index(
         .one()
         .await?;
 
-    let members = queries::user_vaults::get_users_dangerous()
+    let members = queries::user_vaults::get_users()
         .bind(&transaction, &vault_id)
         .all()
         .await?;
 
-    let non_members = queries::user_vaults::get_non_members_dangerous()
+    let non_members = queries::user_vaults::get_non_members()
         .bind(&transaction, &team_id, &vault_id)
         .all()
         .await?;
@@ -48,7 +48,7 @@ pub async fn index(
         .all()
         .await?;
 
-    let user = queries::users::get_dangerous()
+    let user = queries::users::get()
         .bind(&transaction, &(current_user.user_id as i32))
         .one()
         .await?;

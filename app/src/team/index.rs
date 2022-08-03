@@ -41,7 +41,7 @@ pub async fn index(
         .iter()
         .any(|p| p == &types::public::Permission::ManageTeam);
 
-    let user = queries::users::get_dangerous().bind(&transaction, &(current_user.user_id as i32)).one().await?;
+    let user = queries::users::get().bind(&transaction, &(current_user.user_id as i32)).one().await?;
 
     let invites = queries::invitations::get_all().bind(&transaction, &organisation_id).all().await?;
 

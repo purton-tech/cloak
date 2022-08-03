@@ -1,9 +1,9 @@
---! insert(user_id, vault_id, ecdh_public_key, encrypted_vault_key)
+--! insert
 INSERT INTO 
     users_vaults (user_id, vault_id, ecdh_public_key, encrypted_vault_key)
 VALUES(:user_id, :vault_id, :ecdh_public_key, :encrypted_vault_key);
 
---! delete(vault_id, user_id, current_user_id)
+--! delete
 DELETE FROM
     users_vaults
 WHERE
@@ -12,14 +12,14 @@ AND
     user_id = :user_id
 AND vault_id IN (SELECT vault_id FROM users_vaults WHERE user_id = :current_user_id);
 
---! get(user_id, vault_id)
+--! get
 SELECT 
     vault_id, user_id, encrypted_vault_key, ecdh_public_key 
 FROM users_vaults 
 WHERE 
     user_id = :user_id AND vault_id = :vault_id;
 
---! get_users_dangerous(vault_id) : (environments?)
+--! get_users : (environments?)
 SELECT 
     uv.vault_id, 
     uv.user_id, 
@@ -43,7 +43,7 @@ WHERE
     uv.vault_id = :vault_id;
 
 -- Fetch members of the team that have not been added to this vault
---! get_non_members_dangerous(organisation_id, vault_id)
+--! get_non_members
 SELECT 
     u.id, 
     u.email,
@@ -54,7 +54,7 @@ WHERE
 AND
     u.id NOT IN (SELECT user_id FROM users_vaults WHERE vault_id = :vault_id);
 
---! remove_user_from_vault(vault_id, user_id, current_user)
+--! remove_user_from_vault
 DELETE FROM
     users_vaults
 WHERE

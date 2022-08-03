@@ -54,14 +54,14 @@ pub async fn accept_invitation(
         .await?;
 
     if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
-        let user = queries::users::get_dangerous()
+        let user = queries::users::get()
             .bind(&transaction, &(current_user.user_id as i32))
             .one()
             .await?;
 
         // Make sure the user accepting the invitation is the user that we emailed
         if user.email == invitation.email {
-            let user = queries::users::get_by_email_dangerous()
+            let user = queries::users::get_by_email()
                 .bind(&transaction, &user.email.as_ref())
                 .one()
                 .await?;

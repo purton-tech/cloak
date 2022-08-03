@@ -27,7 +27,7 @@ pub async fn switch(
         .all()
         .await?;
 
-    let user = queries::users::get_dangerous()
+    let user = queries::users::get()
         .bind(&transaction, &(current_user.user_id as i32))
         .one()
         .await?;

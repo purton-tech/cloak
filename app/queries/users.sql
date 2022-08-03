@@ -1,4 +1,4 @@
---! get_dangerous(id) : (first_name?, last_name?)
+--! get : (first_name?, last_name?)
 SELECT 
     id, email, ecdsa_public_key, first_name, last_name
 FROM 
@@ -6,7 +6,7 @@ FROM
 WHERE
     id = :id;
 
---! get_by_email_dangerous(email) : (first_name?, last_name?)
+--! get_by_email : (first_name?, last_name?)
 SELECT 
     id, email, ecdsa_public_key, first_name, last_name
 FROM 

@@ -38,7 +38,7 @@ impl app::vault::vault_server::Vault for VaultService {
             .map_err(|e| CustomError::Database(e.to_string()))?;
 
         if let Some(vault_id) = service_account.vault_id {
-            queries::vaults::get_dangerous()
+            queries::vaults::vault()
                 .bind(&transaction, &vault_id)
                 .one()
                 .await

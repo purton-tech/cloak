@@ -1,9 +1,9 @@
 @use super::super::layout_html;
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::Organisation;
-@use crate::cornucopia::queries::users::GetDangerous;
+@use crate::cornucopia::queries::users::Get;
 
-@(initials: &str, organisation: &Organisation, user: &GetDangerous)
+@(initials: &str, organisation: &Organisation, user: &Get)
 
 @:layout_html("Your Profile", initials, {
     <div class="m_card">

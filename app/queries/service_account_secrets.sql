@@ -1,4 +1,4 @@
---! get_all_dangerous(service_account_id)
+--! get_all_dangerous
 SELECT  
     id, service_account_id, name, name_blind_index, secret, ecdh_public_key 
 FROM 
@@ -6,7 +6,7 @@ FROM
 WHERE 
     service_account_id = :service_account_id;
 
---! get_users_vaults(user_id, vault_id)
+--! get_users_vaults
 SELECT user_id 
 FROM 
     users_vaults 
@@ -15,7 +15,7 @@ WHERE
 AND
     vault_id = :vault_id;
 
---! insert(service_account_id, name, name_blind_index, secret, ecdh_public_key)
+--! insert
 INSERT INTO service_account_secrets
     (service_account_id, name, name_blind_index, secret, ecdh_public_key)
 VALUES

@@ -1,4 +1,4 @@
---! organisation(org_id) : (name?)
+--! organisation : (name?)
 SELECT 
     id, name
 FROM 
@@ -6,7 +6,7 @@ FROM
 WHERE
     id = :org_id;
 
---! set_name(name, org_id)
+--! set_name
 UPDATE
     organisations
 SET 
@@ -14,7 +14,7 @@ SET
 WHERE
     id = :org_id;
 
---! get_primary_organisation(created_by_user_id): (name?)
+--! get_primary_organisation : (name?)
 SELECT 
     id, name
 FROM 
@@ -22,7 +22,7 @@ FROM
 WHERE
     created_by_user_id = :created_by_user_id;
 
---! add_user_to_organisation(user_id, organisation_id, roles)
+--! add_user_to_organisation
 INSERT INTO 
     organisation_users (user_id, organisation_id, roles)
 VALUES(:user_id, :organisation_id, :roles);
@@ -33,7 +33,7 @@ INSERT INTO
 VALUES(current_app_user()) 
 RETURNING id;
 
---! get_users(organisation_id)
+--! get_users
 SELECT 
     u.id, ou.organisation_id, u.email, u.ecdh_public_key, ou.roles
 FROM 
@@ -42,7 +42,7 @@ LEFT JOIN users u ON u.id = ou.user_id
 WHERE
     ou.organisation_id = :organisation_id;
 
---! get_teams(user_id) : (organisation_name?)
+--! get_teams : (organisation_name?)
 SELECT 
     o.id,
     o.name as organisation_name, 
@@ -55,7 +55,7 @@ WHERE
     ou.user_id = :user_id
 ORDER BY o.name ASC;
 
---! remove_user(user_id_to_remove, organisation_id)
+--! remove_user
 DELETE FROM
     organisation_users
 WHERE

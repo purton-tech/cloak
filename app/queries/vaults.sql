@@ -1,10 +1,10 @@
---! insert(organisation_id, name)
+--! insert
 INSERT INTO 
     vaults (organisation_id, name)
 VALUES(:organisation_id, :name) 
 RETURNING id;
 
---! insert_user_vaults(user_id, vault_id, ecdh_public_key, encrypted_vault_key)
+--! insert_user_vaults
 INSERT INTO 
     users_vaults (user_id, vault_id, ecdh_public_key, encrypted_vault_key)
 VALUES(
@@ -14,7 +14,7 @@ VALUES(
     :encrypted_vault_key
 );
 
---! get_dangerous(id)
+--! vault
 SELECT 
     id, name, updated_at, created_at
 FROM 
@@ -22,7 +22,7 @@ FROM
 WHERE
     id = :id;
 
---! get(id, current_user_id)
+--! get
 SELECT 
     id, name, updated_at, created_at
 FROM 
@@ -38,7 +38,7 @@ IN
     WHERE
         user_id = :current_user_id);
 
---! get_all(current_user_id, organisation_id)
+--! get_all
 SELECT 
     v.id, v.name, v.updated_at, v.created_at
 FROM 
@@ -49,13 +49,13 @@ WHERE
 AND
     v.organisation_id = :organisation_id;
 
---! user_vault_count(vault_id)
+--! user_vault_count
 SELECT count(*) FROM users_vaults WHERE vault_id = :vault_id;
 
---! secrets_count(vault_id)
+--! secrets_count
 SELECT count(*) FROM secrets WHERE vault_id = :vault_id;
 
---! delete(vault_id, current_user_id)
+--! delete
 DELETE FROM
     vaults
 WHERE
@@ -63,7 +63,7 @@ WHERE
 AND
     :current_user_id IN (SELECT user_id FROM users_vaults WHERE vault_id = :vault_id);
 
---! remove_vault_from_service_accounts(vault_id, current_user_id)
+--! remove_vault_from_service_accounts
 UPDATE
     service_accounts
 SET
@@ -73,7 +73,7 @@ WHERE
 AND
     :current_user_id IN (SELECT user_id FROM users_vaults WHERE vault_id = :vault_id);
 
---! delete_vault_secrets(vault_id, current_user_id)
+--! delete_vault_secrets
 DELETE FROM
     secrets
 WHERE
