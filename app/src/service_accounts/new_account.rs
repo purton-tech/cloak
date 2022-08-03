@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -8,7 +9,6 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct NewServiceAccount {
@@ -31,27 +31,32 @@ pub async fn new(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
-    queries::service_accounts::insert(
-        &transaction,
-        &organisation_id,
-        &new_service_account.name,
-        &new_service_account.public_key,
-        &new_service_account.encrypted_private_key,
-    )
-    .await?;
+    queries::service_accounts::insert()
+        .bind(
+            &transaction,
+            &organisation_id,
+            &new_service_account.name.as_ref(),
+            &new_service_account.public_key.as_ref(),
+            &new_service_account.encrypted_private_key.as_ref(),
+        )
+        .await?;
 
-    queries::audit::insert(
-        &transaction,
-        &(current_user.user_id as i32),
-        &organisation_id,
-        &AuditAction::NewServiceAccount,
-        &AuditAccessType::Web,
-        "Service account created"
-    )
-    .await?;
-    
+    queries::audit::insert()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &organisation_id,
+            &AuditAction::NewServiceAccount,
+            &AuditAccessType::Web,
+            &String::from("Service account created").as_ref(),
+        )
+        .await?;
+
     transaction.commit().await?;
 
     Ok(Redirect::to(&super::index_route(team.id)))

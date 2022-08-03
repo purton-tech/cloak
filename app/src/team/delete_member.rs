@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form},
@@ -8,7 +9,6 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteMember {
@@ -26,22 +26,24 @@ pub async fn delete(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    queries::organisations::remove_user(
-        &transaction,
-        &delete_member.user_id,
-        &delete_member.organisation_id,
-    )
-    .await?;
+    queries::organisations::remove_user()
+        .bind(
+            &transaction,
+            &delete_member.user_id,
+            &delete_member.organisation_id,
+        )
+        .await?;
 
-    queries::audit::insert(
-        &transaction,
-        &(current_user.user_id as i32),
-        &delete_member.organisation_id,
-        &AuditAction::CreateInvite,
-        &AuditAccessType::Web,
-        &format!("{} removed from team", &delete_member.user_id)
-    )
-    .await?;
+    queries::audit::insert()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &delete_member.organisation_id,
+            &AuditAction::CreateInvite,
+            &AuditAccessType::Web,
+            &format!("{} removed from team", &delete_member.user_id).as_ref(),
+        )
+        .await?;
 
     transaction.commit().await?;
 

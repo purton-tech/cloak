@@ -1,54 +1,48 @@
---! organisation(org_id) { id, name? }
+--! organisation : (name?)
 SELECT 
     id, name
 FROM 
     organisations
 WHERE
-    id = $1
+    id = :org_id;
 
---! set_name(org_id, name)
+--! set_name
 UPDATE
     organisations
 SET 
-    name = $2 
+    name = :name
 WHERE
-    id = $1
+    id = :org_id;
 
-    
---! get_primary_organisation(created_by_user_id) { id, name? }
+--! get_primary_organisation : (name?)
 SELECT 
     id, name
 FROM 
     organisations
 WHERE
-    created_by_user_id = $1
+    created_by_user_id = :created_by_user_id;
 
---! add_user_to_organisation(user_id, organisation_id, roles)
+--! add_user_to_organisation
 INSERT INTO 
     organisation_users (user_id, organisation_id, roles)
-VALUES($1, $2, $3) 
+VALUES(:user_id, :organisation_id, :roles);
 
---! insert_organisation() 
+--! insert_organisation
 INSERT INTO 
     organisations (created_by_user_id)
 VALUES(current_app_user()) 
-RETURNING id
+RETURNING id;
 
---! insert_user_into_org(user_id, organisation_id, roles)
-INSERT INTO 
-    organisation_users (user_id, organisation_id, roles)
-VALUES($1, $2, $3) 
-
---! get_users(organisation_id) { id, organisation_id, email, ecdh_public_key, roles} *
+--! get_users
 SELECT 
     u.id, ou.organisation_id, u.email, u.ecdh_public_key, ou.roles
 FROM 
     organisation_users ou
 LEFT JOIN users u ON u.id = ou.user_id
 WHERE
-    ou.organisation_id = $1
+    ou.organisation_id = :organisation_id;
 
---! get_teams(user_id) { id, organisation_name?, team_owner } *
+--! get_teams : (organisation_name?)
 SELECT 
     o.id,
     o.name as organisation_name, 
@@ -58,13 +52,13 @@ FROM
 LEFT JOIN organisations o ON o.id = ou.organisation_id
 LEFT JOIN users u ON u.id = o.created_by_user_id
 WHERE
-    ou.user_id = $1
-ORDER BY o.name ASC
+    ou.user_id = :user_id
+ORDER BY o.name ASC;
 
---! remove_user(user_id_to_remove, organisation_id)
+--! remove_user
 DELETE FROM
     organisation_users
 WHERE
-    user_id = $1
+    user_id = :user_id_to_remove
 AND
-    organisation_id = $2 
+    organisation_id = :organisation_id;

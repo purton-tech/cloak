@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -8,7 +9,6 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct DeleteServiceAccount {
@@ -26,24 +26,32 @@ pub async fn delete(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
-    queries::service_accounts::delete_service_account(
-        &transaction,
-        &idor_delete_service_account.service_account_id,
-        &organisation_id
-    )
-    .await?;
+    queries::service_accounts::delete_service_account()
+        .bind(
+            &transaction,
+            &idor_delete_service_account.service_account_id,
+            &organisation_id,
+        )
+        .await?;
 
-    queries::audit::insert(
-        &transaction,
-        &(current_user.user_id as i32),
-        &organisation_id,
-        &AuditAction::ConnectServiceAccount,
-        &AuditAccessType::Web,
-        &format!("Service account {} deleted", idor_delete_service_account.service_account_id)
-    )
-    .await?;
+    queries::audit::insert()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &organisation_id,
+            &AuditAction::ConnectServiceAccount,
+            &AuditAccessType::Web,
+            &format!(
+                "Service account {} deleted",
+                idor_delete_service_account.service_account_id
+            ).as_ref(),
+        )
+        .await?;
 
     transaction.commit().await?;
 

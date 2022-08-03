@@ -1,5 +1,5 @@
-use crate::cornucopia::queries;
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -12,7 +12,7 @@ use validator::Validate;
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct SetName {
     #[validate(length(min = 1, message = "The name is mandatory"))]
-    pub name: String
+    pub name: String,
 }
 
 pub async fn set_name(
@@ -21,18 +21,14 @@ pub async fn set_name(
     Extension(pool): Extension<Pool>,
     Form(set_name): Form<SetName>,
 ) -> Result<impl IntoResponse, CustomError> {
-
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    queries::organisations::set_name(
-        &transaction,
-        &organisation_id,
-        &set_name.name,
-    )
-    .await?;
+    queries::organisations::set_name()
+        .bind(&transaction, &set_name.name.as_ref(), &organisation_id)
+        .await?;
 
     transaction.commit().await?;
 

@@ -31,22 +31,24 @@ impl app::vault::vault_server::Vault for VaultService {
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let service_account =
-            queries::service_accounts::get_by_ecdh_public_key(&transaction, &req.ecdh_public_key)
-                .await
-                .map_err(|e| CustomError::Database(e.to_string()))?;
-
-        if let Some(vault_id) = service_account.vault_id {
-            queries::vaults::get_dangerous(&transaction, &vault_id)
-                .await
-                .map_err(|e| CustomError::Database(e.to_string()))?;
-
-            let secrets = queries::service_account_secrets::get_all_dangerous(
-                &transaction,
-                &service_account.id,
-            )
+        let service_account = queries::service_accounts::get_by_ecdh_public_key()
+            .bind(&transaction, &req.ecdh_public_key.as_ref())
+            .one()
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
+
+        if let Some(vault_id) = service_account.vault_id {
+            queries::vaults::vault()
+                .bind(&transaction, &vault_id)
+                .one()
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
+
+            let secrets = queries::service_account_secrets::get_all_dangerous()
+                .bind(&transaction, &service_account.id)
+                .all()
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
 
             let secrets = secrets
                 .into_iter()
@@ -93,35 +95,37 @@ impl app::vault::vault_server::Vault for VaultService {
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let secrets = queries::secrets::get_all(
-            &transaction,
-            &(req.vault_id as i32),
-        )
-        .await
-        .map_err(|e| CustomError::Database(e.to_string()))?;
+        let secrets = queries::secrets::get_all()
+            .bind(&transaction, &(req.vault_id as i32))
+            .all()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let vault = queries::vaults::get(
-            &transaction,
-            &(req.vault_id as i32),
-            &(authenticated_user.user_id as i32),
-        )
-        .await
-        .map_err(|e| CustomError::Database(e.to_string()))?;
+        let vault = queries::vaults::get()
+            .bind(
+                &transaction,
+                &(req.vault_id as i32),
+                &(authenticated_user.user_id as i32),
+            )
+            .one()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let user_vault = queries::user_vaults::get(
-            &transaction,
-            &(authenticated_user.user_id as i32),
-            &(req.vault_id as i32),
-        )
-        .await
-        .map_err(|e| CustomError::Database(e.to_string()))?;
+        let user_vault = queries::user_vaults::get()
+            .bind(
+                &transaction,
+                &(authenticated_user.user_id as i32),
+                &(req.vault_id as i32),
+            )
+            .one()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        let service_accounts = queries::service_accounts::get_by_vault(
-            &transaction,
-            &(req.vault_id as i32),
-        )
-        .await
-        .map_err(|e| CustomError::Database(e.to_string()))?;
+        let service_accounts = queries::service_accounts::get_by_vault()
+            .bind(&transaction, &(req.vault_id as i32))
+            .all()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
         let secrets = secrets
             .into_iter()
@@ -185,38 +189,40 @@ impl app::vault::vault_server::Vault for VaultService {
 
         for account_secret in service_account.account_secrets {
             // Get the service account this request is trying to access
-            let sa = queries::service_accounts::get_dangerous(
-                &transaction,
-                &(account_secret.service_account_id as i32),
-            )
-            .await
-            .map_err(|e| CustomError::Database(e.to_string()))?;
+            let sa = queries::service_accounts::get_dangerous()
+                .bind(&transaction, &(account_secret.service_account_id as i32))
+                .one()
+                .await
+                .map_err(|e| CustomError::Database(e.to_string()))?;
 
             // If the vault is already connected we can do an IDOR check
             // And see if the user actually has access to the vault.
             if let Some(vault_id) = sa.vault_id {
                 // Blow up, if the user doesn't have access to the vault.
-                queries::service_account_secrets::get_users_vaults(
-                    &transaction,
-                    &(authenticated_user.user_id as i32),
-                    &vault_id,
-                )
-                .await
-                .map_err(|e| CustomError::Database(e.to_string()))?;
+                queries::service_account_secrets::get_users_vaults()
+                    .bind(
+                        &transaction,
+                        &(authenticated_user.user_id as i32),
+                        &vault_id,
+                    )
+                    .all()
+                    .await
+                    .map_err(|e| CustomError::Database(e.to_string()))?;
             }
 
             // If yes, save the secret
             for secret in account_secret.secrets {
-                queries::service_account_secrets::insert(
-                    &transaction,
-                    &(account_secret.service_account_id as i32),
-                    &secret.encrypted_name,
-                    &secret.name_blind_index,
-                    &secret.encrypted_secret_value,
-                    &account_secret.public_ecdh_key,
-                )
-                .await
-                .map_err(|e| CustomError::Database(e.to_string()))?;
+                queries::service_account_secrets::insert()
+                    .bind(
+                        &transaction,
+                        &(account_secret.service_account_id as i32),
+                        &secret.encrypted_name.as_ref(),
+                        &secret.name_blind_index.as_ref(),
+                        &secret.encrypted_secret_value.as_ref(),
+                        &account_secret.public_ecdh_key.as_ref(),
+                    )
+                    .await
+                    .map_err(|e| CustomError::Database(e.to_string()))?;
             }
         }
 

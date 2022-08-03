@@ -1,11 +1,11 @@
 @use crate::cornucopia::queries::user_vaults::Get;
-@use crate::cornucopia::queries::user_vaults::GetNonMembersDangerous;
+@use crate::cornucopia::queries::user_vaults::GetNonMembers;
 @use crate::cornucopia::queries::environments::GetAll;
 
 @(
     user_vault: &Get, 
     environments: Vec<GetAll>,
-    non_members: Vec<GetNonMembersDangerous>,
+    non_members: Vec<GetNonMembers>,
     team_id: &i32
 )
 

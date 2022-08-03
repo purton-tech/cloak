@@ -1,7 +1,7 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 use axum::extract::Path;
 use axum::{
     extract::{Extension, Form},
@@ -29,28 +29,36 @@ pub async fn connect(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
-    queries::service_accounts::connect(
-        &transaction,
-        &connect_form.vault_id,
-        &connect_form.environment_id,
-        &connect_form.service_account_id,
-        &(current_user.user_id as i32),
-        &organisation_id
-    )
-    .await?;
+    queries::service_accounts::connect()
+        .bind(
+            &transaction,
+            &connect_form.vault_id,
+            &connect_form.environment_id,
+            &connect_form.service_account_id,
+            &(current_user.user_id as i32),
+            &organisation_id,
+        )
+        .await?;
 
-    queries::audit::insert(
-        &transaction,
-        &(current_user.user_id as i32),
-        &organisation_id,
-        &AuditAction::ConnectServiceAccount,
-        &AuditAccessType::Web,
-        &format!("Service account {} connected", &connect_form.service_account_id)
-    )
-    .await?;
-    
+    queries::audit::insert()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &organisation_id,
+            &AuditAction::ConnectServiceAccount,
+            &AuditAccessType::Web,
+            &format!(
+                "Service account {} connected",
+                &connect_form.service_account_id
+            ).as_ref(),
+        )
+        .await?;
+
     transaction.commit().await?;
 
     Ok(Redirect::to(&super::index_route(team.id)))

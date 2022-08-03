@@ -1,5 +1,6 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types::public::{AuditAccessType, AuditAction};
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -8,7 +9,6 @@ use axum::{
 use deadpool_postgres::Pool;
 use serde::Deserialize;
 use validator::Validate;
-use crate::cornucopia::types::public::{AuditAction, AuditAccessType};
 
 #[derive(Deserialize, Validate, Default, Debug)]
 pub struct NewVault {
@@ -31,38 +31,45 @@ pub async fn new(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
-    let vault_id =
-        queries::vaults::insert(&transaction, &organisation_id, &new_vault.name).await?;
+    let vault_id = queries::vaults::insert()
+        .bind(&transaction, &organisation_id, &new_vault.name.as_ref())
+        .one()
+        .await?;
 
-    queries::vaults::insert_user_vaults(
-        &transaction,
-        &(current_user.user_id as i32),
-        &vault_id,
-        &new_vault.public_key,
-        &new_vault.encrypted_vault_key,
-    )
-    .await?;
-
-    queries::audit::insert(
-        &transaction,
-        &(current_user.user_id as i32),
-        &organisation_id,
-        &AuditAction::CreateVault,
-        &AuditAccessType::Web,
-        &format!("{} vault created", &new_vault.name)
-    )
-    .await?;
-
-    let envs = queries::environments::setup_environments(&transaction, &vault_id).await?;
-    for env in envs {
-        queries::environments::connect_environment_to_user(
+    queries::vaults::insert_user_vaults()
+        .bind(
             &transaction,
             &(current_user.user_id as i32),
-            &env.id,
+            &vault_id,
+            &new_vault.public_key.as_ref(),
+            &new_vault.encrypted_vault_key.as_ref(),
         )
         .await?;
+
+    queries::audit::insert()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &organisation_id,
+            &AuditAction::CreateVault,
+            &AuditAccessType::Web,
+            &format!("{} vault created", &new_vault.name).as_ref(),
+        )
+        .await?;
+
+    let envs = queries::environments::setup_environments()
+        .bind(&transaction, &vault_id)
+        .all()
+        .await?;
+    for env in envs {
+        queries::environments::connect_environment_to_user()
+            .bind(&transaction, &(current_user.user_id as i32), &env.id)
+            .await?;
     }
 
     transaction.commit().await?;

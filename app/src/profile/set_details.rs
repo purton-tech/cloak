@@ -1,5 +1,5 @@
-use crate::cornucopia::queries;
 use crate::authentication::Authentication;
+use crate::cornucopia::queries;
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Form, Path},
@@ -14,7 +14,7 @@ pub struct SetDetails {
     #[validate(length(min = 1, message = "The first name is mandatory"))]
     pub first_name: String,
     #[validate(length(min = 1, message = "The last name is mandatory"))]
-    pub last_name: String
+    pub last_name: String,
 }
 
 pub async fn set_details(
@@ -23,21 +23,24 @@ pub async fn set_details(
     Extension(pool): Extension<Pool>,
     Form(set_name): Form<SetDetails>,
 ) -> Result<impl IntoResponse, CustomError> {
-
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    queries::users::set_name(
-        &transaction,
-        &(current_user.user_id as i32),
-        &set_name.first_name,
-        &set_name.last_name,
-    )
-    .await?;
+    queries::users::set_name()
+        .bind(
+            &transaction,
+            &set_name.first_name.as_ref(),
+            &set_name.last_name.as_ref(),
+            &(current_user.user_id as i32),
+        )
+        .await?;
 
     transaction.commit().await?;
 
-    crate::layout::redirect_and_snackbar(&crate::profile::index_route(organisation_id), "Details Updated")
+    crate::layout::redirect_and_snackbar(
+        &crate::profile::index_route(organisation_id),
+        "Details Updated",
+    )
 }

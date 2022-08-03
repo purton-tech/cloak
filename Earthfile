@@ -1,4 +1,4 @@
-FROM purtontech/rust-on-nails-devcontainer:1.0.13
+FROM purtontech/rust-on-nails-devcontainer:1.0.14
 
 # Proto compiler and web grpc.
 RUN sudo apt update \

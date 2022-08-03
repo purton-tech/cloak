@@ -1,11 +1,11 @@
---! get_all(vault_id) { id, name } *
+--! get_all
 SELECT  
     id, 
     name
 FROM 
     environments 
 WHERE 
-    vault_id = $1
+    vault_id = :vault_id
 AND 
     id
 IN
@@ -14,21 +14,21 @@ IN
         users_environments
     WHERE
         user_id = current_app_user())
-ORDER BY name
+ORDER BY name;
 
---! connect_environment_to_user(user_id, environment_id)
-INSERT INTO users_environments (user_id, environment_id) VALUES($1, $2);
+--! connect_environment_to_user
+INSERT INTO users_environments (user_id, environment_id) VALUES(:user_id, :environment_id);
 
---! setup_environments(vault_id) { id, name } *
+--! setup_environments
 INSERT INTO 
     environments (vault_id, name)
 VALUES
-    ($1, 'Development'),
-    ($1, 'Staging'),
-    ($1, 'Production')
+    (:vault_id, 'Development'),
+    (:vault_id, 'Staging'),
+    (:vault_id, 'Production')
 RETURNING id, name;
 
---! get_environments_and_vaults() { id, name, vault_name, vault_id } *
+--! get_environments_and_vaults
 SELECT  
     id, 
     name,
@@ -44,4 +44,4 @@ IN
         users_environments
     WHERE
         user_id = current_app_user())
-ORDER BY name
+ORDER BY name;

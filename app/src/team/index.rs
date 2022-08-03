@@ -18,25 +18,32 @@ pub async fn index(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let team = queries::organisations::organisation(&transaction, &organisation_id).await?;
+    let team = queries::organisations::organisation()
+        .bind(&transaction, &organisation_id)
+        .one()
+        .await?;
 
-    let users = queries::organisations::get_users(
-        &transaction,
-        &organisation_id,
-    )
-    .await?;
+    let users = queries::organisations::get_users()
+        .bind(&transaction, &organisation_id)
+        .all()
+        .await?;
 
-    let permissions: Vec<queries::rbac::Permissions> =
-        queries::rbac::permissions(&transaction, &(current_user.user_id as i32), &organisation_id)
-            .await?;
+    let permissions: Vec<types::public::Permission> = queries::rbac::permissions()
+        .bind(
+            &transaction,
+            &(current_user.user_id as i32),
+            &organisation_id,
+        )
+        .all()
+        .await?;
 
     let can_manage_team = permissions
         .iter()
-        .any(|p| p.permission == types::public::Permission::ManageTeam);
+        .any(|p| p == &types::public::Permission::ManageTeam);
 
-    let user = queries::users::get_dangerous(&transaction, &(current_user.user_id as i32)).await?;
+    let user = queries::users::get().bind(&transaction, &(current_user.user_id as i32)).one().await?;
 
-    let invites = queries::invitations::get_all(&transaction, &organisation_id).await?;
+    let invites = queries::invitations::get_all().bind(&transaction, &organisation_id).all().await?;
 
     let initials =
         crate::layout::initials(&user.email, user.first_name.clone(), user.last_name.clone());

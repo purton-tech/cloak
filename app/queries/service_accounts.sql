@@ -1,35 +1,45 @@
---! connect(vault_id, environment_id, id, current_user_id, organisation_id)
+--! connect
 UPDATE service_accounts 
 SET 
-    vault_id = $1, environment_id = $2
+    vault_id = :vault_id, environment_id = :environment_id
 WHERE 
-    id = $3
+    id = :id
 AND 
     -- Make sure the user has access to the vault
-    $1 IN (SELECT vault_id from users_vaults WHERE user_id = $4)
-AND organisation_id = $5
+    :vault_id IN (SELECT vault_id from users_vaults WHERE user_id = :current_user_id)
+AND organisation_id = :organisation_id;
 
---! insert(organisation_id, name, ecdh_public_key, encrypted_ecdh_private_key)
+--! insert
 INSERT INTO 
     service_accounts (organisation_id, name, ecdh_public_key, encrypted_ecdh_private_key)
-VALUES($1, $2, $3, $4) 
+VALUES(
+    :organisation_id, 
+    :name, 
+    :ecdh_public_key, 
+    :encrypted_ecdh_private_key
+);
 
---! get_all(organisation_id) { id, vault_id?, account_name, vault_name?, environment_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at } *
+--! get_all : (vault_id?, vault_name?, environment_name?)
 SELECT 
-    sa.id, sa.vault_id, sa.name,
+    sa.id, 
+    sa.vault_id, 
+    sa.name as account_name,
     (SELECT name FROM vaults WHERE id = sa.vault_id) as vault_name,
     (SELECT name FROM environments WHERE id = sa.environment_id) as environment_name,
-    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
-    sa.updated_at, sa.created_at 
+    sa.ecdh_public_key, 
+    sa.encrypted_ecdh_private_key,
+    sa.updated_at, 
+    sa.created_at 
 FROM 
     service_accounts sa
 WHERE 
-    sa.organisation_id = $1
+    sa.organisation_id = :organisation_id;
 
---! get_by_vault(vault_id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, environment_id?, updated_at, created_at } *
+--! get_by_vault : (vault_id?, environment_id?)
 SELECT 
-    sa.id, sa.vault_id, 
-    sa.name, 
+    sa.id as id, 
+    sa.vault_id as vault_id, 
+    sa.name as name, 
     v.name as vault_name, 
     sa.ecdh_public_key, 
     sa.encrypted_ecdh_private_key,
@@ -43,26 +53,36 @@ LEFT OUTER JOIN
 ON 
     v.id = sa.vault_id
 WHERE 
-    sa.vault_id = $1
+    sa.vault_id = :vault_id;
 
---! get_by_ecdh_public_key(ecdh_public_key) { id, vault_id?, account_name, vault_name, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at }
+--! get_by_ecdh_public_key : (vault_id?, vault_name?)
 SELECT 
-    sa.id, sa.vault_id, sa.name, v.name as vault_name, 
-    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
-    sa.updated_at, sa.created_at 
+    sa.id, 
+    sa.vault_id, 
+    sa.name as account_name, 
+    v.name as vault_name, 
+    sa.ecdh_public_key, 
+    sa.encrypted_ecdh_private_key,
+    sa.updated_at, 
+    sa.created_at 
 FROM 
     service_accounts sa
 LEFT OUTER JOIN
     vaults v
 ON 
     v.id = sa.vault_id
-WHERE sa.ecdh_public_key = $1
+WHERE sa.ecdh_public_key = :ecdh_public_key;
 
---! get_dangerous(id) { id, vault_id?, account_name, vault_name?, ecdh_public_key, encrypted_ecdh_private_key, updated_at, created_at }
+--! get_dangerous : (vault_id?, vault_name?)
 SELECT
-    sa.id, sa.vault_id, sa.name, v.name as vault_name, 
-    sa.ecdh_public_key, sa.encrypted_ecdh_private_key,
-    sa.updated_at, sa.created_at 
+    sa.id, 
+    sa.vault_id, 
+    sa.name, 
+    v.name as vault_name, 
+    sa.ecdh_public_key,
+    sa.encrypted_ecdh_private_key,
+    sa.updated_at, 
+    sa.created_at 
 FROM 
     service_accounts sa
 LEFT OUTER JOIN
@@ -70,18 +90,18 @@ LEFT OUTER JOIN
 ON 
     v.id = sa.vault_id
 WHERE
-    sa.id = $1
+    sa.id = :id;
 
---! delete_service_account(id, organisation_id)
+--! delete_service_account
 DELETE FROM
     service_accounts
 WHERE
-    id = $1
+    id = :id
 AND
-    organisation_id = $2
+    organisation_id = :organisation_id;
 
---! delete_service_account_secrets(service_account_id)
+--! delete_service_account_secrets
 DELETE FROM
     service_account_secrets
 WHERE
-    service_account_id = $1
+    service_account_id = :service_account_id;

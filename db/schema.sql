@@ -1374,6 +1374,20 @@ ALTER TABLE ONLY public.environments
 ALTER TABLE public.audit_trail ENABLE ROW LEVEL SECURITY;
 
 --
+-- Name: sessions authentication_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY authentication_policy ON public.sessions TO authentication USING (true);
+
+
+--
+-- Name: users authentication_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY authentication_policy ON public.users TO authentication USING (true);
+
+
+--
 -- Name: environments; Type: ROW SECURITY; Schema: public; Owner: -
 --
 
@@ -1389,14 +1403,14 @@ ALTER TABLE public.invitations ENABLE ROW LEVEL SECURITY;
 -- Name: audit_trail multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.audit_trail USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+CREATE POLICY multi_tenancy_policy ON public.audit_trail TO application USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
 
 
 --
 -- Name: environments multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.environments USING ((vault_id IN ( SELECT users_vaults.vault_id
+CREATE POLICY multi_tenancy_policy ON public.environments TO application USING ((vault_id IN ( SELECT users_vaults.vault_id
    FROM public.users_vaults
   WHERE (users_vaults.user_id = public.current_app_user())))) WITH CHECK ((vault_id IN ( SELECT users_vaults.vault_id
    FROM public.users_vaults
@@ -1407,7 +1421,7 @@ CREATE POLICY multi_tenancy_policy ON public.environments USING ((vault_id IN ( 
 -- Name: invitations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.invitations USING (((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)) OR ((email)::text IN ( SELECT users.email
+CREATE POLICY multi_tenancy_policy ON public.invitations TO application USING (((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)) OR ((email)::text IN ( SELECT users.email
    FROM public.users
   WHERE (users.id = public.current_app_user()))))) WITH CHECK ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
 
@@ -1423,7 +1437,7 @@ COMMENT ON POLICY multi_tenancy_policy ON public.invitations IS 'A users can acc
 -- Name: organisations multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.organisations USING (((id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)) OR (created_by_user_id = public.current_app_user())));
+CREATE POLICY multi_tenancy_policy ON public.organisations TO application USING (((id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)) OR (created_by_user_id = public.current_app_user())));
 
 
 --
@@ -1437,7 +1451,7 @@ COMMENT ON POLICY multi_tenancy_policy ON public.organisations IS 'A user can se
 -- Name: secrets multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.secrets USING ((vault_id IN ( SELECT users_vaults.vault_id
+CREATE POLICY multi_tenancy_policy ON public.secrets TO application USING ((vault_id IN ( SELECT users_vaults.vault_id
    FROM public.users_vaults)));
 
 
@@ -1445,7 +1459,7 @@ CREATE POLICY multi_tenancy_policy ON public.secrets USING ((vault_id IN ( SELEC
 -- Name: service_account_secrets multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.service_account_secrets USING ((service_account_id IN ( SELECT service_account_secrets.service_account_id
+CREATE POLICY multi_tenancy_policy ON public.service_account_secrets TO application USING ((service_account_id IN ( SELECT service_account_secrets.service_account_id
    FROM public.service_accounts
   WHERE (service_accounts.organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)))));
 
@@ -1454,14 +1468,14 @@ CREATE POLICY multi_tenancy_policy ON public.service_account_secrets USING ((ser
 -- Name: service_accounts multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.service_accounts USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+CREATE POLICY multi_tenancy_policy ON public.service_accounts TO application USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
 
 
 --
 -- Name: users multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.users USING ((id IN ( SELECT public.get_users_for_app_user() AS get_users_for_app_user)));
+CREATE POLICY multi_tenancy_policy ON public.users TO application USING ((id IN ( SELECT public.get_users_for_app_user() AS get_users_for_app_user)));
 
 
 --
@@ -1475,7 +1489,7 @@ COMMENT ON POLICY multi_tenancy_policy ON public.users IS 'A user can see all th
 -- Name: users_vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.users_vaults USING (((vault_id IN ( SELECT users_vaults.vault_id
+CREATE POLICY multi_tenancy_policy ON public.users_vaults TO application USING (((vault_id IN ( SELECT users_vaults.vault_id
    FROM public.vaults)) AND (user_id IN ( SELECT public.get_users_for_app_user() AS get_users_for_app_user))));
 
 
@@ -1483,21 +1497,21 @@ CREATE POLICY multi_tenancy_policy ON public.users_vaults USING (((vault_id IN (
 -- Name: vaults multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.vaults USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+CREATE POLICY multi_tenancy_policy ON public.vaults TO application USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
 
 
 --
 -- Name: organisation_users multi_tenancy_policy_delete; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+CREATE POLICY multi_tenancy_policy_delete ON public.organisation_users FOR DELETE TO application USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
 
 
 --
 -- Name: organisation_users multi_tenancy_policy_insert; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_insert ON public.organisation_users FOR INSERT WITH CHECK (((organisation_id IN ( SELECT invitations.organisation_id
+CREATE POLICY multi_tenancy_policy_insert ON public.organisation_users FOR INSERT TO application WITH CHECK (((organisation_id IN ( SELECT invitations.organisation_id
    FROM public.invitations)) OR (organisation_id IN ( SELECT public.get_orgs_app_user_created() AS get_orgs_app_user_created))));
 
 
@@ -1512,7 +1526,7 @@ COMMENT ON POLICY multi_tenancy_policy_insert ON public.organisation_users IS 'A
 -- Name: organisation_users multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT USING (true);
+CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT TO application USING (true);
 
 
 --
@@ -1533,6 +1547,111 @@ ALTER TABLE public.organisation_users ENABLE ROW LEVEL SECURITY;
 --
 
 ALTER TABLE public.organisations ENABLE ROW LEVEL SECURITY;
+
+--
+-- Name: audit_trail readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.audit_trail FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: environments readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.environments FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: invitations readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.invitations FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: organisation_users readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.organisation_users FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: organisations readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.organisations FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: roles_permissions readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.roles_permissions FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: schema_migrations readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.schema_migrations FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: secrets readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.secrets FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: service_account_secrets readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.service_account_secrets FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: service_accounts readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.service_accounts FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: sessions readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.sessions FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: users readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.users FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: users_environments readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.users_environments FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: users_vaults readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.users_vaults FOR SELECT TO authentication USING (true);
+
+
+--
+-- Name: vaults readonly_policy; Type: POLICY; Schema: public; Owner: -
+--
+
+CREATE POLICY readonly_policy ON public.vaults FOR SELECT TO authentication USING (true);
+
 
 --
 -- Name: secrets; Type: ROW SECURITY; Schema: public; Owner: -

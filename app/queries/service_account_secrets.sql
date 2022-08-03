@@ -1,22 +1,28 @@
---! get_all_dangerous(service_account_id) { id, service_account_id, name, name_blind_index, secret, ecdh_public_key } *
+--! get_all_dangerous
 SELECT  
     id, service_account_id, name, name_blind_index, secret, ecdh_public_key 
 FROM 
     service_account_secrets 
 WHERE 
-    service_account_id = $1
+    service_account_id = :service_account_id;
 
---! get_users_vaults(user_id, vault_id)
+--! get_users_vaults
 SELECT user_id 
 FROM 
     users_vaults 
 WHERE 
-    user_id = $1
+    user_id = :user_id
 AND
-    vault_id = $2
+    vault_id = :vault_id;
 
---! insert(service_account_id, name, name_blind_index, secret, ecdh_public_key)
+--! insert
 INSERT INTO service_account_secrets
     (service_account_id, name, name_blind_index, secret, ecdh_public_key)
 VALUES
-    ($1, $2, $3, $4, $5)
+    (
+        :service_account_id, 
+        :name, 
+        :name_blind_index, 
+        :secret, 
+        :ecdh_public_key
+);

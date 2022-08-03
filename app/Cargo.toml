@@ -32,7 +32,7 @@ tokio-postgres = { version = "0.7", features = [
 postgres-types = { version = "0", features = ["derive"] }
 tokio-postgres-rustls = "0"
 time = { version = "0", default-features = false,  features = ["formatting"] }
-cornucopia_client = "0"
+cornucopia_async = "0"
 rustls = "0"
 webpki-roots = "0"
 

@@ -1,23 +1,23 @@
---! get_dangerous(id) { id, email, ecdsa_public_key, first_name?, last_name? }
+--! get : (first_name?, last_name?)
 SELECT 
     id, email, ecdsa_public_key, first_name, last_name
 FROM 
     users
 WHERE
-    id = $1
+    id = :id;
 
---! get_by_email_dangerous(email) { id, email, ecdsa_public_key, first_name?, last_name? }
+--! get_by_email : (first_name?, last_name?)
 SELECT 
     id, email, ecdsa_public_key, first_name, last_name
 FROM 
     users
 WHERE
-    email = $1
+    email = :email;
 
---! set_name(current_user_id, first_name, last_name)
+--! set_name(first_name, last_name, current_user_id)
 UPDATE
     users
 SET 
-    first_name = $2, last_name = $3 
+    first_name = :first_name, last_name = :last_name
 WHERE
-    id = $1
+    id = :current_user_id;

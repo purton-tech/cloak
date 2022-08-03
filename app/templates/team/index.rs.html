@@ -5,16 +5,16 @@
 @use crate::layout::SideBar;
 @use crate::cornucopia::queries::organisations::GetUsers;
 @use crate::cornucopia::queries::organisations::Organisation;
-@use crate::cornucopia::queries::invitations::GetAll;
-@use crate::cornucopia::queries::users::GetDangerous;
+@use crate::cornucopia::queries::invitations::Invitation;
+@use crate::cornucopia::queries::users::Get;
 @use crate::templates::statics::delete_svg;
 
 @(
     initials: &str, 
     users: Vec<GetUsers>, 
-    invites: Vec<GetAll>, 
+    invites: Vec<Invitation>, 
     organisation: &Organisation, 
-    user: &GetDangerous,
+    user: &Get,
     can_manage_team: bool
 )
 

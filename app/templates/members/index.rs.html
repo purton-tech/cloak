@@ -2,8 +2,8 @@
 @use crate::layout::SideBar;
 @use crate::templates::statics::delete_svg;
 @use crate::cornucopia::queries::user_vaults::Get;
-@use crate::cornucopia::queries::user_vaults::GetUsersDangerous;
-@use crate::cornucopia::queries::user_vaults::GetNonMembersDangerous;
+@use crate::cornucopia::queries::user_vaults::GetUsers;
+@use crate::cornucopia::queries::user_vaults::GetNonMembers;
 @use crate::cornucopia::queries::environments::GetAll;
 @use crate::cornucopia::queries::organisations::Organisation;
 @use super::delete_html;
@@ -12,8 +12,8 @@
 @(
     initials: &str,
     user_vault: Get, 
-    members: Vec<GetUsersDangerous>, 
-    non_members: Vec<GetNonMembersDangerous>, 
+    members: Vec<GetUsers>, 
+    non_members: Vec<GetNonMembers>, 
     environments: Vec<GetAll>,
     organisation: &Organisation
 )
