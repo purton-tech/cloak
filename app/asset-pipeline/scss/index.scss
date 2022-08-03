@@ -69,8 +69,7 @@ img {
     @media (min-width: 1800px) { @content; }
 }
 
-@import './app_layout';
-@import './content_layout';
+@import './layout';
 @import './cards';
 @import './buttons';
 @import './tables';
