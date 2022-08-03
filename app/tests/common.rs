@@ -236,8 +236,8 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
         .await?;
     connect_button.click().await?;
 
-    let attach_link = driver.find_element(By::LinkText("My Dev Machine")).await?;
-    attach_link.click().await?;
+    let view_link = driver.find_element(By::LinkText("My Dev Machine")).await?;
+    view_link.click().await?;
 
     let close_link = driver.find_element(By::LinkText("X")).await?;
     close_link.click().await?;
