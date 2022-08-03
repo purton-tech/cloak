@@ -51,20 +51,11 @@
     transform: translate(-50%, 200%);
   }
 }
-@media (min-width: 640px) {
-  .snackbar-container {
-      min-width: 288px;
-      max-width: 568px;
-      display: inline-flex;
-      border-radius: 2px;
-      margin: 24px;
-  }
-}
 
-@media (max-width: 640px) {
-  .snackbar-container {
-      left: 0;
-      right: 0;
-      width: 100%;
-  }
+.snackbar-container {
+    min-width: 288px;
+    max-width: 568px;
+    display: inline-flex;
+    border-radius: 2px;
+    margin-bottom: 2em;
 }
