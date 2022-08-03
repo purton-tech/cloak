@@ -1,14 +1,20 @@
 ![Alt text](www/static/secrets-screenshot.png "Secrets Screenshot")
 
-## End 2 End Encrypted Secrets Manager for Operations and Development
+## Cloak - Your team's central source of truth for secrets and application configuration
 
-* Uses standard encryption algorithms so that we never see your secrets.
-* CLI tool to bring secrets from the vault to you local environemnt.
+* Cloak helps prevent secrets sprawl with effective secrets management.
+* Cloak secures access by tightly controlling secrets with granular Role-Based Access Control (RBAC).
+* End 2 End encryption ensures defence in depth for your secrets.
+* Uses well known and well tested Elliptic Curve cryptography.
+* Our web interface manages encrypted key creation and distribution to make security the default for your projects.
+* The CLI tool brings secrets from the vault to you local environment, CICD pipelines, servers and more.
 * Hosted by us or on your own infrastructure, runs as docker containers.
 * Permissive licence.
-* User interface to manage teams, add secrets and manage service accounts.
-* Role based access control, give users admin access to manage their own teams.
+* Multi team, manage as many teams as you want.
+* Allow teams to manage themselves but still maintain a single source of truth for your secrets.
+* Extensive audit trail monitors access and usage.
+* Scales from Startup to Big Corp.
 
 ## Developers
 
-Cloak uses [Rust on Nails](https://rust-on-nails.com/) architecture.
+Cloak uses the [Rust on Nails](https://rust-on-nails.com/) architecture for secure full stack web applications.
