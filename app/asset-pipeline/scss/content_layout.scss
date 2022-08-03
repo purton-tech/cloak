@@ -6,6 +6,7 @@ body {
         min-height: 100vh;
     
         > header {
+            height: 60px;
             grid-area: header;
             padding: 0 1rem;
             background-color: var(--background);
@@ -130,15 +131,6 @@ body {
                     }
                 }
             }
-
-            > .profile {
-                width: 240px;
-                position: absolute;
-                bottom: 0;
-                display: flex;
-                justify-content: center;
-                padding: 1rem;
-            }
         }
 
         // Handle the responsive menu when in phone mode
@@ -181,8 +173,11 @@ body {
                 display: block;
             }
 
-            > header > .hamburger {
-                display: none;
+            > header {
+                height: 100%;
+                > .hamburger {
+                    display: none;
+                }
             }
         }
     }
