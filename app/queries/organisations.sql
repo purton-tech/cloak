@@ -33,9 +33,15 @@ INSERT INTO
 VALUES(current_app_user()) 
 RETURNING id;
 
---! get_users
+--! get_users : (first_name?, last_name?)
 SELECT 
-    u.id, ou.organisation_id, u.email, u.ecdh_public_key, ou.roles
+    u.id, 
+    ou.organisation_id, 
+    u.email, 
+    u.first_name,
+    u.last_name,
+    u.ecdh_public_key, 
+    ou.roles
 FROM 
     organisation_users ou
 LEFT JOIN users u ON u.id = ou.user_id

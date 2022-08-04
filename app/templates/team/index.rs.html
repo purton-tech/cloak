@@ -58,7 +58,7 @@
             <table class="m_table team_table">
                 <thead>
                     <tr>
-                        <th>Email</th>
+                        <th>Name or Email</th>
                         <th class="hide-on-phones">Special Privileges</th>
                         @if can_manage_team {
                             <th>Action</th>
@@ -69,7 +69,7 @@
                     @for user in users {
                         <tr>
                             <td>
-                                @user.email
+                                @crate::layout::name(user.email, user.first_name, user.last_name)
                             </td>
                             <td class="hide-on-phones">
                                 @for (index, role) in user.roles.into_iter().enumerate() {

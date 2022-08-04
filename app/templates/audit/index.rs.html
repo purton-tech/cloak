@@ -5,10 +5,16 @@
 @use crate::cornucopia::queries::audit::Audit;
 @use time::format_description::well_known::Rfc3339;
 @use crate::cornucopia::queries::organisations::Organisation;
+@use crate::cornucopia::queries::organisations::GetUsers;
 @use crate::templates::statics::filter_svg;
 @use super::filter_html;
 
-@(initials: &str, audits: Vec<Audit>, organisation: &Organisation)
+@(
+    initials: &str, 
+    audits: Vec<Audit>, 
+    team_users: Vec<GetUsers>, 
+    organisation: &Organisation
+)
 
 @:layout_html("Audit Trail", initials, {
     <div class="m_card">
@@ -56,6 +62,6 @@
         </div>
     </div>
 
-    @:filter_html()
+    @:filter_html(team_users)
 }, {
 }, organisation, None, SideBar::Audit)

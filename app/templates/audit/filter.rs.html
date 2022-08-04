@@ -1,14 +1,57 @@
+@use crate::cornucopia::queries::organisations::GetUsers;
 
-@()
+@(team_users: Vec<GetUsers>)
 
 <form class="m_form" method="post" action="">
     <side-drawer label="Filter Results" id="filter-drawer">
         <template slot="body">
             <fieldset>
-                <label for="name">Name *</label>
-                <input type="text" required name="name" />
-                <span class="a_help_text">Give your new team a name</span>
+                <label for="name">Time Range</label>
+                <select>
+                    <option value="0">Any</option>
+                    <option value="1">Today</option>
+                    <option value="2">Yesterday</option>
+                    <option value="3">In the Last Week</option>
+                </select>
+                <span class="a_help_text">Give a time range for the events you are looking for.</span>
+            
+                <label for="name">User</label>
+                <select>
+                    <option>Any</option>
+                    @for user in team_users {
+                        <option value="@user.id">@crate::layout::name(user.email, user.first_name, user.last_name)</option>
+                    }
+                </select>
+                <span class="a_help_text">For which user do you want to search</span>
+
+                <label for="name">Access Type</label>
+                <select>
+                    <option>Any</option>
+                    <option>User Interface</option>
+                    <option>CLI</option>
+                    <option>Service Account</option>
+                </select>
+                <span class="a_help_text">Split between user interface and CLI usage.</span>
+
+                <label for="name">Action</label>
+                <select>
+                    <option>Any</option>
+                    <option>Add Member</option>
+                    <option>Delete Member</option>
+                    <option>Add Secret</option>
+                    <option>Delete Secret</option>
+                    <option>Access Secrets</option>
+                    <option>New Service Account</option>
+                    <option>Delete Service Account</option>
+                    <option>Connect Service Account</option>
+                    <option>Create Invite</option>
+                    <option>Remove Team Member</option>
+                    <option>Create Vault</option>
+                    <option>Delete Vault</option>
+                </select>
+                <span class="a_help_text">What action did the user perform.h</span>
             </fieldset>
+
         </template>
         <template slot="footer">
             <button class="a_button auto success" type="submit">Apply Filter</button>

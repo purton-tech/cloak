@@ -26,6 +26,14 @@ pub fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: 
     .to_string()
 }
 
+pub fn name(email: String, first_name: Option<String>, last_name: Option<String>) -> String {
+    if let (Some(first_name), Some(last_name)) = (first_name, last_name) {
+        return format!("{} {}", first_name, last_name);
+    }
+
+    return email;
+}
+
 pub fn initials(email: &str, first_name: Option<String>, last_name: Option<String>) -> String {
     if let (Some(first_name), Some(last_name)) = (first_name, last_name) {
         let i1 = first_name.chars().next();

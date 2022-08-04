@@ -28,12 +28,17 @@ pub async fn index(
         .one()
         .await?;
 
+    let team_users = queries::organisations::get_users()
+        .bind(&transaction, &organisation_id)
+        .all()
+        .await?;
+
     let audits = queries::audit::audit()
         .bind(&transaction, &organisation_id)
         .all()
         .await?;
 
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, &initials, audits, &team)
+        crate::templates::audit::index_html(buf, &initials, audits, team_users, &team)
     }))
 }
