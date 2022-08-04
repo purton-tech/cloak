@@ -41,9 +41,15 @@ pub async fn index(
         .iter()
         .any(|p| p == &types::public::Permission::ManageTeam);
 
-    let user = queries::users::get().bind(&transaction, &(current_user.user_id as i32)).one().await?;
+    let user = queries::users::get()
+        .bind(&transaction, &(current_user.user_id as i32))
+        .one()
+        .await?;
 
-    let invites = queries::invitations::get_all().bind(&transaction, &organisation_id).all().await?;
+    let invites = queries::invitations::get_all()
+        .bind(&transaction, &organisation_id)
+        .all()
+        .await?;
 
     let initials =
         crate::layout::initials(&user.email, user.first_name.clone(), user.last_name.clone());

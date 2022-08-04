@@ -1,6 +1,6 @@
 use crate::authentication::Authentication;
-use deadpool_postgres::Transaction;
 use crate::errors::CustomError;
+use deadpool_postgres::Transaction;
 
 // A helper function for setting the RLS user which is used by all the policies.
 pub async fn set_row_level_security_user(

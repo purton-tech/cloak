@@ -117,17 +117,18 @@ pub async fn create(
         vec![types::public::Role::Collaborator]
     };
 
-    queries::invitations::insert_invitation().bind(
-        &transaction,
-        &organisation_id,
-        &new_invite.email.as_ref(),
-        &new_invite.first_name.as_ref(),
-        &new_invite.last_name.as_ref(),
-        &invitation_selector_base64.as_ref(),
-        &invitation_verifier_hash_base64.as_ref(),
-        &roles.as_ref(),
-    )
-    .await?;
+    queries::invitations::insert_invitation()
+        .bind(
+            &transaction,
+            &organisation_id,
+            &new_invite.email.as_ref(),
+            &new_invite.first_name.as_ref(),
+            &new_invite.last_name.as_ref(),
+            &invitation_selector_base64.as_ref(),
+            &invitation_verifier_hash_base64.as_ref(),
+            &roles.as_ref(),
+        )
+        .await?;
 
     transaction.commit().await?;
 

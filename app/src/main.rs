@@ -1,28 +1,30 @@
 mod api_service;
+mod audit;
 mod authentication;
 mod config;
 mod email;
 mod errors;
 mod hybrid;
-mod audit;
 mod layout;
 mod members;
+mod profile;
 mod registration_handler;
+mod rls;
 mod secrets;
 mod service_accounts;
 mod team;
-mod profile;
 mod vaults;
-mod rls;
 
-
+use crate::templates::statics::StaticFile;
+use axum::body::{self, Body, Empty};
 use axum::extract::{Extension, Path};
-use axum::http::{Response, StatusCode, header, HeaderValue};
+use axum::http::{header, HeaderValue, Response, StatusCode};
+use axum::{
+    response::{Html, IntoResponse},
+    routing::get,
+};
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
-use crate::templates::statics::StaticFile;
-use axum::body::{self, Empty, Body};
-use axum::{response::{IntoResponse, Html}, routing::get};
 
 #[tokio::main]
 async fn main() {

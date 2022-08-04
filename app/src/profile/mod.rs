@@ -2,14 +2,17 @@ mod index;
 mod set_details;
 
 use axum::{
+    routing::{get, post},
     Router,
-    routing::{post, get},
 };
 
 pub fn routes() -> Router {
     Router::new()
         .route("/app/team/:organisation_id/profile", get(index::index))
-        .route("/app/team/:organisation_id/set_details", post(set_details::set_details))
+        .route(
+            "/app/team/:organisation_id/set_details",
+            post(set_details::set_details),
+        )
 }
 
 pub fn set_details_route(organisation_id: i32) -> String {

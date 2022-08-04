@@ -52,7 +52,11 @@ pub async fn delete(
         .await?;
 
     queries::secrets::delete_service_account()
-        .bind(&transaction, &secret.name_blind_index.as_ref(), &secret.vault_id)
+        .bind(
+            &transaction,
+            &secret.name_blind_index.as_ref(),
+            &secret.vault_id,
+        )
         .await?;
 
     transaction.commit().await?;

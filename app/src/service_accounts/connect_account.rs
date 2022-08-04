@@ -55,7 +55,8 @@ pub async fn connect(
             &format!(
                 "Service account {} connected",
                 &connect_form.service_account_id
-            ).as_ref(),
+            )
+            .as_ref(),
         )
         .await?;
 

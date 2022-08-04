@@ -49,7 +49,8 @@ pub async fn delete(
             &format!(
                 "Service account {} deleted",
                 idor_delete_service_account.service_account_id
-            ).as_ref(),
+            )
+            .as_ref(),
         )
         .await?;
 
