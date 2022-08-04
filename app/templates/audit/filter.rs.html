@@ -1,8 +1,8 @@
 @use crate::cornucopia::queries::organisations::GetUsers;
 
-@(team_users: Vec<GetUsers>)
+@(team_users: Vec<GetUsers>, organisation_id: i32)
 
-<form class="m_form" method="post" action="">
+<form class="m_form" method="post" action="@crate::audit::index_route(organisation_id)">
     <side-drawer label="Filter Results" id="filter-drawer">
         <template slot="body">
             <fieldset>
@@ -26,28 +26,28 @@
 
                 <label for="name">Access Type</label>
                 <select>
-                    <option>Any</option>
-                    <option>User Interface</option>
-                    <option>CLI</option>
-                    <option>Service Account</option>
+                    <option value="0">Any</option>
+                    <option value="1">User Interface</option>
+                    <option value="2">CLI</option>
+                    <option value="3">Service Account</option>
                 </select>
                 <span class="a_help_text">Split between user interface and CLI usage.</span>
 
                 <label for="name">Action</label>
                 <select>
-                    <option>Any</option>
-                    <option>Add Member</option>
-                    <option>Delete Member</option>
-                    <option>Add Secret</option>
-                    <option>Delete Secret</option>
-                    <option>Access Secrets</option>
-                    <option>New Service Account</option>
-                    <option>Delete Service Account</option>
-                    <option>Connect Service Account</option>
-                    <option>Create Invite</option>
-                    <option>Remove Team Member</option>
-                    <option>Create Vault</option>
-                    <option>Delete Vault</option>
+                    <option value="0">Any</option>
+                    <option value="1">Add Member</option>
+                    <option value="2">Delete Member</option>
+                    <option value="3">Add Secret</option>
+                    <option value="4">Delete Secret</option>
+                    <option value="5">Access Secrets</option>
+                    <option value="6">New Service Account</option>
+                    <option value="7">Delete Service Account</option>
+                    <option value="8">Connect Service Account</option>
+                    <option value="9">Create Invite</option>
+                    <option value="10">Remove Team Member</option>
+                    <option value="11">Create Vault</option>
+                    <option value="12">Delete Vault</option>
                 </select>
                 <span class="a_help_text">What action did the user perform.h</span>
             </fieldset>

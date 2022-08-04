@@ -5,7 +5,17 @@ use axum::{
     extract::{Extension, Path},
     response::Html,
 };
+use serde::Deserialize;
 use deadpool_postgres::Pool;
+
+
+#[derive(Deserialize, Default, Debug)]
+pub struct Filter {
+    pub when: u32,
+    pub user: i32,
+    pub access_type: u32,
+    pub action: u32,
+}
 
 pub async fn filter(
     Path(organisation_id): Path<i32>,
