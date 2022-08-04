@@ -1,13 +1,13 @@
 use crate::authentication::Authentication;
 use crate::cornucopia::queries;
+use crate::cornucopia::types;
 use crate::errors::CustomError;
 use axum::{
     extract::{Extension, Path},
     response::Html,
 };
-use serde::Deserialize;
 use deadpool_postgres::Pool;
-
+use serde::Deserialize;
 
 #[derive(Deserialize, Default, Debug)]
 pub struct Filter {
@@ -43,8 +43,13 @@ pub async fn filter(
         .all()
         .await?;
 
-    let audits = queries::audit::audit()
-        .bind(&transaction, &organisation_id)
+    let audits = queries::audit::filter()
+        .bind(
+            &transaction,
+            &types::public::AuditAction::CreateVault,
+            &types::public::AuditAccessType::Web,
+            &organisation_id,
+        )
         .all()
         .await?;
 
