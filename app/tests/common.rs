@@ -1,4 +1,3 @@
-use deadpool_postgres;
 use deadpool_postgres::Pool;
 use rand::Rng;
 use std::env;
@@ -71,12 +70,12 @@ pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
     // APP_DATABASE_URL=postgresql://cloak:testpassword@db:5432/cloak?sslmode=disable
     let mut cfg = deadpool_postgres::Config::new();
     let url: Vec<&str> = database_url.split("postgresql://").collect();
-    let split_on_at: Vec<&str> = url[1].split("@").collect();
-    let user_and_pass: Vec<&str> = split_on_at[0].split(":").collect();
+    let split_on_at: Vec<&str> = url[1].split('@').collect();
+    let user_and_pass: Vec<&str> = split_on_at[0].split(':').collect();
 
-    let split_on_slash: Vec<&str> = split_on_at[1].split("/").collect();
-    let host_and_port: Vec<&str> = split_on_slash[0].split(":").collect();
-    let dbname_and_params: Vec<&str> = split_on_slash[1].split("?").collect();
+    let split_on_slash: Vec<&str> = split_on_at[1].split('/').collect();
+    let host_and_port: Vec<&str> = split_on_slash[0].split(':').collect();
+    let dbname_and_params: Vec<&str> = split_on_slash[1].split('?').collect();
 
     cfg.user = Some(String::from(user_and_pass[0]));
     cfg.password = Some(String::from(user_and_pass[1]));
@@ -223,12 +222,16 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
         .await?;
     submit_button.click().await?;
 
-    let attach_link = driver.find_element(By::LinkText("Connect to Vault")).await?;
+    let attach_link = driver
+        .find_element(By::LinkText("Connect to Vault"))
+        .await?;
     attach_link.click().await?;
 
     let vault_selector = driver.find_element(By::Css("select:first-of-type")).await?;
     let select = SelectElement::new(&vault_selector).await?;
-    select.select_by_exact_text("Vault: My Vault, Environment: Development").await?;
+    select
+        .select_by_exact_text("Vault: My Vault, Environment: Development")
+        .await?;
 
     // Connect this account
     let connect_button = driver
@@ -236,8 +239,8 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
         .await?;
     connect_button.click().await?;
 
-    let attach_link = driver.find_element(By::LinkText("My Dev Machine")).await?;
-    attach_link.click().await?;
+    let view_link = driver.find_element(By::LinkText("My Dev Machine")).await?;
+    view_link.click().await?;
 
     let close_link = driver.find_element(By::LinkText("X")).await?;
     close_link.click().await?;
@@ -281,7 +284,7 @@ pub async fn count_service_account_secrets(config: &Config, email: &str) -> i64 
     let rows = client.query(&stmt, &[&vault_id]).await.unwrap();
     let count: i64 = rows[0].get(0);
 
-    return count;
+    count
 }
 
 pub async fn count_secrets(config: &Config, email: &str) -> i64 {
@@ -318,7 +321,7 @@ pub async fn count_secrets(config: &Config, email: &str) -> i64 {
     let rows = client.query(&stmt, &[&user_id]).await.unwrap();
     let count: i64 = rows[0].get(0);
 
-    return count;
+    count
 }
 
 pub fn hex_to_bytes(hex: &str) -> Result<Vec<u8>, std::num::ParseIntError> {

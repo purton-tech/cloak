@@ -20,3 +20,7 @@ import '../templates/secrets/delete_secret'
 import '../templates/team/create_invite'
 import '../templates/members/add_member'
 import '../templates/members/delete_member'
+
+// Misc.
+import './remember-form'
+import './filter-trigger'

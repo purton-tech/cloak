@@ -1,0 +1,61 @@
+@use crate::cornucopia::queries::organisations::GetUsers;
+
+@(team_users: Vec<GetUsers>, organisation_id: i32, reset_search: bool)
+
+<form 
+    class="m_form remember" method="post" 
+    data-remember-reset="@reset_search"
+    data-remember-name="audit"
+    id="filter-form" 
+    action="@crate::audit::index_route(organisation_id)">
+    <side-drawer label="Filter Results" id="filter-drawer">
+        <template slot="body">
+            <fieldset>
+                
+                <label for="name">User</label>
+                <select name="user">
+                    <option value="0">Any</option>
+                    @for user in team_users {
+                        <option value="@user.id">@crate::layout::name(user.email, user.first_name, user.last_name)</option>
+                    }
+                </select>
+                <span class="a_help_text">For which user do you want to search</span>
+
+                <label for="name">Access Type</label>
+                <select name="access_type">
+                    <option value="0">Any</option>
+                    <option value="1">User Interface</option>
+                    <option value="2">CLI</option>
+                    <option value="3">Service Account</option>
+                </select>
+                <span class="a_help_text">Split between user interface and CLI usage.</span>
+
+                <label for="name">Action</label>
+                <select name="action">
+                    <option value="0">Any</option>
+                    <option value="1">Add Member</option>
+                    <option value="2">Delete Member</option>
+                    <option value="3">Add Secret</option>
+                    <option value="4">Delete Secret</option>
+                    <option value="5">Access Secrets</option>
+                    <option value="6">New Service Account</option>
+                    <option value="7">Delete Service Account</option>
+                    <option value="8">Connect Service Account</option>
+                    <option value="9">Create Invite</option>
+                    <option value="10">Remove Team Member</option>
+                    <option value="11">Create Vault</option>
+                    <option value="12">Delete Vault</option>
+                </select>
+                <span class="a_help_text">What action did the user perform.h</span>
+            </fieldset>
+
+            <fieldset>
+                <input type="hidden" name="id" id="last-row-id", value="0" />
+            </fieldset>
+
+        </template>
+        <template slot="footer">
+            <button class="a_button auto success" type="submit">Apply Filter</button>
+        </template>
+    </side-drawer>
+</form>

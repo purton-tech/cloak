@@ -113,7 +113,7 @@ async fn insert_secrets(cmd_args: &[OsString], secrets: &HashMap<String, String>
         for (name, value) in secrets.iter() {
             if let Ok(arg_to_check) = arg.clone().into_string() {
                 let env_name = format!("${}", name);
-                if &arg_to_check == &env_name {
+                if arg_to_check == env_name {
                     arg = OsString::from(value);
                 }
             }
@@ -121,7 +121,7 @@ async fn insert_secrets(cmd_args: &[OsString], secrets: &HashMap<String, String>
         process_args.push(arg);
     }
 
-    return process_args;
+    process_args
 }
 
 async fn get_secrets(

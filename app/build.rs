@@ -1,10 +1,9 @@
+use ructe::{Result, Ructe};
 use std::env;
 use std::path::Path;
-use ructe::{Result, Ructe};
 use std::path::PathBuf;
 
 fn main() -> Result<()> {
-
     tonic_build::configure()
         .compile(
             &["api.proto"], // Files in the path

@@ -40,7 +40,7 @@ pub async fn new_team(
     queries::organisations::add_user_to_organisation()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &org_id,
             &roles.as_ref(),
         )

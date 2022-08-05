@@ -40,7 +40,7 @@ pub async fn connect(
             &connect_form.vault_id,
             &connect_form.environment_id,
             &connect_form.service_account_id,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
         )
         .await?;
@@ -48,14 +48,15 @@ pub async fn connect(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::ConnectServiceAccount,
             &AuditAccessType::Web,
             &format!(
                 "Service account {} connected",
                 &connect_form.service_account_id
-            ).as_ref(),
+            )
+            .as_ref(),
         )
         .await?;
 

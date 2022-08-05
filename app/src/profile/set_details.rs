@@ -33,7 +33,7 @@ pub async fn set_details(
             &transaction,
             &set_name.first_name.as_ref(),
             &set_name.last_name.as_ref(),
-            &(current_user.user_id as i32),
+            &current_user.user_id,
         )
         .await?;
 

@@ -34,7 +34,7 @@ pub async fn new(
 
     // This will blow up if the user doesn't have access to the vault
     queries::vaults::get()
-        .bind(&transaction, &id, &(current_user.user_id as i32))
+        .bind(&transaction, &id, &current_user.user_id)
         .one()
         .await?;
 
@@ -52,7 +52,7 @@ pub async fn new(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::AddSecret,
             &AuditAccessType::Web,

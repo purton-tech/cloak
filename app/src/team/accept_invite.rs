@@ -46,7 +46,7 @@ pub async fn accept_invitation(
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;
     let transaction = client.transaction().await?;
-    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
+    super::super::rls::set_row_level_security_user(&transaction, current_user).await?;
 
     let invitation = queries::invitations::get_invitation()
         .bind(&transaction, &invitation_selector)
@@ -55,7 +55,7 @@ pub async fn accept_invitation(
 
     if invitation.invitation_verifier_hash == invitation_verifier_hash_base64 {
         let user = queries::users::get()
-            .bind(&transaction, &(current_user.user_id as i32))
+            .bind(&transaction, &current_user.user_id)
             .one()
             .await?;
 
@@ -82,7 +82,7 @@ pub async fn accept_invitation(
                         &transaction,
                         &invitation.first_name.as_ref(),
                         &invitation.last_name.as_ref(),
-                        &(current_user.user_id as i32),
+                        &current_user.user_id,
                     )
                     .await?;
             }

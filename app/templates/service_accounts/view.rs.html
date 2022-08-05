@@ -22,7 +22,7 @@
                     name="encrypted_private_key" 
                     readonly
                     id='@format!("wrapped-ecdh-private-key-{}", service_account.id)' 
-                    rows="8">@service_account.ecdh_public_key</textarea>
+                    rows="8">@service_account.encrypted_ecdh_private_key</textarea>
                 <span class="a_help_text">The key for this service account</span>
             </fieldset>
 

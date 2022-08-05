@@ -43,7 +43,7 @@ pub async fn delete(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::DeleteSecret,
             &AuditAccessType::Web,
@@ -52,7 +52,11 @@ pub async fn delete(
         .await?;
 
     queries::secrets::delete_service_account()
-        .bind(&transaction, &secret.name_blind_index.as_ref(), &secret.vault_id)
+        .bind(
+            &transaction,
+            &secret.name_blind_index.as_ref(),
+            &secret.vault_id,
+        )
         .await?;
 
     transaction.commit().await?;

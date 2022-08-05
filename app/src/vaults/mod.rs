@@ -21,7 +21,10 @@ pub fn routes() -> Router {
     Router::new()
         .route("/app/team/:organisation_id/vaults", get(index::index))
         .route("/app/team/:organisation_id/new_vault", post(new_vault::new))
-        .route("/app/team/:organisation_id/vaults/delete", post(delete_vault::delete))
+        .route(
+            "/app/team/:organisation_id/vaults/delete",
+            post(delete_vault::delete),
+        )
 }
 
 pub fn index_route(organisation_id: i32) -> String {

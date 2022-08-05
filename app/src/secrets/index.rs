@@ -29,7 +29,7 @@ pub async fn index(
         .await?;
 
     let user_vault = queries::user_vaults::get()
-        .bind(&transaction, &(current_user.user_id as i32), &vault_id)
+        .bind(&transaction, &current_user.user_id, &vault_id)
         .one()
         .await?;
 
@@ -39,20 +39,26 @@ pub async fn index(
         .await?;
 
     let user = queries::users::get()
-        .bind(&transaction, &(current_user.user_id as i32))
+        .bind(&transaction, &current_user.user_id)
         .one()
         .await?;
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     if secrets.is_empty() {
         Ok(crate::render(|buf| {
-            crate::templates::secrets::empty_html(buf, &initials, &user_vault, environments, &team)
+            crate::ructe::templates::secrets::empty_html(
+                buf,
+                &initials,
+                &user_vault,
+                environments,
+                &team,
+            )
         }))
     } else {
         queries::audit::insert()
             .bind(
                 &transaction,
-                &(current_user.user_id as i32),
+                &current_user.user_id,
                 &team.id,
                 &AuditAction::AccessSecrets,
                 &AuditAccessType::Web,
@@ -61,7 +67,7 @@ pub async fn index(
             .await?;
 
         Ok(crate::render(|buf| {
-            crate::templates::secrets::index_html(
+            crate::ructe::templates::secrets::index_html(
                 buf,
                 &initials,
                 &user_vault,

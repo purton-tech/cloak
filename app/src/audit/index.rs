@@ -18,7 +18,7 @@ pub async fn index(
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     let user = queries::users::get()
-        .bind(&transaction, &(current_user.user_id as i32))
+        .bind(&transaction, &current_user.user_id)
         .one()
         .await?;
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
@@ -28,12 +28,25 @@ pub async fn index(
         .one()
         .await?;
 
-    let audits = queries::audit::audit()
+    let team_users = queries::organisations::get_users()
         .bind(&transaction, &organisation_id)
         .all()
         .await?;
 
+    let audits = queries::audit::audit()
+        .bind(
+            &transaction,
+            &None,
+            &None,
+            &None,
+            &None,
+            &organisation_id,
+            &(super::PAGE_SIZE + 1),
+        )
+        .all()
+        .await?;
+
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, &initials, audits, &team)
+        crate::ructe::templates::audit::index_html(buf, &initials, audits, team_users, &team, true)
     }))
 }

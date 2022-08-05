@@ -139,19 +139,17 @@ impl app::vault::vault_server::Vault for VaultService {
 
         let service_accounts = service_accounts
             .into_iter()
-            .map(|s| {
+            .filter_map(|s| {
                 if let Some(env_id) = s.environment_id {
-                    return Some(ServiceAccount {
+                    Some(ServiceAccount {
                         service_account_id: s.id as u32,
                         environment_id: env_id as u32,
                         public_ecdh_key: s.ecdh_public_key,
-                    });
+                    })
                 } else {
-                    return None;
-                };
+                    None
+                }
             })
-            .filter(|s| s.is_some())
-            .map(|x| x.unwrap())
             .collect();
 
         let response = GetVaultResponse {
@@ -252,7 +250,9 @@ async fn authenticate<T>(req: &Request<T>) -> Result<authentication::Authenticat
             .parse::<u32>()
             .map_err(|_| Status::new(Code::Internal, "x-user-id not parseable as unsigned int"))?;
 
-        Ok(authentication::Authentication { user_id })
+        Ok(authentication::Authentication {
+            user_id: user_id as i32,
+        })
     } else {
         Err(Status::new(
             Code::PermissionDenied,

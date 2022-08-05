@@ -24,7 +24,7 @@ pub async fn index(
 
     // Blow up if the user doesn't have access to the vault
     queries::user_vaults::get()
-        .bind(&transaction, &(current_user.user_id as i32), &vault_id)
+        .bind(&transaction, &current_user.user_id, &vault_id)
         .one()
         .await?;
 
@@ -39,7 +39,7 @@ pub async fn index(
         .await?;
 
     let user_vault = queries::user_vaults::get()
-        .bind(&transaction, &(current_user.user_id as i32), &vault_id)
+        .bind(&transaction, &current_user.user_id, &vault_id)
         .one()
         .await?;
 
@@ -49,13 +49,13 @@ pub async fn index(
         .await?;
 
     let user = queries::users::get()
-        .bind(&transaction, &(current_user.user_id as i32))
+        .bind(&transaction, &current_user.user_id)
         .one()
         .await?;
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     Ok(crate::render(|buf| {
-        crate::templates::members::index_html(
+        crate::ructe::templates::members::index_html(
             buf,
             &initials,
             user_vault,

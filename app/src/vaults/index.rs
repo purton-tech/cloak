@@ -24,23 +24,19 @@ pub async fn index(
         .await?;
 
     let vaults = queries::vaults::get_all()
-        .bind(
-            &transaction,
-            &(current_user.user_id as i32),
-            &organisation_id,
-        )
+        .bind(&transaction, &current_user.user_id, &organisation_id)
         .all()
         .await?;
 
     let user = queries::users::get()
-        .bind(&transaction, &(current_user.user_id as i32))
+        .bind(&transaction, &current_user.user_id)
         .one()
         .await?;
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     if vaults.is_empty() {
         Ok(crate::render(|buf| {
-            crate::templates::vaults::empty_html(buf, &initials, &team)
+            crate::ructe::templates::vaults::empty_html(buf, &initials, &team)
         }))
     } else {
         let mut summary_vaults: Vec<VaultSummary> = Default::default();
@@ -67,7 +63,7 @@ pub async fn index(
         }
 
         Ok(crate::render(|buf| {
-            crate::templates::vaults::index_html(buf, &initials, summary_vaults, &team)
+            crate::ructe::templates::vaults::index_html(buf, &initials, summary_vaults, &team)
         }))
     }
 }

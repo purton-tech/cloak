@@ -12,7 +12,7 @@ pub enum SideBar {
     ServiceAccounts,
     Team,
     Profile,
-    Switch
+    Switch,
 }
 
 pub fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: bool) -> String {
@@ -26,19 +26,29 @@ pub fn get_menu_class(side_bar: &SideBar, selected_sidebar: &SideBar, sub_menu: 
     .to_string()
 }
 
+pub fn name(email: String, first_name: Option<String>, last_name: Option<String>) -> String {
+    if let (Some(first_name), Some(last_name)) = (first_name, last_name) {
+        return format!("{} {}", first_name, last_name);
+    }
+
+    email
+}
+
 pub fn initials(email: &str, first_name: Option<String>, last_name: Option<String>) -> String {
     if let (Some(first_name), Some(last_name)) = (first_name, last_name) {
         let i1 = first_name.chars().next();
         let i2 = last_name.chars().next();
 
         let intials = match (i1, i2) {
-            (Some(first_initial), Some(last_initial)) => format!("{}{}", first_initial, last_initial),
+            (Some(first_initial), Some(last_initial)) => {
+                format!("{}{}", first_initial, last_initial)
+            }
             (Some(first_initial), None) => format!("{}", first_initial),
-            _ => "".to_string()
+            _ => "".to_string(),
         };
         return intials;
     }
-    
+
     return email.chars().next().unwrap().to_string().to_uppercase();
 }
 

@@ -110,9 +110,7 @@ async fn sign_in_user(
 // Before we ivite people we have to have a team name and set our own name
 async fn set_profile_details(driver: &WebDriver) -> WebDriverResult<()> {
     driver
-        .find_element(By::XPath(
-            "//a[@data-drawer-target='set-name-drawer']",
-        ))
+        .find_element(By::XPath("//a[@data-drawer-target='set-name-drawer']"))
         .await?
         .click()
         .await?;
@@ -120,23 +118,23 @@ async fn set_profile_details(driver: &WebDriver) -> WebDriverResult<()> {
     let name_field = driver.find_element(By::Id("org-name")).await?;
     name_field.send_keys("Testing Team").await?;
 
-    let submit_button = driver
-        .find_element(By::Id("save-org-name"))
-        .await?;
+    let submit_button = driver.find_element(By::Id("save-org-name")).await?;
     submit_button.click().await?;
 
     let sa_link = driver.find_element(By::LinkText("Your Profile")).await?;
     sa_link.click().await?;
 
-    let name_field = driver.find_element(By::Css("input[name='first_name']")).await?;
+    let name_field = driver
+        .find_element(By::Css("input[name='first_name']"))
+        .await?;
     name_field.send_keys("David").await?;
 
-    let name_field = driver.find_element(By::Css("input[name='last_name']")).await?;
+    let name_field = driver
+        .find_element(By::Css("input[name='last_name']"))
+        .await?;
     name_field.send_keys("Jason").await?;
 
-    let submit_button = driver
-        .find_element(By::Id("save-details-button"))
-        .await?;
+    let submit_button = driver.find_element(By::Id("save-details-button")).await?;
     submit_button.click().await?;
 
     Ok(())
@@ -182,10 +180,14 @@ async fn add_team_member(
     let name_field = driver.find_element(By::Css("input[name='email']")).await?;
     name_field.send_keys(team_member).await?;
 
-    let name_field = driver.find_element(By::Css("input[name='first_name']")).await?;
+    let name_field = driver
+        .find_element(By::Css("input[name='first_name']"))
+        .await?;
     name_field.send_keys("Trevor").await?;
 
-    let name_field = driver.find_element(By::Css("input[name='last_name']")).await?;
+    let name_field = driver
+        .find_element(By::Css("input[name='last_name']"))
+        .await?;
     name_field.send_keys("Invitable").await?;
 
     let submit_button = driver

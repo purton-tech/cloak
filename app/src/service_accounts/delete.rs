@@ -42,14 +42,15 @@ pub async fn delete(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::ConnectServiceAccount,
             &AuditAccessType::Web,
             &format!(
                 "Service account {} deleted",
                 idor_delete_service_account.service_account_id
-            ).as_ref(),
+            )
+            .as_ref(),
         )
         .await?;
 

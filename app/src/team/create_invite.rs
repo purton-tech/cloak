@@ -71,7 +71,7 @@ pub async fn create_invite(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::CreateInvite,
             &AuditAccessType::Web,
@@ -96,7 +96,7 @@ pub async fn create(
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;
     let transaction = client.transaction().await?;
-    super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
+    super::super::rls::set_row_level_security_user(&transaction, current_user).await?;
 
     let invitation_selector = rand::thread_rng().gen::<[u8; 6]>();
     let invitation_selector_base64 =
@@ -117,17 +117,18 @@ pub async fn create(
         vec![types::public::Role::Collaborator]
     };
 
-    queries::invitations::insert_invitation().bind(
-        &transaction,
-        &organisation_id,
-        &new_invite.email.as_ref(),
-        &new_invite.first_name.as_ref(),
-        &new_invite.last_name.as_ref(),
-        &invitation_selector_base64.as_ref(),
-        &invitation_verifier_hash_base64.as_ref(),
-        &roles.as_ref(),
-    )
-    .await?;
+    queries::invitations::insert_invitation()
+        .bind(
+            &transaction,
+            &organisation_id,
+            &new_invite.email.as_ref(),
+            &new_invite.first_name.as_ref(),
+            &new_invite.last_name.as_ref(),
+            &invitation_selector_base64.as_ref(),
+            &invitation_verifier_hash_base64.as_ref(),
+            &roles.as_ref(),
+        )
+        .await?;
 
     transaction.commit().await?;
 
