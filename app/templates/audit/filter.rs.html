@@ -8,7 +8,7 @@
             <fieldset>
                 
                 <label for="name">User</label>
-                <select name="user">
+                <select class="remember" name="user">
                     <option value="0">Any</option>
                     @for user in team_users {
                         <option value="@user.id">@crate::layout::name(user.email, user.first_name, user.last_name)</option>
@@ -17,7 +17,7 @@
                 <span class="a_help_text">For which user do you want to search</span>
 
                 <label for="name">Access Type</label>
-                <select name="access_type">
+                <select class="remember" name="access_type">
                     <option value="0">Any</option>
                     <option value="1">User Interface</option>
                     <option value="2">CLI</option>
@@ -26,7 +26,7 @@
                 <span class="a_help_text">Split between user interface and CLI usage.</span>
 
                 <label for="name">Action</label>
-                <select name="action">
+                <select class="remember" name="action">
                     <option value="0">Any</option>
                     <option value="1">Add Member</option>
                     <option value="2">Delete Member</option>
