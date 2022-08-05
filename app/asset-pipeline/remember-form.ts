@@ -4,11 +4,9 @@ document.querySelectorAll('form.remember').forEach((form) => {
     const name = form.getAttribute('data-remember-name')
     if(forget != null && name != null) {
         form.querySelectorAll('select').forEach((select) => {
-            console.log('here')
             if(select instanceof HTMLSelectElement) {
                 // Restore from local storage
                 if(forget && forget == "true") {
-                    console.log('forget' + name + '::' + select.name)
                     localStorage.removeItem(name + '::' + select.name)
                 } else {
                     const selectedIndex = localStorage.getItem(name + '::' + select.name)
