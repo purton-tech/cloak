@@ -1,6 +1,6 @@
 pub mod common;
 
-use thirtyfour::prelude::*;
+use thirtyfour::{components::select::SelectElement, prelude::*};
 
 // let's set up the sequence of steps we want the browser to take
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -14,6 +14,36 @@ async fn run_single_user() -> WebDriverResult<()> {
     driver.quit().await?;
 
     result?;
+
+    Ok(())
+}
+
+async fn audit_filter(driver: &WebDriver, email: &str) -> WebDriverResult<()> {
+    let audit_link = driver.find_element(By::LinkText("Audit Trail")).await?;
+    audit_link.click().await?;
+
+    let filter_button = driver
+        .find_element(By::XPath("//button[text()='Filter']"))
+        .await?;
+    filter_button.click().await?;
+
+    let user_selector = driver.find_element(By::Css("select:first-of-type")).await?;
+    let select = SelectElement::new(&user_selector).await?;
+    select.select_by_exact_text(email).await?;
+
+    let submit_button = driver
+        .find_element(By::Css(".a_button.auto.success"))
+        .await?;
+    submit_button.click().await?;
+
+    // See it in the search results
+    let table_cell = driver
+        .find_element(By::XPath(
+            "//table[@class='m_table audit_table']/tbody/tr[last()]/td[2]",
+        ))
+        .await?;
+
+    assert_eq!(table_cell.text().await?, email);
 
     Ok(())
 }
@@ -71,6 +101,8 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
     let count = common::count_service_account_secrets(config, &email).await;
 
     assert_eq!(count, 3);
+
+    audit_filter(driver, &email).await?;
 
     Ok(())
 }

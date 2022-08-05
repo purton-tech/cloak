@@ -55,7 +55,7 @@ pub async fn index(
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     Ok(crate::render(|buf| {
-        crate::templates::members::index_html(
+        crate::ructe::templates::members::index_html(
             buf,
             &initials,
             user_vault,

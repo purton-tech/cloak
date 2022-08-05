@@ -16,9 +16,7 @@
                 <select name="user">
                     <option value="0">Any</option>
                     @for user in team_users {
-                        <option value="@user.id">
-                            @crate::layout::name(user.email, user.first_name, user.last_name)
-                        </option>
+                        <option value="@user.id">@crate::layout::name(user.email, user.first_name, user.last_name)</option>
                     }
                 </select>
                 <span class="a_help_text">For which user do you want to search</span>

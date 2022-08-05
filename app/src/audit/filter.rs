@@ -18,18 +18,17 @@ pub struct Filter {
 }
 
 impl Filter {
-    
     pub fn get_id(&self) -> Option<i32> {
         match self.id {
             0 => None,
-            n => Some(n)
+            n => Some(n),
         }
     }
 
     pub fn get_user(&self) -> Option<i32> {
         match self.user {
             0 => None,
-            n => Some(n)
+            n => Some(n),
         }
     }
 
@@ -38,7 +37,7 @@ impl Filter {
             0 => None,
             1 => Some(types::public::AuditAccessType::Web),
             2 => Some(types::public::AuditAccessType::CLI),
-            _ => Some(types::public::AuditAccessType::ServiceAccount)
+            _ => Some(types::public::AuditAccessType::ServiceAccount),
         }
     }
 
@@ -56,7 +55,7 @@ impl Filter {
             9 => Some(types::public::AuditAction::CreateInvite),
             10 => Some(types::public::AuditAction::RemoveTeamMember),
             11 => Some(types::public::AuditAction::CreateVault),
-            _ => Some(types::public::AuditAction::DeleteVault)
+            _ => Some(types::public::AuditAction::DeleteVault),
         }
     }
 }
@@ -102,6 +101,6 @@ pub async fn filter(
         .await?;
 
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, &initials, audits, team_users, &team, false)
+        crate::ructe::templates::audit::index_html(buf, &initials, audits, team_users, &team, false)
     }))
 }

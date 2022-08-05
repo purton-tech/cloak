@@ -41,12 +41,12 @@ pub async fn index(
             &None,
             &None,
             &organisation_id,
-            &(super::PAGE_SIZE + 1)
+            &(super::PAGE_SIZE + 1),
         )
         .all()
         .await?;
 
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, &initials, audits, team_users, &team, true)
+        crate::ructe::templates::audit::index_html(buf, &initials, audits, team_users, &team, true)
     }))
 }

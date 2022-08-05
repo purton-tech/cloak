@@ -15,7 +15,7 @@
                     <h4 class="title">@vault.name</h4>
                     <div class="created">
                         Created
-                        <relative-time datetime='@vault.created_at.format(&Rfc3339).unwrap_or("".to_string())'></relative-time>
+                        <relative-time datetime='@vault.created_at.format(&Rfc3339).unwrap_or_else(|_| "".to_string())'></relative-time>
                     </div>
                 </div>
                 <div>

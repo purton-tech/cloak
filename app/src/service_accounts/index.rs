@@ -40,11 +40,11 @@ pub async fn index(
 
     if service_accounts.is_empty() {
         Ok(crate::render(|buf| {
-            crate::templates::service_accounts::empty_html(buf, &initials, &team)
+            crate::ructe::templates::service_accounts::empty_html(buf, &initials, &team)
         }))
     } else {
         Ok(crate::render(|buf| {
-            crate::templates::service_accounts::index_html(
+            crate::ructe::templates::service_accounts::index_html(
                 buf,
                 &initials,
                 service_accounts,

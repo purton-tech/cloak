@@ -31,7 +31,7 @@ pub fn name(email: String, first_name: Option<String>, last_name: Option<String>
         return format!("{} {}", first_name, last_name);
     }
 
-    return email;
+    email
 }
 
 pub fn initials(email: &str, first_name: Option<String>, last_name: Option<String>) -> String {

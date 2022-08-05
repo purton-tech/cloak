@@ -34,6 +34,6 @@ pub async fn switch(
     let initials = crate::layout::initials(&user.email, user.first_name, user.last_name);
 
     Ok(crate::render(|buf| {
-        crate::templates::team::switch_html(buf, &initials, teams, &team)
+        crate::ructe::templates::team::switch_html(buf, &initials, teams, &team)
     }))
 }

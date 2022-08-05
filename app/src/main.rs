@@ -15,7 +15,7 @@ mod service_accounts;
 mod team;
 mod vaults;
 
-use crate::templates::statics::StaticFile;
+use crate::ructe::templates::statics::StaticFile;
 use axum::body::{self, Body, Empty};
 use axum::extract::{Extension, Path};
 use axum::http::{header, HeaderValue, Response, StatusCode};
@@ -102,8 +102,12 @@ async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
     }
 }
 
+#[allow(clippy::all)]
 pub mod cornucopia {
     include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
 }
 
-include!(concat!(env!("OUT_DIR"), "/ructe/templates.rs"));
+#[allow(clippy::all)]
+pub mod ructe {
+    include!(concat!(env!("OUT_DIR"), "/ructe/templates.rs"));
+}

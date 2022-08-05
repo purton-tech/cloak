@@ -34,7 +34,7 @@ pub async fn add(
     // separated list of ids.
     let envs: Vec<i32> = add_member
         .environments
-        .split(",")
+        .split(',')
         .map(|e| e.parse::<i32>().unwrap_or(-1))
         .filter(|e| *e != -1)
         .collect();

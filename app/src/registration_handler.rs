@@ -32,7 +32,7 @@ pub async fn post_registration(
         .await;
 
     if let Ok(org) = org {
-        return Ok(Redirect::to(&crate::vaults::index_route(org.id)));
+        Ok(Redirect::to(&crate::vaults::index_route(org.id)))
     } else {
         let inserted_org_id = queries::organisations::insert_organisation()
             .bind(&transaction)
@@ -55,6 +55,6 @@ pub async fn post_registration(
 
         transaction.commit().await?;
 
-        return Ok(Redirect::to(&crate::vaults::index_route(inserted_org_id)));
+        Ok(Redirect::to(&crate::vaults::index_route(inserted_org_id)))
     }
 }

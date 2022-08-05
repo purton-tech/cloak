@@ -46,7 +46,13 @@ pub async fn index(
 
     if secrets.is_empty() {
         Ok(crate::render(|buf| {
-            crate::templates::secrets::empty_html(buf, &initials, &user_vault, environments, &team)
+            crate::ructe::templates::secrets::empty_html(
+                buf,
+                &initials,
+                &user_vault,
+                environments,
+                &team,
+            )
         }))
     } else {
         queries::audit::insert()
@@ -61,7 +67,7 @@ pub async fn index(
             .await?;
 
         Ok(crate::render(|buf| {
-            crate::templates::secrets::index_html(
+            crate::ructe::templates::secrets::index_html(
                 buf,
                 &initials,
                 &user_vault,

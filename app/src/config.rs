@@ -1,4 +1,3 @@
-use deadpool_postgres;
 use lettre::message;
 use rustls::ClientConfig;
 use std::env;
@@ -79,15 +78,15 @@ impl Config {
         } else {
             self.app_database_url.split("postgres://").collect()
         };
-        let split_on_at: Vec<&str> = url[1].split("@").collect();
-        let user_and_pass: Vec<&str> = split_on_at[0].split(":").collect();
+        let split_on_at: Vec<&str> = url[1].split('@').collect();
+        let user_and_pass: Vec<&str> = split_on_at[0].split(':').collect();
 
-        let split_on_slash: Vec<&str> = split_on_at[1].split("/").collect();
-        let host_and_port: Vec<&str> = split_on_slash[0].split(":").collect();
-        let dbname_and_params: Vec<&str> = split_on_slash[1].split("?").collect();
+        let split_on_slash: Vec<&str> = split_on_at[1].split('/').collect();
+        let host_and_port: Vec<&str> = split_on_slash[0].split(':').collect();
+        let dbname_and_params: Vec<&str> = split_on_slash[1].split('?').collect();
 
         // we need to repalce %40 with @ so this works on Azure Postgres
-        cfg.user = Some(String::from(user_and_pass[0].replace("%40", "@")));
+        cfg.user = Some(user_and_pass[0].replace("%40", "@"));
         cfg.password = Some(String::from(user_and_pass[1]));
         cfg.host = Some(String::from(host_and_port[0]));
         cfg.port = Some(host_and_port[1].parse::<u16>().unwrap());
@@ -110,13 +109,11 @@ impl Config {
                 .with_root_certificates(root_store)
                 .with_no_client_auth();
             let tls = MakeRustlsConnect::new(tls_config);
-            return cfg
-                .create_pool(Some(deadpool_postgres::Runtime::Tokio1), tls)
-                .unwrap();
+            cfg.create_pool(Some(deadpool_postgres::Runtime::Tokio1), tls)
+                .unwrap()
         } else {
-            return cfg
-                .create_pool(Some(deadpool_postgres::Runtime::Tokio1), NoTls)
-                .unwrap();
+            cfg.create_pool(Some(deadpool_postgres::Runtime::Tokio1), NoTls)
+                .unwrap()
         }
     }
 }

@@ -20,12 +20,10 @@
     <div class="m_card">
         <div class="header">
             <span>Audit Trail</span>
-            <button class="a_button" data-drawer-target="filter-drawer">
-                Filter
-            </button>
+            <button class="a_button" data-drawer-target="filter-drawer">Filter</button>
         </div>
         <div class="body">
-            <table class="m_table team_table">
+            <table class="m_table audit_table">
                 <thead>
                     <tr>
                         <th class="hide-on-phones">When</th>
@@ -40,7 +38,7 @@
                         @if index < 10 {
                             <tr>
                                 <td class="hide-on-phones">
-                                    <relative-time datetime='@audit.created_at.format(&Rfc3339).unwrap_or("".to_string())'></relative-time>
+                                    <relative-time datetime='@audit.created_at.format(&Rfc3339).unwrap_or_else(|_| "".to_string())'></relative-time>
                                 </td>
                                 <td>
                                     @audit.email

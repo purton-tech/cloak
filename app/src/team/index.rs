@@ -55,7 +55,7 @@ pub async fn index(
         crate::layout::initials(&user.email, user.first_name.clone(), user.last_name.clone());
 
     Ok(crate::render(|buf| {
-        crate::templates::team::index_html(
+        crate::ructe::templates::team::index_html(
             buf,
             &initials,
             users,

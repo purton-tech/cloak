@@ -40,7 +40,7 @@ pub async fn index(
 
     if vaults.is_empty() {
         Ok(crate::render(|buf| {
-            crate::templates::vaults::empty_html(buf, &initials, &team)
+            crate::ructe::templates::vaults::empty_html(buf, &initials, &team)
         }))
     } else {
         let mut summary_vaults: Vec<VaultSummary> = Default::default();
@@ -67,7 +67,7 @@ pub async fn index(
         }
 
         Ok(crate::render(|buf| {
-            crate::templates::vaults::index_html(buf, &initials, summary_vaults, &team)
+            crate::ructe::templates::vaults::index_html(buf, &initials, summary_vaults, &team)
         }))
     }
 }
