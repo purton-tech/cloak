@@ -1,6 +1,8 @@
 mod filter;
 mod index;
 
+pub const PAGE_SIZE: i64 = 10;
+
 use axum::{
     routing::{get, post},
     Router,

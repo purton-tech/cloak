@@ -86,6 +86,7 @@ pub async fn filter(
             &filter_form.convert_to_access_type(),
             &filter_form.get_user(),
             &organisation_id,
+            &(super::PAGE_SIZE + 1)
         )
         .all()
         .await?;

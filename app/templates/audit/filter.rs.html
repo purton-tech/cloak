@@ -2,7 +2,7 @@
 
 @(team_users: Vec<GetUsers>, organisation_id: i32)
 
-<form class="m_form" method="post" action="@crate::audit::index_route(organisation_id)">
+<form class="m_form" method="post" id="filter-form" action="@crate::audit::index_route(organisation_id)">
     <side-drawer label="Filter Results" id="filter-drawer">
         <template slot="body">
             <fieldset>

@@ -37,28 +37,32 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for audit in audits {
-                        <tr>
-    
-                            <td class="hide-on-phones">
-                                <relative-time datetime='@audit.created_at.format(&Rfc3339).unwrap_or("".to_string())'></relative-time>
-                            </td>
-                            <td>
-                                @audit.email
-                            </td>
-                            <td class="hide-on-phones">
-                                <span class="a_badge a_badge--success">@:client_html(audit.access_type)</span>
-                            </td>
-                            <td>
-                                <span class="a_badge a_badge--success">@:action_html(audit.action)</span>
-                            </td>
-                            <td class="hide-on-phones">
-                                @audit.description
-                            </td>
-                        </tr>
+                    @for (index, audit) in audits.iter().enumerate() {
+                        @if index < 10 {
+                            <tr>
+                                <td class="hide-on-phones">
+                                    <relative-time datetime='@audit.created_at.format(&Rfc3339).unwrap_or("".to_string())'></relative-time>
+                                </td>
+                                <td>
+                                    @audit.email
+                                </td>
+                                <td class="hide-on-phones">
+                                    <span class="a_badge a_badge--success">@:client_html(audit.access_type)</span>
+                                </td>
+                                <td>
+                                    <span class="a_badge a_badge--success">@:action_html(audit.action)</span>
+                                </td>
+                                <td class="hide-on-phones">
+                                    @audit.description
+                                </td>
+                            </tr>
+                        }
                     }
                 </tbody>
             </table>
+            @if let Some(audit) = audits.get(10) {
+                <button data-filter-target="filter-form" data-filter-last-row="@audit.id">Load More</button>
+            }
         </div>
     </div>
 

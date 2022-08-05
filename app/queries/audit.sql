@@ -1,5 +1,6 @@
 --! audit : Audit()
-SELECT 
+SELECT
+    id,
     (SELECT email from users WHERE id = user_id) as email,
     created_at,
     action, 
@@ -10,10 +11,11 @@ FROM
 WHERE 
     organisation_id = :organisation_id
 ORDER BY created_at DESC
-LIMIT 50;
+LIMIT :limit;
 
 --! filter(action?, access_type?, user_id?) : Audit()
 SELECT 
+    id,
     (SELECT email from users WHERE id = user_id) as email,
     created_at,
     action, 
@@ -28,7 +30,7 @@ WHERE
     AND user_id = COALESCE(:user_id, user_id)
     AND organisation_id = :organisation_id
 ORDER BY created_at DESC
-LIMIT 50;
+LIMIT :limit;
 
 --! insert
 INSERT INTO 

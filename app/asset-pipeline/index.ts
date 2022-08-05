@@ -23,3 +23,4 @@ import '../templates/members/delete_member'
 
 // Misc.
 import './remember-select'
+import './filter-trigger'
