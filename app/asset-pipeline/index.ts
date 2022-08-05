@@ -22,5 +22,5 @@ import '../templates/members/add_member'
 import '../templates/members/delete_member'
 
 // Misc.
-import './remember-select'
+import './remember-form'
 import './filter-trigger'

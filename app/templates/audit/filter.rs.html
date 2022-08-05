@@ -1,23 +1,30 @@
 @use crate::cornucopia::queries::organisations::GetUsers;
 
-@(team_users: Vec<GetUsers>, organisation_id: i32)
+@(team_users: Vec<GetUsers>, organisation_id: i32, reset_search: bool)
 
-<form class="m_form" method="post" id="filter-form" action="@crate::audit::index_route(organisation_id)">
+<form 
+    class="m_form remember" method="post" 
+    data-remember-reset="@reset_search"
+    data-remember-name="audit"
+    id="filter-form" 
+    action="@crate::audit::index_route(organisation_id)">
     <side-drawer label="Filter Results" id="filter-drawer">
         <template slot="body">
             <fieldset>
                 
                 <label for="name">User</label>
-                <select class="remember" name="user">
+                <select name="user">
                     <option value="0">Any</option>
                     @for user in team_users {
-                        <option value="@user.id">@crate::layout::name(user.email, user.first_name, user.last_name)</option>
+                        <option value="@user.id">
+                            @crate::layout::name(user.email, user.first_name, user.last_name)
+                        </option>
                     }
                 </select>
                 <span class="a_help_text">For which user do you want to search</span>
 
                 <label for="name">Access Type</label>
-                <select class="remember" name="access_type">
+                <select name="access_type">
                     <option value="0">Any</option>
                     <option value="1">User Interface</option>
                     <option value="2">CLI</option>
@@ -26,7 +33,7 @@
                 <span class="a_help_text">Split between user interface and CLI usage.</span>
 
                 <label for="name">Action</label>
-                <select class="remember" name="action">
+                <select name="action">
                     <option value="0">Any</option>
                     <option value="1">Add Member</option>
                     <option value="2">Delete Member</option>

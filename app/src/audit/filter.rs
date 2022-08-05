@@ -96,12 +96,12 @@ pub async fn filter(
             &filter_form.convert_to_access_type(),
             &filter_form.get_user(),
             &organisation_id,
-            &(super::PAGE_SIZE + 1)
+            &(super::PAGE_SIZE + 1),
         )
         .all()
         .await?;
 
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, &initials, audits, team_users, &team)
+        crate::templates::audit::index_html(buf, &initials, audits, team_users, &team, false)
     }))
 }

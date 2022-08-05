@@ -47,6 +47,6 @@ pub async fn index(
         .await?;
 
     Ok(crate::render(|buf| {
-        crate::templates::audit::index_html(buf, &initials, audits, team_users, &team)
+        crate::templates::audit::index_html(buf, &initials, audits, team_users, &team, true)
     }))
 }

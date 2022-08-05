@@ -13,7 +13,8 @@
     initials: &str, 
     audits: Vec<Audit>, 
     team_users: Vec<GetUsers>, 
-    organisation: &Organisation
+    organisation: &Organisation,
+    reset_search: bool
 )
 
 @:layout_html("Audit Trail", initials, {
@@ -60,12 +61,16 @@
                     }
                 </tbody>
             </table>
+            <br />
             @if let Some(audit) = audits.get(10) {
-                <button data-filter-target="filter-form" data-filter-last-row="@audit.id">Load More</button>
+                <div class="center">
+                    <button class="a_button" data-filter-target="filter-form" 
+                        data-filter-last-row="@audit.id">Load More</button>
+                </div>
             }
         </div>
     </div>
 
-    @:filter_html(team_users, organisation.id)
+    @:filter_html(team_users, organisation.id, reset_search)
 }, {
 }, organisation, None, SideBar::Audit)
