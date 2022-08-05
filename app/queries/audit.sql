@@ -12,7 +12,7 @@ WHERE
 ORDER BY created_at DESC
 LIMIT 50;
 
---! filter : Audit()
+--! filter(action?, access_type?, user_id?) : Audit()
 SELECT 
     (SELECT email from users WHERE id = user_id) as email,
     created_at,
@@ -25,6 +25,7 @@ WHERE
     -- The inputs are optional in which case we can use COALESCE to skip
     action = COALESCE(:action, action)
     AND access_type = COALESCE(:access_type, access_type)
+    AND user_id = COALESCE(:user_id, user_id)
     AND organisation_id = :organisation_id
 ORDER BY created_at DESC
 LIMIT 50;

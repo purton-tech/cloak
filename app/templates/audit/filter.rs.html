@@ -6,18 +6,10 @@
     <side-drawer label="Filter Results" id="filter-drawer">
         <template slot="body">
             <fieldset>
-                <label for="name">Time Range</label>
-                <select>
-                    <option value="0">Any</option>
-                    <option value="1">Today</option>
-                    <option value="2">Yesterday</option>
-                    <option value="3">In the Last Week</option>
-                </select>
-                <span class="a_help_text">Give a time range for the events you are looking for.</span>
-            
+                
                 <label for="name">User</label>
-                <select>
-                    <option>Any</option>
+                <select name="user">
+                    <option value="0">Any</option>
                     @for user in team_users {
                         <option value="@user.id">@crate::layout::name(user.email, user.first_name, user.last_name)</option>
                     }
@@ -25,7 +17,7 @@
                 <span class="a_help_text">For which user do you want to search</span>
 
                 <label for="name">Access Type</label>
-                <select>
+                <select name="access_type">
                     <option value="0">Any</option>
                     <option value="1">User Interface</option>
                     <option value="2">CLI</option>
@@ -34,7 +26,7 @@
                 <span class="a_help_text">Split between user interface and CLI usage.</span>
 
                 <label for="name">Action</label>
-                <select>
+                <select name="action">
                     <option value="0">Any</option>
                     <option value="1">Add Member</option>
                     <option value="2">Delete Member</option>
