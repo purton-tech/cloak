@@ -30,7 +30,7 @@ pub async fn delete(
             &transaction,
             &delete_member.vault_id,
             &delete_member.user_id,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
         )
         .await?;
 
@@ -40,7 +40,7 @@ pub async fn delete(
         .await?;
 
     // If we remove ourself, redirect to vaults page.
-    let url = if delete_member.user_id == (current_user.user_id as i32) {
+    let url = if delete_member.user_id == current_user.user_id {
         crate::vaults::index_route(team.id)
     } else {
         super::member_route(params.1, params.0)

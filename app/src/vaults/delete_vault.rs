@@ -36,7 +36,7 @@ pub async fn delete(
         .bind(
             &transaction,
             &idor_delete_vault.vault_id,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
         )
         .one()
         .await?;
@@ -46,14 +46,14 @@ pub async fn delete(
             .bind(
                 &transaction,
                 &idor_delete_vault.vault_id,
-                &(current_user.user_id as i32),
+                &current_user.user_id,
             )
             .await?;
 
         queries::audit::insert()
             .bind(
                 &transaction,
-                &(current_user.user_id as i32),
+                &current_user.user_id,
                 &organisation_id,
                 &AuditAction::DeleteVault,
                 &AuditAccessType::Web,

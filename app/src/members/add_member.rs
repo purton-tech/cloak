@@ -42,7 +42,7 @@ pub async fn add(
     // Do an IDOR check, does this user have access to the vault. This will
     // blow up if we don't
     queries::vaults::get()
-        .bind(&transaction, &vault_id, &(current_user.user_id as i32))
+        .bind(&transaction, &vault_id, &current_user.user_id)
         .one()
         .await?;
 

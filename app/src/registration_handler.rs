@@ -27,7 +27,7 @@ pub async fn post_registration(
     super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
     let org = queries::organisations::get_primary_organisation()
-        .bind(&transaction, &(current_user.user_id as i32))
+        .bind(&transaction, &current_user.user_id)
         .one()
         .await;
 
@@ -47,7 +47,7 @@ pub async fn post_registration(
         queries::organisations::add_user_to_organisation()
             .bind(
                 &transaction,
-                &(current_user.user_id as i32),
+                &current_user.user_id,
                 &inserted_org_id,
                 &roles.as_ref(),
             )

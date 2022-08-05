@@ -250,7 +250,9 @@ async fn authenticate<T>(req: &Request<T>) -> Result<authentication::Authenticat
             .parse::<u32>()
             .map_err(|_| Status::new(Code::Internal, "x-user-id not parseable as unsigned int"))?;
 
-        Ok(authentication::Authentication { user_id })
+        Ok(authentication::Authentication {
+            user_id: user_id as i32,
+        })
     } else {
         Err(Status::new(
             Code::PermissionDenied,

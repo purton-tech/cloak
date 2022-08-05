@@ -7,7 +7,7 @@ use axum::{
 
 #[derive(Debug)]
 pub struct Authentication {
-    pub user_id: u32,
+    pub user_id: i32,
 }
 
 // From a request extract our authentication token.
@@ -22,7 +22,9 @@ where
         if let Some(user_id) = req.headers().get("x-user-id") {
             if let Ok(user_id) = user_id.to_str() {
                 if let Ok(user_id) = user_id.parse::<u32>() {
-                    return Ok(Authentication { user_id });
+                    return Ok(Authentication {
+                        user_id: user_id as i32,
+                    });
                 }
             }
         }

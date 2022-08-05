@@ -44,7 +44,7 @@ pub async fn new(
     queries::vaults::insert_user_vaults()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &vault_id,
             &new_vault.public_key.as_ref(),
             &new_vault.encrypted_vault_key.as_ref(),
@@ -54,7 +54,7 @@ pub async fn new(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::CreateVault,
             &AuditAccessType::Web,
@@ -68,7 +68,7 @@ pub async fn new(
         .await?;
     for env in envs {
         queries::environments::connect_environment_to_user()
-            .bind(&transaction, &(current_user.user_id as i32), &env.id)
+            .bind(&transaction, &current_user.user_id, &env.id)
             .await?;
     }
 

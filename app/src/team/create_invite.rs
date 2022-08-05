@@ -71,7 +71,7 @@ pub async fn create_invite(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::CreateInvite,
             &AuditAccessType::Web,

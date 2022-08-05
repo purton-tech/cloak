@@ -49,7 +49,7 @@ pub async fn new(
     queries::audit::insert()
         .bind(
             &transaction,
-            &(current_user.user_id as i32),
+            &current_user.user_id,
             &organisation_id,
             &AuditAction::NewServiceAccount,
             &AuditAccessType::Web,

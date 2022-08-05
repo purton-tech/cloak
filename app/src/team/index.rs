@@ -29,11 +29,7 @@ pub async fn index(
         .await?;
 
     let permissions: Vec<types::public::Permission> = queries::rbac::permissions()
-        .bind(
-            &transaction,
-            &(current_user.user_id as i32),
-            &organisation_id,
-        )
+        .bind(&transaction, &current_user.user_id, &organisation_id)
         .all()
         .await?;
 
@@ -42,7 +38,7 @@ pub async fn index(
         .any(|p| p == &types::public::Permission::ManageTeam);
 
     let user = queries::users::get()
-        .bind(&transaction, &(current_user.user_id as i32))
+        .bind(&transaction, &current_user.user_id)
         .one()
         .await?;
 

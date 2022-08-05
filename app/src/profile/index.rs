@@ -23,7 +23,7 @@ pub async fn index(
         .await?;
 
     let user = queries::users::get()
-        .bind(&transaction, &(current_user.user_id as i32))
+        .bind(&transaction, &current_user.user_id)
         .one()
         .await?;
     let initials =
