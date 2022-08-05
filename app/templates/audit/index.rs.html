@@ -6,7 +6,6 @@
 @use time::format_description::well_known::Rfc3339;
 @use crate::cornucopia::queries::organisations::Organisation;
 @use crate::cornucopia::queries::organisations::GetUsers;
-@use crate::templates::statics::filter_svg;
 @use super::filter_html;
 
 @(
@@ -22,7 +21,6 @@
         <div class="header">
             <span>Audit Trail</span>
             <button class="a_button" data-drawer-target="filter-drawer">
-                <img alt="Filter" width="16" height="16" src="/static/@filter_svg.name"></img>
                 Filter
             </button>
         </div>
