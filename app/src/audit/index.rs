@@ -34,8 +34,15 @@ pub async fn index(
         .await?;
 
     let audits = queries::audit::audit()
-        .bind(&transaction, &organisation_id, 
-            &(super::PAGE_SIZE + 1))
+        .bind(
+            &transaction,
+            &None,
+            &None,
+            &None,
+            &None,
+            &organisation_id,
+            &(super::PAGE_SIZE + 1)
+        )
         .all()
         .await?;
 

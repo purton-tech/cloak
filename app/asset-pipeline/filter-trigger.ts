@@ -8,9 +8,12 @@ document.querySelectorAll('[data-filter-target]').forEach(async (row) => {
         if(target != null && lastRow != null) {
             const form = document.getElementById(target)
             if(form instanceof HTMLFormElement) {
-                form.submit()
+                const lastRowHiddenField = document.getElementById('last-row-id')
+                if(lastRowHiddenField instanceof HTMLInputElement) {
+                    lastRowHiddenField.value = lastRow
+                    form.submit()
+                }
             }
-            console.log(lastRow)
         }
         event.stopImmediatePropagation()
     })

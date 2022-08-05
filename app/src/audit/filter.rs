@@ -11,12 +11,21 @@ use serde::Deserialize;
 
 #[derive(Deserialize, Default, Debug)]
 pub struct Filter {
+    pub id: i32,
     pub user: i32,
     pub access_type: u32,
     pub action: u32,
 }
 
 impl Filter {
+    
+    pub fn get_id(&self) -> Option<i32> {
+        match self.id {
+            0 => None,
+            n => Some(n)
+        }
+    }
+
     pub fn get_user(&self) -> Option<i32> {
         match self.user {
             0 => None,
@@ -79,9 +88,10 @@ pub async fn filter(
         .all()
         .await?;
 
-    let audits = queries::audit::filter()
+    let audits = queries::audit::audit()
         .bind(
             &transaction,
+            &filter_form.get_id(),
             &filter_form.convert_to_action(),
             &filter_form.convert_to_access_type(),
             &filter_form.get_user(),
