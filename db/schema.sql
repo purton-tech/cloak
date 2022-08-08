@@ -185,7 +185,7 @@ CREATE FUNCTION public.get_orgs_for_app_user() RETURNS SETOF integer
 DECLARE
     current_key text := current_ecdh_public_key();
 BEGIN
-    raise notice 'Key (%)', current_key;
+    -- raise notice 'Key (%)', current_key;
     -- Is this an API call using the ECDH public key?
     IF current_key IS NOT NULL AND LENGTH(current_key) > 10 THEN
         RETURN QUERY SELECT
@@ -1405,13 +1405,6 @@ ALTER TABLE ONLY public.environments
 ALTER TABLE public.audit_trail ENABLE ROW LEVEL SECURITY;
 
 --
--- Name: sessions authentication_policy; Type: POLICY; Schema: public; Owner: -
---
-
-CREATE POLICY authentication_policy ON public.sessions TO authentication USING (true);
-
-
---
 -- Name: users authentication_policy; Type: POLICY; Schema: public; Owner: -
 --
 
@@ -1557,14 +1550,14 @@ COMMENT ON POLICY multi_tenancy_policy_insert ON public.organisation_users IS 'A
 -- Name: organisation_users multi_tenancy_policy_select; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT TO application USING (true);
+CREATE POLICY multi_tenancy_policy_select ON public.organisation_users FOR SELECT TO application USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
 
 
 --
 -- Name: POLICY multi_tenancy_policy_select ON organisation_users; Type: COMMENT; Schema: public; Owner: -
 --
 
-COMMENT ON POLICY multi_tenancy_policy_select ON public.organisation_users IS 'Only disconnect a user from an org if we have access to that org.';
+COMMENT ON POLICY multi_tenancy_policy_select ON public.organisation_users IS 'Allow the user to see the organisation-users table';
 
 
 --
@@ -1736,4 +1729,6 @@ INSERT INTO public.schema_migrations (version) VALUES
     ('20220410155252'),
     ('20220410155319'),
     ('20220621094035'),
-    ('20220728091159');
+    ('20220728091159'),
+    ('20220808093939'),
+    ('20220808094314');
