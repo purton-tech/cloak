@@ -50,7 +50,7 @@ GRANT SELECT, UPDATE ON users TO application;
 GRANT SELECT ON users_id_seq TO application;
 
 -- Give access to the readonly user
-GRANT SELECT ON sessions, users, sessions_id_seq TO readonly;
+GRANT SELECT ON sessions, users, users_id_seq, sessions_id_seq TO readonly;
 
 -- Give access to authentication user
 GRANT SELECT, INSERT, UPDATE, DELETE ON sessions TO authentication;
