@@ -60,7 +60,7 @@
         @:delete_html(member, &organisation.id)
     }
 }, {
-    @if non_members.is_empty() {
+    @if ! non_members.is_empty() {
         @:add_member_html(&user_vault, environments, non_members, &organisation.id)
         <button class="a_button mini primary" id="add-member">Add Member</button>
     }
