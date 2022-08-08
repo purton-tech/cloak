@@ -138,11 +138,26 @@ COMMENT ON FUNCTION public.current_app_user() IS 'These needs to be set by the a
 
 
 --
+-- Name: current_ecdh_public_key(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.current_ecdh_public_key() RETURNS text
+    LANGUAGE sql
+    AS $$
+    SELECT
+        current_setting(
+            'row_level_security.ecdh_public_key',
+            true
+        )
+$$;
+
+
+--
 -- Name: get_orgs_app_user_created(); Type: FUNCTION; Schema: public; Owner: -
 --
 
 CREATE FUNCTION public.get_orgs_app_user_created() RETURNS SETOF integer
-    LANGUAGE sql
+    LANGUAGE sql SECURITY DEFINER
     AS $$
     SELECT
         id
@@ -165,14 +180,30 @@ COMMENT ON FUNCTION public.get_orgs_app_user_created() IS 'All the orgs a user c
 --
 
 CREATE FUNCTION public.get_orgs_for_app_user() RETURNS SETOF integer
-    LANGUAGE sql
+    LANGUAGE plpgsql SECURITY DEFINER
     AS $$
-    SELECT
-        organisation_id
-    FROM
-        organisation_users
-    WHERE
-        user_id = current_app_user()
+DECLARE
+    current_key text := current_ecdh_public_key();
+BEGIN
+    raise notice 'Key (%)', current_key;
+    -- Is this an API call using the ECDH public key?
+    IF current_key IS NOT NULL AND LENGTH(current_key) > 10 THEN
+        RETURN QUERY SELECT
+            organisation_id
+        FROM
+            service_accounts
+        WHERE
+            ecdh_public_key = current_key;
+    -- It's a normal call get the current app user
+    ELSE
+        RETURN QUERY SELECT
+            organisation_id
+        FROM
+            organisation_users
+        WHERE
+            user_id = current_app_user();
+    END IF;
+END;
 $$;
 
 
@@ -188,7 +219,7 @@ COMMENT ON FUNCTION public.get_orgs_for_app_user() IS 'All the orgs a user has b
 --
 
 CREATE FUNCTION public.get_users_for_app_user() RETURNS SETOF integer
-    LANGUAGE sql
+    LANGUAGE sql SECURITY DEFINER
     AS $$
     SELECT
         user_id
@@ -1468,7 +1499,7 @@ CREATE POLICY multi_tenancy_policy ON public.service_account_secrets TO applicat
 -- Name: service_accounts multi_tenancy_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY multi_tenancy_policy ON public.service_accounts TO application USING ((organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user)));
+CREATE POLICY multi_tenancy_policy ON public.service_accounts TO application USING ((((ecdh_public_key)::text = public.current_ecdh_public_key()) OR (organisation_id IN ( SELECT public.get_orgs_for_app_user() AS get_orgs_for_app_user))));
 
 
 --

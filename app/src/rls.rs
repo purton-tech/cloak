@@ -19,3 +19,20 @@ pub async fn set_row_level_security_user(
 
     Ok(())
 }
+// A helper function for setting the RLS user which is used by all the policies.
+pub async fn set_row_level_security_ecdh_public_key(
+    transaction: &Transaction<'_>,
+    ecdh_public_key: &str,
+) -> Result<(), CustomError> {
+    transaction
+        .query(
+            &format!(
+                "SET LOCAL row_level_security.ecdh_public_key = '{}'",
+                ecdh_public_key
+            ),
+            &[],
+        )
+        .await?;
+
+    Ok(())
+}

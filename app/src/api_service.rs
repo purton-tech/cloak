@@ -14,7 +14,6 @@ impl app::vault::vault_server::Vault for VaultService {
         &self,
         request: Request<GetServiceAccountRequest>,
     ) -> Result<Response<GetServiceAccountResponse>, Status> {
-        let authenticated_user = authenticate(&request).await?;
         let req = request.into_inner();
 
         // Create a transaction and setup RLS
@@ -27,7 +26,8 @@ impl app::vault::vault_server::Vault for VaultService {
             .transaction()
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
-        super::rls::set_row_level_security_user(&transaction, &authenticated_user)
+
+        super::rls::set_row_level_security_ecdh_public_key(&transaction, &req.ecdh_public_key)
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
 
@@ -37,40 +37,28 @@ impl app::vault::vault_server::Vault for VaultService {
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
 
-        if let Some(vault_id) = service_account.vault_id {
-            queries::vaults::vault()
-                .bind(&transaction, &vault_id)
-                .one()
-                .await
-                .map_err(|e| CustomError::Database(e.to_string()))?;
+        let secrets = queries::service_account_secrets::get_all_dangerous()
+            .bind(&transaction, &service_account.id)
+            .all()
+            .await
+            .map_err(|e| CustomError::Database(e.to_string()))?;
 
-            let secrets = queries::service_account_secrets::get_all_dangerous()
-                .bind(&transaction, &service_account.id)
-                .all()
-                .await
-                .map_err(|e| CustomError::Database(e.to_string()))?;
+        let secrets = secrets
+            .into_iter()
+            .map(|secret| ServiceAccountSecret {
+                encrypted_name: secret.name,
+                name_blind_index: secret.name_blind_index,
+                encrypted_secret_value: secret.secret,
+                ecdh_public_key: secret.ecdh_public_key,
+            })
+            .collect();
 
-            let secrets = secrets
-                .into_iter()
-                .map(|secret| ServiceAccountSecret {
-                    encrypted_name: secret.name,
-                    name_blind_index: secret.name_blind_index,
-                    encrypted_secret_value: secret.secret,
-                    ecdh_public_key: secret.ecdh_public_key,
-                })
-                .collect();
+        let response = GetServiceAccountResponse {
+            service_account_id: service_account.id as u32,
+            secrets,
+        };
 
-            let response = GetServiceAccountResponse {
-                service_account_id: service_account.id as u32,
-                secrets,
-            };
-
-            return Ok(Response::new(response));
-        }
-
-        Err(Status::invalid_argument(
-            "This service account is not attached to a vault",
-        ))
+        return Ok(Response::new(response));
     }
 
     async fn get_vault(
