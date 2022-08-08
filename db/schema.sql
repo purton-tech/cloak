@@ -1576,35 +1576,35 @@ ALTER TABLE public.organisations ENABLE ROW LEVEL SECURITY;
 -- Name: audit_trail readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.audit_trail FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.audit_trail FOR SELECT TO readonly USING (true);
 
 
 --
 -- Name: environments readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.environments FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.environments FOR SELECT TO readonly USING (true);
 
 
 --
 -- Name: invitations readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.invitations FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.invitations FOR SELECT TO readonly USING (true);
 
 
 --
 -- Name: organisation_users readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.organisation_users FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.organisation_users FOR SELECT TO readonly USING (true);
 
 
 --
 -- Name: organisations readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.organisations FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.organisations FOR SELECT TO readonly USING (true);
 
 
 --
@@ -1625,21 +1625,21 @@ CREATE POLICY readonly_policy ON public.schema_migrations FOR SELECT TO authenti
 -- Name: secrets readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.secrets FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.secrets FOR SELECT TO readonly USING (true);
 
 
 --
 -- Name: service_account_secrets readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.service_account_secrets FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.service_account_secrets FOR SELECT TO readonly USING (true);
 
 
 --
 -- Name: service_accounts readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.service_accounts FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.service_accounts FOR SELECT TO readonly USING (true);
 
 
 --
@@ -1653,7 +1653,7 @@ CREATE POLICY readonly_policy ON public.sessions FOR SELECT TO authentication US
 -- Name: users readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.users FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.users FOR SELECT TO readonly USING (true);
 
 
 --
@@ -1667,14 +1667,14 @@ CREATE POLICY readonly_policy ON public.users_environments FOR SELECT TO authent
 -- Name: users_vaults readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.users_vaults FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.users_vaults FOR SELECT TO readonly USING (true);
 
 
 --
 -- Name: vaults readonly_policy; Type: POLICY; Schema: public; Owner: -
 --
 
-CREATE POLICY readonly_policy ON public.vaults FOR SELECT TO authentication USING (true);
+CREATE POLICY readonly_policy ON public.vaults FOR SELECT TO readonly USING (true);
 
 
 --

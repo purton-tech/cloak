@@ -22,6 +22,7 @@ alias nrs='npm run start'
 
 alias db='psql $DATABASE_URL'
 alias adb='psql $APP_DATABASE_URL'
+alias rdb='psql $RO_DATABASE_URL'
 
 # Leave a line below or the files will cat together
 
