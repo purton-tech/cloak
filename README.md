@@ -41,16 +41,16 @@
 
 ## Features and Benefits
 
-* Cloak helps prevent secrets sprawl with effective secrets management.
-* Cloak secures access by tightly controlling secrets with granular Role-Based Access Control (RBAC).
-* End 2 End encryption ensures defence in depth for your secrets.
-* Uses well known and well tested Elliptic Curve cryptography.
+* End-to-End encryption - Every secret is encrypted before a single byte ever leaves your device. Only you and your team control the encryption keys and who is able decrypt your secrets.
+* Eliminate secrets sprawl. When people leave or an incident happens, update secrets in one place and push it out everywhere.
+* Role-Based Access Control (RBAC) means users only see the secrets they need to see to do their jobs.
+* Built in multi tenancy. Teams can manage their own secrets and no one person has access to all the secrets unless you give them the permission.
+* Uses well known and well tested Elliptic Curve cryptography. No proprietary encryption mechanisms.
 * Our web interface manages encrypted key creation and distribution to make security the default for your projects.
 * The CLI tool brings secrets from the vault to you local environment, CICD pipelines, servers and more.
-* Hosted by us or on your own infrastructure, runs as docker containers.
-* Permissive licence.
-* Multi team, manage as many teams as you want.
-* Allow teams to manage themselves but still maintain a single source of truth for your secrets.
+* Hosted by us so you don't need to manage infrastructure, upgrades or support.
+* You have the option to deploy on your own servers using our docker images. Our containers are built in public from our Github CI/CD pipeline.
+* Permissive MIT licence and fully open client and server source code. This not only means that you can inspect our code, but that others have done so too.
 * Extensive audit trail that monitors access and usage.
 * Scales from Startup to Big Corp.
 
