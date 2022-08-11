@@ -18,12 +18,14 @@ ARG DBMATE_VERSION=1.15.0
 # Base images
 ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
 ARG NGINX=nginx:1.21.5
+ARG KUBECTL=bitnami/kubectl:latest
 
 # This file builds the following containers
 ARG APP_IMAGE_NAME=purtontech/cloak-server:latest
 ARG INIT_IMAGE_NAME=purtontech/cloak-db-migrations:latest
 ARG ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
 ARG WWW_IMAGE_NAME=purtontech/cloak-website:latest
+ARG KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
 
 
 WORKDIR /build
@@ -52,6 +54,7 @@ all:
     BUILD +envoy-container
     BUILD +www-container
     BUILD +build-cli-osx
+    BUILD +kubernetes-container
 
 npm-deps:
     COPY $APP_FOLDER/package.json $APP_FOLDER/package.json
@@ -92,7 +95,7 @@ build:
     RUN mkdir asset-pipeline
     COPY --dir +npm-build/dist $APP_FOLDER/
     COPY --dir $APP_FOLDER/asset-pipeline/images $APP_FOLDER/asset-pipeline
-    # We need to run inside docker as we need postgres running for SQLX
+    # We need to run inside docker as we need postgres running for cornucopia
     ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/postgres?sslmode=disable
     USER root
     WITH DOCKER \
@@ -230,3 +233,17 @@ build-cli-osx:
         CXX=o64-clang++ \
         cargo build --release --target x86_64-apple-darwin
     SAVE ARTIFACT target/x86_64-apple-darwin/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_MACOS_EXE_NAME
+
+kubernetes-container:
+    FROM debian:11-slim
+    COPY +build/$CLI_EXE_NAME /usr/local/bin/cloak
+    RUN apt-get update \
+        && apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl \
+            wget
+    RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    RUN chmod +x ./kubectl
+    RUN mv ./kubectl /usr/local/bin
+    CMD cloak --ecdh-private-key-file /cloak/cloak.pem env > tmp.env && kubectl create secret generic test -o yaml --from-env-file tmp.env
+    SAVE IMAGE $KUBERNETES_NAME
