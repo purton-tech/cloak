@@ -62,7 +62,7 @@
                                 <relative-time datetime="@service_account.updated_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
                             </td>
                             <td class="hide-on-phones">
-                                <relative-time datetime=@service_account.created_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
+                                <relative-time datetime="@service_account.created_at.format(&Rfc3339).unwrap_or_default()"></relative-time>
                             </td>
                             <td>
                                 <a id='@format!("delete-account-controller-{}", service_account.id)' href="#">
