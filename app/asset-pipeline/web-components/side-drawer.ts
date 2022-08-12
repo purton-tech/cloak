@@ -23,52 +23,67 @@ export class SideDrawer extends HTMLElement {
 
     constructor() {
         super()
-        const body = this.querySelector("template[slot='body']").cloneNode(true)
-        const footer = this.querySelector("template[slot='footer']").cloneNode(true)
-        const title = this.attributes.getNamedItem('label').value
-        const templateNode = template.cloneNode(true)
+        const bodyEle = this.querySelector("template[slot='body']")
+        const footerEle = this.querySelector("template[slot='footer']")
+        const titleText = this.attributes.getNamedItem('label')
 
-        if(templateNode instanceof HTMLTemplateElement && body instanceof HTMLTemplateElement
-            && footer instanceof HTMLTemplateElement) {
-            const templateDocument = templateNode.content
-            const drawerBody = templateDocument.querySelector(".drawer__body")
-            drawerBody.appendChild(body.content)
-            const drawerFooter = templateDocument.querySelector(".drawer__footer")
-            drawerFooter.appendChild(footer.content)
+        if(bodyEle != null && footerEle != null && titleText != null) {
 
-            const templateTitle = templateDocument.querySelector(".drawer__title")
-            templateTitle.innerHTML = title
-
-            const thiz = this
-
-            const closeButton = templateDocument.querySelector(".drawer__close")
-            closeButton.addEventListener("click", function(e) {
-                e.stopPropagation()
-                thiz.open = false
-            });
-
-            const overlay = templateDocument.querySelector(".drawer__overlay")
-            overlay.addEventListener("click", function(e) {
-                e.stopPropagation()
-                thiz.open = false
-            });
-
-            overlay.addEventListener('keydown', (event : Event) => {
-                console.log(event)
-                if(event instanceof KeyboardEvent) {
-                    if (event.key === 'Escape') {
-                        this.open = false
-                    }
-                }
-              }, false);
-
-            // Catch all clicks in the panel so they don't propogate up to the document
-            const panel = templateDocument.querySelector(".drawer__panel")
-            panel.addEventListener("click", function(e) {
-                e.stopPropagation()
-            });
+            const body = bodyEle.cloneNode(true)
+            const footer = footerEle.cloneNode(true)
+            const title = titleText.value
+            const templateNode = template.cloneNode(true)
     
-            this.appendChild(templateDocument)
+            if(templateNode instanceof HTMLTemplateElement && body instanceof HTMLTemplateElement
+                && footer instanceof HTMLTemplateElement) {
+                const templateDocument = templateNode.content
+                const drawerBody = templateDocument.querySelector(".drawer__body")
+                const drawerFooter = templateDocument.querySelector(".drawer__footer")
+                const templateTitle = templateDocument.querySelector(".drawer__title")
+                const closeButton = templateDocument.querySelector(".drawer__close")
+                const overlay = templateDocument.querySelector(".drawer__overlay")
+                const panel = templateDocument.querySelector(".drawer__panel")
+
+                if(drawerBody && drawerFooter && templateTitle && closeButton && overlay && panel) {
+
+                    drawerBody.appendChild(body.content)
+                    drawerFooter.appendChild(footer.content)
+        
+                    templateTitle.innerHTML = title
+        
+                    const thiz = this
+        
+                    closeButton.addEventListener("click", function(e) {
+                        e.stopPropagation()
+                        thiz.open = false
+                    });
+        
+                    overlay.addEventListener("click", function(e) {
+                        e.stopPropagation()
+                        thiz.open = false
+                    });
+        
+                    overlay.addEventListener('keydown', (event : Event) => {
+                        console.log(event)
+                        if(event instanceof KeyboardEvent) {
+                            if (event.key === 'Escape') {
+                                this.open = false
+                            }
+                        }
+                      }, false);
+        
+                    // Catch all clicks in the panel so they don't propogate up to the document
+                    panel.addEventListener("click", function(e) {
+                        e.stopPropagation()
+                    });
+            
+                    this.appendChild(templateDocument)
+                } else {
+                    console.error("side-drawer: could not find required elements.")
+                }
+            }
+        } else {
+            console.error("side-drawer: could not find required elements.")
         }
 
     }
@@ -86,6 +101,7 @@ export class SideDrawer extends HTMLElement {
     }
 
     attributeChangedCallback(name: string, oldVal: string, newVal: string) {
+        const drawer = this.querySelector('.drawer')
         if (oldVal !== newVal) {
             switch (name) {
                 case 'open':
@@ -93,11 +109,11 @@ export class SideDrawer extends HTMLElement {
                     if(newVal == 'true') {
                         val = true
                     }
-                    if(val == true) {
-                        this.querySelector('.drawer').classList.remove('drawer--open')
-                        this.querySelector('.drawer').classList.add('drawer--open')
-                    } else {
-                        this.querySelector('.drawer').classList.remove('drawer--open')
+                    if(val == true && drawer) {
+                        drawer.classList.remove('drawer--open')
+                        drawer.classList.add('drawer--open')
+                    } else if (drawer) {
+                        drawer.classList.remove('drawer--open')
                     }
                     break;
             }

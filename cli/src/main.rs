@@ -1,4 +1,5 @@
 pub mod vault {
+    #![allow(clippy::derive_partial_eq_without_eq)]
     tonic::include_proto!("vault");
 }
 
@@ -13,8 +14,9 @@ use std::env;
 use std::ffi::OsString;
 use std::process::{Command, Stdio};
 
-use aes_gcm::aead::{generic_array::GenericArray, Aead, NewAead, Payload};
+use aes_gcm::aead::{generic_array::GenericArray, Aead, Payload};
 use aes_gcm::Aes256Gcm;
+use aes_gcm::KeyInit;
 use cli_table::{print_stdout, Table};
 use dotenv::dotenv;
 
@@ -167,7 +169,7 @@ fn decrypt_secret(
     shared_secret: &SharedSecret,
 ) -> Result<String, Box<dyn std::error::Error>> {
     let nonce_and_cipher: Vec<&str> = nonce_and_cipher.split('|').collect();
-    if let Some(nonce) = nonce_and_cipher.get(0) {
+    if let Some(nonce) = nonce_and_cipher.first() {
         if let Some(cipher) = nonce_and_cipher.get(1) {
             let nonce_bytes = base64::decode(nonce).unwrap();
             let cipher_bytes = base64::decode(cipher).unwrap();

@@ -12,17 +12,12 @@ mod registration_handler;
 mod rls;
 mod secrets;
 mod service_accounts;
+mod static_files;
 mod team;
 mod vaults;
 
-use crate::ructe::templates::statics::StaticFile;
-use axum::body::{self, Body, Empty};
-use axum::extract::{Extension, Path};
-use axum::http::{header, HeaderValue, Response, StatusCode};
-use axum::{
-    response::{Html, IntoResponse},
-    routing::get,
-};
+use axum::extract::Extension;
+use axum::{response::Html, routing::get};
 use std::net::SocketAddr;
 use tower_http::trace::TraceLayer;
 
@@ -41,7 +36,7 @@ async fn main() {
     let pool = config.create_pool();
 
     let axum_make_service = axum::Router::new()
-        .route("/static/*path", get(static_path))
+        .route("/static/*path", get(static_files::static_path))
         .merge(audit::routes())
         .merge(vaults::routes())
         .merge(secrets::routes())
@@ -82,26 +77,6 @@ where
     Html(Box::leak(html.into_boxed_str()))
 }
 
-async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
-    let path = path.trim_start_matches('/');
-
-    if let Some(data) = StaticFile::get(path) {
-        Response::builder()
-            .status(StatusCode::OK)
-            .header(
-                header::CONTENT_TYPE,
-                HeaderValue::from_str(data.mime.as_ref()).unwrap(),
-            )
-            .body(body::boxed(Body::from(data.content)))
-            .unwrap()
-    } else {
-        Response::builder()
-            .status(StatusCode::NOT_FOUND)
-            .body(body::boxed(Empty::new()))
-            .unwrap()
-    }
-}
-
 #[allow(clippy::all)]
 pub mod cornucopia {
     include!(concat!(env!("OUT_DIR"), "/cornucopia.rs"));
@@ -109,5 +84,6 @@ pub mod cornucopia {
 
 #[allow(clippy::all)]
 pub mod ructe {
+    // https://github.com/rust-lang/rust-analyzer/issues/5484
     include!(concat!(env!("OUT_DIR"), "/ructe/templates.rs"));
 }

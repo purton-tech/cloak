@@ -10,22 +10,27 @@ export class ECDHCipher extends HTMLElement {
 
     constructor() {
         super()
-        const cipher = Cipher.fromString(this.attributes.getNamedItem('cipher').value)
-        const ecdhPublicKey = ByteData.fromB64(
-            this.attributes.getNamedItem('ecdh-public-key').value)
-        const wrappedAesKey = Cipher.fromString(
-            this.attributes.getNamedItem('wrapped-aes-key').value)
-
-        // With the users ECDH key create a key form a key agreement
-        // This key can then unwrap the wrapped key.
-        // The unwrapped key can decrypt the cipher
-        ECDHPublicKey.import(ecdhPublicKey).then(ecdhPublicKey => {
-            Vault.decryptVaultKey(wrappedAesKey, ecdhPublicKey).then(vaultKey => {
-                vaultKey.decrypt(cipher).then(plaintext => {
-                    this.innerText = plaintext.toText()
+        const cipherEle = this.attributes.getNamedItem('cipher');
+        const pkEle = this.attributes.getNamedItem('ecdh-public-key');
+        const wrappedEle = this.attributes.getNamedItem('wrapped-aes-key');
+        if (cipherEle != null && pkEle != null && wrappedEle != null) {
+            const cipher = Cipher.fromString(cipherEle.value)
+            const ecdhPublicKey = ByteData.fromB64(pkEle.value)
+            const wrappedAesKey = Cipher.fromString(wrappedEle.value)
+    
+            // With the users ECDH key create a key form a key agreement
+            // This key can then unwrap the wrapped key.
+            // The unwrapped key can decrypt the cipher
+            ECDHPublicKey.import(ecdhPublicKey).then(ecdhPublicKey => {
+                Vault.decryptVaultKey(wrappedAesKey, ecdhPublicKey).then(vaultKey => {
+                    vaultKey.decrypt(cipher).then(plaintext => {
+                        this.innerText = plaintext.toText()
+                    })
                 })
             })
-        })
+        } else {
+            console.error('Coulkd not find the HTML elements needed')
+        }
     }
 }
 
