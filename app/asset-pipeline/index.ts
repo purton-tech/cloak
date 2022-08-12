@@ -24,3 +24,4 @@ import '../templates/members/delete_member'
 // Misc.
 import './remember-form'
 import './filter-trigger'
+import './select-div'

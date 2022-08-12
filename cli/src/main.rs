@@ -43,6 +43,7 @@ pub enum Commands {
     Run(Vec<OsString>),
     Info,
     Secrets,
+    Env,
 }
 
 #[tokio::main]
@@ -90,6 +91,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 table.push(SecretRow { name, value })
             }
             print_stdout(table.with_title())?;
+        }
+        Commands::Env => {
+            let secrets: HashMap<String, String> = get_secrets(&config).await?;
+            for (name, value) in secrets.into_iter() {
+                println!("{}={}", name, value);
+            }
         }
     }
 
