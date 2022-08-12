@@ -1,6 +1,7 @@
 {
     "rust-analyzer.diagnostics.disabled": [
-        "macro-error"
+        "macro-error",
+        "unresolved-module"
     ],
     // https://github.com/rust-analyzer/rust-analyzer/issues/4616
     "rust-analyzer.checkOnSave.extraArgs": [

@@ -109,5 +109,6 @@ pub mod cornucopia {
 
 #[allow(clippy::all)]
 pub mod ructe {
+    // https://github.com/rust-lang/rust-analyzer/issues/5484
     include!(concat!(env!("OUT_DIR"), "/ructe/templates.rs"));
 }
