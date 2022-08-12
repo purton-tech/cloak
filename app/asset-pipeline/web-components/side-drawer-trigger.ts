@@ -12,7 +12,6 @@ document.addEventListener('readystatechange', () => {
                 const target = row.getAttribute('data-drawer-target')
                 if(target != null) {
                     const drawer = document.getElementById(target)
-                    console.log(drawer)
                     if (drawer instanceof SideDrawer) {
                         drawer.open = true
                     }

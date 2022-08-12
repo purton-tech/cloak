@@ -1,4 +1,4 @@
-import { ECDHKeyPair, ECDHPublicKey } from '../cryptography/ecdh_keypair'
+import { ECDHPublicKey } from '../cryptography/ecdh_keypair'
 import { Cipher } from '../cryptography/cipher'
 import { ByteData } from '../cryptography/byte_data'
 import { Vault } from '../cryptography/vault'
