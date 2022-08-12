@@ -121,4 +121,8 @@ export class SideDrawer extends HTMLElement {
     }
 }
 
-customElements.define('side-drawer', SideDrawer);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('side-drawer', SideDrawer);
+    }
+})

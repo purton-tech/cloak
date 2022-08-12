@@ -63,4 +63,8 @@ export class SnackBar extends HTMLElement {
     }
 }
 
-customElements.define('snack-bar', SnackBar);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('snack-bar', SnackBar)
+    }
+})

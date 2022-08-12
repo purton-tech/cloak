@@ -34,4 +34,8 @@ export class ECDHCipher extends HTMLElement {
     }
 }
 
-customElements.define('ecdh-cipher', ECDHCipher);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('ecdh-cipher', ECDHCipher);
+    }
+})
