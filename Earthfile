@@ -245,5 +245,5 @@ kubernetes-container:
     RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
     RUN chmod +x ./kubectl
     RUN mv ./kubectl /usr/local/bin
-    CMD cloak --ecdh-private-key-file /cloak/cloak.pem env > tmp.env && kubectl create secret generic test -o yaml --from-env-file tmp.env
+    CMD cloak --ecdh-private-key-file /cloak/cloak.pem env > tmp.env && kubectl create secret generic \$NAME --dry-run=client -o yaml --from-env-file tmp.env | kubectl apply -f -
     SAVE IMAGE $KUBERNETES_NAME

@@ -33,7 +33,7 @@
             </div>
         </div>
         <form class="m_form" method="post" action="@crate::vaults::delete_route(organisation.id)">
-            <side-drawer label="Delete Vault ?" id=@format!("delete-vault-drawer-{}", vault.id)>
+            <side-drawer label="Delete Vault ?" id='@format!("delete-vault-drawer-{}", vault.id)'>
                 <template slot="body">
                     <p>Are you sure you want to delete this vault?</p>
                     <p>If so then type the name of the vault <strong>&quot;@vault.name&quot;</strong>

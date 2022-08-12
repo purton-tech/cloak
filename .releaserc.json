@@ -25,6 +25,10 @@
         "name": "purtontech/cloak-website:latest",
         "skipLogin": true
     }],
+    ["@semantic-release-plus/docker", {
+        "name": "purtontech/cloak-kubernetes:latest",
+        "skipLogin": true
+    }],
     ["@semantic-release/exec", {
       "publishCmd": "./update-config.sh",
       "execCwd": "./infra"
