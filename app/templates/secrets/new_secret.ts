@@ -26,18 +26,23 @@ class NewSecret extends SideDrawer {
     constructor() {
         super()
 
-        // Attach to the button
         const newVaultButton = document.getElementById('new-secret')
-        newVaultButton.addEventListener('click', async event => {
-            this.open = true
-        })
-
-        // So you want to create a secret
         const createSecretButton = this.querySelector('#create-secret')
-        createSecretButton.addEventListener('click', async event => {
-            event.preventDefault()
-            this.createSecret()
-        })
+
+        if(newVaultButton && createSecretButton) {
+            // Attach to the button
+            newVaultButton.addEventListener('click', async event => {
+                this.open = true
+            })
+    
+            // So you want to create a secret
+            createSecretButton.addEventListener('click', async event => {
+                event.preventDefault()
+                this.createSecret()
+            })
+        } else {
+            console.error('Could not fund required elements')
+        }
     }
 
     async createSecret() {
@@ -190,4 +195,8 @@ class NewSecret extends SideDrawer {
     }
 }
 
-customElements.define('new-secret', NewSecret);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('new-secret', NewSecret);
+    }
+})

@@ -5,11 +5,15 @@ class InviteUser extends SideDrawer {
     constructor() {
         super()
 
-        this.querySelector('button.danger').addEventListener('click', event => {
-            event.preventDefault()
-            this.open = false
-            return false
-        })
+        const cancelButton = this.querySelector('button.danger')
+
+        if(cancelButton) {
+            cancelButton.addEventListener('click', event => {
+                event.preventDefault()
+                this.open = false
+                return false
+            })
+        }
 
         // Initiate the button that opens this drawer
         let newSecretButton = document.getElementById('invite-user')
@@ -21,4 +25,8 @@ class InviteUser extends SideDrawer {
     }
 }
 
-customElements.define('invite-user', InviteUser);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('invite-user', InviteUser);
+    }
+})

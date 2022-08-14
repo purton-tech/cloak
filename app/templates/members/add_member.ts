@@ -6,24 +6,30 @@ class AddMember extends SideDrawer {
     constructor() {
         super()
 
-        this.querySelector('button.danger').addEventListener('click', event => {
-            event.preventDefault()
-            this.open = false
-            return false
-        })
-
-        this.querySelector('button.success').addEventListener('click', event => {
-            event.preventDefault()
-            this.updateUsers()
-            return false
-        })
-
-        // Initiate the button that opens this drawer
+        const cancelButton = this.querySelector('button.danger')
+        const successButton = this.querySelector('button.success')
         let newSecretButton = document.getElementById('add-member')
-        if (newSecretButton) {
+
+        if(cancelButton && successButton && newSecretButton) {
+
+            cancelButton.addEventListener('click', event => {
+                event.preventDefault()
+                this.open = false
+                return false
+            })
+    
+            successButton.addEventListener('click', event => {
+                event.preventDefault()
+                this.updateUsers()
+                return false
+            })
+    
+            // Initiate the button that opens this drawer
             newSecretButton.addEventListener('click', async event => {
                 this.open = true
             })
+        } else {
+            console.error('Could not fund required elements')
         }
     }
 
@@ -40,21 +46,23 @@ class AddMember extends SideDrawer {
             const htmlOption = userSelection.item(userSelection.selectedIndex)
             if(htmlOption instanceof HTMLOptionElement) {
                 const selectedECDHPubKey = htmlOption.getAttribute("data-ecdh-pub-key")
-                const ecdhPublicKey = await ECDHPublicKey.import(ByteData.fromB64(selectedECDHPubKey))
-                const vaultKey = await this.decryptSymmetricVaultKey()
-                const epherealKeyPair = await ECDHKeyPair.fromRandom()
-                const aesKey = await epherealKeyPair.privateKey.deriveAESKey(ecdhPublicKey)
-                const wrappedVaultKey = await aesKey.wrap(vaultKey)
-                const ecdhPublicKeyData = await epherealKeyPair.publicKey.export()
-    
-                wrappedKeyInput.value = wrappedVaultKey.string
-                ecdhPublicKeyInput.value = await ecdhPublicKeyData.b64
-    
-                const form = document.getElementById("add-team-member")
-    
-                if(form instanceof HTMLFormElement) {
-                    this.parseEnvironments()
-                    form.submit()
+                if(selectedECDHPubKey) {
+                    const ecdhPublicKey = await ECDHPublicKey.import(ByteData.fromB64(selectedECDHPubKey))
+                    const vaultKey = await this.decryptSymmetricVaultKey()
+                    const epherealKeyPair = await ECDHKeyPair.fromRandom()
+                    const aesKey = await epherealKeyPair.privateKey.deriveAESKey(ecdhPublicKey)
+                    const wrappedVaultKey = await aesKey.wrap(vaultKey)
+                    const ecdhPublicKeyData = await epherealKeyPair.publicKey.export()
+        
+                    wrappedKeyInput.value = wrappedVaultKey.string
+                    ecdhPublicKeyInput.value = await ecdhPublicKeyData.b64
+        
+                    const form = document.getElementById("add-team-member")
+        
+                    if(form instanceof HTMLFormElement) {
+                        this.parseEnvironments()
+                        form.submit()
+                    }
                 }
             }
         }
@@ -82,4 +90,8 @@ class AddMember extends SideDrawer {
     }
 }
 
-customElements.define('add-member', AddMember);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('add-member', AddMember);
+    }
+})

@@ -56,4 +56,8 @@ class ViewAccount extends SideDrawer {
     }
 }
 
-customElements.define('view-account', ViewAccount);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('view-account', ViewAccount);
+    }
+})

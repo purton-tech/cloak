@@ -42,4 +42,9 @@ class NewVault extends SideDrawer {
     }
 }
 
-customElements.define('new-vault', NewVault);
+
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('new-vault', NewVault);
+    }
+})

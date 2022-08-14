@@ -11,17 +11,28 @@ class ConnectAccount extends SideDrawer {
     constructor() {
         super()
 
-        const serviceAccountId = parseInt(this.getAttribute('service-account-id'))
+        const serviceAccountAttr = this.getAttribute('service-account-id')
 
-        let newAccountButton = document.getElementById('service-account-row-' + serviceAccountId)
-        newAccountButton.addEventListener('click', async event => {
-            this.open = true
-        })
+        if(serviceAccountAttr) {
+            const serviceAccountId = parseInt(serviceAccountAttr)
+            let connectButton = this.querySelector('#connect-to-vault-' + serviceAccountId)
+            let newAccountButton = document.getElementById('service-account-row-' + serviceAccountId)
 
-        let connectButton = this.querySelector('#connect-to-vault-' + serviceAccountId)
-        connectButton.addEventListener('click', async event => {
-            await this.handleConnect(serviceAccountId)
-        })
+            if(connectButton && newAccountButton) {
+    
+                newAccountButton.addEventListener('click', async event => {
+                    this.open = true
+                })
+        
+                connectButton.addEventListener('click', async event => {
+                    await this.handleConnect(serviceAccountId)
+                })
+            } else {
+                console.error('Could not fund required elements')
+            }
+        } else {
+            console.error('Could not fund required elements')
+        }
     }
 
     async handleConnect(serviceAccountId: number) {
@@ -158,4 +169,8 @@ class ConnectAccount extends SideDrawer {
     }
 }
 
-customElements.define('connect-account', ConnectAccount);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('connect-account', ConnectAccount);
+    }
+})

@@ -34,4 +34,8 @@ class NewAccount extends SideDrawer {
     }
 }
 
-customElements.define('new-account', NewAccount);
+document.addEventListener('readystatechange', () => {
+    if (document.readyState == 'complete') {
+        customElements.define('new-account', NewAccount);
+    }
+})
