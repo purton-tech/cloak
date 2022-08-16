@@ -11,6 +11,7 @@ hyper = { version = "0", features = ["server"] }
 pin-project = "1"
 tower = { version = "0", default-features = false }
 tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
+tokio-util = "0"
 validator = { version = "0", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 tracing = "0"
