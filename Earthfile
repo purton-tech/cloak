@@ -123,8 +123,8 @@ init-container:
 app-container:
     FROM scratch
     COPY +build/$APP_EXE_NAME rust-exe
-    COPY --dir +npm-build/dist dist
-    COPY --dir $APP_FOLDER/asset-pipeline/images asset-pipeline/images
+    COPY --dir +npm-build/dist $APP_FOLDER/
+    COPY --dir $APP_FOLDER/asset-pipeline/images $APP_FOLDER/asset-pipeline/images
     ENTRYPOINT ["./rust-exe"]
     SAVE IMAGE $APP_IMAGE_NAME
 

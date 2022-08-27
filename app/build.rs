@@ -18,6 +18,7 @@ fn main() -> Result<()> {
 
     ructe()?;
 
+    // See https://github.com/kaj/ructe/issues/112
     //pub content: &'static [u8],
     let file_path = path_buf.join("templates/statics.rs");
 
