@@ -14,7 +14,50 @@ fn main() -> Result<()> {
     cornucopia()?;
 
     let out_dir = env::var_os("OUT_DIR").unwrap();
-    let path_buf = PathBuf::from(format!("{}/ructe", out_dir.into_string().unwrap()));
+    let path_buf = PathBuf::from(format!("{}/ructe", &out_dir.into_string().unwrap()));
+
+    ructe()?;
+
+    // See https://github.com/kaj/ructe/issues/112
+    //pub content: &'static [u8],
+    let file_path = path_buf.join("templates/statics.rs");
+
+    // s/pub content: \&\x27static \[u8\]/pub file_name: \&\x27static str/g
+    let output = std::process::Command::new("sed")
+        .arg("-i")
+        .arg(r"s/pub content: \&\x27static \[u8\]/pub file_name: \&\x27static str/g")
+        .arg(file_path.clone())
+        .output()?;
+    if !output.status.success() {
+        panic!("{}", &std::str::from_utf8(&output.stderr).unwrap());
+    }
+
+    // s/content: include_bytes!(/file_name: /g
+    let output = std::process::Command::new("sed")
+        .arg("-i")
+        .arg(r"s/content: include_bytes!(/file_name: /g")
+        .arg(file_path.clone())
+        .output()?;
+    if !output.status.success() {
+        panic!("{}", &std::str::from_utf8(&output.stderr).unwrap());
+    }
+
+    // s/),/,/g
+    let output = std::process::Command::new("sed")
+        .arg("-i")
+        .arg(r"s/),/,/g")
+        .arg(file_path)
+        .output()?;
+    if !output.status.success() {
+        panic!("{}", &std::str::from_utf8(&output.stderr).unwrap());
+    }
+
+    Ok(())
+}
+
+fn ructe() -> Result<()> {
+    let out_dir = env::var_os("OUT_DIR").unwrap();
+    let path_buf = PathBuf::from(format!("{}/ructe", &out_dir.into_string().unwrap()));
     let mut ructe = Ructe::new(path_buf).unwrap();
     let mut statics = ructe.statics().unwrap();
     statics.add_files("dist").unwrap();

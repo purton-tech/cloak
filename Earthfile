@@ -39,6 +39,7 @@ USER vscode
 
 dev:
     BUILD +pull-request
+    # On github this check is performed directly by the action
     BUILD +check-selenium-failure
 
 pull-request:
@@ -123,8 +124,8 @@ init-container:
 app-container:
     FROM scratch
     COPY +build/$APP_EXE_NAME rust-exe
-    COPY --dir +npm-build/dist dist
-    COPY --dir $APP_FOLDER/asset-pipeline/images asset-pipeline/images
+    COPY --dir +npm-build/dist build/$APP_FOLDER/
+    COPY --dir $APP_FOLDER/asset-pipeline/images build/$APP_FOLDER/asset-pipeline/images
     ENTRYPOINT ["./rust-exe"]
     SAVE IMAGE $APP_IMAGE_NAME
 
@@ -209,7 +210,7 @@ check-selenium-failure:
     # https://github.com/earthly/earthly/issues/988
     # If we failed in selenium a fail file will have been created
     # to get build to pass and see video, run +pull-request
-    IF [ -f ./tmp/fail ]
+    IF [ -f ./tmp/earthly/fail ]
         RUN echo "cargo test has failed." && exit 1
     END
 

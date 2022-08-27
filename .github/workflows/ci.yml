@@ -51,7 +51,7 @@ jobs:
     # https://github.com/earthly/earthly/issues/988
     - name: Fail if Earthly Silently Failed
       run: |
-        if test -f "tmp/fail"; then
+        if test -f "tmp/earthly/fail"; then
           exit 1
         fi
 

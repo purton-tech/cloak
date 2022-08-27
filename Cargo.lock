@@ -98,6 +98,7 @@ dependencies = [
  "tokio",
  "tokio-postgres",
  "tokio-postgres-rustls",
+ "tokio-util",
  "tonic",
  "tonic-build",
  "tower",
