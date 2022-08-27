@@ -75,29 +75,29 @@
 
         <ul>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Vaults, false)'>
-            <img alt="Menu Item" width="24px" src="/static/@vault_svg.name"></img>
+            <img alt="Menu Item" width="24px" height="24px" src="/static/@vault_svg.name"></img>
             <a href="@crate::vaults::index_route(organisation.id)">Vaults</a>
           </li>
 
           @if let Some(vault_id) = vault_id {
             <li class='@layout::get_menu_class(&side_bar, &SideBar::Secrets, true)'>
-              <img alt="Menu Item" width="24px" src="/static/@secrets_svg.name"></img>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@secrets_svg.name"></img>
               <a href='@crate::secrets::index_route(vault_id, organisation.id)'>Secrets</a>
             </li>
 
             <li class='@layout::get_menu_class(&side_bar, &SideBar::Members, true)'>
-              <img alt="Menu Item" width="24px" src="/static/@users_svg.name"></img>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@users_svg.name"></img>
               <a href='@crate::members::member_route(vault_id, organisation.id)'>Members</a>
             </li>
           }
 
           <li class='@layout::get_menu_class(&side_bar, &SideBar::ServiceAccounts, false)'>
-              <img alt="Menu Item" width="24px" src="/static/@accounts_svg.name"></img>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@accounts_svg.name"></img>
               <a href="@crate::service_accounts::index_route(organisation.id)">Service Accounts</a>
           </li>
 
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Audit, false)'>
-              <img alt="Menu Item" width="24px" src="/static/@audit_svg.name"></img>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@audit_svg.name"></img>
               <a href="@crate::audit::index_route(organisation.id)">Audit Trail</a>
           </li>
         </ul>
@@ -106,7 +106,7 @@
         
         <ul>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Team, false)'>
-              <img alt="Menu Item" width="24px" src="/static/@users_svg.name"></img>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@users_svg.name"></img>
               <a href="@crate::team::index_route(organisation.id)">Team</a>
           </li>
         </ul>
@@ -115,15 +115,15 @@
         
         <ul>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Switch, false)'>
-              <img alt="Menu Item" width="24px" src="/static/@switch_svg.name"></img>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@switch_svg.name"></img>
               <a href="@crate::team::switch_route(organisation.id)">Switch Teams</a>
           </li>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::Profile, false)'>
-              <img alt="Menu Item" width="24px" src="/static/@profile_svg.name"></img>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@profile_svg.name"></img>
               <a href="@crate::profile::index_route(organisation.id)">Your Profile</a>
           </li>
           <li class='@layout::get_menu_class(&side_bar, &SideBar::None, false)'>
-              <img alt="Menu Item" width="22px" src="/static/@logout_svg.name"></img>
+              <img alt="Menu Item" width="22px" height="24px" src="/static/@logout_svg.name"></img>
               <a class="clickable" data-drawer-target="logout-drawer" href="#">Logout</a>
           </li>
         </ul>

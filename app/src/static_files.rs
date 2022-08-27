@@ -10,7 +10,7 @@ pub async fn static_path(Path(path): Path<String>) -> impl IntoResponse {
 
     let data = if path == "index.css.map" {
         Some(&index_css_map)
-    } else if path.is_empty() {
+    } else if path == "index.js.map" {
         Some(&index_js_map)
     } else {
         StaticFile::get(path)
