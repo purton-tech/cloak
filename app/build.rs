@@ -100,14 +100,5 @@ fn cornucopia() -> Result<()> {
         panic!("{}", &std::str::from_utf8(&output.stderr).unwrap());
     }
 
-    let output = std::process::Command::new("sed")
-        .arg("-i")
-        .arg(r"s/#!\[/#\[/g")
-        .arg(file_path)
-        .output()?;
-    if !output.status.success() {
-        panic!("{}", &std::str::from_utf8(&output.stderr).unwrap());
-    }
-
     Ok(())
 }
