@@ -13,7 +13,7 @@ alias gdb='git branch | grep -v "main" | xargs git branch -D'
 
 # Cargo watch
 alias cw='mold -run cargo watch --no-gitignore -i "*.scss" -i "*.ts" -i node_modules -x run'
-alias zs='zola serve --interface 0.0.0.0 --port 7104'
+alias zs='zola serve --interface 0.0.0.0 --port 7104 --base-url localhost'
 
 alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/www/content:/workdir tmaier/markdown-spellcheck:latest "**/*.md"'
 

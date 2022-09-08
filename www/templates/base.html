@@ -30,8 +30,16 @@
           <li class="sub-menu-item"><a href="{{ page.path | safe }}">{{ page.title }}</a></li>
           {% endfor %}
           <li><a class="menu-item" href="/pricing/">Pricing</a></li>
+
+          <!-- {{ config.base_url}} -->
+          {% if config.base_url == "http://localhost:7104" %}
           <li><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></li>
           <li><a class="menu-item" href="/auth/sign_in">Sign In</a></li>
+          {% else %}
+          <li><a class="a_button a_button--primary" href="{{ config.extra.app_base_url}}/auth/sign_up">Sign Up</a></li>
+          <li><a class="menu-item" href="{{ config.extra.app_base_url}}/auth/sign_in">Sign In</a></li>
+          {% endif %}
+
         </ul>
       </nav>
     </div>
