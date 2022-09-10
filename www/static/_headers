@@ -1,4 +1,7 @@
-/*
+https://cloak.pages.dev/*
+  X-Robots-Tag: noindex
+  
+https://cloak.software/*
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
