@@ -21,3 +21,4 @@ highlight_themes_css = [
 [extra]
 # Put all your custom variables here
 app_base_url = "https://app.cloak.software"
+ga_analytics = "G-NSK5LPX8EN"
