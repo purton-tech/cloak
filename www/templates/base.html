@@ -8,6 +8,17 @@
   <link rel="stylesheet" href="/index.css?h={{get_file_hash(path="public/index.css", sha_type=256)}}">
   <link rel="stylesheet" href="/syntax-theme.css?h={{get_file_hash(path="static/syntax-theme.css", sha_type=256)}}">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  {% if config.base_url != "http://localhost:7104" %}
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-VDSG2MG0S6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-VDSG2MG0S6');
+  </script>
+  {% endif %}
 </head>
 
 <body class="l_marketing">
