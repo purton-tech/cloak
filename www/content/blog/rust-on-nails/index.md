@@ -11,7 +11,7 @@ subtitle = "A full stack architecture for Rust web applications"
 
 This article was more popular than we expected and as we added more content grew beyond the size of a blog post.
 
-It is now avaiable on it's own mini site at [https://rust-on-nails.com](https://rust-on-nails.com)
+It is now available on it's own mini site at [https://rust-on-nails.com](https://rust-on-nails.com)
 
 ## The old article
 

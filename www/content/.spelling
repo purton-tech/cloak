@@ -35,6 +35,7 @@ MSSQL
 markup.rs
 Sass
 Webpack
+Typosquatting
  - blog/_index.md
 sort_by
 class_name
@@ -157,3 +158,5 @@ LND
 19
  - pricing/_index.md
 pricing.html
+ - blog/secure-your-development-enviroment/index.md
+2022-09-08
