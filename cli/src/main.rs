@@ -31,7 +31,7 @@ pub struct Cli {
     #[clap(long, default_value_t=String::from("./cloak.pem"))]
     pub ecdh_private_key_file: String,
 
-    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://cloak.software"))]
+    #[clap(short, long, env="API_HOST_URL", default_value_t=String::from("https://app.cloak.software"))]
     pub api_host_url: String,
 
     #[clap(subcommand)]
