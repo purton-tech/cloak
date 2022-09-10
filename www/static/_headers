@@ -1,0 +1,9 @@
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  X-XSS-Protection": "1; mode=block"
+  X-Download-Options": "noopen"
+  X-DNS-Prefetch-Control": "off"
+  Strict-Transport-Security": "max-age=31536000; includeSubDomains"
+  Permissions-Policy": "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
