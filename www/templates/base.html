@@ -4,7 +4,11 @@
 <head>
   <meta charset="utf-8"></meta>
   <meta name="viewport" content="width=device-width, initial-scale=1"></meta>
+  {% if page.title %}
+  <title>{{ page.title }} | {{ config.title }}</title>
+  {% else %}
   <title>{{ config.title }}</title>
+  {% endif %}
   <link rel="stylesheet" href="/index.css?h={{get_file_hash(path="public/index.css", sha_type=256)}}">
   <link rel="stylesheet" href="/syntax-theme.css?h={{get_file_hash(path="static/syntax-theme.css", sha_type=256)}}">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
