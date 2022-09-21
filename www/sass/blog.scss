@@ -19,6 +19,12 @@
         padding: 2em;
         margin-bottom: 2em;
     }
+
+    ul, ol {
+        > li {
+            padding-bottom: 1rem;
+        }
+    }
 }
 
 @include for-tablet-portrait-up {
