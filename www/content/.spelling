@@ -36,6 +36,7 @@ markup.rs
 Sass
 Webpack
 Typosquatting
+RBAC
  - blog/_index.md
 sort_by
 class_name
@@ -160,3 +161,14 @@ LND
 pricing.html
  - blog/secure-your-development-enviroment/index.md
 2022-09-08
+ - blog/authorization-postgres-rls/index.md
+RLS
+2022-09-19
+PSQL
+current_app_user
+N.B.
+500
+5000
+public.products
+ANALYZE
+Casbin
