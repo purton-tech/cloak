@@ -185,7 +185,7 @@ The *Seq Scan on public.products* section shows us the index is not used.
 (11 rows)
 ```
 
-This is because Postgres run the RLS policies **AFTER** the results have been pulled from the database. So to get our index to trigger we need to put our some of our policy into the SQL call.
+So my research suggests that sometimes the Postgres query planner doesn't work optimally for RLS. So for example in this case if we extend the `WHERE` clause of the original query the index does trigger.
 
 ```sql
 EXPLAIN ANALYZE VERBOSE SELECT COUNT(*) from products WHERE user_id = 6;
@@ -206,7 +206,7 @@ ps=1)
 (8 rows)
 ```
 
-So as far as I can tell, you need to be very careful how you from the read SQL queries with RLS or you will get a performance hit.
+So as far as I can tell, you need to be very careful how you query with RLS or you will get a performance hit.
 
 ## Other Articles to look at
 
