@@ -35,14 +35,14 @@ footer_cta = { title = "Sign up for our service", prompt = "Get control of your 
 authentication = { sign_up = "https://app.cloak.software/auth/sign_up", sign_in = "https://app.cloak.software/auth/sign_in" }
 # When running on localhost you can set the sign up and sign links to somewhere else.
 localhost = "http://localhost:7104"
-authentication_development = { sign_up = "/blog", sign_in = "/blog" }
+authentication_development = { sign_up = "/auth/sign_up", sign_in = "/auth/sign_in" }
 
 # Information required by terms and privacy pages.
 support_email = "support@cloak.software"
 company_address = "71-75 Shelton Street, London, LND, WC2H 9JQ, United Kingdom"
 
 # Social icons (shown on the footer)
-github_repo = "https://github.com/purton-tech/cloake"
+github_repo = "https://github.com/purton-tech/cloak"
 
 # Resources on the footer (LHS)
 resources_1 = [
