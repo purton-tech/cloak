@@ -54,8 +54,8 @@ cloak
 cloak.exe
 2019-11-27
 github
- - developers/_index.md
-developers.html
+ - documentation/_index.md
+documentation.html
  - reference/01-security.md
 2022-01-01
 TL
@@ -72,7 +72,7 @@ aes_key
 alice_ecdh_keypair
 service_account_ecdh_keypair
 temporary_ecdh_keypair
- - developers/02-get-started.md
+ - documentation/02-get-started.md
 1
 2
 env
@@ -118,13 +118,13 @@ datas
 47
  - reference/managing-keys-in-the-browser.md
 2022-02-03
- - developers/03-cli.md
+ - documentation/03-cli.md
 2022-02-22
 cloak.pem
 cli
- - developers/04-injecting-secrets.md
+ - documentation/04-injecting-secrets.md
 2022-02-21
- - developers/05-encrypting-key.md
+ - documentation/05-encrypting-key.md
 2022-02-20
 pem
  - blog/rust-on-nails/index.md

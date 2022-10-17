@@ -1,6 +1,8 @@
 +++
 title = "Encrypting your private key"
 date = 2022-02-20
+sort_by = "weight" 
+weight = 50
 +++
 
 The cloak.pem file is full compatible with OpenSSL. You can import and export the pem file with encryption.

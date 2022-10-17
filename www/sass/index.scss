@@ -1,15 +1,5 @@
-@import 'normalise';
+@import '../themes/tech-startup-theme/sass/index';
 
-// https://css-tricks.com/inheriting-box-sizing-probably-slightly-better-best-practice/
-*, *:before, *:after {
-    box-sizing: inherit;
-}
-
-// Make images repsinsive
-img {
-    max-width: 100%;
-    height: auto;
-}
 
 // Colours
 :root {
@@ -35,42 +25,3 @@ img {
     --shadow-medium: 0 8px 30px rgba(0, 0, 0, 0.12);
     --shadow-large: 0 30px 60px rgba(0, 0, 0, 0.12);
 }
-
-// Fonts
-:root {
-    --font-family-light: ui-sans-serif, system-ui, -apple-system, 
-        BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, 
-        sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji;
-    --font-family-regular: ui-sans-serif, system-ui, -apple-system, 
-        BlinkMacSystemFont, Segoe UI, Roboto, Helvetica Neue, Arial, Noto Sans, 
-        sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol, Noto Color Emoji, Times, serif;
-    --font-family-mono: Consolas, Liberation Mono, Courier New, monospace;
-}
-
-:root {
-    --content-width: 1040px;
-    --article-width: 45rem;
-    --content-padding: 10rem 1em 30px 1em;
-    --mobile-content-padding: 5rem 1em 30px 1em;
-}
-
-html {
-    box-sizing: border-box;
-    font-family: var(--font-family-light);
-}
-
-body {
-    background: #f7f7f7;
-}
-
-@import './navbar';
-@import './footer';
-@import './buttons';
-@import './cta';
-@import './footer-cta';
-@import './developer-docs';
-@import './blog';
-@import './typography';
-@import './utility';
-@import './cards';
-@import './pricing';

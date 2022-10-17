@@ -5,7 +5,7 @@ date = 2022-01-20
 
 A quick way to get HTTPS ingress into a Kubernetes cluster is to deploy the cloudlared container as a deployment or  sidecar. 
 
-Follow [the instructions](https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation) for setting up `cloudflared` on your local machine.
+Follow [the instructions](https://documentation.cloudflare.com/cloudflare-one/connections/connect-apps/install-and-setup/installation) for setting up `cloudflared` on your local machine.
 
 ## 1. Certificate Generation
 

@@ -1,6 +1,8 @@
 +++
 title = "Injecting secrets into applications"
 date = 2022-02-21
+sort_by = "weight" 
+weight = 40
 +++
 
 The Cloak cli can run your application and inject environment variables into the process.

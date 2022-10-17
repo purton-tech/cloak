@@ -1,0 +1,3 @@
+[submodule "www/themes/tech-startup-theme"]
+	path = www/themes/tech-startup-theme
+	url = https://github.com/purton-tech/tech-startup-theme.git

@@ -1,6 +1,8 @@
 +++
 title = "Install the CLI"
 date = 2019-11-27
+sort_by = "weight" 
+weight = 10
 +++
 
 Installing the precompiled binary is the easiest way to get started with Cloak. Our binaries are publicly compiled using our CI/CD pipeline. Checksums for binaries are available on github.

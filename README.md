@@ -54,6 +54,6 @@
 * Extensive audit trail that monitors access and usage.
 * Scales from Startup to Big Corp.
 
-## Developers
+## documentation
 
 Cloak uses the [Rust on Nails](https://rust-on-nails.com/) architecture for secure full stack web applications.
