@@ -32,7 +32,7 @@ every_page_cta = { title = "Your 30 seconds away from trying us out", cta_url = 
 footer_cta = { title = "Sign up for our service", prompt = "Get control of your secrets and add security.", cta_url = "/blog", cta_button = "Check it Out" }
 
 # Where shall we point the sign in and sign up buttons.
-authentication = { sign_up = "/auth/sign_up", sign_in = "/auth/sign_in" }
+authentication = { sign_up = "https://app.cloak.software/auth/sign_up", sign_in = "https://app.cloak.software/auth/sign_in" }
 # When running on localhost you can set the sign up and sign links to somewhere else.
 localhost = "http://localhost:7104"
 authentication_development = { sign_up = "/blog", sign_in = "/blog" }
