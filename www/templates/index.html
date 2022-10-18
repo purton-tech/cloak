@@ -56,8 +56,14 @@
   </div>
 </section>
 
+{% if config.extra.footer_cta %}
 <section class="m_footer_cta">
-  <h3>Start managing your secrets today for free</h3>
-  <p><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></p>
+  <h3>{{config.extra.every_page_cta.title}}</h3>
+  {% if config.extra.every_page_cta.cta_url  %}
+  <p><a class="a_button a_button--primary" href="{{config.extra.every_page_cta.cta_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
+  {% else %}
+  <p><a class="a_button a_button--primary" href="{{sign_up_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
+  {% endif %}
 </section>
+{% endif %}
 {% endblock content %}
