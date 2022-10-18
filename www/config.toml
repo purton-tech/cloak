@@ -26,10 +26,10 @@ ga_analytics = "G-NSK5LPX8EN"
 copyright = "Copyright 2021 - 2022"
 
 # Every page CTA. At the bottom of every blog post we have a cta
-every_page_cta = { title = "Your 30 seconds away from trying us out", cta_button = "Sign Up" }
+every_page_cta = { title = "It takes 30 seconds to sign up for our free plan", cta_button = "Sign Up" }
 
 # On the footer we have a signup button and a call to action, set the text here
-footer_cta = { title = "Sign up for our service", prompt = "Get control of your secrets and add security.", cta_button = "Check it Out" }
+footer_cta = { title = "Sign Up for Free", prompt = "Take control of your application config and secrets", cta_button = "Check it Out" }
 
 # Where shall we point the sign in and sign up buttons.
 authentication = { sign_up = "https://app.cloak.software/auth/sign_up", sign_in = "https://app.cloak.software/auth/sign_in" }
