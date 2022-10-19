@@ -24,7 +24,7 @@ The server wrapped key is then stored in the database along with any public keys
 
 ### Key Generation Process
 
-![Browser based key management based on passwords](/reference/client-side-encryption.png)
+![Browser based key management based on passwords](/docs/reference/client-side-encryption.png)
 
 ## Algorithms
 

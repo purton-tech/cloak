@@ -9,17 +9,17 @@ weight = 30
 
 Service accounts allow documentation or systems to access secrets. Create a service account and give it a name.
 
-![Creating a service account](/documentation/create-service-account.png)
+![Creating a service account](/docs/getting-started/create-service-account.png)
 
 ### Step 2: Attach the service account to a vault
 
-![Creating a service account](/documentation/attach-service-account.png)
+![Creating a service account](/docs/getting-started/attach-service-account.png)
 
 ### Step 3: Access their service accounts private key
 
 Cut and paste the service account private key into a file called cloak.pem in the folder from which you will use the cloak cli.
 
-![Creating a vault](/documentation/show-private-key.png)
+![Creating a vault](/docs/getting-started/show-private-key.png)
 
 ### Step 4: View your secrets with Cloak cli.
 

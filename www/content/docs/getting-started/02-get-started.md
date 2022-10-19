@@ -9,7 +9,7 @@ weight = 20
 
 Once you have registered with Cloak you will be taken to the vaults page and can create a Vault. The Vault name can be anything you like, for example the project name or your team name.
 
-![Creating a vault](/documentation/create-vault.png)
+![Creating a vault](/docs/getting-started/create-vault.png)
 
 
 ### Step 2: Add some secrets
