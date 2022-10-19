@@ -1,6 +1,7 @@
 +++
 title = "Managing security keys in the browser"
 date = 2022-02-03
+weight = 20
 +++
 
 Many web applications with client-side encryption that use passwords derive both encryption and server authentication keys from them. Examples are:

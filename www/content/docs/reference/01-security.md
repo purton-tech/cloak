@@ -1,6 +1,7 @@
 +++
 title = "How we secure your secrets"
 date = 2022-01-01
+weight = 10
 +++
 
 > ## TL;DR 

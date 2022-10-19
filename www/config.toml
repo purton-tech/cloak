@@ -23,6 +23,8 @@ highlight_themes_css = [
 # Put all your custom variables here
 ga_analytics = "G-NSK5LPX8EN"
 
+first_doc_page = "/docs/getting-started/introduction/"
+
 copyright = "Copyright 2021 - 2022"
 
 # Every page CTA. At the bottom of every blog post we have a cta
