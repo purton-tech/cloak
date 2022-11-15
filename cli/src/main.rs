@@ -73,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
             println!("Calling out to {:?} with {:?}", &args[0], &cmd_args);
 
-            Command::new(&args[0])
+            let mut child = Command::new(&args[0])
                 .args(&cmd_args)
                 .stdin(Stdio::null())
                 .stdout(Stdio::inherit())
@@ -81,7 +81,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .spawn()
                 .expect("Failed to run command");
 
-            println!("finished");
+            child.wait().expect("failed to wait on child");
         }
         Commands::Info => {
             println!("Public Key {:?}", config.public_key_der_base64);
