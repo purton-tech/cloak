@@ -179,7 +179,6 @@ integration-test:
                 -e SMTP_PASSWORD=thisisnotused \
                 -e SMTP_TLS_OFF='true' \
                 --name app $APP_IMAGE_NAME \
-            && docker run -d --rm --network=build_default --name www $WWW_IMAGE_NAME \
             && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
             && cargo test --no-run --release --target x86_64-unknown-linux-musl \
             && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
