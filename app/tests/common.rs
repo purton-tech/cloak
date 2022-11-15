@@ -164,11 +164,6 @@ pub async fn register_random_user(driver: &WebDriver) -> WebDriverResult<String>
 
     // Register someone
     driver
-        .find_element(By::LinkText("SIGN UP"))
-        .await?
-        .click()
-        .await?;
-    driver
         .find_element(By::Id("email"))
         .await?
         .send_keys(&email)
