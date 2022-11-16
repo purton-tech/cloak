@@ -140,6 +140,8 @@ pub async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
 }
 
 pub async fn register_user(driver: &WebDriver, config: &Config) -> WebDriverResult<String> {
+    driver.get(format!("{}/auth/sign_up", &config.host)).await?;
+
     let email = register_random_user(driver).await?;
 
     force_otp(config).await;
@@ -163,11 +165,6 @@ pub async fn register_random_user(driver: &WebDriver) -> WebDriverResult<String>
     let email = random_email();
 
     // Register someone
-    driver
-        .find_element(By::LinkText("SIGN UP"))
-        .await?
-        .click()
-        .await?;
     driver
         .find_element(By::Id("email"))
         .await?

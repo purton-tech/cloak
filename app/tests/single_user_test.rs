@@ -52,7 +52,7 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
     let delay = std::time::Duration::new(11, 0);
     driver.set_implicit_wait_timeout(delay).await?;
 
-    driver.get(&config.host).await?;
+    driver.get(format!("{}/auth/sign_up", &config.host)).await?;
 
     let email = common::register_user(driver, config).await?;
 

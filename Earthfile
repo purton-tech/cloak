@@ -1,3 +1,4 @@
+VERSION 0.6
 FROM purtontech/rust-on-nails-devcontainer:1.0.16
 
 # Proto compiler and web grpc.
@@ -46,14 +47,12 @@ pull-request:
     BUILD +init-container
     BUILD +app-container
     BUILD +envoy-container
-    BUILD +www-container
     BUILD +integration-test
 
 all:
     BUILD +init-container
     BUILD +app-container
     BUILD +envoy-container
-    BUILD +www-container
     BUILD +build-cli-osx
     BUILD +kubernetes-container
 
@@ -139,22 +138,6 @@ envoy-container:
     RUN sed -i '0,/development/{s/development/app/}' /etc/envoy/envoy.yaml
     SAVE IMAGE $ENVOY_IMAGE_NAME
 
-zola-generate:
-    ARG ZOLA_VERSION=0.15.3
-    RUN sudo curl -OL https://github.com/getzola/zola/releases/download/v$ZOLA_VERSION/zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
-        && sudo tar -xvf zola-v$ZOLA_VERSION-x86_64-unknown-linux-gnu.tar.gz \
-        && sudo mv zola /usr/bin/zola \
-        && sudo chmod +x /usr/bin/zola
-    COPY --dir www www
-    RUN cd www && zola build
-    SAVE ARTIFACT www/public public
-
-# Test this with docker run --rm -p7180:80 ianpurton/vault:www
-www-container:
-    FROM $NGINX
-    COPY +zola-generate/public /usr/share/nginx/html/
-    SAVE IMAGE $WWW_IMAGE_NAME
-
 integration-test:
     FROM +build
     COPY --dir $APP_FOLDER/tests $APP_FOLDER/
@@ -181,7 +164,6 @@ integration-test:
         --pull selenium/video:ffmpeg-4.3.1-20220208 \
         # Bring up the containers we have built
         --load $APP_IMAGE_NAME=+app-container \
-        --load $WWW_IMAGE_NAME=+www-container \
         --load $ENVOY_IMAGE_NAME=+envoy-container
 
         # Force to command to always be succesful so the artifact is saved. 
@@ -197,16 +179,16 @@ integration-test:
                 -e SMTP_PASSWORD=thisisnotused \
                 -e SMTP_TLS_OFF='true' \
                 --name app $APP_IMAGE_NAME \
-            && docker run -d --rm --network=build_default --name www $WWW_IMAGE_NAME \
             && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
             && cargo test --no-run --release --target x86_64-unknown-linux-musl \
             && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
             && (cargo test --release --target x86_64-unknown-linux-musl -- --nocapture || echo fail > ./tmp/fail) \
-            && docker stop app www envoy video
+            && docker stop app envoy video
     END
     SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
 
 check-selenium-failure:
+    FROM +integration-test
     # https://github.com/earthly/earthly/issues/988
     # If we failed in selenium a fail file will have been created
     # to get build to pass and see video, run +pull-request

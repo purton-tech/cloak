@@ -22,12 +22,7 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     let delay = std::time::Duration::new(11, 0);
     driver.set_implicit_wait_timeout(delay).await?;
 
-    driver.get(&config.host).await?;
-
     let team_member = common::register_user(driver, config).await?;
-
-    // Go to home page
-    driver.get(&config.host).await?;
 
     let account_owner = common::register_user(driver, config).await?;
 
@@ -53,7 +48,6 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     add_member_to_vault(driver, &team_member).await?;
 
     // Log back in as the member
-    driver.get(&config.host).await?;
     sign_in_user(driver, &team_member, config).await?;
 
     // Add a service account
@@ -71,15 +65,10 @@ async fn sign_in_user(
     email: &str,
     config: &common::Config,
 ) -> WebDriverResult<()> {
-    // Go to home page
-    driver.get(&config.host).await?;
+    // Go to sign in page
+    driver.get(format!("{}/auth/sign_in", &config.host)).await?;
 
-    // Register someone
-    driver
-        .find_element(By::LinkText("SIGN IN"))
-        .await?
-        .click()
-        .await?;
+    // Sign in someone
     driver
         .find_element(By::Id("email"))
         .await?
