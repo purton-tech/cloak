@@ -5,8 +5,8 @@
     "@semantic-release/release-notes-generator",
     ["@semantic-release/github", {
       "assets": [
-        {"path": "tmp/cloak-linux", "label": "cloak-linux-amd64"},
-        {"path": "tmp/cloak-macos", "label": "cloak-macos-darwin"}
+        {"path": "artifacts/cloak-linux", "label": "cloak-linux-amd64"},
+        {"path": "artifacts/cloak-macos", "label": "cloak-macos-darwin"}
       ]
     }],
     ["@semantic-release-plus/docker", {
