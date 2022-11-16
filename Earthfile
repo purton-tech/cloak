@@ -188,6 +188,7 @@ integration-test:
     SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
 
 check-selenium-failure:
+    FROM +integration-test
     # https://github.com/earthly/earthly/issues/988
     # If we failed in selenium a fail file will have been created
     # to get build to pass and see video, run +pull-request

@@ -140,6 +140,8 @@ pub async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
 }
 
 pub async fn register_user(driver: &WebDriver, config: &Config) -> WebDriverResult<String> {
+    driver.get(format!("{}/auth/sign_up", &config.host)).await?;
+
     let email = register_random_user(driver).await?;
 
     force_otp(config).await;

@@ -22,11 +22,7 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     let delay = std::time::Duration::new(11, 0);
     driver.set_implicit_wait_timeout(delay).await?;
 
-    driver.get(format!("{}/auth/sign_up", &config.host)).await?;
-
     let team_member = common::register_user(driver, config).await?;
-
-    driver.get(format!("{}/auth/sign_up", &config.host)).await?;
 
     let account_owner = common::register_user(driver, config).await?;
 
