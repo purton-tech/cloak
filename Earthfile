@@ -106,8 +106,8 @@ build:
                 dbmate up \
             && cargo build --release --target x86_64-unknown-linux-musl
     END
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./artifacts/$APP_EXE_NAME
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./artifacts/$CLI_LINUX_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/app
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/cli
 
 init-container:
     FROM debian:bullseye-slim
@@ -186,7 +186,8 @@ integration-test:
             && (cargo test --release --target x86_64-unknown-linux-musl -- --nocapture || echo fail > ./tmp/fail) \
             && docker stop app envoy video
     END
-    SAVE ARTIFACT tmp AS LOCAL ./tmp/earthly
+    # You need the tmp/* if you use just tmp earthly will overwrite the folder
+    SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly
 
 check-selenium-failure:
     FROM +integration-test
@@ -216,7 +217,7 @@ build-cli-osx:
         && CC=o64-clang \
         CXX=o64-clang++ \
         cargo build --release --target x86_64-apple-darwin
-    SAVE ARTIFACT target/x86_64-apple-darwin/release/$CLI_EXE_NAME AS LOCAL ./artifacts/$CLI_MACOS_EXE_NAME
+    SAVE ARTIFACT target/x86_64-apple-darwin/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_MACOS_EXE_NAME
 
 kubernetes-container:
     FROM debian:11-slim
