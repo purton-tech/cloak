@@ -56,6 +56,7 @@ all:
     BUILD +envoy-container
     BUILD +build-cli-osx
     BUILD +kubernetes-container
+    BUILD +save-artifacts
 
 npm-deps:
     COPY $APP_FOLDER/package.json $APP_FOLDER/package.json
@@ -106,8 +107,14 @@ build:
                 dbmate up \
             && cargo build --release --target x86_64-unknown-linux-musl
     END
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME
+
+save-artifacts:
+    FROM +build
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/app
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/cli
+
 
 init-container:
     FROM debian:bullseye-slim
