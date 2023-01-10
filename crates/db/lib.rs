@@ -11,7 +11,7 @@ pub use queries::organisations::GetUsers as Member;
 pub use queries::organisations::Organisation;
 pub use queries::secrets::Secret;
 pub use queries::service_accounts::ServiceAccount;
-pub use queries::user_vaults::UserVault;
+pub use queries::user_vaults::{NonMember, UserVault, VaultMember};
 pub use queries::users::User;
 pub use types::public::Role;
 

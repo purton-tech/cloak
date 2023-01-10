@@ -22,7 +22,3 @@ pub fn routes() -> Router {
             post(delete_member::delete),
         )
 }
-
-pub fn member_route(vault_id: i32, organisation_id: i32) -> String {
-    format!("/app/team/{}/vault/{}/members", organisation_id, vault_id)
-}

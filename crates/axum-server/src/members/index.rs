@@ -28,12 +28,12 @@ pub async fn index(
         .one()
         .await?;
 
-    let _members = queries::user_vaults::get_users()
+    let members = queries::user_vaults::get_users()
         .bind(&transaction, &vault_id)
         .all()
         .await?;
 
-    let _non_members = queries::user_vaults::get_non_members()
+    let non_members = queries::user_vaults::get_non_members()
         .bind(&transaction, &team_id, &vault_id)
         .all()
         .await?;
@@ -43,15 +43,16 @@ pub async fn index(
         .one()
         .await?;
 
-    let _environments = queries::environments::get_all()
+    let environments = queries::environments::get_all()
         .bind(&transaction, &user_vault.vault_id)
         .all()
         .await?;
 
-    let _user = queries::users::user()
-        .bind(&transaction, &current_user.user_id)
-        .one()
-        .await?;
-
-    Ok(Html(ui_components::audit::index(team.id)))
+    Ok(Html(ui_components::members::index::index(
+        team.id,
+        user_vault,
+        environments,
+        members,
+        non_members,
+    )))
 }

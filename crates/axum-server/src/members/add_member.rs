@@ -64,7 +64,7 @@ pub async fn add(
 
     transaction.commit().await?;
 
-    Ok(Redirect::to(&super::member_route(
+    Ok(Redirect::to(&ui_components::routes::members::member_route(
         organisation_id,
         vault_id,
     )))

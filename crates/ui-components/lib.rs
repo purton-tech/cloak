@@ -1,6 +1,7 @@
 pub mod audit;
 pub mod cloak_layout;
 pub mod logout_form;
+pub mod members;
 pub mod profile;
 pub mod profile_popup;
 pub mod secrets;
@@ -10,6 +11,12 @@ pub mod teams;
 pub mod vaults;
 
 pub mod routes {
+
+    pub mod members {
+        pub fn member_route(vault_id: i32, organisation_id: i32) -> String {
+            format!("/app/team/{}/vault/{}/members", organisation_id, vault_id)
+        }
+    }
 
     pub mod secrets {
         pub fn index_route(vault_id: i32, organisation_id: i32) -> String {

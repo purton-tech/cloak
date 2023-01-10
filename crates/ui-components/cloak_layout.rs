@@ -67,7 +67,7 @@ pub fn CloakLayout<'a>(cx: Scope<'a, CloakLayoutProps<'a>>) -> Element {
                                 NavItem {
                                     id: SideBar::Members.to_string(),
                                     selected_item_id: cx.props.selected_item.to_string(),
-                                    href: super::routes::vaults::index_route(cx.props.team_id),
+                                    href: super::routes::members::member_route(vault_id, cx.props.team_id),
                                     icon: nav_api_keys_svg.name,
                                     title: "Members"
                                 }

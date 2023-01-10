@@ -19,7 +19,7 @@ FROM users_vaults
 WHERE 
     user_id = :user_id AND vault_id = :vault_id;
 
---! get_users : (environments?)
+--! get_users : VaultMember(environments?)
 SELECT 
     uv.vault_id, 
     uv.user_id, 
@@ -43,7 +43,7 @@ WHERE
     uv.vault_id = :vault_id;
 
 -- Fetch members of the team that have not been added to this vault
---! get_non_members
+--! get_non_members : NonMember()
 SELECT 
     u.id, 
     u.email,

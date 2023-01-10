@@ -43,7 +43,7 @@ pub async fn delete(
     let url = if delete_member.user_id == current_user.user_id {
         ui_components::routes::vaults::index_route(team.id)
     } else {
-        super::member_route(params.1, params.0)
+        ui_components::routes::members::member_route(params.1, params.0)
     };
 
     transaction.commit().await?;
