@@ -2,7 +2,7 @@
 use super::logout_form::LogoutForm;
 use assets::files::*;
 use dioxus::prelude::*;
-use primer_rsx::{AppLayout, NavGroup, NavItem};
+use primer_rsx::{AppLayout, NavGroup, NavItem, NavItemWithSubItem, NavSubGroup, NavSubItem};
 
 #[derive(PartialEq, Eq, Debug)]
 pub enum SideBar {
@@ -48,32 +48,41 @@ pub fn CloakLayout<'a>(cx: Scope<'a, CloakLayoutProps<'a>>) -> Element {
                 NavGroup {
                     heading: "Vaults",
                     content:  cx.render(rsx!(
-                        NavItem {
-                            id: SideBar::Vaults.to_string(),
-                            selected_item_id: cx.props.selected_item.to_string(),
-                            href: super::routes::vaults::index_route(cx.props.team_id),
-                            icon: nav_api_keys_svg.name,
-                            title: "Vaults"
-                        }
+
                         if let Some(vault_id) = cx.props.vault_id {
                             cx.render(rsx!(
-                                NavItem {
-                                    id: SideBar::Secrets.to_string(),
+                                NavItemWithSubItem {
+                                    id: SideBar::Vaults.to_string(),
                                     selected_item_id: cx.props.selected_item.to_string(),
-                                    href: super::routes::secrets::index_route(vault_id, cx.props.team_id),
+                                    href: super::routes::vaults::index_route(cx.props.team_id),
                                     icon: nav_api_keys_svg.name,
-                                    title: "Secrets"
-                                }
-                                NavItem {
-                                    id: SideBar::Members.to_string(),
-                                    selected_item_id: cx.props.selected_item.to_string(),
-                                    href: super::routes::members::member_route(vault_id, cx.props.team_id),
-                                    icon: nav_api_keys_svg.name,
-                                    title: "Members"
+                                    title: "Vaults",
+                                    NavSubGroup {
+                                        NavSubItem {
+                                            id: SideBar::Secrets.to_string(),
+                                            selected_item_id: cx.props.selected_item.to_string(),
+                                            href: super::routes::secrets::index_route(vault_id, cx.props.team_id),
+                                            title: "Secrets"
+                                        }
+                                        NavSubItem {
+                                            id: SideBar::Members.to_string(),
+                                            selected_item_id: cx.props.selected_item.to_string(),
+                                            href: super::routes::members::member_route(vault_id, cx.props.team_id),
+                                            title: "Members"
+                                        }
+                                    }
                                 }
                             ))
                         } else {
-                            None
+                            cx.render(rsx!(
+                                NavItem {
+                                    id: SideBar::Vaults.to_string(),
+                                    selected_item_id: cx.props.selected_item.to_string(),
+                                    href: super::routes::vaults::index_route(cx.props.team_id),
+                                    icon: nav_api_keys_svg.name,
+                                    title: "Vaults"
+                                }
+                            ))
                         }
                         NavItem {
                             id: SideBar::ServiceAccounts.to_string(),
