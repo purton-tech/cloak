@@ -31,5 +31,5 @@ RUN curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Li
 
 # all the volumes configured in the docker-compose.yml
 RUN sudo mkdir -p /workspace/target && sudo chown $USERNAME:$USERNAME /workspace/target
-RUN sudo mkdir -p /workspace/app/node_modules && sudo chown $USERNAME:$USERNAME /workspace/app/node_modules
+RUN sudo mkdir -p /workspace/crates/asset-pipeline/node_modules && sudo chown $USERNAME:$USERNAME /workspace/crates/asset-pipeline/node_modules
 RUN sudo mkdir -p /workspace/infra/node_modules && sudo chown $USERNAME:$USERNAME /workspace/infra/node_modules

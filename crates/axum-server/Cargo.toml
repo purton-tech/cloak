@@ -1,0 +1,52 @@
+[package]
+name = "cloak"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+grpc-api = { path = "../grpc-api" }
+db = { path = "../db" }
+assets = { path = "../asset-pipeline" }
+ui-components = { path = "../ui-components" }
+
+axum = "0.5.17"
+hyper = { version = "0", features = ["server"] }
+pin-project = "1"
+tower = { version = "0", default-features = false }
+tokio = { version = "1", default-features = false, features = ["macros", "rt-multi-thread"] }
+tokio-util = "0"
+validator = { version = "0", features = ["derive"] }
+serde = { version = "1", features = ["derive"] }
+tracing = "0"
+tracing-subscriber = { version="0", features = ["env-filter"] }
+tower-http = { version = "0", default-features = false, features = ["fs", "trace"] }
+
+# Used for our request parser user_id
+futures = "0.3"
+
+# gRPC dependencies
+tonic = "0"
+prost = "0"
+
+# Generate secure invitations
+rand = "0"
+sha2 = "0"
+lettre = { version = "0.10.0-rc.4", default-features = false,  features = ["rustls-tls", "smtp-transport", "builder"] }
+
+# Elliptic Curve Digital Signature Algorithm
+p256 = { version = "0.10", default-features = false, features = ["ecdsa", "pem"] } 
+base64 = "0.13.1" # So we encode DER public key to base64
+
+# Used by ructe for image mime type detection
+mime = "0.3.0"
+
+[dev-dependencies]
+# WebDriver Library for UI testing.
+thirtyfour = { version = "0", default-features = false, features = [ "reqwest-rustls-tls", "tokio-runtime" ] }
+tokio = { version = "1", features = ["macros"] }
+rand = "0"
+reqwest = { version = "0", default-features = false }
+quoted_printable = "0"
+

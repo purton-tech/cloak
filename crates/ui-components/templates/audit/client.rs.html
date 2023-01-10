@@ -1,0 +1,15 @@
+@use db::types::public::AuditAccessType;
+
+@(entity: AuditAccessType)
+
+@match entity {
+    AuditAccessType::CLI => {
+        CLI
+    }
+    AuditAccessType::Web => {
+        User Interface
+    }
+    AuditAccessType::ServiceAccount => {
+        Service Account
+    }
+  }

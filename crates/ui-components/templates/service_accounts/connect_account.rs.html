@@ -1,0 +1,41 @@
+@use db::queries::service_accounts::GetAll;
+@use db::queries::environments::GetEnvironmentsAndVaults;
+@use crate::service_accounts::connect_route;
+
+@(
+    service_account: &GetAll,
+    environments_and_vaults: &Vec<GetEnvironmentsAndVaults>,
+    team_id: &i32
+)
+
+<connect-account label="Connect to Vault" service-account-id='@format!("{}", service_account.id)'>
+    <template slot="body">
+        <form class="m_form">
+            <fieldset>
+                <label for="secret">Which Vault would you like to connect to?</label>
+                <select id='@format!("vault-select-{}", service_account.id)'>
+                    <option>Select...</option>
+                    @for environment in environments_and_vaults {
+                        <option value='@format!("{}:{}", environment.vault_id, environment.id)'>@format!("Vault: {}, Environment: {}", environment.vault_name, environment.name)</option>
+                    }
+
+                    <input 
+                        id='@format!("service-account-public-key-{}", service_account.id)'
+                        type="hidden" value="@service_account.ecdh_public_key"
+                        name="public_key" />
+                </select>
+            </fieldset>
+        </form>
+
+    </template>
+
+    <template slot="footer">
+        <button class="a_button auto success" id='@format!("connect-to-vault-{}", service_account.id)'>Connect to Vault</button>
+    </template>
+</connect-account>
+
+<form class="m_form" method="post" action="@connect_route(*team_id)" id='@format!("service-account-form-{}", service_account.id)'>
+    <input type="hidden" name="service_account_id" value='@format!("{}", service_account.id)' />
+    <input type="hidden" name="environment_id" id='@format!("service-account-form-environment-id-{}", service_account.id)' />
+    <input type="hidden" name="vault_id" id='@format!("service-account-form-vault-id-{}", service_account.id)' />
+</form>
