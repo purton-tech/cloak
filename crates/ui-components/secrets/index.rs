@@ -1,4 +1,5 @@
 use crate::cloak_layout::{CloakLayout, SideBar};
+use assets::files::button_plus_svg;
 use db::{Environment, Secret, UserVault};
 use dioxus::prelude::*;
 use primer_rsx::*;
@@ -21,7 +22,8 @@ pub fn index(
         if cx.props.secrets.is_empty() {
             cx.render(rsx! {
                 super::empty::EmptySecrets {
-                    organisation_id: cx.props.organisation_id
+                    organisation_id: cx.props.organisation_id,
+                    vault_id: cx.props.user_vault.vault_id
                 }
             })
         } else {
@@ -34,6 +36,12 @@ pub fn index(
                     vault_id: cx.props.user_vault.vault_id
                     header: cx.render(rsx!(
                         h3 { "Secrets" }
+                        Button {
+                            prefix_image_src: "{button_plus_svg.name}",
+                            drawer_trigger: super::new_secret::DRAW_TRIGGER,
+                            button_scheme: ButtonScheme::Primary,
+                            "Create A New Secret"
+                        }
                     ))
                     TabContainer {
                         tabs: cx.render(rsx! {

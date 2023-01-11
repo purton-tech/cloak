@@ -7,6 +7,7 @@ use primer_rsx::*;
 #[derive(Props, PartialEq, Eq)]
 pub struct EmptySecretsProps {
     organisation_id: i32,
+    vault_id: i32,
 }
 
 pub fn EmptySecrets(cx: Scope<EmptySecretsProps>) -> Element {
@@ -14,15 +15,19 @@ pub fn EmptySecrets(cx: Scope<EmptySecretsProps>) -> Element {
         CloakLayout {
             selected_item: SideBar::Secrets,
             team_id: cx.props.organisation_id,
+            vault_id: cx.props.vault_id
             title: "Secrets"
             header: cx.render(rsx!(
                 h3 { "Secrets" }
             ))
             BlankSlate {
-                heading: "Looks like you don't have any API keys",
+                heading: "This vault doesn't have any secrets yet",
                 visual: empty_api_keys_svg.name,
-                description: "API Keys allow you to access our programming interface",
-                primary_action_drawer: ("New API Key", "create-api-key")
+                description: "Create your first secret and add it to the vault",
+                primary_action_drawer: ("Create A New Secret", super::new_secret::DRAW_TRIGGER)
+            }
+            super::new_secret::NewSecretForm {
+                submit_action: crate::routes::secrets::new_route(cx.props.vault_id, cx.props.organisation_id)
             }
         }
     ))
