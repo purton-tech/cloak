@@ -1,5 +1,6 @@
 use crate::cloak_layout::{CloakLayout, SideBar};
 use crate::routes::secrets::index_route;
+use assets::files::button_plus_svg;
 use dioxus::prelude::*;
 use primer_rsx::*;
 
@@ -28,6 +29,12 @@ pub fn index(organisation_id: i32, vaults: Vec<VaultSummary>) -> String {
                 title: "Vaults"
                 header: cx.render(rsx!(
                     h3 { "Vaults" }
+                    Button {
+                        prefix_image_src: "{button_plus_svg.name}",
+                        drawer_trigger: super::new_vault::DRAW_TRIGGER,
+                        button_scheme: ButtonScheme::Primary,
+                        "Create A New Vault"
+                    }
                 ))
 
                 Box {
@@ -45,26 +52,32 @@ pub fn index(organisation_id: i32, vaults: Vec<VaultSummary>) -> String {
                                 }
                                 tbody {
                                     cx.props.vaults.iter().map(|vault| rsx!(
-                                        td {
-                                            a {
-                                                href: "{vault.href}",
+                                        tr {
+                                            td {
+                                                a {
+                                                    href: "{vault.href}",
+                                                    "{vault.name}"
+                                                }
+                                            }
+                                            td {
                                                 "{vault.name}"
                                             }
-                                        }
-                                        td {
-                                            "{vault.name}"
-                                        }
-                                        td {
-                                            "{vault.user_count}"
-                                        }
-                                        td {
-                                            "{vault.secrets_count}"
+                                            td {
+                                                "{vault.user_count}"
+                                            }
+                                            td {
+                                                "{vault.secrets_count}"
+                                            }
                                         }
                                     ))
                                 }
                             }
                         }
                     }
+                }
+
+                super::new_vault::NewVaultForm {
+                    submit_action: crate::routes::vaults::new_route(cx.props.organisation_id)
                 }
             }
         })

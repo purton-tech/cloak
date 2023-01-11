@@ -37,20 +37,22 @@ pub fn index(
                     ))
                     TabContainer {
                         tabs: cx.render(rsx! {
-                            cx.props.environments.iter().map(|env| rsx!(
+                            cx.props.environments.iter().enumerate().map(|(index, env)| rsx!(
                                 TabHeader {
-                                    selected: false,
+                                    selected: index == 0,
                                     tab: "{env.name}-panel",
                                     name: &env.name
                                 }
                             ))
                         })
-                        cx.props.environments.iter().map(|env| rsx!(
+                        cx.props.environments.clone().into_iter().enumerate().map(|(index, env)| rsx!(
                             TabPanel {
-                                hidden: true,
+                                hidden: index != 0,
                                 id: "{env.name}-panel",
-                                div {
-                                    h4 { "{env.name}" }
+                                super::table::SecretsTable {
+                                    user_vault: cx.props.user_vault.clone(),
+                                    secrets: cx.props.secrets.clone(),
+                                    environment: env
                                 }
                             }
                         ))

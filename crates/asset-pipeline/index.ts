@@ -4,6 +4,7 @@ import './scss/index.scss'
 import './web-components/side-drawer'
 import './web-components/side-drawer-trigger'
 import './web-components/ecdh-cipher'
+import './web-components/ecdh-keygen'
 import './web-components/snack-bar'
 import './web-components/data-table'
 import './cards'
@@ -26,3 +27,5 @@ import '@github/time-elements/dist/relative-time-element';
 import './remember-form'
 import './filter-trigger'
 import './select-div'
+
+import '@primer/view-components/app/components/primer/tab_container_component';
