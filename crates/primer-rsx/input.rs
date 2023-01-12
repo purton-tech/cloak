@@ -110,6 +110,8 @@ pub fn Input<'a>(cx: Scope<'a, InputProps<'a>>) -> Element {
         ""
     };
 
+    let id = if let Some(id) = cx.props.id { id } else { "" };
+
     let input_class = format!("{} {}", input_type, input_size);
 
     cx.render(rsx!(
@@ -123,6 +125,7 @@ pub fn Input<'a>(cx: Scope<'a, InputProps<'a>>) -> Element {
             None => None
         }
         input {
+            id: "{id}",
             class: "{input_class}",
             value: "{value}",
             name: "{cx.props.name}",

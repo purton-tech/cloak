@@ -49,6 +49,8 @@ pub fn Select<'a>(cx: Scope<'a, SelectProps<'a>>) -> Element {
 
     let class = select_size.to_string();
 
+    let id = if let Some(id) = cx.props.id { id } else { "" };
+
     cx.render(rsx!(
         match cx.props.label {
             Some(l) => cx.render(rsx!(
@@ -59,6 +61,7 @@ pub fn Select<'a>(cx: Scope<'a, SelectProps<'a>>) -> Element {
             None => None
         }
         select {
+            id: "{id}",
             class: "{class}",
             value: "{value}",
             name: "{cx.props.name}",

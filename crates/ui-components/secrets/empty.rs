@@ -15,7 +15,7 @@ pub fn EmptySecrets(cx: Scope<EmptySecretsProps>) -> Element {
         CloakLayout {
             selected_item: SideBar::Secrets,
             team_id: cx.props.organisation_id,
-            vault_id: cx.props.vault_id
+            vault_id: cx.props.vault_id,
             title: "Secrets"
             header: cx.render(rsx!(
                 h3 { "Secrets" }
@@ -25,9 +25,6 @@ pub fn EmptySecrets(cx: Scope<EmptySecretsProps>) -> Element {
                 visual: empty_api_keys_svg.name,
                 description: "Create your first secret and add it to the vault",
                 primary_action_drawer: ("Create A New Secret", super::new_secret::DRAW_TRIGGER)
-            }
-            super::new_secret::NewSecretForm {
-                submit_action: crate::routes::secrets::new_route(cx.props.vault_id, cx.props.organisation_id)
             }
         }
     ))

@@ -25,6 +25,13 @@ pub fn index(
                     organisation_id: cx.props.organisation_id,
                     vault_id: cx.props.user_vault.vault_id
                 }
+                super::new_secret::NewSecretForm {
+                    submit_action: crate::routes::secrets::new_route(
+                        cx.props.user_vault.vault_id,
+                        cx.props.organisation_id),
+                    user_vault: cx.props.user_vault.clone(),
+                    environments: cx.props.environments.clone()
+                }
             })
         } else {
             cx.render(rsx! {
@@ -65,6 +72,13 @@ pub fn index(
                             }
                         ))
                     }
+                }
+                super::new_secret::NewSecretForm {
+                    submit_action: crate::routes::secrets::new_route(
+                        cx.props.user_vault.vault_id,
+                        cx.props.organisation_id),
+                    user_vault: cx.props.user_vault.clone(),
+                    environments: cx.props.environments.clone()
                 }
             })
         }

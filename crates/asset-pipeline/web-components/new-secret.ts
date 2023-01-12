@@ -1,9 +1,8 @@
-import { SideDrawer } from '../../asset-pipeline/web-components/side-drawer'
-import { Vault, Cipher, ByteData, AESKey, ECDHKeyPair, ECDHPublicKey } from '../../asset-pipeline/cryptography/vault'
-import { VaultClient } from '../../asset-pipeline/api.client';
+import { Vault, Cipher, ByteData, AESKey, ECDHKeyPair, ECDHPublicKey } from '../cryptography/vault'
+import { VaultClient } from '../api.client';
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
-import { CreateSecretsRequest, Secret, ServiceAccount, ServiceAccountSecrets } from '../../asset-pipeline/api';
+import { CreateSecretsRequest, Secret, ServiceAccount, ServiceAccountSecrets } from '../api';
 
 
 /**
@@ -14,7 +13,7 @@ import { CreateSecretsRequest, Secret, ServiceAccount, ServiceAccountSecrets } f
  * - Alice can now decrypt the Vault encryption key using the derived key.
  * - Alice can use the Vault encryption key to encrypt the secrets.
  */
-class NewSecret extends SideDrawer {
+class NewSecret extends HTMLElement {
 
     private secretNameInput: HTMLInputElement
     private secretValueInput: HTMLTextAreaElement
@@ -26,14 +25,9 @@ class NewSecret extends SideDrawer {
     constructor() {
         super()
 
-        const newVaultButton = document.getElementById('new-secret')
         const createSecretButton = this.querySelector('#create-secret')
 
-        if(newVaultButton && createSecretButton) {
-            // Attach to the button
-            newVaultButton.addEventListener('click', async event => {
-                this.open = true
-            })
+        if(createSecretButton) {
     
             // So you want to create a secret
             createSecretButton.addEventListener('click', async event => {
@@ -41,7 +35,7 @@ class NewSecret extends SideDrawer {
                 this.createSecret()
             })
         } else {
-            console.error('Could not fund required elements')
+            console.error('Could not find required elements')
         }
     }
 

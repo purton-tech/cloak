@@ -27,21 +27,23 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                         }
                         tbody {
                             cx.props.secrets.iter().map(|secret| rsx!(
-                                td {
-                                    {LazyNodes::new(|f| f.text(format_args!(
-                                        "<ecdh-cipher cipher='{}'
-                                        wrapped-aes-key='{}' 
-                                        ecdh-public-key='{}'></ecdh-cipher>",
-                                        secret.name,
-                                        cx.props.user_vault.encrypted_vault_key,
-                                        cx.props.user_vault.ecdh_public_key
-                                    )))}
-                                }
-                                td {
-                                }
-                                td {
-                                }
-                                td {
+                                tr {
+                                    td {
+                                        {LazyNodes::new(|f| f.text(format_args!(
+                                            "<ecdh-cipher cipher='{}'
+                                            wrapped-aes-key='{}' 
+                                            ecdh-public-key='{}'></ecdh-cipher>",
+                                            secret.name,
+                                            cx.props.user_vault.encrypted_vault_key,
+                                            cx.props.user_vault.ecdh_public_key
+                                        )))}
+                                    }
+                                    td {
+                                    }
+                                    td {
+                                    }
+                                    td {
+                                    }
                                 }
                             ))
                         }
