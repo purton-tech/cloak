@@ -1,6 +1,6 @@
 use crate::cloak_layout::{CloakLayout, SideBar};
 use crate::routes::secrets::index_route;
-use assets::files::button_plus_svg;
+use assets::files::{button_plus_svg, empty_api_keys_svg};
 use dioxus::prelude::*;
 use primer_rsx::*;
 
@@ -29,51 +29,36 @@ pub fn index(organisation_id: i32, vaults: Vec<VaultSummary>) -> String {
                 title: "Vaults"
                 header: cx.render(rsx!(
                     h3 { "Vaults" }
-                    Button {
-                        prefix_image_src: "{button_plus_svg.name}",
-                        drawer_trigger: super::new_vault::DRAW_TRIGGER,
-                        button_scheme: ButtonScheme::Primary,
-                        "Create A New Vault"
+
+                    if ! cx.props.vaults.is_empty() {
+                        cx.render(rsx! {
+                            Button {
+                                prefix_image_src: "{button_plus_svg.name}",
+                                drawer_trigger: super::new_vault::DRAW_TRIGGER,
+                                button_scheme: ButtonScheme::Primary,
+                                "Create A New Vault"
+                            }
+                        })
+                    } else {
+                        None
                     }
                 ))
 
-                Box {
-                    BoxHeader {
-                        title: "Your Vaults"
-                    }
-                    BoxBody {
-                        DataTable {
-                            table {
-                                thead {
-                                    th { "Name" }
-                                    th { "Created" }
-                                    th { "Members" }
-                                    th { "Secrets" }
-                                }
-                                tbody {
-                                    cx.props.vaults.iter().map(|vault| rsx!(
-                                        tr {
-                                            td {
-                                                a {
-                                                    href: "{vault.href}",
-                                                    "{vault.name}"
-                                                }
-                                            }
-                                            td {
-                                                "{vault.name}"
-                                            }
-                                            td {
-                                                "{vault.user_count}"
-                                            }
-                                            td {
-                                                "{vault.secrets_count}"
-                                            }
-                                        }
-                                    ))
-                                }
-                            }
+                if cx.props.vaults.is_empty() {
+                    cx.render(rsx! {
+                        BlankSlate {
+                            heading: "You don't have any vaults yet",
+                            visual: empty_api_keys_svg.name,
+                            description: "Vaults allow you to keep related secrets together.",
+                            primary_action_drawer: ("Create A New Vault", super::new_vault::DRAW_TRIGGER)
                         }
-                    }
+                    })
+                } else {
+                    cx.render(rsx! {
+                        super::table::VaultTable {
+                            vaults: &cx.props.vaults
+                        }
+                    })
                 }
 
                 super::new_vault::NewVaultForm {
