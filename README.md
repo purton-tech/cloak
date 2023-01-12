@@ -29,7 +29,7 @@
       Homepage
     </a>
     <span> | </span>
-    <a href="https://cloak.software/developers/">
+    <a href="https://cloak.software/docs/getting-started/introduction/">
       Docs
     </a>
   </h4>
