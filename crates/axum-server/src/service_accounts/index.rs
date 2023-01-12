@@ -32,7 +32,7 @@ pub async fn index(
         .all()
         .await?;
 
-    Ok(Html(ui_components::service_accounts::index(
+    Ok(Html(ui_components::service_accounts::index::index(
         team.id,
         service_accounts,
         environments_and_vaults,
