@@ -70,7 +70,11 @@ pub async fn add_secrets(
     value: &str,
     selector: &str,
 ) -> WebDriverResult<()> {
-    let new_secret_button = driver.find_element(By::Id("new-secret")).await?;
+    let new_secret_button = driver
+        .find_element(By::XPath(
+            "//turbo-frame//button[text()='Create A New Secret']",
+        ))
+        .await?;
     new_secret_button.click().await?;
 
     let name_field = driver.find_element(By::Css("input[name='name']")).await?;
@@ -81,9 +85,8 @@ pub async fn add_secrets(
         .await?;
     secret_field.send_keys(value).await?;
 
-    // Wait for it to open
     let submit_button = driver
-        .find_element(By::Css(".a_button.auto.success"))
+        .find_element(By::XPath("//turbo-frame//footer//button[text()='Create']"))
         .await?;
     submit_button.click().await?;
 
@@ -98,19 +101,22 @@ pub async fn add_secrets(
 }
 
 pub async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
-    let new_vault_button = driver.find_element(By::Id("new-vault")).await?;
+    let new_vault_button = driver
+        .find_element(By::XPath(
+            "//turbo-frame//button[text()='Create A New Vault']",
+        ))
+        .await?;
     new_vault_button.click().await?;
 
     let name_field = driver.find_element(By::Css("input[name='name']")).await?;
     name_field.send_keys("My Vault").await?;
 
-    // Wait for it to open
     let submit_button = driver
-        .find_element(By::Css(".a_button.auto.success"))
+        .find_element(By::XPath("//turbo-frame//footer//button[text()='Create']"))
         .await?;
     submit_button.click().await?;
 
-    let vault_card = driver.find_element(By::Css(".vault-card")).await?;
+    let vault_card = driver.find_element(By::LinkText("My Vault")).await?;
     vault_card.click().await?;
 
     Ok(())
