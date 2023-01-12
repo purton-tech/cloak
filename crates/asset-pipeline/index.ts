@@ -8,7 +8,9 @@ import './web-components/ecdh-keygen'
 import './web-components/snack-bar'
 import './web-components/data-table'
 import './web-components/new-secret'
-import './cards'
+import './web-components/new-account'
+import './web-components/connect-account'
+import './web-components/add-member'
 import '@github/time-elements/dist/relative-time-element';
 
 // Front end enhancement
