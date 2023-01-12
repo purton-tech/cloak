@@ -18,7 +18,6 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
         {
             LazyNodes::new(|f| f.text(format_args!("<new-secret>")))
         }
-        // The form to create an invitation
         form {
             id: "add-secret-form",
             method: "post",

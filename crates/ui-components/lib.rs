@@ -16,6 +16,20 @@ pub mod routes {
         pub fn member_route(vault_id: i32, organisation_id: i32) -> String {
             format!("/app/team/{}/vault/{}/members", organisation_id, vault_id)
         }
+
+        pub fn add_route(vault_id: i32, organisation_id: i32) -> String {
+            format!(
+                "/app/team/{}/vault/{}/members/add",
+                organisation_id, vault_id
+            )
+        }
+
+        pub fn delete_route(vault_id: i32, organisation_id: i32) -> String {
+            format!(
+                "/app/team/{}/vault/{}/members/delete",
+                organisation_id, vault_id
+            )
+        }
     }
 
     pub mod secrets {

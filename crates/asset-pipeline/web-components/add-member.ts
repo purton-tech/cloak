@@ -5,11 +5,11 @@ class AddMember extends HTMLElement {
     constructor() {
         super()
 
-        const successButton = this.querySelector('button.success')
+        const addMemberButton = this.querySelector('#add-member-button')
 
-        if(successButton) {
+        if(addMemberButton) {
 
-            successButton.addEventListener('click', event => {
+            addMemberButton.addEventListener('click', event => {
                 event.preventDefault()
                 this.updateUsers()
                 return false
@@ -43,7 +43,7 @@ class AddMember extends HTMLElement {
                     wrappedKeyInput.value = wrappedVaultKey.string
                     ecdhPublicKeyInput.value = await ecdhPublicKeyData.b64
         
-                    const form = document.getElementById("add-team-member")
+                    const form = document.getElementById("add-member-form")
         
                     if(form instanceof HTMLFormElement) {
                         this.parseEnvironments()
