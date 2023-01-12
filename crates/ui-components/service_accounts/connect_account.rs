@@ -22,18 +22,21 @@ pub fn ConnectAccountForm<'a>(cx: Scope<'a, FormProps<'a>>) -> Element {
             label: "Connect to Vault",
             trigger_id: "{cx.props.drawer_trigger}",
             DrawerBody {
-                Select {
-                    id: "vault-select-{cx.props.service_account.id}",
-                    name: "environment_id",
-                    label: "Which Vault would you like to connect to?"
-                    cx.props.environments_and_vaults.iter().map(|env| {
-                        cx.render(rsx! (
-                            option {
-                                value: "{env.vault_id}:{env.id}",
-                                "Vault {env.vault_name} Environment {env.name}"
-                            }
-                        ))
-                    })
+                div {
+                    class: "d-flex flex-column",
+                    Select {
+                        id: "vault-select-{cx.props.service_account.id}",
+                        name: "environment_id",
+                        label: "Which Vault would you like to connect to?"
+                        cx.props.environments_and_vaults.iter().map(|env| {
+                            cx.render(rsx! (
+                                option {
+                                    value: "{env.vault_id}:{env.id}",
+                                    "Vault {env.vault_name} Environment {env.name}"
+                                }
+                            ))
+                        })
+                    }
                 }
 
                 input {
