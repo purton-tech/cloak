@@ -31,3 +31,6 @@ import './filter-trigger'
 import './select-div'
 
 import '@primer/view-components/app/components/primer/tab_container_component';
+
+// Hotwired Turbo
+import '@hotwired/turbo'

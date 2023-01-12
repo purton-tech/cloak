@@ -32,5 +32,8 @@ pub async fn set_name(
 
     transaction.commit().await?;
 
-    crate::layout::redirect_and_snackbar(&super::index_route(organisation_id), "Team Name Updated")
+    crate::layout::redirect_and_snackbar(
+        &ui_components::routes::team::index_route(organisation_id),
+        "Team Name Updated",
+    )
 }

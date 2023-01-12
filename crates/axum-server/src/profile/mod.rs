@@ -1,4 +1,5 @@
 mod index;
+mod profile_popup;
 mod set_details;
 
 use axum::{
@@ -9,6 +10,10 @@ use axum::{
 pub fn routes() -> Router {
     Router::new()
         .route("/app/team/:organisation_id/profile", get(index::index))
+        .route(
+            "/app/team/:organisation_id/profile_popup",
+            get(profile_popup::index),
+        )
         .route(
             "/app/team/:organisation_id/set_details",
             post(set_details::set_details),

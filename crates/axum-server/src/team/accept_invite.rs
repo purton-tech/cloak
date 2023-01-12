@@ -28,7 +28,9 @@ pub async fn invite(
     )
     .await?;
 
-    Ok(Redirect::to(&super::switch_route(team_id)))
+    Ok(Redirect::to(&ui_components::routes::team::switch_route(
+        team_id,
+    )))
 }
 
 pub async fn accept_invitation(
