@@ -55,7 +55,9 @@ pub fn index(
                 } else {
                     cx.render(rsx! {
                         super::table::ServiceAccountTable {
-                            service_accounts: cx.props.service_accounts.clone()
+                            service_accounts: cx.props.service_accounts.clone(),
+                            environments_and_vaults: cx.props.environments_and_vaults.clone(),
+                            team_id: cx.props.organisation_id
                         }
                     })
                 }

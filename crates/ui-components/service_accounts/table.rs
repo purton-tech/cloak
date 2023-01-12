@@ -1,11 +1,13 @@
 #![allow(non_snake_case)]
-use db::ServiceAccount;
+use db::{EnvironmentsAndVault, ServiceAccount};
 use dioxus::prelude::*;
 use primer_rsx::*;
 
 #[derive(Props, PartialEq)]
 pub struct TableProps {
     service_accounts: Vec<ServiceAccount>,
+    environments_and_vaults: Vec<EnvironmentsAndVault>,
+    team_id: i32,
 }
 
 pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
@@ -44,9 +46,17 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                                                 "{service_account.account_name}"
                                             }
                                             td {
-                                                id: "service-account-row-{service_account.id}",
                                                 a {
+                                                    href: "#",
+                                                    "data-drawer-target": "service-account-row-{service_account.id}",
                                                     "Connect to Vault"
+                                                }
+                                                super::connect_account::ConnectAccountForm {
+                                                    drawer_trigger: "service-account-row-{service_account.id}",
+                                                    submit_action: crate::routes::service_accounts::connect_route(cx.props.team_id),
+                                                    service_account: service_account,
+                                                    environments_and_vaults: &cx.props.environments_and_vaults,
+                                                    team_id: cx.props.team_id
                                                 }
                                             }
                                         ))
