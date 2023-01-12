@@ -81,7 +81,7 @@ pub fn team_popup(teams: Vec<GetTeams>, organisation: Organisation) -> String {
                 div {
                     class: "d-flex flex-justify-center height-full width-full flex-items-center",
                     h4 {
-                        "SkyTrace"
+                        "Cloak"
                     }
                 }
                 {

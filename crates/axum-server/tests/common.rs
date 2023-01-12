@@ -86,7 +86,7 @@ pub async fn add_secrets(
     secret_field.send_keys(value).await?;
 
     let submit_button = driver
-        .find_element(By::XPath("//turbo-frame//footer//button[text()='Create']"))
+        .find_element(By::XPath("//footer//button[text()='Create']"))
         .await?;
     submit_button.click().await?;
 
