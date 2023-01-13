@@ -14,6 +14,7 @@ struct MembersProps {
     submit_action: String,
     team_name: String,
     profile_link: String,
+    name_form_submit_action: String,
 }
 
 pub fn members(
@@ -237,12 +238,15 @@ pub fn members(
             }
 
             // Form to set he org name
-            super::team_name_form::TeamNameForm {}
+            super::team_name_form::TeamNameForm {
+                submit_action: cx.props.name_form_submit_action.clone()
+            }
         })
     }
 
     let submit_action = crate::routes::team::create_route(organisation.id);
     let profile_link = crate::routes::profile::index_route(organisation.id);
+    let name_form_submit_action = crate::routes::team::set_name_route(organisation.id);
 
     let team_name = if let Some(team) = &organisation.name {
         format!("Team : {}", team)
@@ -261,6 +265,7 @@ pub fn members(
             submit_action,
             team_name,
             profile_link,
+            name_form_submit_action,
         },
     );
     let _ = app.rebuild();
