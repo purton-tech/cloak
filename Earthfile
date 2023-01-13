@@ -188,7 +188,7 @@ integration-test:
             && docker stop app envoy video
     END
     # You need the tmp/* if you use just tmp earthly will overwrite the folder
-    SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly
+    SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly/
 
 check-selenium-failure:
     FROM +integration-test

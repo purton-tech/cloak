@@ -124,6 +124,9 @@ pub async fn create_a_vault(driver: &WebDriver) -> WebDriverResult<()> {
 }
 
 pub async fn register_user(driver: &WebDriver, config: &Config) -> WebDriverResult<String> {
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
     driver.get(format!("{}/auth/sign_up", &config.host)).await?;
 
     let email = register_random_user(driver).await?;

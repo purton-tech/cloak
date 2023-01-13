@@ -69,6 +69,9 @@ async fn sign_in_user(
     // Go to sign in page
     driver.get(format!("{}/auth/sign_in", &config.host)).await?;
 
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
     // Sign in someone
     driver
         .find_element(By::Id("email"))
