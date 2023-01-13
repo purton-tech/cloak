@@ -29,7 +29,7 @@ pub fn ConnectAccountForm<'a>(cx: Scope<'a, FormProps<'a>>) -> Element {
                             cx.render(rsx! (
                                 option {
                                     value: "{env.vault_id}:{env.id}",
-                                    "Vault {env.vault_name} Environment {env.name}"
+                                    "Vault: {env.vault_name}, Environment: {env.name}"
                                 }
                             ))
                         })

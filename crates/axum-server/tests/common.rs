@@ -199,26 +199,44 @@ pub async fn force_otp(config: &Config) {
 }
 
 pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
-    let sa_link = driver
+    driver
         .find_element(By::LinkText("Service Accounts"))
+        .await?
+        .click()
         .await?;
-    sa_link.click().await?;
 
-    let new_account_button = driver.find_element(By::Id("new-account")).await?;
-    new_account_button.click().await?;
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
-    let name_field = driver.find_element(By::Css("input[name='name']")).await?;
-    name_field.send_keys("My Dev Machine").await?;
-
-    let submit_button = driver
-        .find_element(By::Css(".a_button.auto.success"))
+    driver
+        .find_element(By::XPath("//button[text()='Add Service Account']"))
+        .await?
+        .click()
         .await?;
-    submit_button.click().await?;
 
-    let attach_link = driver
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    driver
+        .find_element(By::Css("input[name='name']"))
+        .await?
+        .send_keys("My Dev Machine")
+        .await?;
+
+    driver
+        .find_element(By::XPath("//button[text()='Create Service Account']"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    driver
         .find_element(By::LinkText("Connect to Vault"))
+        .await?
+        .click()
         .await?;
-    attach_link.click().await?;
 
     let vault_selector = driver.find_element(By::Css("select:first-of-type")).await?;
     let select = SelectElement::new(&vault_selector).await?;
@@ -226,17 +244,29 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
         .select_by_exact_text("Vault: My Vault, Environment: Development")
         .await?;
 
-    // Connect this account
-    let connect_button = driver
+    driver
         .find_element(By::XPath("//button[text()='Connect to Vault']"))
+        .await?
+        .click()
         .await?;
-    connect_button.click().await?;
 
-    let view_link = driver.find_element(By::LinkText("My Dev Machine")).await?;
-    view_link.click().await?;
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
-    let close_link = driver.find_element(By::LinkText("X")).await?;
-    close_link.click().await?;
+    driver
+        .find_element(By::LinkText("My Dev Machine"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    driver
+        .find_element(By::LinkText("X"))
+        .await?
+        .click()
+        .await?;
 
     Ok(())
 }
