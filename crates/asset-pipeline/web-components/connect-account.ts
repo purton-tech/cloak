@@ -10,10 +10,10 @@ class ConnectAccount extends SideDrawer {
     constructor() {
         super()
 
-        const serviceAccountAttr = this.getAttribute('service-account-id')
+        const serviceAccountIDHiddenField = document.getElementById('service-account-id')
 
-        if(serviceAccountAttr) {
-            const serviceAccountId = parseInt(serviceAccountAttr)
+        if(serviceAccountIDHiddenField instanceof HTMLInputElement) {
+            const serviceAccountId = parseInt(serviceAccountIDHiddenField.value)
             let connectButton = this.querySelector('#connect-to-vault-' + serviceAccountId)
 
             if(connectButton) {

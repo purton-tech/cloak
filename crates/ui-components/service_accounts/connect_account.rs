@@ -24,7 +24,10 @@ pub fn ConnectAccountForm<'a>(cx: Scope<'a, FormProps<'a>>) -> Element {
                     Select {
                         id: "vault-select-{cx.props.service_account.id}",
                         name: "environment_id",
-                        label: "Which Vault would you like to connect to?"
+                        label: "Which Vault would you like to connect to?",
+                        option {
+                            "Select..."
+                        }
                         cx.props.environments_and_vaults.iter().map(|env| {
                             cx.render(rsx! (
                                 option {
@@ -34,6 +37,13 @@ pub fn ConnectAccountForm<'a>(cx: Scope<'a, FormProps<'a>>) -> Element {
                             ))
                         })
                     }
+                }
+
+                input {
+                    id: "service-account-id",
+                    "type": "hidden",
+                    value: "{cx.props.service_account.id}",
+                    name: "service_account_id"
                 }
 
                 input {
