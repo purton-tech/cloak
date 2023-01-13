@@ -57,7 +57,7 @@ pub fn teams(teams: Vec<Team>, organisation_id: i32) -> String {
                                                         if team.id != cx.props.organisation_id {
                                                             cx.render(rsx! {
                                                                 a {
-                                                                    href: "../{team.id}/team",
+                                                                    href: "../{team.id}",
                                                                     "(Switch to this Team)"
                                                                 }
                                                             })

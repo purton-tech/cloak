@@ -31,16 +31,15 @@ async fn audit_filter(driver: &WebDriver, email: &str) -> WebDriverResult<()> {
     let select = SelectElement::new(&user_selector).await?;
     select.select_by_exact_text(email).await?;
 
-    let submit_button = driver
-        .find_element(By::Css(".a_button.auto.success"))
+    driver
+        .find_element(By::XPath("//button[text()='Apply Filter']"))
+        .await?
+        .click()
         .await?;
-    submit_button.click().await?;
 
     // See it in the search results
     let table_cell = driver
-        .find_element(By::XPath(
-            "//table[@class='m_table audit_table']/tbody/tr[last()]/td[2]",
-        ))
+        .find_element(By::XPath("//tbody/tr[last()]/td[2]"))
         .await?;
 
     assert_eq!(table_cell.text().await?, email);

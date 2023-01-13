@@ -4,6 +4,7 @@ pub use cornucopia_async::Params;
 pub use deadpool_postgres::{Pool, PoolError, Transaction};
 pub use tokio_postgres::Error as TokioPostgresError;
 
+pub use queries::audit::Audit;
 pub use queries::environments::{Environment, EnvironmentsAndVault};
 pub use queries::invitations::Invitation;
 pub use queries::organisations::GetTeams as Team;

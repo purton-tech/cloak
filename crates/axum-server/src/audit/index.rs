@@ -17,22 +17,12 @@ pub async fn index(
     let transaction = client.transaction().await?;
     super::super::rls::set_row_level_security_user(&transaction, &current_user).await?;
 
-    let _user = queries::users::user()
-        .bind(&transaction, &current_user.user_id)
-        .one()
-        .await?;
-
-    let team = queries::organisations::organisation()
-        .bind(&transaction, &organisation_id)
-        .one()
-        .await?;
-
-    let _team_users = queries::organisations::get_users()
+    let team_users = queries::organisations::get_users()
         .bind(&transaction, &organisation_id)
         .all()
         .await?;
 
-    let _audits = queries::audit::audit()
+    let audits = queries::audit::audit()
         .bind(
             &transaction,
             &None,
@@ -45,5 +35,9 @@ pub async fn index(
         .all()
         .await?;
 
-    Ok(Html(ui_components::audit::index(team.id)))
+    Ok(Html(ui_components::audit::index::index(
+        organisation_id,
+        team_users,
+        audits,
+    )))
 }
