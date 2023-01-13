@@ -1,6 +1,7 @@
 pub mod common;
 
 use thirtyfour::{components::select::SelectElement, prelude::*};
+use tokio::time::{sleep, Duration};
 
 // let's set up the sequence of steps we want the browser to take
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -36,7 +37,7 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     )
     .await?;
 
-    set_profile_details(driver).await?;
+    set_profile_details(driver, &account_owner).await?;
 
     add_team_member(driver, &team_member, &account_owner, config).await?;
 
@@ -97,7 +98,45 @@ async fn sign_in_user(
 }
 
 // Before we ivite people we have to have a team name and set our own name
-async fn set_profile_details(driver: &WebDriver) -> WebDriverResult<()> {
+async fn set_profile_details(driver: &WebDriver, email: &str) -> WebDriverResult<()> {
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    // Click on the profile button
+    let path = format!("//span[text()='{}']", email);
+    driver.find_element(By::XPath(&path)).await?.click().await?;
+
+    driver
+        .find_element(By::LinkText("Profile"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    driver
+        .find_element(By::Css("input[name='first_name']"))
+        .await?
+        .send_keys("David")
+        .await?;
+
+    driver
+        .find_element(By::Css("input[name='last_name']"))
+        .await?
+        .send_keys("Jason")
+        .await?;
+
+    driver
+        .find_element(By::XPath("//button[text()='Update Profile']"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    // Now set the org name
     driver
         .find_element(By::LinkText("Team Members"))
         .await?
@@ -110,8 +149,17 @@ async fn set_profile_details(driver: &WebDriver) -> WebDriverResult<()> {
         .click()
         .await?;
 
+    // Wait for the form to appear
     driver
-        .find_element(By::XPath("//input[name='name']"))
+        .query(By::Css("input[name='name']"))
+        .first()
+        .await?
+        .wait_until()
+        .displayed()
+        .await?;
+
+    driver
+        .find_element(By::Css("input[name='name']"))
         .await?
         .send_keys("Testing Team")
         .await?;
@@ -122,31 +170,30 @@ async fn set_profile_details(driver: &WebDriver) -> WebDriverResult<()> {
         .click()
         .await?;
 
-    let sa_link = driver.find_element(By::LinkText("Your Profile")).await?;
-    sa_link.click().await?;
-
-    let name_field = driver
-        .find_element(By::Css("input[name='first_name']"))
-        .await?;
-    name_field.send_keys("David").await?;
-
-    let name_field = driver
-        .find_element(By::Css("input[name='last_name']"))
-        .await?;
-    name_field.send_keys("Jason").await?;
-
-    let submit_button = driver.find_element(By::Id("save-details-button")).await?;
-    submit_button.click().await?;
-
     Ok(())
 }
 
 async fn add_member_to_vault(driver: &WebDriver, email: &str) -> WebDriverResult<()> {
-    let sa_link = driver.find_element(By::LinkText("Members")).await?;
-    sa_link.click().await?;
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
-    let new_user_button = driver.find_element(By::Id("add-member")).await?;
-    new_user_button.click().await?;
+    driver
+        .find_element(By::LinkText("Members"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    driver
+        .find_element(By::XPath("//button[text()='Add Member']"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
     let vault_selector = driver.find_element(By::Css("select:first-of-type")).await?;
     let select = SelectElement::new(&vault_selector).await?;
@@ -158,10 +205,11 @@ async fn add_member_to_vault(driver: &WebDriver, email: &str) -> WebDriverResult
         .await?;
     dev_label.click().await?;
 
-    let submit_button = driver
-        .find_element(By::Css(".a_button.auto.success"))
+    driver
+        .find_element(By::XPath("//button[text()='Add User to Vault']"))
+        .await?
+        .click()
         .await?;
-    submit_button.click().await?;
 
     Ok(())
 }
@@ -172,37 +220,60 @@ async fn add_team_member(
     team_owner: &str,
     config: &common::Config,
 ) -> WebDriverResult<()> {
-    let sa_link = driver.find_element(By::LinkText("Team")).await?;
-    sa_link.click().await?;
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
-    let new_user_button = driver.find_element(By::Id("invite-user")).await?;
-    new_user_button.click().await?;
+    // Click on the side menu
+    driver
+        .find_element(By::LinkText("Team Members"))
+        .await?
+        .click()
+        .await?;
 
-    let name_field = driver.find_element(By::Css("input[name='email']")).await?;
-    name_field.send_keys(team_member).await?;
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
-    let name_field = driver
+    driver
+        .find_element(By::XPath("//button[text()='Invite New Team Member']"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    driver
+        .find_element(By::Css("input[name='email']"))
+        .await?
+        .send_keys(team_member)
+        .await?;
+
+    driver
         .find_element(By::Css("input[name='first_name']"))
+        .await?
+        .send_keys("Trevor")
         .await?;
-    name_field.send_keys("Trevor").await?;
 
-    let name_field = driver
+    driver
         .find_element(By::Css("input[name='last_name']"))
+        .await?
+        .send_keys("Invitable")
         .await?;
-    name_field.send_keys("Invitable").await?;
 
-    let submit_button = driver
-        .find_element(By::Css(".a_button.auto.success"))
+    driver
+        .find_element(By::XPath("//button[text()='Send Invitation']"))
+        .await?
+        .click()
         .await?;
-    submit_button.click().await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
     let table_cell = driver
-        .find_element(By::XPath(
-            "//table[@class='m_table team_table']/tbody/tr[last()]/td[1]/span",
-        ))
+        .find_element(By::XPath("//tbody/tr[last()]/td[1]/span"))
         .await?;
 
-    assert_eq!(table_cell.text().await?, "Invited");
+    assert_eq!(table_cell.text().await?, "Trevor Invitable");
 
     // Get the invite from mailhog
     let invitation_url = get_invite_url_from_email(config).await?;
@@ -213,9 +284,7 @@ async fn add_team_member(
     driver.get(invitation_url).await?;
 
     let table_cell = driver
-        .find_element(By::XPath(
-            "//table[@class='m_table memberships']/tbody/tr[1]/td[2]",
-        ))
+        .find_element(By::XPath("//tbody/tr[1]/td[2]"))
         .await?;
 
     assert_eq!(table_cell.text().await?, team_owner);

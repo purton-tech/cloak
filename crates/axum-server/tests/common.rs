@@ -2,6 +2,7 @@ use db::Pool;
 use rand::Rng;
 use std::env;
 use thirtyfour::{components::select::SelectElement, prelude::*};
+use tokio::time::{sleep, Duration};
 
 #[derive(Clone)]
 pub struct Config {
@@ -135,11 +136,23 @@ pub async fn register_user(driver: &WebDriver, config: &Config) -> WebDriverResu
 }
 
 pub async fn select_first_vault(driver: &WebDriver) -> WebDriverResult<()> {
-    let vault_menu_link = driver.find_element(By::LinkText("Vaults")).await?;
-    vault_menu_link.click().await?;
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
-    let vault_card = driver.find_element(By::Css(".vault-card")).await?;
-    vault_card.click().await?;
+    driver
+        .find_element(By::LinkText("Vaults"))
+        .await?
+        .click()
+        .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
+    driver
+        .find_element(By::XPath("//tbody/tr[last()]/td[1]/a"))
+        .await?
+        .click()
+        .await?;
 
     Ok(())
 }
