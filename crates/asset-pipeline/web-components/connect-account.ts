@@ -3,9 +3,9 @@ import { VaultClient } from '../api.client';
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
 import { GetVaultResponse, Secret } from '../api';
+import { SideDrawer } from './side-drawer';
 
-
-class ConnectAccount extends HTMLElement {
+class ConnectAccount extends SideDrawer {
 
     constructor() {
         super()

@@ -99,16 +99,28 @@ async fn sign_in_user(
 // Before we ivite people we have to have a team name and set our own name
 async fn set_profile_details(driver: &WebDriver) -> WebDriverResult<()> {
     driver
-        .find_element(By::XPath("//a[@data-drawer-target='set-name-drawer']"))
+        .find_element(By::LinkText("Team Members"))
         .await?
         .click()
         .await?;
 
-    let name_field = driver.find_element(By::Id("org-name")).await?;
-    name_field.send_keys("Testing Team").await?;
+    driver
+        .find_element(By::XPath("//button[text()='Edit Name']"))
+        .await?
+        .click()
+        .await?;
 
-    let submit_button = driver.find_element(By::Id("save-org-name")).await?;
-    submit_button.click().await?;
+    driver
+        .find_element(By::XPath("//input[name='name']"))
+        .await?
+        .send_keys("Testing Team")
+        .await?;
+
+    driver
+        .find_element(By::XPath("//button[text()='Set Team Name']"))
+        .await?
+        .click()
+        .await?;
 
     let sa_link = driver.find_element(By::LinkText("Your Profile")).await?;
     sa_link.click().await?;

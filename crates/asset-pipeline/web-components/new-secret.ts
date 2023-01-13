@@ -3,7 +3,7 @@ import { VaultClient } from '../api.client';
 import { GrpcWebFetchTransport } from "@protobuf-ts/grpcweb-transport";
 import type { RpcOptions } from "@protobuf-ts/runtime-rpc";
 import { CreateSecretsRequest, Secret, ServiceAccount, ServiceAccountSecrets } from '../api';
-
+import { SideDrawer } from './side-drawer';
 
 /**
  * Alice creates a new secret for a vault.
@@ -13,7 +13,7 @@ import { CreateSecretsRequest, Secret, ServiceAccount, ServiceAccountSecrets } f
  * - Alice can now decrypt the Vault encryption key using the derived key.
  * - Alice can use the Vault encryption key to encrypt the secrets.
  */
-class NewSecret extends HTMLElement {
+class NewSecret extends SideDrawer {
 
     private secretNameInput: HTMLInputElement
     private secretValueInput: HTMLTextAreaElement

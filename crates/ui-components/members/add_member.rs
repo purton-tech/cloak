@@ -16,9 +16,6 @@ pub struct AddMemberFormProps {
 
 pub fn AddMemberForm(cx: Scope<AddMemberFormProps>) -> Element {
     cx.render(rsx! {
-        {
-            LazyNodes::new(|f| f.text(format_args!("<add-member>")))
-        }
         form {
             id: "add-member-form",
             method: "post",
@@ -26,6 +23,7 @@ pub fn AddMemberForm(cx: Scope<AddMemberFormProps>) -> Element {
             Drawer {
                 label: "Add User to Vault",
                 trigger_id: DRAW_TRIGGER,
+                component_name: "add-member",
                 DrawerBody {
                     div {
                         class: "d-flex flex-column",
@@ -105,6 +103,5 @@ pub fn AddMemberForm(cx: Scope<AddMemberFormProps>) -> Element {
                 }
             }
         }
-        {LazyNodes::new(|f| f.text(format_args!("</add-member>")))}
     })
 }

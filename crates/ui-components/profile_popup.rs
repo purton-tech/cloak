@@ -5,9 +5,10 @@ use primer_rsx::*;
 
 struct ProfilePopupProps {
     user_name_or_email: String,
+    profile_url: String,
 }
 
-pub fn profile_popup(user: User) -> String {
+pub fn profile_popup(user: User, organisation_id: i32) -> String {
     fn app(cx: Scope<ProfilePopupProps>) -> Element {
         cx.render(rsx! {
             {
@@ -20,8 +21,7 @@ pub fn profile_popup(user: User) -> String {
                 suffix_image_src: button_select_svg.name,
                 class: "width-full",
                 DropDownLink {
-                    href: "profile",
-                    target: "_top",
+                    href: &cx.props.profile_url,
                     "Profile"
                 }
                 DropDownLink {
@@ -47,6 +47,7 @@ pub fn profile_popup(user: User) -> String {
         app,
         ProfilePopupProps {
             user_name_or_email: name,
+            profile_url: crate::routes::profile::index_route(organisation_id),
         },
     );
     let _ = app.rebuild();

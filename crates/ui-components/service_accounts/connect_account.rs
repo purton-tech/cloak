@@ -14,13 +14,10 @@ pub struct FormProps<'a> {
 
 pub fn ConnectAccountForm<'a>(cx: Scope<'a, FormProps<'a>>) -> Element {
     cx.render(rsx! {
-        {
-            LazyNodes::new(|f| f.text(format_args!("<connect-account service-account-id='{}'>",
-                cx.props.service_account.id)))
-        }
         Drawer {
             label: "Connect to Vault",
             trigger_id: "{cx.props.drawer_trigger}",
+            component_name: "connect-account",
             DrawerBody {
                 div {
                     class: "d-flex flex-column",
@@ -77,9 +74,6 @@ pub fn ConnectAccountForm<'a>(cx: Scope<'a, FormProps<'a>>) -> Element {
                     "Connect to Vault"
                 }
             }
-        }
-        {
-            LazyNodes::new(|f| f.text(format_args!("</connect-account>")))
         }
     })
 }

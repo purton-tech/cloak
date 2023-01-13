@@ -1,6 +1,7 @@
 import { Vault, Cipher, ByteData, AESKey, ECDHKeyPair, ECDHPublicKey } from '../cryptography/vault'
+import { SideDrawer } from './side-drawer'
 
-class AddMember extends HTMLElement {
+class AddMember extends SideDrawer {
 
     constructor() {
         super()

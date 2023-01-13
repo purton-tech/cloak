@@ -13,6 +13,7 @@ struct MembersProps {
     can_manage_team: bool,
     submit_action: String,
     team_name: String,
+    profile_link: String,
 }
 
 pub fn members(
@@ -68,7 +69,7 @@ pub fn members(
                                         p {
                                             "Please set your "
                                             a {
-                                                href: "profile",
+                                                href: "{cx.props.profile_link}",
                                                 "name"
                                             }
                                         }
@@ -241,6 +242,7 @@ pub fn members(
     }
 
     let submit_action = crate::routes::team::create_route(organisation.id);
+    let profile_link = crate::routes::profile::index_route(organisation.id);
 
     let team_name = if let Some(team) = &organisation.name {
         format!("Team : {}", team)
@@ -258,6 +260,7 @@ pub fn members(
             can_manage_team,
             submit_action,
             team_name,
+            profile_link,
         },
     );
     let _ = app.rebuild();

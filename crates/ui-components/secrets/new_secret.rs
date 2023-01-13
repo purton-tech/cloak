@@ -1,5 +1,4 @@
 #![allow(non_snake_case)]
-#![allow(unused_braces)]
 use db::{Environment, UserVault};
 use dioxus::prelude::*;
 use primer_rsx::*;
@@ -15,9 +14,6 @@ pub struct NewSecretFormProps {
 
 pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
     cx.render(rsx! {
-        {
-            LazyNodes::new(|f| f.text(format_args!("<new-secret>")))
-        }
         form {
             id: "add-secret-form",
             method: "post",
@@ -25,6 +21,7 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
             Drawer {
                 label: "Add Secret",
                 trigger_id: DRAW_TRIGGER,
+                component_name: "new-secret",
                 DrawerBody {
                     div {
                         class: "d-flex flex-column",
@@ -102,6 +99,5 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
                 }
             }
         }
-        {LazyNodes::new(|f| f.text(format_args!("</new-secret>")))}
     })
 }
