@@ -201,8 +201,6 @@ check-selenium-failure:
 
 build-cli-osx:
     FROM joseluisq/rust-linux-darwin-builder:1.62.1
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
-    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
     COPY --dir Cargo.lock Cargo.toml crates .
     RUN apt-get update \
         && apt-get install -y --no-install-recommends \
