@@ -203,7 +203,7 @@ build-cli-osx:
     FROM joseluisq/rust-linux-darwin-builder:1.62.1
     COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
     COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
-    COPY --dir db Cargo.lock Cargo.toml protos .
+    COPY --dir Cargo.lock Cargo.toml crates .
     RUN apt-get update \
         && apt-get install -y --no-install-recommends \
             protobuf-compiler \
@@ -214,7 +214,7 @@ build-cli-osx:
         && apt-get clean -y \
         && rm -r /var/cache/* /var/lib/apt/lists/*
 
-    RUN cd cli \ 
+    RUN cd crates/cli \ 
         && CC=o64-clang \
         CXX=o64-clang++ \
         cargo build --release --target x86_64-apple-darwin
