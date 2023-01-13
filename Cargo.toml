@@ -1,8 +1,10 @@
 [workspace]
 
 members = [
-    "app",
-    "cli",
+    "crates/axum-server",
+    "crates/db",
+    "crates/grpc-api",
+    "crates/cli",
 ]
 
 # Don't add debug information and give us quicker incremental builds

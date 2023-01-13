@@ -1,0 +1,181 @@
+@use super::statics::*;
+@use crate::layout;
+@use crate::layout::SideBar;
+@use db::queries::organisations::Organisation;
+
+@(
+  title: &str, 
+  initials: &str,
+  content: Content, 
+  header: Content, 
+  organisation: &Organisation, 
+  vault_id: Option<i32>, 
+  side_bar: SideBar
+)
+
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    </meta>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    </meta>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    </meta>
+    <title>@title</title>
+    <link rel="stylesheet" href="/static/@index_css.name" type="text/css" />
+
+    <script src="/static/@index_js.name" type="text/javascript" async></script>
+    <link rel="icon" type="image/svg+xml" href="/static/@favicon_svg.name">
+    </link>
+  </head>
+
+  <body>
+    <div class="l_application">
+      <input type="checkbox" id="nav-toggle" />
+      <header>
+        @* Handles the hamburger menu *@
+        <label class="hamburger" for="nav-toggle">
+          <div class="top_bun"></div>
+          <div class="meat"></div>
+          <div class="bottom_bun"></div>
+        </label>
+  
+        <div>
+          @* The icon to bring up the profile page *@
+          <a class="profile" href="@crate::profile::index_route(organisation.id)">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" height="42px">
+              <circle cx="32" cy="32" r="32" />
+              <text stroke="white" fill="white" text-anchor="middle"
+                dominant-baseline="central" x="50%" y="50%">@initials</text>
+            </svg>
+          </a>
+        </div>
+
+        @:header()
+  
+      </header>
+
+      @* Navigation shown as a side menu *@
+      <nav class="sidenav">
+        <h1><a href="@crate::vaults::index_route(organisation.id)">Cloak</a></h1>
+
+        <div class="team-name">
+          <strong>Team : </strong>
+
+          @if let Some(name) = &organisation.name {
+            <a href="@crate::team::index_route(organisation.id)">@name</a>
+          } else {
+            Name Not Set <a data-drawer-target="set-name-drawer" href="#">Set Name</a>
+          }
+        </div>
+
+        <h2>Application</h2>
+
+        <ul>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::Vaults, false)'>
+            <img alt="Menu Item" width="24px" height="24px" src="/static/@vault_svg.name"></img>
+            <a href="@crate::vaults::index_route(organisation.id)">Vaults</a>
+          </li>
+
+          @if let Some(vault_id) = vault_id {
+            <li class='@layout::get_menu_class(&side_bar, &SideBar::Secrets, true)'>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@secrets_svg.name"></img>
+              <a href='@crate::secrets::index_route(vault_id, organisation.id)'>Secrets</a>
+            </li>
+
+            <li class='@layout::get_menu_class(&side_bar, &SideBar::Members, true)'>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@users_svg.name"></img>
+              <a href='@crate::members::member_route(vault_id, organisation.id)'>Members</a>
+            </li>
+          }
+
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::ServiceAccounts, false)'>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@accounts_svg.name"></img>
+              <a href="@crate::service_accounts::index_route(organisation.id)">Service Accounts</a>
+          </li>
+
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::Audit, false)'>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@audit_svg.name"></img>
+              <a href="@crate::audit::index_route(organisation.id)">Audit Trail</a>
+          </li>
+        </ul>
+  
+        <h2>Collaborate</h2>
+        
+        <ul>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::Team, false)'>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@users_svg.name"></img>
+              <a href="@crate::team::index_route(organisation.id)">Team</a>
+          </li>
+        </ul>
+  
+        <h2>Account</h2>
+        
+        <ul>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::Switch, false)'>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@switch_svg.name"></img>
+              <a href="@crate::team::switch_route(organisation.id)">Switch Teams</a>
+          </li>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::Profile, false)'>
+              <img alt="Menu Item" width="24px" height="24px" src="/static/@profile_svg.name"></img>
+              <a href="@crate::profile::index_route(organisation.id)">Your Profile</a>
+          </li>
+          <li class='@layout::get_menu_class(&side_bar, &SideBar::None, false)'>
+              <img alt="Menu Item" width="22px" height="24px" src="/static/@logout_svg.name"></img>
+              <a class="clickable" data-drawer-target="logout-drawer" href="#">Logout</a>
+          </li>
+        </ul>
+
+      </nav>
+      <main class="container">
+        <section class="content">
+          <div>
+            @:content()
+          </div>
+        </section>
+      </main>
+    </div>
+    <snack-bar></snack-bar>
+
+    @* Logout conirmation form *@
+    <div class="profile">
+      <form class="m_form" method="post" action="/auth/sign_out">
+        <side-drawer label="Logout ?" id="logout-drawer">
+          <template slot="body">
+            <p>Are you sure you want to Logout?</p>
+
+            <div class="m_callout">
+              <p>During logout we delete all cookies associated with your account 
+                and any private keys stored in local storage.</p>
+            </div>
+          </template>
+          <template slot="footer">
+            <button class="a_button auto danger" slot="footer"
+              type="submit">Logout</button>
+            </template>
+        </side-drawer>
+      </form>
+    </div>
+
+    @* Form to set the team name *@
+    <form class="m_form" method="post" action="@crate::team::set_name_route(organisation.id)">
+      <side-drawer label="Set Team Name" id="set-name-drawer">
+        <template slot="body">
+          <p>Set your team name</p>
+          <fieldset>
+              <label for="org-name">Name</label>
+              <input type="text" autocomplete="off" id="org-name" required="" name="name">
+              </input>
+          </fieldset>
+        </template>
+        <template slot="footer">
+          <button class="a_button auto success" id="save-org-name" slot="footer"
+            type="submit">Set Name</button>
+          </template>
+      </side-drawer>
+    </form>
+  </body>
+
+  </html>

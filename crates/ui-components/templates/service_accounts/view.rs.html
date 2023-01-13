@@ -1,0 +1,88 @@
+@use db::queries::service_accounts::GetAll;
+
+@(service_account: &GetAll)
+
+<form class="m_form">
+    <view-account 
+        service-account-id='@format!("{}", service_account.id)' 
+        label="Integrations">
+        <template slot="body">
+
+            <fieldset>
+                <select class="select-div" name="integration-type">
+                    <option value='@format!("dot-env-{}", service_account.id)'>Local Development Machine</option>
+                    <option value='@format!("kubernetes-{}", service_account.id)'>Kubernetes</option>
+                </select>
+            </fieldset>
+
+            <!-- documentation -->
+            <div id='@format!("dot-env-{}", service_account.id)' class="mt-1">
+
+                <h5>1. Install the cloak CLI</h5>
+
+                <p>https://cloak.software/developers/</p>
+
+                <h5>2. Download the private key for this service account</h5>
+
+                <p>
+                    Click here 
+                    <a id='@format!("wrapped-ecdh-private-key-{}", service_account.id)' 
+                        data-key="@service_account.encrypted_ecdh_private_key"
+                        download="cloak.pem">
+                        cloak.pem
+                    </a>
+                    to download your private key. 
+                    Store it in the folder where you will use the cloak CLI tool.
+                </p>
+
+                <h5>3. View the secrets</h5>
+                <p>
+                    From the same folder where you downloaded your <code>cloak.pem</code> file run...
+                </p>
+                <code>$ cloak secrets</code>
+
+                <h5>4. Store secrets in a .env file (Optional)</h5>
+                <p>
+                    From the same folder where you downloaded your <code>cloak.pem</code> file run...
+                </p>
+                <code>$ cloak env > .env</code>
+
+                <h5>5. Inject secrets into as env vars into a process (Optional)</h5>
+                <p>
+                    From the same folder where you downloaded your <code>cloak.pem</code> file run...
+                </p>
+                <code>$ cloak run name-of-process</code>
+            </div>
+
+            <!-- Kubernetes -->
+            <div id='@format!("kubernetes-{}", service_account.id)' class="mt-1">
+
+                <h5>1. Install the cloak CLI</h5>
+
+                <p>https://cloak.software/developers/</p>
+
+                <h5>2. Download the private key for this service account</h5>
+
+                <p>
+                    Click here 
+                    <a id='@format!("wrapped-ecdh-private-key-{}", service_account.id)' 
+                        data-key="@service_account.encrypted_ecdh_private_key"
+                        download="cloak.pem">
+                        cloak.pem
+                    </a>
+                    to download your private key. 
+                    Store it in the folder where you will use the cloak CLI tool.
+                </p>
+
+                <h5>3. Create a Kubernetes Secret</h5>
+
+                <p><code>$ cloak env > tmp.env</code></p>
+                <p><code>$ kubectl create secret generic credentials --from-env-file tmp.env</code></p>
+            </div>
+
+        </template>
+
+        <template slot="footer">
+        </template>
+    </view-account>
+</form>

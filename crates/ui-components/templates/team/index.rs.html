@@ -1,0 +1,121 @@
+@use super::super::layout_html;
+@use super::create_invite_html;
+@use super::delete_html;
+@use super::role_html;
+@use crate::layout::SideBar;
+@use db::queries::organisations::GetUsers;
+@use db::queries::organisations::Organisation;
+@use db::queries::invitations::Invitation;
+@use db::queries::users::user;
+@use crate::ructe::templates::statics::delete_svg;
+
+@(
+    initials: &str, 
+    users: Vec<GetUsers>, 
+    invites: Vec<Invitation>, 
+    organisation: &Organisation, 
+    user: &Get,
+    can_manage_team: bool
+)
+
+@:layout_html("Team", initials, {
+
+    @for user in &users {
+        @:delete_html(user.organisation_id, user.id, &user.email, &organisation.id)
+    }
+
+    <div class="m_card">
+        <div class="header">
+            @match (&organisation.name, can_manage_team) {
+                (Some(name), true) => {
+                    <span>Team : @name <a data-drawer-target="set-name-drawer" href="#">Edit</a></span>
+                }
+                (Some(name), false) => {
+                    <span>Team : @name</span>
+                }
+                (None, true) => {
+                    <span>Team : <a data-drawer-target="set-name-drawer" href="#">Set Team Name</a></span>
+                }
+                (None, false) => {
+                    <span>Team : Name Not Set</span>
+                }
+            }
+        </div>
+        <div class="body">
+            @if can_manage_team {
+                @if user.first_name.is_none() || organisation.name.is_none() {
+                    <div class="m_callout">
+                        <h3>Before you are able to invite people to your team you will need to do the following</h3>
+                        @if organisation.name.is_none() {
+                            <p>Please set your <a data-drawer-target="set-name-drawer" href="#">teams name </a></p>
+                        }
+                        @if user.first_name.is_none() {
+                            <p>Please set your <a href="@crate::profile::index_route(organisation.id)">name </a></p>
+                        }
+                    </div>
+                }
+            }
+            <table class="m_table team_table">
+                <thead>
+                    <tr>
+                        <th>Name or Email</th>
+                        <th class="hide-on-phones">Special Privileges</th>
+                        @if can_manage_team {
+                            <th>Action</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @for user in users {
+                        <tr>
+                            <td>
+                                @crate::layout::name(user.email, user.first_name, user.last_name)
+                            </td>
+                            <td class="hide-on-phones">
+                                @for (index, role) in user.roles.into_iter().enumerate() {
+                                    @if index > 0 {
+                                        and
+                                    }
+                                    <span>@:role_html(role)</span>
+                                }
+                            </td>
+                            @if can_manage_team {
+                                <td>
+                                    <a href="#" data-drawer-target='@format!("delete-member-drawer-{}-{}", user.organisation_id, user.id)'>
+                                        <img src="/static/@delete_svg.name" width="18" height="18"></img>
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                    }
+
+                    @for invite in invites {
+                        <tr>
+                            <td>
+                                @invite.email
+                                <span class="a_badge a_badge--success">Invited</span>
+                            </td>
+                            <td class="hide-on-phones">
+                                @for (index, role) in invite.roles.into_iter().enumerate() {
+                                    @if index > 0 {
+                                        and
+                                    }
+                                    <span>@:role_html(role)</span>
+                                }
+                            </td>
+                            @if can_manage_team {
+                                <td>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}, {
+    @if user.first_name.is_some() && organisation.name.is_some() && can_manage_team {
+        @:create_invite_html(&organisation.id)
+        <button class="a_button mini primary" id="invite-user">Invite a New Team Member</button>
+    }
+}, organisation, None, SideBar::Team)

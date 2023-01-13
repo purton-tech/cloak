@@ -1,0 +1,30 @@
+[package]
+name = "cli"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+tokio = { version = "1", default-features = false, features = ["macros", "rt", "rt-multi-thread"] }
+
+# gRPC dependencies
+tonic = "0"
+prost = "0"
+# We use request to make grpc-web requests
+reqwest = { version = "0", default-features = false, features = ["rustls-tls"]  }
+
+# Command line parser
+clap = { version = "3.0.0-rc.9", features = ["derive", "env"] }
+dotenv = "0.15.0"
+
+# Elliptic Curve Diffie Helman
+p256 = { version = "0", default-features = false, features = ["ecdh", "pem"] } 
+base64 = "0.13.1" # So we encode DER public key to base64
+aes-gcm = "0"
+
+# OK, I wanted a pretty table
+cli-table = { version = "0", default-features = false, features = ["derive"] }
+
+[build-dependencies]
+rust-grpc-web = { git = "https://github.com/elliptic-email/rust-grpc-web" }

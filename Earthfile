@@ -8,13 +8,17 @@ RUN sudo apt update \
     && sudo mv protoc-gen-grpc-web* /usr/local/bin/protoc-gen-grpc-web \
     && sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
 
-ARG APP_EXE_NAME=app
-ARG APP_FOLDER=app
-ARG CLI_FOLDER=cli
+ARG APP_EXE_NAME=cloak
 ARG CLI_EXE_NAME=cli
 ARG CLI_LINUX_EXE_NAME=cloak-linux
 ARG CLI_MACOS_EXE_NAME=cloak-macos
 ARG DBMATE_VERSION=1.15.0
+
+# Folders
+ARG AXUM_FOLDER=crates/axum-server
+ARG DB_FOLDER=crates/db
+ARG GRPC_API_FOLDER=crates/grpc-api
+ARG PIPELINE_FOLDER=crates/asset-pipeline
 
 # Base images
 ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
@@ -31,12 +35,6 @@ ARG KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
 
 WORKDIR /build
 
-USER root
-
-# Set up for docker in docker https://github.com/earthly/earthly/issues/1225
-#this breaks my build
-#DO github.com/earthly/lib+INSTALL_DIND
-
 USER vscode
 
 dev:
@@ -45,13 +43,13 @@ dev:
     BUILD +check-selenium-failure
 
 pull-request:
-    BUILD +init-container
+    BUILD +migration-container
     BUILD +app-container
     BUILD +envoy-container
     BUILD +integration-test
 
 all:
-    BUILD +init-container
+    BUILD +migration-container
     BUILD +app-container
     BUILD +envoy-container
     BUILD +build-cli-osx
@@ -59,44 +57,40 @@ all:
     BUILD +save-artifacts
 
 npm-deps:
-    COPY $APP_FOLDER/package.json $APP_FOLDER/package.json
-    COPY $APP_FOLDER/package-lock.json $APP_FOLDER/package-lock.json
-    RUN cd $APP_FOLDER && npm install
-    SAVE ARTIFACT $APP_FOLDER/node_modules
+    COPY $PIPELINE_FOLDER/package.json $PIPELINE_FOLDER/package.json
+    COPY $PIPELINE_FOLDER/package-lock.json $PIPELINE_FOLDER/package-lock.json
+    RUN cd $PIPELINE_FOLDER && npm install
+    SAVE ARTIFACT $PIPELINE_FOLDER/node_modules
 
 npm-build:
     FROM +npm-deps
-    COPY $APP_FOLDER/asset-pipeline $APP_FOLDER/asset-pipeline
-    COPY $APP_FOLDER/templates $APP_FOLDER/templates
-    # Protos needed for typescript web gRPC.
-    COPY protos protos
-    COPY +npm-deps/node_modules $APP_FOLDER/node_modules
-    RUN cd $APP_FOLDER && npm run release
-    SAVE ARTIFACT $APP_FOLDER/dist
+    COPY $PIPELINE_FOLDER $PIPELINE_FOLDER
+    COPY --if-exists $GRPC_API_FOLDER $GRPC_API_FOLDER
+    COPY +npm-deps/node_modules $PIPELINE_FOLDER/node_modules
+    RUN cd $PIPELINE_FOLDER && npm run release
+    SAVE ARTIFACT $PIPELINE_FOLDER/dist
 
 prepare-cache:
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/asset-pipeline $APP_FOLDER
-    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER
+    # Copy in all our crates
+    COPY --dir crates crates
     COPY Cargo.lock Cargo.toml .
-    RUN cargo chef prepare --recipe-path recipe.json
+    RUN cargo chef prepare --recipe-path recipe.json --bin $AXUM_FOLDER
     SAVE ARTIFACT recipe.json
 
 build-cache:
     COPY +prepare-cache/recipe.json ./
-    RUN cargo chef cook --release --target x86_64-unknown-linux-musl 
+    RUN cargo chef cook --release --target x86_64-unknown-linux-musl
     SAVE ARTIFACT target
     SAVE ARTIFACT $CARGO_HOME cargo_home
     SAVE IMAGE --cache-hint
 
 build:
-    COPY --dir $APP_FOLDER/src $APP_FOLDER/Cargo.toml $APP_FOLDER/build.rs $APP_FOLDER/templates $APP_FOLDER/queries $APP_FOLDER/asset-pipeline $APP_FOLDER
-    COPY --dir $CLI_FOLDER/src $CLI_FOLDER/Cargo.toml $CLI_FOLDER/build.rs $CLI_FOLDER
-    COPY --dir db Cargo.lock Cargo.toml protos .
+    # Copy in all our crates
+    COPY --dir crates crates
+    COPY --dir Cargo.lock Cargo.toml .
     COPY +build-cache/cargo_home $CARGO_HOME
     COPY +build-cache/target target
-    RUN mkdir asset-pipeline
-    COPY --dir +npm-build/dist $APP_FOLDER/
-    COPY --dir $APP_FOLDER/asset-pipeline/images $APP_FOLDER/asset-pipeline
+    COPY --dir +npm-build/dist $PIPELINE_FOLDER/
     # We need to run inside docker as we need postgres running for cornucopia
     ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/postgres?sslmode=disable
     USER root
@@ -104,7 +98,7 @@ build:
         --pull postgres:alpine
         RUN docker run -d --rm --network=host -e POSTGRES_PASSWORD=testpassword postgres:alpine \
             && while ! pg_isready --host=localhost --port=5432 --username=postgres; do sleep 1; done ;\
-                dbmate up \
+                dbmate --migrations-dir $DB_FOLDER/migrations up \
             && cargo build --release --target x86_64-unknown-linux-musl
     END
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME
@@ -115,8 +109,7 @@ save-artifacts:
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME AS LOCAL ./tmp/app
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_LINUX_EXE_NAME
 
-
-init-container:
+migration-container:
     FROM debian:bullseye-slim
     RUN apt-get update -y \  
         && apt-get install -y --no-install-recommends ca-certificates curl libpq-dev \
@@ -124,17 +117,20 @@ init-container:
     RUN curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
         && mv ./dbmate-linux-amd64 /usr/bin/dbmate \
         && chmod +x /usr/bin/dbmate
-    COPY --dir db .
+    COPY --dir $DB_FOLDER .
     CMD dbmate up
-    SAVE IMAGE $INIT_IMAGE_NAME
+    SAVE IMAGE --push $MIGRATIONS_IMAGE_NAME
 
+# To test this locally run
+# docker run -it --rm -e APP_DATABASE_URL=$APP_DATABASE_URL -p 7403:7403 purtontech/trace-server:latest
 app-container:
     FROM scratch
-    COPY +build/$APP_EXE_NAME rust-exe
-    COPY --dir +npm-build/dist build/$APP_FOLDER/
-    COPY --dir $APP_FOLDER/asset-pipeline/images build/$APP_FOLDER/asset-pipeline/images
-    ENTRYPOINT ["./rust-exe"]
-    SAVE IMAGE $APP_IMAGE_NAME
+    COPY +build/$APP_EXE_NAME axum-server
+    # Place assets in a build folder as that's where statics is expecting them.
+    COPY --dir +npm-build/dist /build/$PIPELINE_FOLDER/
+    COPY --dir $PIPELINE_FOLDER/images /build/$PIPELINE_FOLDER/images
+    ENTRYPOINT ["./axum-server"]
+    SAVE IMAGE --push $APP_IMAGE_NAME
 
 envoy-container:
     FROM $ENVOY_PROXY
@@ -148,8 +144,6 @@ envoy-container:
 
 integration-test:
     FROM +build
-    COPY --dir $APP_FOLDER/tests $APP_FOLDER/
-    COPY --dir db .
     COPY .devcontainer/docker-compose.yml ./ 
     COPY .devcontainer/docker-compose.earthly.yml ./ 
     ARG DATABASE_URL=postgresql://postgres:testpassword@localhost:5432/cloak?sslmode=disable
@@ -176,7 +170,7 @@ integration-test:
 
         # Force to command to always be succesful so the artifact is saved. 
         # https://github.com/earthly/earthly/issues/988
-        RUN dbmate up \
+        RUN dbmate --migrations-dir $DB_FOLDER/migrations up \
             && docker run -d -p 7103:7103 --rm --network=build_default \
                 -e APP_DATABASE_URL=$APP_DATABASE_URL \
                 -e INVITE_DOMAIN=http://envoy:7100 \
@@ -194,7 +188,7 @@ integration-test:
             && docker stop app envoy video
     END
     # You need the tmp/* if you use just tmp earthly will overwrite the folder
-    SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly
+    SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly/
 
 check-selenium-failure:
     FROM +integration-test
