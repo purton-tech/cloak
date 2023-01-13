@@ -33,8 +33,15 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                                     if let Some(vault_name) = &service_account.vault_name {
                                         cx.render(rsx!(
                                             td {
-                                                id: "service-account-view-{service_account.id}",
-                                                "{service_account.account_name}"
+                                                a {
+                                                    href: "#",
+                                                    "data-drawer-target": "service-account-view-{service_account.id}",
+                                                    "{service_account.account_name}"
+                                                }
+                                                super::view_account::ViewAccountDrawer {
+                                                    drawer_trigger: "service-account-view-{service_account.id}",
+                                                    service_account: service_account
+                                                }
                                             }
                                             td {
                                                 "{vault_name}"
