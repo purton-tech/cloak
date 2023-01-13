@@ -170,7 +170,7 @@ integration-test:
 
         # Force to command to always be succesful so the artifact is saved. 
         # https://github.com/earthly/earthly/issues/988
-        RUN dbmate up \
+        RUN dbmate --migrations-dir $DB_FOLDER/migrations up \
             && docker run -d -p 7103:7103 --rm --network=build_default \
                 -e APP_DATABASE_URL=$APP_DATABASE_URL \
                 -e INVITE_DOMAIN=http://envoy:7100 \
