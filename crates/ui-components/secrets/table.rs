@@ -39,8 +39,16 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                                         )))}
                                     }
                                     td {
+                                        RelativeTime {
+                                            format: RelativeTimeFormat::Datetime,
+                                            datetime: &secret.updated_at
+                                        }
                                     }
                                     td {
+                                        RelativeTime {
+                                            format: RelativeTimeFormat::Datetime,
+                                            datetime: &secret.created_at
+                                        }
                                     }
                                     td {
                                     }

@@ -30,8 +30,9 @@ SELECT
     (SELECT name FROM environments WHERE id = sa.environment_id) as environment_name,
     sa.ecdh_public_key, 
     sa.encrypted_ecdh_private_key,
-    sa.updated_at, 
-    sa.created_at 
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(created_at)::text) as created_at
 FROM 
     service_accounts sa
 WHERE 
@@ -46,8 +47,9 @@ SELECT
     sa.ecdh_public_key, 
     sa.encrypted_ecdh_private_key,
     sa.environment_id,
-    sa.updated_at, 
-    sa.created_at 
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(sa.updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(sa.created_at)::text) as created_at
 FROM 
     service_accounts sa
 LEFT OUTER JOIN
@@ -65,8 +67,9 @@ SELECT
     v.name as vault_name, 
     sa.ecdh_public_key, 
     sa.encrypted_ecdh_private_key,
-    sa.updated_at, 
-    sa.created_at 
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(sa.updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(sa.created_at)::text) as created_at
 FROM 
     service_accounts sa
 LEFT OUTER JOIN
@@ -83,8 +86,9 @@ SELECT
     v.name as vault_name, 
     sa.ecdh_public_key,
     sa.encrypted_ecdh_private_key,
-    sa.updated_at, 
-    sa.created_at 
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(sa.updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(sa.created_at)::text) as created_at
 FROM 
     service_accounts sa
 LEFT OUTER JOIN

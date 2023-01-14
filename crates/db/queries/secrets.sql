@@ -20,8 +20,9 @@ SELECT
     secret, 
     environment_id,
     (SELECT name from environments WHERE id = environment_id) AS environment_name,
-    updated_at, 
-    created_at  
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(created_at)::text) as created_at
 FROM secrets WHERE vault_id = :vault_id
 ORDER BY environment_name;
 
@@ -34,8 +35,9 @@ SELECT
     secret,
     environment_id,
     (SELECT name from environments WHERE id = environment_id) AS environment_name,
-    updated_at, 
-    created_at  
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(created_at)::text) as created_at
 FROM secrets WHERE id = :id;
 
 --! delete_secret

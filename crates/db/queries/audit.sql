@@ -2,7 +2,8 @@
 SELECT 
     id,
     (SELECT email from users WHERE id = user_id) as email,
-    created_at,
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(created_at)::text) as created_at,
     action, 
     access_type, 
     description 

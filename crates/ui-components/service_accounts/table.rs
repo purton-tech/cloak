@@ -83,8 +83,16 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                                         ))
                                     }
                                     td {
+                                        RelativeTime {
+                                            format: RelativeTimeFormat::Datetime,
+                                            datetime: &service_account.updated_at
+                                        }
                                     }
                                     td {
+                                        RelativeTime {
+                                            format: RelativeTimeFormat::Datetime,
+                                            datetime: &service_account.created_at
+                                        }
                                     }
                                     td {
                                     }

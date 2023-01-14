@@ -28,6 +28,10 @@ pub fn AuditTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                             cx.props.audits.iter().map(|audit| rsx!(
                                 tr {
                                     td {
+                                        RelativeTime {
+                                            format: RelativeTimeFormat::Relative,
+                                            datetime: &audit.created_at
+                                        }
                                     }
                                     td {
                                         "{audit.email}"
