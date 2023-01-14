@@ -27,7 +27,7 @@ ARG KUBECTL=bitnami/kubectl:latest
 
 # This file builds the following containers
 ARG APP_IMAGE_NAME=purtontech/cloak-server:latest
-ARG INIT_IMAGE_NAME=purtontech/cloak-db-migrations:latest
+ARG MIGRATIONS_IMAGE_NAME=purtontech/cloak-db-migrations:latest
 ARG ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
 ARG WWW_IMAGE_NAME=purtontech/cloak-website:latest
 ARG KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
