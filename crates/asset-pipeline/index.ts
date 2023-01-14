@@ -10,7 +10,7 @@ import './web-components/data-table'
 import './web-components/new-secret'
 import './web-components/connect-account'
 import './web-components/add-member'
-import '@github/time-elements/dist/relative-time-element';
+import '@github/relative-time-element';
 
 // Front end enhancement
 //import '../templates/vaults/new_vault'

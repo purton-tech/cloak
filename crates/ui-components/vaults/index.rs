@@ -11,6 +11,8 @@ pub struct VaultSummary {
     pub user_count: i32,
     pub secrets_count: i32,
     pub href: String,
+    pub updated_at: String,
+    pub created_at: String,
 }
 
 #[derive(Props, PartialEq)]

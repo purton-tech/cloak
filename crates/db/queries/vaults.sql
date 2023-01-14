@@ -1,3 +1,5 @@
+--: Vault()
+
 --! insert
 INSERT INTO 
     vaults (organisation_id, name)
@@ -14,17 +16,25 @@ VALUES(
     :encrypted_vault_key
 );
 
---! vault
+--! vault : Vault
 SELECT 
-    id, name, updated_at, created_at
+    id, 
+    name, 
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(created_at)::text) as created_at
 FROM 
     vaults
 WHERE
     id = :id;
 
---! get
+--! get : Vault
 SELECT 
-    id, name, updated_at, created_at
+    id, 
+    name, 
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(created_at)::text) as created_at
 FROM 
     vaults
 WHERE
@@ -38,9 +48,13 @@ IN
     WHERE
         user_id = :current_user_id);
 
---! get_all
+--! get_all : Vault
 SELECT 
-    v.id, v.name, v.updated_at, v.created_at
+    v.id,
+    v.name, 
+    -- Convert times to ISO 8601 string.
+    trim(both '"' from to_json(v.updated_at)::text) as updated_at, 
+    trim(both '"' from to_json(v.created_at)::text) as created_at
 FROM 
     vaults v
 LEFT JOIN users_vaults uv ON uv.vault_id = v.id

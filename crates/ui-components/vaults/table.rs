@@ -33,7 +33,10 @@ pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                                         }
                                     }
                                     td {
-                                        "{vault.name}"
+                                        RelativeTime {
+                                            format: RelativeTimeFormat::Datetime,
+                                            datetime: &vault.created_at
+                                        }
                                     }
                                     td {
                                         "{vault.user_count}"

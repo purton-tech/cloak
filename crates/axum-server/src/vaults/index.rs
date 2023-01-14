@@ -47,8 +47,8 @@ pub async fn index(
             id: vault.id,
             name: vault.name,
             href: "".to_string(),
-            //created_at: vault.created_at,
-            //updated_at: vault.updated_at,
+            created_at: vault.created_at,
+            updated_at: vault.updated_at,
         });
     }
 

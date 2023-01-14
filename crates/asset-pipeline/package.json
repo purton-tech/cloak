@@ -10,15 +10,15 @@
         "copy-primer": "mkdir -p ./dist && cp ./node_modules/@primer/view-components/app/assets/styles/primer_view_components.css ./dist/"
     },
     "devDependencies": {
-        "@github/time-elements": "^3.1.2",
+        "@github/relative-time-element": "^4.1.5",
+        "@hotwired/turbo": "^7.2.4",
         "@parcel/reporter-bundle-buddy": "^2.3.2",
         "@parcel/transformer-sass": "^2.2.1",
         "@primer/css": "20.6.0",
         "@primer/view-components": "0.0.111",
         "@protobuf-ts/grpcweb-transport": "^2.2.2",
         "@protobuf-ts/plugin": "^2.2.2",
-        "parcel": "^2.0.0",
-        "@hotwired/turbo": "^7.2.4"
+        "parcel": "^2.0.0"
     },
     "dependencies": {
         "idb": "^7.0.0"
