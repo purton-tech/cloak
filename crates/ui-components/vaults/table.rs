@@ -21,15 +21,20 @@ pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                             th { "Name" }
                             th { "Created" }
                             th { "Members" }
-                            th { "Secrets" }
+                            th {
+                                class: "text-right",
+                                "Secrets"
+                            }
                         }
                         tbody {
                             cx.props.vaults.iter().map(|vault| rsx!(
                                 tr {
                                     td {
-                                        a {
-                                            href: "{vault.href}",
-                                            "{vault.name}"
+                                        strong {
+                                            a {
+                                                href: "{vault.href}",
+                                                "{vault.name}"
+                                            }
                                         }
                                     }
                                     td {
@@ -39,10 +44,16 @@ pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                                         }
                                     }
                                     td {
-                                        "{vault.user_count}"
+                                        Label {
+                                            "{vault.user_count}"
+                                        }
                                     }
                                     td {
-                                        "{vault.secrets_count}"
+                                        class: "text-right",
+                                        Label {
+                                            label_color: LabelColor::Attention,
+                                            "{vault.secrets_count}"
+                                        }
                                     }
                                 }
                             ))
