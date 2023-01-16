@@ -6,6 +6,7 @@ use primer_rsx::*;
 #[derive(Props, PartialEq)]
 pub struct TableProps {
     members: Vec<VaultMember>,
+    organisation_id: i32,
 }
 
 pub fn MembersTable(cx: Scope<TableProps>) -> Element {
@@ -20,7 +21,10 @@ pub fn MembersTable(cx: Scope<TableProps>) -> Element {
                         thead {
                             th { "Name" }
                             th { "Environments" }
-                            th { "Action" }
+                            th {
+                                class: "text-right",
+                                "Action" 
+                            }
                         }
                         tbody {
                             cx.props.members.iter().map(|member| rsx!(
@@ -38,6 +42,17 @@ pub fn MembersTable(cx: Scope<TableProps>) -> Element {
                                         }
                                     }
                                     td {
+                                        class: "text-right",
+                                        DropDown {
+                                            direction: Direction::SouthWest,
+                                            button_text: "...",
+                                            DropDownLink {
+                                                drawer_trigger: format!("delete-secret-trigger-{}-{}", 
+                                                    member.vault_id, member.user_id),
+                                                href: "#",
+                                                "Remove Member"
+                                            }
+                                        }
                                     }
                                 }
                             ))
@@ -46,5 +61,25 @@ pub fn MembersTable(cx: Scope<TableProps>) -> Element {
                 }
             }
         }
+        // Create all the delete drawers
+        cx.props.members.iter().map(|member| {
+            if cx.props.members.len() == 1 {
+                cx.render(rsx!(
+                    super::remove_warning::RemoveMemberWarningDrawer {
+                        trigger_id: format!("delete-secret-trigger-{}-{}", 
+                            member.vault_id, member.user_id),
+                    }
+                ))
+            }  else {
+                cx.render(rsx!(
+                    super::remove::RemoveMemberDrawer {
+                        organisation_id: cx.props.organisation_id,
+                        vault_member: member,
+                        trigger_id: format!("delete-secret-trigger-{}-{}", 
+                            member.vault_id, member.user_id),
+                    }
+                ))
+            }
+        })
     ))
 }

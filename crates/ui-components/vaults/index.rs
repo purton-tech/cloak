@@ -58,7 +58,8 @@ pub fn index(organisation_id: i32, vaults: Vec<VaultSummary>) -> String {
                 } else {
                     cx.render(rsx! {
                         super::table::VaultTable {
-                            vaults: &cx.props.vaults
+                            vaults: &cx.props.vaults,
+                            organisation_id: cx.props.organisation_id
                         }
                     })
                 }

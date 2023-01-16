@@ -67,6 +67,7 @@ pub fn index(
                                 super::table::SecretsTable {
                                     user_vault: cx.props.user_vault.clone(),
                                     secrets: cx.props.secrets.clone(),
+                                    organisation_id: cx.props.organisation_id,
                                     environment: env
                                 }
                             }

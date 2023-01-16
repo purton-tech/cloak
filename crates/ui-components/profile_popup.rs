@@ -27,7 +27,7 @@ pub fn profile_popup(user: User, organisation_id: i32) -> String {
                 DropDownLink {
                     href: "#",
                     target: "_top",
-                    drawer_trigger: "logout-drawer",
+                    drawer_trigger: "logout-drawer".to_string(),
                     "Log Out"
                 }
             }

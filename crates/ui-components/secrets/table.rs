@@ -5,6 +5,7 @@ use primer_rsx::*;
 
 #[derive(Props, PartialEq)]
 pub struct TableProps {
+    organisation_id: i32,
     environment: Environment,
     secrets: Vec<Secret>,
     user_vault: UserVault,
@@ -23,7 +24,10 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                             th { "Name" }
                             th { "Updated" }
                             th { "Created" }
-                            th { "Action" }
+                            th {
+                                class: "text-right",
+                                "Action" 
+                            }
                         }
                         tbody {
                             cx.props.secrets.iter().map(|secret| rsx!(
@@ -51,6 +55,16 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                                         }
                                     }
                                     td {
+                                        class: "text-right",
+                                        DropDown {
+                                            direction: Direction::SouthWest,
+                                            button_text: "...",
+                                            DropDownLink {
+                                                drawer_trigger: format!("delete-secret-trigger-{}", secret.id),
+                                                href: "#",
+                                                "Delete Secret"
+                                            }
+                                        }
                                     }
                                 }
                             ))
@@ -59,5 +73,16 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                 }
             }
         }
+        // Create all the delete drawers
+        cx.props.secrets.iter().map(|secret| {
+            cx.render(rsx!(
+                super::delete::DeleteSecretDrawer {
+                    organisation_id: cx.props.organisation_id,
+                    user_vault: &cx.props.user_vault,
+                    secret: secret,
+                    trigger_id: format!("delete-secret-trigger-{}", secret.id),
+                }
+            ))
+        })
     ))
 }

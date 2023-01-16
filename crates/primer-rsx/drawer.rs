@@ -8,6 +8,7 @@ pub struct DrawerProps<'a> {
     label: &'a str,
     children: Element<'a>,
     component_name: Option<&'a str>,
+    submit_action: Option<String>,
 }
 
 pub fn Drawer<'a>(cx: Scope<'a, DrawerProps<'a>>) -> Element {
@@ -29,17 +30,35 @@ pub fn Drawer<'a>(cx: Scope<'a, DrawerProps<'a>>) -> Element {
         "side-drawer"
     };
 
-    cx.render(rsx!(
-        {
-            LazyNodes::new(|f| f.text(format_args!("{drawer_wc}")))
-        }
-        {
-            &cx.props.children
-        }
-        {
-            LazyNodes::new(|f| f.text(format_args!("</{drawer_close_name}>")))
-        }
-    ))
+    if let Some(submit_action) = cx.props.submit_action.clone() {
+        cx.render(rsx!(
+            form {
+                action: "{submit_action}",
+                method: "post",
+                {
+                    LazyNodes::new(|f| f.text(format_args!("{drawer_wc}")))
+                }
+                {
+                    &cx.props.children
+                }
+                {
+                    LazyNodes::new(|f| f.text(format_args!("</{drawer_close_name}>")))
+                }
+            }
+        ))
+    } else {
+        cx.render(rsx!(
+            {
+                LazyNodes::new(|f| f.text(format_args!("{drawer_wc}")))
+            }
+            {
+                &cx.props.children
+            }
+            {
+                LazyNodes::new(|f| f.text(format_args!("</{drawer_close_name}>")))
+            }
+        ))
+    }
 }
 
 #[derive(Props)]
