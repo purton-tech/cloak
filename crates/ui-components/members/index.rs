@@ -45,6 +45,7 @@ pub fn index(
                 ))
                 super::table::MembersTable {
                     members: cx.props.members.clone(),
+                    organisation_id: cx.props.organisation_id
                 }
             }
             super::add_member::AddMemberForm {

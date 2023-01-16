@@ -1,19 +1,21 @@
 #![allow(non_snake_case)]
+use db::VaultMember;
 use dioxus::prelude::*;
 use primer_rsx::*;
 
-#[derive(Props, PartialEq, Eq)]
+#[derive(Props, PartialEq)]
 pub struct DrawerProps<'a> {
     organisation_id: i32,
-    vault: &'a super::index::VaultSummary,
+    vault_member: &'a VaultMember,
     trigger_id: String,
 }
 
 pub fn RemoveMemberDrawer<'a>(cx: Scope<'a, DrawerProps<'a>>) -> Element {
     cx.render(rsx! {
         Drawer {
-            submit_action: crate::routes::vaults::delete_route(cx.props.organisation_id),
-            label: "Delete Vault ?",
+            submit_action: crate::routes::members::delete_route(
+                cx.props.vault_member.vault_id, cx.props.organisation_id),
+            label: "Remove Member from Vault ?",
             trigger_id: &cx.props.trigger_id,
             DrawerBody {
                 div {
@@ -22,25 +24,18 @@ pub fn RemoveMemberDrawer<'a>(cx: Scope<'a, DrawerProps<'a>>) -> Element {
                         alert_color: AlertColor::Warn,
                         class: "mb-3",
                         h4 {
-                            "Are you sure you want to delete this vault?"
+                            "Are you sure you want to remove {cx.props.vault_member.email}?"
                         }
-                        "If so then type the name of the vault "
-                        strong {
-                            "{cx.props.vault.name}"
-                        }
-                        "into the input field"
                     }
-                    Input {
-                        input_type: InputType::Text,
-                        help_text: "Please confirm the name of the vault you wish to delete"
-                        required: true,
-                        label: "Name",
-                        name: "name"
+                    input {
+                        "type": "hidden",
+                        "name": "user_id",
+                        "value": "{cx.props.vault_member.user_id}"
                     }
                     input {
                         "type": "hidden",
                         "name": "vault_id",
-                        "value": "{cx.props.vault.id}"
+                        "value": "{cx.props.vault_member.vault_id}"
                     }
                 }
             }
@@ -48,7 +43,7 @@ pub fn RemoveMemberDrawer<'a>(cx: Scope<'a, DrawerProps<'a>>) -> Element {
                 Button {
                     button_type: ButtonType::Submit,
                     button_scheme: ButtonScheme::Danger,
-                    "Delete Vault"
+                    "Remove Member"
                 }
             }
         }
