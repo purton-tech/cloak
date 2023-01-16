@@ -35,6 +35,7 @@ impl Default for Direction {
 #[derive(Props)]
 pub struct DropDownProps<'a> {
     children: Element<'a>,
+    carat: Option<bool>,
     button_text: &'a str,
     class: Option<&'a str>,
     direction: Option<Direction>,
@@ -87,12 +88,14 @@ pub fn DropDown<'a>(cx: Scope<'a, DropDownProps<'a>>) -> Element {
                             width: "12"
                         }
                     })
-                } else {
+                } else if cx.props.carat.is_some() && cx.props.carat.unwrap() {
                     cx.render(rsx! {
                         div {
                             class: "dropdown-caret"
                         }
                     })
+                } else {
+                    None
                 }
             }
             ul {
@@ -107,7 +110,7 @@ pub fn DropDown<'a>(cx: Scope<'a, DropDownProps<'a>>) -> Element {
 pub struct DropDownLinkProps<'a> {
     href: &'a str,
     target: Option<&'a str>,
-    drawer_trigger: Option<&'a str>,
+    drawer_trigger: Option<String>,
     class: Option<&'a str>,
     children: Element<'a>,
 }
@@ -119,10 +122,10 @@ pub fn DropDownLink<'a>(cx: Scope<'a, DropDownLinkProps<'a>>) -> Element {
         "dropdown-item".to_string()
     };
 
-    let trigger = if let Some(trigger) = cx.props.drawer_trigger {
+    let trigger = if let Some(trigger) = cx.props.drawer_trigger.clone() {
         trigger
     } else {
-        ""
+        "".to_string()
     };
 
     let target = if let Some(target) = cx.props.target {

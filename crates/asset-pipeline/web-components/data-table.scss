@@ -13,7 +13,7 @@ data-table {
     user-select: inherit;
     display: block;
     max-inline-size: 100%;
-    overflow-x: auto;
+    //overflow-x: auto; // Disabled so that drop down work corectly
     width: 100%;
     
     &[density=condensed] {

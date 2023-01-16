@@ -14,6 +14,7 @@ pub use queries::secrets::Secret;
 pub use queries::service_accounts::ServiceAccount;
 pub use queries::user_vaults::{NonMember, UserVault, VaultMember};
 pub use queries::users::User;
+pub use queries::vaults::Vault;
 pub use types::public::Role;
 
 pub fn create_pool(database_url: &str) -> deadpool_postgres::Pool {
