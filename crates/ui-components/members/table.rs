@@ -63,14 +63,23 @@ pub fn MembersTable(cx: Scope<TableProps>) -> Element {
         }
         // Create all the delete drawers
         cx.props.members.iter().map(|member| {
-            cx.render(rsx!(
-                super::remove::RemoveMemberDrawer {
-                    organisation_id: cx.props.organisation_id,
-                    vault_member: member,
-                    trigger_id: format!("delete-secret-trigger-{}-{}", 
-                        member.vault_id, member.user_id),
-                }
-            ))
+            if cx.props.members.len() == 1 {
+                cx.render(rsx!(
+                    super::remove_warning::RemoveMemberWarningDrawer {
+                        trigger_id: format!("delete-secret-trigger-{}-{}", 
+                            member.vault_id, member.user_id),
+                    }
+                ))
+            }  else {
+                cx.render(rsx!(
+                    super::remove::RemoveMemberDrawer {
+                        organisation_id: cx.props.organisation_id,
+                        vault_member: member,
+                        trigger_id: format!("delete-secret-trigger-{}-{}", 
+                            member.vault_id, member.user_id),
+                    }
+                ))
+            }
         })
     ))
 }
