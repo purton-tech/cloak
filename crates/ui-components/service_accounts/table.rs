@@ -25,7 +25,10 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                             th { "Environment" }
                             th { "Updated" }
                             th { "Created" }
-                            th { "Action" }
+                            th {
+                                class: "text-right",
+                                "Action" 
+                            }
                         }
                         tbody {
                             cx.props.service_accounts.iter().map(|service_account| rsx!(
@@ -95,6 +98,17 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                                         }
                                     }
                                     td {
+                                        class: "text-right",
+                                        DropDown {
+                                            direction: Direction::SouthWest,
+                                            button_text: "...",
+                                            DropDownLink {
+                                                drawer_trigger: format!("sa-delete-trigger-{}", 
+                                                    service_account.id),
+                                                href: "#",
+                                                "Delete Service Account"
+                                            }
+                                        }
                                     }
                                 }
                             ))
@@ -103,5 +117,14 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                 }
             }
         }
+        cx.props.service_accounts.iter().map(|sa| {
+            cx.render(rsx!(
+                super::delete::DeleteServiceAccoutDrawer {
+                    organisation_id: cx.props.team_id,
+                    trigger_id: format!("sa-delete-trigger-{}", sa.id),
+                    service_account: sa
+                }
+            ))
+        })
     ))
 }
