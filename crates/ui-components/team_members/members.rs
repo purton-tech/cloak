@@ -162,9 +162,11 @@ pub fn members(
                                                     td {
                                                         class: "text-right",
                                                         DropDown {
-                                                            direction: Direction::West,
-                                                            button_text: "",
+                                                            direction: Direction::SouthWest,
+                                                            button_text: "...",
                                                             DropDownLink {
+                                                                drawer_trigger: format!("remove-member-trigger-{}-{}", 
+                                                                    member.id, member.organisation_id),
                                                                 href: "#",
                                                                 target: "_top",
                                                                 "Remove User From Team"
@@ -231,6 +233,18 @@ pub fn members(
                     }
                 }
             }
+
+            cx.props.members.iter().map(|member| rsx!(
+                cx.render(rsx!(
+                    super::remove_member::RemoveMemberDrawer {
+                        organisation_id: member.organisation_id,
+                        user_id: member.id,
+                        email: member.email.clone(),
+                        trigger_id: format!("remove-member-trigger-{}-{}", member.id, member.organisation_id)
+                        //organisation_id: &organisation.id
+                    }
+                ))
+            ))
 
             // The form to create an invitation
             super::invitation_form::InvitationForm {
