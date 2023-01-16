@@ -152,7 +152,7 @@ pub async fn select_first_vault(driver: &WebDriver) -> WebDriverResult<()> {
     sleep(Duration::from_millis(1000)).await;
 
     driver
-        .find_element(By::XPath("//tbody/tr[last()]/td[1]/a"))
+        .find_element(By::XPath("//tbody/tr[last()]/td[1]//a"))
         .await?
         .click()
         .await?;
