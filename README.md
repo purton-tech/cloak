@@ -37,7 +37,7 @@
 
 <br />
 
-![Alt text](www/static/secrets-screenshot.png "Secrets Screenshot")
+![Alt text](www/static/github-readme.png "Secrets Screenshot")
 
 ## Features and Benefits
 
