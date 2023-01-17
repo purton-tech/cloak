@@ -41,10 +41,6 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                                                     "data-drawer-target": "service-account-view-{service_account.id}",
                                                     "{service_account.account_name}"
                                                 }
-                                                super::view_account::ViewAccountDrawer {
-                                                    drawer_trigger: "service-account-view-{service_account.id}",
-                                                    service_account: service_account
-                                                }
                                             }
                                             td {
                                                 "{vault_name}"
@@ -122,6 +118,10 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                 super::delete::DeleteServiceAccoutDrawer {
                     organisation_id: cx.props.team_id,
                     trigger_id: format!("sa-delete-trigger-{}", sa.id),
+                    service_account: sa
+                }
+                super::view_account::ViewAccountDrawer {
+                    drawer_trigger: "service-account-view-{sa.id}",
                     service_account: sa
                 }
             ))

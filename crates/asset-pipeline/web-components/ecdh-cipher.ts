@@ -3,9 +3,16 @@ import { Cipher } from '../cryptography/cipher'
 import { ByteData } from '../cryptography/byte_data'
 import { Vault } from '../cryptography/vault'
 
-// <ecdh-cipher cipher="", ecdh-public-key="", wrapped-aes-key=""><ecdh-cipher>
-// Create a key agreement betweent he users ECDH key and the public key
-// Use the result to decrpyt the cipher
+/**
+ * Decrypt data that has been encrypted based on the users ECDH keys.
+ * 
+ * <ecdh-cipher cipher="", ecdh-public-key="", wrapped-aes-key=""><ecdh-cipher>
+ * 
+ * 1. Import the ecdh-public-key
+ * 2. Create a key agreement between the users private ECDH key and ecdh-public-key
+ * 3. Use the agreement to unwrap wrapped-aes-key
+ * 4. Use the unwrappede wrapped-aes-key to decrypt the cipher.
+ */
 export class ECDHCipher extends HTMLElement {
 
     constructor() {

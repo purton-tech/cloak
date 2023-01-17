@@ -5,10 +5,12 @@ import './web-components/side-drawer'
 import './web-components/side-drawer-trigger'
 import './web-components/ecdh-cipher'
 import './web-components/ecdh-keygen'
+import './web-components/ecdh-non-shareable-keygen'
 import './web-components/snack-bar'
 import './web-components/data-table'
 import './web-components/new-secret'
 import './web-components/connect-account'
+import './web-components/downloadable-key'
 import './web-components/add-member'
 import '@github/relative-time-element';
 
