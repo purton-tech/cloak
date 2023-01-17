@@ -6,10 +6,11 @@ use primer_rsx::*;
 
 #[derive(Props, PartialEq)]
 struct SecretProps {
-    user_vault: UserVault,
-    environments: Vec<Environment>,
-    secrets: Vec<Secret>,
     organisation_id: i32,
+    user_vault: UserVault,
+    env_secrets: Vec<(Environment, Vec<Secret>)>,
+    secrets: Vec<Secret>,
+    environments: Vec<Environment>,
 }
 
 pub fn index(
@@ -52,23 +53,37 @@ pub fn index(
                     ))
                     TabContainer {
                         tabs: cx.render(rsx! {
-                            cx.props.environments.iter().enumerate().map(|(index, env)| rsx!(
+                            TabHeader {
+                                selected: true,
+                                tab: "all-panel",
+                                name: "All"
+                            }
+                            cx.props.environments.iter().map(|env| rsx!(
                                 TabHeader {
-                                    selected: index == 0,
+                                    selected: false,
                                     tab: "{env.name}-panel",
                                     name: &env.name
                                 }
                             ))
                         })
-                        cx.props.environments.clone().into_iter().enumerate().map(|(index, env)| rsx!(
+                        TabPanel {
+                            hidden: false,
+                            id: "all-panel",
+                            super::table::SecretsTable {
+                                user_vault: cx.props.user_vault.clone(),
+                                secrets: cx.props.secrets.clone(),
+                                organisation_id: cx.props.organisation_id
+                            }
+                        }
+                        cx.props.env_secrets.clone().into_iter().map(|env_secrets| rsx!(
                             TabPanel {
-                                hidden: index != 0,
-                                id: "{env.name}-panel",
+                                hidden: true,
+                                id: "{env_secrets.0.name}-panel",
                                 super::table::SecretsTable {
                                     user_vault: cx.props.user_vault.clone(),
-                                    secrets: cx.props.secrets.clone(),
+                                    secrets: env_secrets.1.clone(),
                                     organisation_id: cx.props.organisation_id,
-                                    environment: env
+                                    environment: env_secrets.0
                                 }
                             }
                         ))
@@ -85,13 +100,28 @@ pub fn index(
         }
     }
 
+    // Filter the secrets by environement
+    let env_secrets: Vec<(Environment, Vec<Secret>)> = environments
+        .clone()
+        .into_iter()
+        .map(|env| {
+            let sec = secrets
+                .clone()
+                .into_iter()
+                .filter(|s| s.environment_id == env.id)
+                .collect();
+            (env, sec)
+        })
+        .collect();
+
     let mut app = VirtualDom::new_with_props(
         app,
         SecretProps {
             organisation_id,
             user_vault,
-            environments,
+            env_secrets,
             secrets,
+            environments,
         },
     );
     let _ = app.rebuild();

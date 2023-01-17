@@ -1,11 +1,16 @@
 import { AESKey, ECDHKeyPair } from '../cryptography/vault'
 
-// Create a key pair encrypted with the users key, the keys are stored in hidden
-// fields which can be used in a form and sent to the server
-//
-// <ecdh-keygen  public="public_key", private="encrypted_vault_key"><ecdh-cipher>
-// Create a key agreement betweent he users ECDH key and the public key
-// Use the result to decrpyt the cipher
+/**
+ * Create a key pair encrypted with the users key, the keys are stored in hidden
+ * fields which can be used in a form and sent to the server
+ * 
+ * <ecdh-keygen  public="public_key", private="encrypted_vault_key"><ecdh-cipher>
+ * 
+ * Public and private are the names that will be used for the fields.
+ * 
+ * 1. Generate a random AES key.
+ * 2. Wrap it using the user public ECDH key.
+ */
 export class EcdhKeygen extends HTMLElement {
 
     constructor() {

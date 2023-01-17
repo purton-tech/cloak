@@ -36,8 +36,8 @@ pub fn NewAccountForm(cx: Scope<FormProps>) -> Element {
                             name: "name"
                         }
                         {LazyNodes::new(|f| f.text(format_args!(
-                            "<ecdh-keygen public='public_key',
-                                private='encrypted_private_key'></ecdh-keygen>")))}
+                            "<ecdh-non-shareable-keygen public='public_key',
+                                private='encrypted_private_key'></ecdh-non-shareable-keygen>")))}
                     }
                 }
                 DrawerFooter {

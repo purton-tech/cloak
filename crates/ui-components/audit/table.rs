@@ -37,8 +37,14 @@ pub fn AuditTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                                         "{audit.email}"
                                     }
                                     td {
+                                        super::access_type::AuditAccessType {
+                                            access_type: &audit.access_type
+                                        }
                                     }
                                     td {
+                                        super::audit_action::AuditAction {
+                                            audit_action: &audit.action
+                                        }
                                     }
                                     td {
                                         "{audit.description}"

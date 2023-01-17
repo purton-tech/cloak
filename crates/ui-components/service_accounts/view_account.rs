@@ -25,12 +25,122 @@ pub fn ViewAccountDrawer<'a>(cx: Scope<'a, ViewAccountDrawerProps<'a>>) -> Eleme
                                 tab: "Local",
                                 name: "Local"
                             }
+                            TabHeader {
+                                selected: false,
+                                tab: "Kubernetes",
+                                name: "Kubernetes"
+                            }
                         })
                         TabPanel {
-                            hidden: true,
+                            hidden: false,
                             id: "Local",
-                            h1 {
-                                "Hello"
+                            div {
+                                class: "p-3",
+                                h5 {
+                                    class: "mb-2",
+                                    "1. Install the cloak CLI"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    a {
+                                        href: "https://cloak.software/docs/getting-started/introduction/",
+                                        target: "_blank",
+                                        "Getting Started Docs"
+                                    }
+                                }
+                                h5 {
+                                    class: "mb-2",
+                                    "2. Download the private key for this service account"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    "Click here "
+                                    {LazyNodes::new(|f| f.text(format_args!(
+                                        "<downloadable-key wrapped-ecdh-private-key='{}'></downloadable-key>", 
+                                        cx.props.service_account.encrypted_ecdh_private_key
+                                    )))}
+                                    " to download your private key. 
+                                    Store it in the folder where you will use the cloak CLI tool."
+                                }
+                                h5 {
+                                    class: "mb-2",
+                                    "3. View the secrets"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    "From the same folder where you downloaded your <code>cloak.pem</code> file run..."
+                                    code {
+                                        "$ cloak secrets"
+                                    }
+                                }
+                                h5 {
+                                    class: "mb-2",
+                                    "4. Store secrets in a .env file (Optional)"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    "From the same folder where you downloaded your <code>cloak.pem</code> file run..."
+                                    code {
+                                        "$ cloak env > .env"
+                                    }
+                                }
+                                h5 {
+                                    class: "mb-2",
+                                    "5. Inject secrets into as env vars into a process (Optional)"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    "From the same folder where you downloaded your <code>cloak.pem</code> file run..."
+                                    code {
+                                        "$ cloak run name-of-process"
+                                    }
+                                }
+                            }
+                        }
+                        TabPanel {
+                            hidden: true,
+                            id: "Kubernetes",
+                            div {
+                                class: "p-3",
+                                h5 {
+                                    class: "mb-2",
+                                    "1. Install the cloak CLI"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    a {
+                                        href: "https://cloak.software/docs/getting-started/introduction/",
+                                        target: "_blank",
+                                        "Getting Started Docs"
+                                    }
+                                }
+                                h5 {
+                                    class: "mb-2",
+                                    "2. Download the private key for this service account"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    "Click here "
+                                    a {
+                                        id: "wrapped-ecdh-private-key-{cx.props.service_account.id}",
+                                        "data-key": "{cx.props.service_account.encrypted_ecdh_private_key}",
+                                        download: "cloak.pem",
+                                        "cloak.pem"
+                                    }
+                                    " to download your private key. 
+                                    Store it in the folder where you will use the cloak CLI tool."
+                                }
+                                h5 {
+                                    class: "mb-2",
+                                    "3. View the secrets"
+                                }
+                                p {
+                                    class: "mb-2",
+                                    "From the same folder where you downloaded your <code>cloak.pem</code> file run..."
+                                    code {
+                                        "$ cloak secrets"
+                                    }
+                                }
                             }
                         }
                     }

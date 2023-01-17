@@ -8,3 +8,4 @@ ApiServiceClientPb.ts
 tmp
 .env
 *.pem
+.DS_Store
