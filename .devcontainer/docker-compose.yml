@@ -73,7 +73,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - target:/workspace/target # Set target as a volume for performance. 
       - node_modules:/workspace/crates/asset-pipeline/node_modules # Set target as a volume for performance. 
-      - infra_node_modules:/workspace/infra/node_modules # Set target as a volume for performance. 
 
     environment:
       # The following is used by the migrations and also for cornucopia at compile time.
@@ -104,4 +103,3 @@ services:
 volumes:
   target:
   node_modules:
-  infra_node_modules:

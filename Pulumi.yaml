@@ -1,0 +1,180 @@
+name: cloak
+description: Cloak Infrastructure as Code
+runtime: yaml
+variables:
+    namespace: cloak
+    appLabels:
+        app: app
+    envoyLabels:
+        app: envoy
+    authLabels:
+        app: auth
+    version: 1.18.3
+    hash-db-migrations: sha256:6d2406e290d619b082a67f81f6207c0c4427c13b8cd601c37e9813613790f413
+    hash-envoy: sha256:6692a1e66811f5283c49a36aefbaf75654adfeaf04ee620863e5c6a30e222827
+    hash-server: sha256:459999cda468ef416bdd4ab84a0c3d5a4e4a42fb2a4107b6817953b2252795e3
+    db-migrations: purtontech/cloak-db-migrations:${version}@${hash-db-migrations}
+    envoy: purtontech/cloak-envoy:${version}@${hash-envoy}
+    server: purtontech/cloak-server:${version}@${hash-server}
+
+resources:
+    envoy-deployment:
+        type: kubernetes:apps/v1:Deployment
+        properties:
+            metadata:
+                name: envoy
+                namespace: ${namespace}
+            spec:
+                selector:
+                    matchLabels: ${envoyLabels}
+                replicas: 1
+                template:
+                    metadata:
+                        labels: ${envoyLabels}
+                    spec:
+                        containers:
+                            - name: envoy
+                              image: ${envoy}
+                              ports:
+                                - containerPort: 7100
+
+    auth-deployment:
+        type: kubernetes:apps/v1:Deployment
+        properties:
+            metadata:
+                name: auth
+                namespace: ${namespace}
+            spec:
+                selector:
+                    matchLabels: ${authLabels}
+                replicas: 1
+                template:
+                    metadata:
+                        labels: ${authLabels}
+                    spec:
+                        containers:
+                            - name: auth
+                              image: purtontech/barricade:1.2.0
+                              ports:
+                                - containerPort: 9090
+                              env: 
+                                - name: DATABASE_URL
+                                  valueFrom:
+                                    secretKeyRef:
+                                        name: database-urls
+                                        key: auth-database-url
+                                - name: AUTH_TYPE
+                                  value: encrypted
+
+                                # Cookie encryption key
+                                - name: SECURE_COOKIE
+                                  value: 'true'
+                                - name: SECRET_KEY
+                                  valueFrom:
+                                    secretKeyRef:
+                                        name: cookie-encryption
+                                        key: cookie-encryption-key
+
+                                - name: REDIRECT_URL
+                                  value: /app/post_registration
+                                - name: ENABLE_EMAIL_OTP
+                                  value: 'true'
+
+                                # Send grid for email
+                                - name: SMTP_HOST
+                                  value: smtp.sendgrid.net
+                                - name: SMTP_PORT
+                                  value: '587'
+                                - name: SMTP_USERNAME
+                                  value: apikey
+                                - name: SMTP_PASSWORD
+                                  valueFrom:
+                                    secretKeyRef:
+                                        name: sendgrid-api
+                                        key: sendgrid-api-key
+                                - name: SMTP_TLS_OFF
+                                  value: 'true'
+
+                                # Config for password reset
+                                - name: RESET_DOMAIN
+                                  value: https://cloak.software
+                                - name: RESET_FROM_EMAIL_ADDRESS
+                                  value: no-reply@cloak.software
+
+    app-deployment:
+        type: kubernetes:apps/v1:Deployment
+        properties:
+            metadata:
+                name: app
+                namespace: ${namespace}
+            spec:
+                selector:
+                    matchLabels: ${appLabels}
+                replicas: 1
+                template:
+                    metadata:
+                        labels: ${appLabels}
+                    spec:
+                        containers:
+                            - name: app
+                              image: ${server}
+                              ports:
+                                - containerPort: 7103
+                              env: 
+                                - name: APP_DATABASE_URL
+                                  valueFrom:
+                                    secretKeyRef:
+                                        name: database-urls
+                                        key: app-database-url
+                        initContainers:
+                            - name: server-init
+                              image: ${db-migrations}
+                              env: 
+                                - name: DATABASE_URL
+                                  valueFrom:
+                                    secretKeyRef:
+                                        name: database-urls
+                                        key: migrations-database-url
+    
+    # Cloudflare tunnel attaches here.
+    envoy-service:
+        properties:
+            metadata:
+                name: envoy
+                namespace: ${namespace}
+            spec:
+                ports:
+                    - port: 7100
+                      protocol: TCP
+                      targetPort: 7100
+                selector:
+                    app: envoy
+        type: kubernetes:core/v1:Service
+
+    app-service:
+        properties:
+            metadata:
+                name: app
+                namespace: ${namespace}
+            spec:
+                ports:
+                    - port: 7103
+                      protocol: TCP
+                      targetPort: 7103
+                selector:
+                    app: app
+        type: kubernetes:core/v1:Service
+
+    auth-service:
+        properties:
+            metadata:
+                name: auth
+                namespace: ${namespace}
+            spec:
+                ports:
+                    - port: 9090
+                      protocol: TCP
+                      targetPort: 9090
+                selector:
+                    app: auth
+        type: kubernetes:core/v1:Service

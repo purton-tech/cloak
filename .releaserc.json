@@ -27,15 +27,15 @@
     }],
     ["@semantic-release/exec", {
       "publishCmd": "./update-config.sh",
-      "execCwd": "./infra"
+      "execCwd": "./.github/workflows"
     }],
     ["@semantic-release/exec", {
       "publishCmd": "./update-version.sh ${nextRelease.version}",
-      "execCwd": "./infra"
+      "execCwd": "./.github/workflows"
     }],
     ["@semantic-release/exec", {
       "publishCmd": "./update-git.sh ${nextRelease.version}",
-      "execCwd": "./infra"
+      "execCwd": "./.github/workflows"
     }]
   ]
 }
