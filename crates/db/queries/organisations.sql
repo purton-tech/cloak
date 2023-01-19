@@ -20,7 +20,9 @@ SELECT
 FROM 
     organisations
 WHERE
-    created_by_user_id = :created_by_user_id;
+    created_by_user_id = :created_by_user_id
+ORDER BY id ASC
+LIMIT 1;
 
 --! add_user_to_organisation
 INSERT INTO 
