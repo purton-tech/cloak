@@ -1,69 +1,77 @@
 {% extends "base.html" %}
 
 {% block content %}
-<section class="m_cta">
-  <div class="content">
-    <h1>Secure encrypted secrets automation for developers</h1>
-    <div class="text">
-      <p>A central source of truth for your application secrets. 
-        The only open source solution on the market with full end to end encryption.</p>
-    </div>
-    <div class="buttons"><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></div>
-    <div class="image"><img alt="Cream" src="central-source-of-truth.svg"></img></div>
+
+
+<section class="content d-flex flex-content-center flex-column mt-4 mt-md-12 text-center">
+  <h1 class="h3-mktg mb-6 pt-6">
+    Secure encrypted secrets automation for developers
+  </h1>
+  <h2 class="h6-mktg color-fg-muted mb-4">
+    A central source of truth for your application secrets. 
+        The only open source solution on the market with full end to end encryption.
+  </h2>
+  <div class="mb-6">
+    <a class="btn-mktg" href="{{ sign_up_url }}">Sign Up</a>
+  </div>
+  <div class="border-left border-right border-top">
+    <img alt="Secrets Management" src="secrets-screenshot.png"></img>
   </div>
 </section>
 
-<section class="row">
-  <div class="column">
-    <h2>Manage related secrets in Vaults</h2>
-    <p>
-      Vaults help you collect secrets by projects or environments. A central repository 
+<section class="color-bg-success text-center">
+  <h2 class="pt-6 pb-6">Defence in Depth for your Secrets</h2>
+</section>
+
+<section>
+  <div class="content d-md-flex flex-row pt-9 pb-6">
+    <div class="col-md-6 pr-4">
+      <h2 class="h5-mktg mb-6">Manage related secrets in Vaults</h2>
+      <h4 class="h6-mktg color-fg-muted mb-6">
+        Vaults help you collect secrets by projects or environments. A central repository 
       for encrypted secrets is a cybersecurity best practice.
-    </p>
-    <p>
-      Vault makes it easy to share secrets with your team and audit secrets usage.
-      The Cloak user interface manages end to end encryption and decryption in the browser. 
-    </p>
-  </div>
-  <div class="column">
-    <img alt="Cream" src="secrets-screenshot.png"></img>
+      </h4>
+    </div>
+    <img class="col-md-6 ml-4 color-shadow-large" alt="Cream" src="secrets-screenshot.png"></img>
   </div>
 </section>
 
-<section class="row reverse">
-  <div class="column">
-    <h2>Manage access with Service Accounts</h2>
-    <p>
-      Service accounts let team members or applications access secrets from Vaults. 
+<section>
+  <div class="content d-md-flex flex-row pt-6 pb-6">
+    <img class="col-md-6 mr-4 color-shadow-large" alt="Cream" src="service-account-screenshot.png"></img>
+    <div class="col-md-6 pl-4">
+      <h2 class="h5-mktg mb-6">Manage access with Service Accounts</h2>
+      <h4 class="h6-mktg color-fg-muted mb-6">
+        Service accounts let team members or applications access secrets from Vaults. 
       The user interface generates a private key which only the user can see. 
       Deploy the key to your local development environment or your infrastructure.
-    </p>
-    <p>Revoking a service account removes access to the secrets. </p>
-  </div>
-  <div class="column">
-    <img alt="Cream" src="service-account-screenshot.png"></img>
+      </h4>
+    </div>
   </div>
 </section>
 
-<section class="row">
-  <div class="column">
-    <h2>The Cloak CLI gives developers easy access to secrets</h2>
-    <p>Cloak injects your secrets into your application as environment variables.</p>
-    <p>The CLI tool has a minimal footprint and runs as well on a laptop as in a docker container.</p>
-  </div>
-  <div class="column">
-    <img alt="Cream" src="cli-screenshot.png"></img>
+<section>
+  <div class="content d-md-flex flex-row pt-6 pb-6">
+    <div class="col-md-6 pr-4">
+      <h2 class="h5-mktg mb-6">The Cloak CLI gives developers easy access to secrets</h2>
+      <h4 class="h6-mktg color-fg-muted mb-6">
+        Cloak injects your secrets into your application as environment variables.
+      </h4>
+      <p>
+        The CLI tool has a minimal footprint and runs as well on a laptop as in a docker container.
+      </p>
+    </div>
+    <img class="col-md-6 ml-4 color-shadow-large" alt="Cream" src="cli-screenshot.png"></img>
   </div>
 </section>
 
-{% if config.extra.footer_cta %}
-<section class="m_footer_cta">
-  <h3>{{config.extra.every_page_cta.title}}</h3>
-  {% if config.extra.every_page_cta.cta_url  %}
-  <p><a class="a_button a_button--primary" href="{{config.extra.every_page_cta.cta_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
+<section class="d-flex flex-content-center flex-column mt-8 mb-8 text-center pl-1 pr-1">
+  <h3 class="mb-3">{{config.extra.every_page_cta.title}}</h3>
+  {% if config.extra.every_page_cta.cta_url %}
+  <p><a class="btn-mktg" href="{{config.extra.every_page_cta.cta_url}}">{{config.extra.every_page_cta.cta_button}}</a>
+  </p>
   {% else %}
-  <p><a class="a_button a_button--primary" href="{{sign_up_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
+  <p><a class="btn-mktg" href="{{sign_up_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
   {% endif %}
 </section>
-{% endif %}
 {% endblock content %}

@@ -2,77 +2,237 @@
 
 {% block content %}
 
-<section class="m_pricing">
-  <h3>Pricing that scales</h3>
-  <h4>Just like our infrastructure</h4>
-  <div class="m_card m_pricing_card">
-    <div class="body">
-      <div class="price">
-        <h3>Core</h3>
-        <h4>Free</h4>
-        <hr />
-        <ul>
-          <li><img src="/tick.svg" width="17px" height="17px" /> 5 Users</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Integrations</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> End to End Encryption</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> API</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> 10,000 Requests/Day</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Unlimited Vaults / Projects</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Direct Customer Support</li>
-        </ul>
-        <p><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></p>
+<section class="mt-4 mt-md-12 text-center">
+  <h1 class="h3-mktg mb-4">Pricing that scales</h1>
+  <h2 class="h6-mktg color-fg-muted mb-4">Just like our infrastructure</h2>
+  <div class="d-md-flex flex-justify-center text-left">
+    <div
+      class="col-md-6 col-lg-4 color-bg-default box-shadow-default-border-mktg rounded pt-5 pb-4 px-3 mb-3 mb-md-0 mx-md-3">
+      <div class="text-center mb-5">
+        <h5 class="h6-mktg mb-3">
+          <span class="d-block color-fg-muted">Cloak for</span>
+          Individuals and Small Teams
+        </h5>
+        <h3 class="mb-3">
+          <div
+            class="d-flex flex-lg-column flex-lg-wrap flex-xl-nowrap flex-xl-row flex-justify-center flex-items-center">
+            <span class="d-flex flex-items-center f0-mktg text-normal text-mono mr-2 no-wrap">
+              <sup class="f3 color-fg-muted v-align-middle mr-1">$</sup>
+              0
+            </span>
+            <span class="text-normal text-left text-lg-center text-xl-left text-mono f6-mktg color-fg-muted">
+              <span>per month /</span>
+              <span class="d-lg-block no-wrap">$0 per year</span>
+            </span>
+          </div>
+        </h3>
+        <a class="btn-mktg btn-block"
+          href="{{sign_up_url}}">
+          Signup it's free
+        </a>
       </div>
-      <div class="price">
-        <h3>Startup</h3>
-        <h4>$50/mo</h4>
-        <hr />
-        <ul>
-          <li><img src="/tick.svg" width="17px" height="17px" /> 15 Users</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Integrations</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> End to End Encryption</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> API</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> 100,000 Requests/Day</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Unlimited Vaults / Projects</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Direct Customer Support</li>
-        </ul>
-        <p><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></p>
+
+      <ul class="list-style-none">
+
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Up to 15 Users in a team
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          All Integrations
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          10,000 Requests/Day
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Unlimited Vaults / Projects
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Audit logs
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          End 2 End Encryption
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Hardware Encryption Keys (Coming soon)
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Secrets Rotation (Coming soon)
+        </li>
+      </ul>
+    </div>
+    <div
+      class="col-md-6 col-lg-4 color-bg-default box-shadow-default-border-mktg rounded pt-5 pb-4 px-3 mb-3 mb-md-0 mx-md-3">
+      <div class="text-center mb-5">
+        <h5 class="h6-mktg mb-3">
+          <span class="d-block color-fg-muted">Cloak for</span>
+          Business
+        </h5>
+        <h3 class="mb-3">
+          <div
+            class="d-flex flex-lg-column flex-lg-wrap flex-xl-nowrap flex-xl-row flex-justify-center flex-items-center">
+            <span class="d-flex flex-items-center f0-mktg text-normal text-mono mr-2 no-wrap">
+              <sup class="f3 color-fg-muted v-align-middle mr-1">$</sup>
+              10
+            </span>
+            <span class="text-normal text-left text-lg-center text-xl-left text-mono f6-mktg color-fg-muted">
+              <span>per team</span>
+              <span class="d-lg-block no-wrap">per month</span>
+            </span>
+          </div>
+        </h3>
+        <a class="btn-mktg btn-block"
+          href="{{sign_up_url}}">
+          Sign Up
+        </a>
       </div>
-      <div class="price">
-        <h3>Growth</h3>
-        <h4>$150/mo</h4>
-        <hr />
-        <ul>
-          <li><img src="/tick.svg" width="17px" height="17px" /> 100 Users</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Integrations</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> End to End Encryption</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> API</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> 200,000 Requests/Day</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Unlimited Vaults / Projects</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Direct Customer Support</li>
-        </ul>
-        <p><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></p>
+
+      <ul class="list-style-none">
+        <li class="mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-arrow-left">
+            <path fill-rule="evenodd"
+              d="M7.78 12.53a.75.75 0 01-1.06 0L2.47 8.28a.75.75 0 010-1.06l4.25-4.25a.75.75 0 011.06 1.06L4.81 7h7.44a.75.75 0 010 1.5H4.81l2.97 2.97a.75.75 0 010 1.06z">
+            </path>
+          </svg>
+          Everything included in Cloak for Individuals, plus...
+        </li>
+
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Unlimited Users in a Team
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Unlimited Teams
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Single Sign On
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          Customer Support
+        </li>
+        <li class="text-medium mb-3">
+          <svg aria-hidden="true" height="16" viewBox="0 0 16 16" version="1.1" width="16" data-view-component="true"
+            class="octicon octicon-chevron-right">
+            <path fill-rule="evenodd"
+              d="M6.22 3.22a.75.75 0 011.06 0l4.25 4.25a.75.75 0 010 1.06l-4.25 4.25a.75.75 0 01-1.06-1.06L9.94 8 6.22 4.28a.75.75 0 010-1.06z">
+            </path>
+          </svg>
+          SCIM Integration
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="content">
+  <div class="d-flex flex-column flex-sm-row gutter gutter-spacious flex-justify-between mt-10 pb-12">
+    <div class="col-12 col-sm-4">
+      <div class="pt-4 pt-md-8 border-top d-flex flex-column height-full flex-justify-start">
+        <span class="h3-mktg mb-n3">”</span>
+        <h3 class="f2-mktg color-fg-default">GitHub Copilot works shockingly well. I will never develop software without it again.</h3>
+        <p class="text-mono f4-mktg color-fg-muted pt-5 mt-auto">Lars Gyrup Brink&nbsp;Nielsen</p>
       </div>
-      <div class="price">
-        <h3>Enterprise</h3>
-        <h4>$500+/mo</h4>
-        <hr />
-        <ul>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Potentially 1000's of Users </li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Integrations</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> End to End Encryption</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> API</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Unlimited Requests/Day</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Unlimited Vaults / Projects</li>
-          <li><img src="/tick.svg" width="17px" height="17px" /> Direct Customer Support</li>
-        </ul>
-        <p><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></p>
+    </div>
+  
+    <div class="col-12 col-sm-4">
+      <div class="pt-4 pt-md-8 border-top d-flex flex-column height-full flex-justify-between">
+        <span class="h3-mktg mb-n3">”</span>
+        <h3 class="f2-mktg color-fg-default">I was stunned when I started writing Clojure with GitHub Copilot and it filled an idiomatic namespace require, just like I was going to write it.</h3>
+        <p class="text-mono f4-mktg color-fg-muted pt-5 mt-auto">Gunnika Batra // Senior&nbsp;Analyst</p>
+      </div>
+    </div>
+  
+    <div class="col-12 col-sm-4">
+      <div class="pt-4 pt-md-8 border-top d-flex flex-column height-full flex-justify-between">
+        <span class="h3-mktg mb-n3">”</span>
+        <h3 class="f2-mktg color-fg-default">Trying to code in an unfamiliar language by googling everything is like navigating a foreign country with just a phrasebook. Using GitHub Copilot is like hiring an interpreter.</h3>
+        <p class="text-mono f4-mktg color-fg-muted pt-5 mt-auto">Harri Edwards // Open&nbsp;AI</p>
       </div>
     </div>
   </div>
 </section>
 
-<section class="m_footer_cta">
-  <h3>Start managing your secrets today for free</h3>
-  <p><a class="a_button a_button--primary" href="/auth/sign_up">Sign Up</a></p>
+{% if config.extra.footer_cta %}
+<section class="color-bg-subtle d-flex flex-content-center flex-column mt-4 pt-8 pb-8 text-center">
+  <h3 class="mb-3">{{config.extra.every_page_cta.title}}</h3>
+  {% if config.extra.every_page_cta.cta_url %}
+  <p><a class="btn-mktg" href="{{config.extra.every_page_cta.cta_url}}">{{config.extra.every_page_cta.cta_button}}</a>
+  </p>
+  {% else %}
+  <p><a class="btn-mktg" href="{{sign_up_url}}">{{config.extra.every_page_cta.cta_button}}</a></p>
+  {% endif %}
 </section>
+{% endif %}
+
 {% endblock content %}
