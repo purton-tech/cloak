@@ -2,7 +2,7 @@ https://cloak.pages.dev/*
   X-Robots-Tag: noindex
   
 https://cloak.software/*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com 'unsafe-inline'; img-src 'self' https://www.google-analytics.com; connect-src https://www.google-analytics.com;
+  Content-Security-Policy: require-trusted-types-for 'script'; default-src 'self'; object-src 'none'; script-src 'self' https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com 'unsafe-inline'; img-src 'self' https://www.google-analytics.com; connect-src https://www.google-analytics.com;
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
