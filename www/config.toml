@@ -67,3 +67,7 @@ menu_items = [
 doc_sections = [
     {name = "Reference", location = "reference"},
 ]
+
+# Blog tile and subtitle
+blog_title = "The Cloak Blog"
+blog_subtitle = "Defence in Depth For Full Stack Web Applications"

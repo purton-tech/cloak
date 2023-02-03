@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.google-analytics.com https://ssl.google-analytics.com https://www.googletagmanager.com 'unsafe-inline'; img-src 'self' https://www.google-analytics.com; connect-src https://www.google-analytics.com;
