@@ -21,7 +21,9 @@ highlight_themes_css = [
 
 [extra]
 # Put all your custom variables here
-ga_analytics = "G-NSK5LPX8EN"
+#ga_analytics = "G-NSK5LPX8EN"
+
+goat_counter = "https://cloak.goatcounter.com/count"
 
 first_doc_page = "/docs/getting-started/introduction/"
 
