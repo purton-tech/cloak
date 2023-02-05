@@ -2,7 +2,7 @@ https://cloak.pages.dev/*
   X-Robots-Tag: noindex
   
 https://cloak.software/*
-  Content-Security-Policy: default-src 'none'; script-src 'self'; img-src 'self' https://cloak.goatcounter.com/count; style-src 'self';
+  Content-Security-Policy: default-src 'none'; script-src 'self'; img-src 'self' https://beamanalytics.b-cdn.net/beam.min.js https://cloak.goatcounter.com/count; style-src 'self';
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer

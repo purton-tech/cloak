@@ -25,6 +25,8 @@ highlight_themes_css = [
 
 goat_counter = "https://cloak.goatcounter.com/count"
 
+beam_analytics = "d0a87bdd-2c59-4e62-8727-4a64a191a234"
+
 first_doc_page = "/docs/getting-started/introduction/"
 
 copyright = "Copyright 2021 - 2022"
