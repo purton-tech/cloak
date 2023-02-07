@@ -59,7 +59,7 @@ resources:
                     spec:
                         containers:
                             - name: auth
-                              image: purtontech/barricade:1.2.2
+                              image: purtontech/barricade:1.2.3
                               ports:
                                 - containerPort: 9090
                               env: 

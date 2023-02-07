@@ -16,7 +16,7 @@ alias watch-app='mold -run cargo watch --workdir /workspace/ -w crates/primer-rs
 alias wa=watch-app
 alias watch-pipeline='npm run start --prefix /workspace/crates/asset-pipeline'
 alias wp=watch-pipeline
-alias watch-zola='cd /workspace/www && zola serve --interface 0.0.0.0 --port 7104 --base-url localhost'
+alias watch-zola='cd /workspace/www && zola serve --drafts --interface 0.0.0.0 --port 7104 --base-url localhost'
 alias wz=watch-zola
 
 alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/www/content:/workdir tmaier/markdown-spellcheck:latest "**/*.md"'
