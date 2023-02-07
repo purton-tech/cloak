@@ -1,7 +1,12 @@
 +++
 title = "Implementing Authorization with Postgres Row Level Security (RLS)"
 date = 2022-09-19
+
+[extra]
+main_image = "blog/authorization-postgres-rls/postgres-auth.png"
 +++
+
+![Kubernetes Secrets Pipeline](./postgres-auth.png)
 
 ## Let's take a simple example of Authorization
 

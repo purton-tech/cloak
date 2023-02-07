@@ -1,7 +1,11 @@
 +++
 title = "How to setup a Cloudflare tunnel as a Kubernetes ingress"
 date = 2022-01-20
+[extra]
+main_image = "blog/cloudflare-tunnels-for-k8-ingress/cloudflare-tunnel.png"
 +++
+
+![You are on Nails](./cloudflare-tunnel.png)
 
 A quick way to get HTTPS ingress into a Kubernetes cluster is to deploy the cloudlared container as a deployment or  sidecar. 
 

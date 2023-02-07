@@ -2,7 +2,11 @@
 title = "Securing your development environment against supply chain attacks"
 date = 2022-09-08
 draft = true
+[extra]
+main_image = "blog/secure-your-development-environment/supply-chain.png"
 +++
+
+![Supply Chain](./supply-chain.png)
 
 As a developer you install executables almost daily. Sometimes directly sometimes indirectly.
 

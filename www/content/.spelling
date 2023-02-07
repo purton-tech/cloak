@@ -172,3 +172,28 @@ N.B.
 public.products
 ANALYZE
 Casbin
+ - blog/secrets-pipeline/index.md
+2023-02-08
+K8
+Hashicorp
+ - docs/_index.md
+docs.html
+ - docs/getting-started/_index.md
+10
+ - docs/getting-started/02-get-started.md
+2022-03-01
+20
+ - docs/getting-started/03-cli.md
+2022-02-22
+30
+cloak.pem
+cli
+ - docs/getting-started/04-injecting-secrets.md
+2022-02-21
+40
+ - docs/getting-started/05-encrypting-key.md
+2022-02-20
+50
+pem
+ - docs/getting-started/introduction.md
+2019-11-27
