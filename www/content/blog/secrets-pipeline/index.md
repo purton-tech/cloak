@@ -5,9 +5,8 @@ draft = true
 
 [extra]
 main_image = "blog/secrets-pipeline/secrets-pipeline-art.png"
+listing_image = "blog/secrets-pipeline/secrets-pipeline-art.png"
 +++
-
-![Kubernetes Secrets Pipeline](./secrets-pipeline-art.png)
 
 I looked at some of the threads about secrets management in Kubernetes and was able to come up with the following diagram.
 

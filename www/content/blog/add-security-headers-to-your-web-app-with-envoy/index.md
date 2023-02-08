@@ -4,9 +4,8 @@ date = 2022-01-24
 
 [extra]
 main_image = "blog/add-security-headers-to-your-web-app-with-envoy/security-headers.png"
+listing_image = "blog/add-security-headers-to-your-web-app-with-envoy/security-headers.png"
 +++
-
-![Security Headers](./security-headers.png)
 
 Envoy gives you the option to run a LUA script against each route you define. So for example let's imagine you have created a route in envoy to your app.
 
