@@ -33,8 +33,8 @@ $$
             true
         )
 $$ LANGUAGE SQL;
-COMMENT ON FUNCTION current_app_user IS 
-    'These needs to be set by the application before accessing the database.';
+COMMENT ON FUNCTION current_ecdh_public_key IS 
+    'These needs to be set by the application before accessing service accounts.';
 
 CREATE FUNCTION get_orgs_for_app_user() RETURNS setof integer AS 
 $$ 
