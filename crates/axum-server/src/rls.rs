@@ -19,7 +19,7 @@ pub async fn set_row_level_security_user(
 
     Ok(())
 }
-// A helper function for setting the RLS user which is used by all the policies.
+// A helper function for setting the RLS ECDH public key which is used to access service account secrets.
 pub async fn set_row_level_security_ecdh_public_key(
     transaction: &Transaction<'_>,
     ecdh_public_key: &str,
