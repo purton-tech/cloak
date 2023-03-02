@@ -1,8 +1,21 @@
+# Azure
+# -----
 # az login --use-device-code
 # az aks get-credentials --name tebi-prod-cluster --resource-group tebi-production
 # export ECDH_PRIVATE_KEY=$(openssl pkcs8 -topk8 -nocrypt -in cloak.enc.pem)
 # cloak pulumi login
+# pulumi stack select azure
 # pulumi up
+
+# Digital Ocean
+# -------------
+# export ECDH_PRIVATE_KEY=$(openssl pkcs8 -topk8 -nocrypt -in cloak.enc.pem)
+# cloak pulumi login
+# cloak doctl auth init
+# doctl kubernetes cluster kubeconfig save onchain-k8s-af1ef23
+# pulumi stack select digital-ocean
+# pulumi up
+
 name: cloak
 description: Cloak Infrastructure as Code
 runtime: yaml
@@ -59,7 +72,7 @@ resources:
                     spec:
                         containers:
                             - name: auth
-                              image: purtontech/barricade:1.2.3
+                              image: purtontech/barricade:1.2.5
                               ports:
                                 - containerPort: 9090
                               env: 
