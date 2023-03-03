@@ -30,8 +30,7 @@ services:
     image: purtontech/barricade:1.2.2
     environment:
       AUTH_TYPE: encrypted
-      # The following is used by the migrations and also for SQLX at compile time.
-      DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak
+      DATABASE_URL: postgresql://cloak_authentication:testpassword@db:5432/cloak
       SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
       REDIRECT_URL: /app/post_registration
       ENABLE_EMAIL_OTP: 'true'
@@ -78,9 +77,9 @@ services:
       # The following is used by the migrations and also for cornucopia at compile time.
       DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak?sslmode=disable
       # A less privelaged role for basic INSERTS, SELECT etc.
-      APP_DATABASE_URL: postgresql://application:testpassword@db:5432/cloak
+      APP_DATABASE_URL: postgresql://cloak_application:testpassword@db:5432/cloak
       # Readonly Dataabse User
-      RO_DATABASE_URL: postgresql://readonly:testpassword@db:5432/cloak
+      RO_DATABASE_URL: postgresql://cloak_readonly:testpassword@db:5432/cloak
       VAULT_SERVER_URL: http://localhost:7103
       VAULT_SERVER_LISTEN_ADDRESS: 0.0.0.0:7103
 

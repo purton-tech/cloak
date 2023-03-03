@@ -1,20 +1,20 @@
 -- migrate:up
 
 -- Open up for authentication
-CREATE POLICY authentication_policy ON users TO authentication USING (true);
+CREATE POLICY authentication_policy ON users TO cloak_authentication USING (true);
 
 -- Open up for database backup
-CREATE POLICY readonly_policy ON audit_trail FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON environments FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON invitations FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON organisation_users FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON organisations FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON secrets FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON service_account_secrets FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON service_accounts FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON users FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON users_vaults FOR SELECT TO readonly USING (true);
-CREATE POLICY readonly_policy ON vaults FOR SELECT TO readonly USING (true);
+CREATE POLICY readonly_policy ON audit_trail FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON environments FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON invitations FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON organisation_users FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON organisations FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON secrets FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON service_account_secrets FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON service_accounts FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON users FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON users_vaults FOR SELECT TO cloak_readonly USING (true);
+CREATE POLICY readonly_policy ON vaults FOR SELECT TO cloak_readonly USING (true);
 
 -- migrate:down
 

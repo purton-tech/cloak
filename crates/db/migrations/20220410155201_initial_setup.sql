@@ -36,35 +36,35 @@ $$ LANGUAGE plpgsql;
 
 DO $$
 BEGIN
-  CREATE ROLE application LOGIN ENCRYPTED PASSWORD 'testpassword';
+  CREATE ROLE cloak_application LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role application -- it already exists';
+  RAISE NOTICE 'not creating role cloak_application -- it already exists';
 END
 $$;
 DO $$
 BEGIN
-  CREATE ROLE authentication LOGIN ENCRYPTED PASSWORD 'testpassword';
+  CREATE ROLE cloak_authentication LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role authentication -- it already exists';
+  RAISE NOTICE 'not creating role cloak_authentication -- it already exists';
 END
 $$;
 DO $$
 BEGIN
-  CREATE ROLE readonly LOGIN ENCRYPTED PASSWORD 'testpassword';
+  CREATE ROLE cloak_readonly LOGIN ENCRYPTED PASSWORD 'testpassword';
   EXCEPTION WHEN DUPLICATE_OBJECT THEN
-  RAISE NOTICE 'not creating role readonly -- it already exists';
+  RAISE NOTICE 'not creating role cloak_readonly -- it already exists';
 END
 $$;
 
 -- Needed so we can do backups.
-GRANT SELECT ON schema_migrations TO readonly;
+GRANT SELECT ON schema_migrations TO cloak_readonly;
 
 -- migrate:down
-DROP OWNED BY application;
-DROP OWNED BY authentication;
-DROP OWNED BY readonly;
+DROP OWNED BY cloak_application;
+DROP OWNED BY cloak_authentication;
+DROP OWNED BY cloak_readonly;
 
-DROP USER application;
-DROP USER authentication;
-DROP USER readonly;
+DROP USER cloak_application;
+DROP USER cloak_authentication;
+DROP USER cloak_readonly;
 
