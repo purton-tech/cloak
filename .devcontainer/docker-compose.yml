@@ -27,10 +27,11 @@ services:
 
   # Our external authentication micro service.
   auth:
-    image: purtontech/barricade:1.2.2
+    image: purtontech/barricade:1.2.5
     environment:
       AUTH_TYPE: encrypted
-      DATABASE_URL: postgresql://cloak_authentication:testpassword@db:5432/cloak
+      # We can't use the cloak_authentication role as the earthly build with fail.
+      DATABASE_URL: postgresql://postgres:testpassword@db:5432/cloak
       SECRET_KEY: 190a5bf4b3cbb6c0991967ab1c48ab30790af876720f1835cbbf3820f4f5d949
       REDIRECT_URL: /app/post_registration
       ENABLE_EMAIL_OTP: 'true'

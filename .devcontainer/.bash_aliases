@@ -25,7 +25,7 @@ alias spell='docker run --rm -ti -v $HOST_PROJECT_PATH/www/content:/workdir tmai
 alias nrs='npm run start'
 
 # Database
-alias dbmate='dbmate --migrations-dir /workspace/crates/db/migrations'
+alias dbmate='dbmate --no-dump-schema --migrations-dir /workspace/crates/db/migrations'
 alias db='psql $DATABASE_URL'
 alias adb='psql $APP_DATABASE_URL'
 alias rdb='psql $RO_DATABASE_URL'
