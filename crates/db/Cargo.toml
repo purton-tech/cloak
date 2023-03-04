@@ -17,7 +17,6 @@ cornucopia_async = "0"
 deadpool-postgres = { version = "0", features = ["serde"] }
 postgres-types = { version = "0", features = ["derive"] }
 time = { version = "0", default-features = false,  features = ["formatting"] }
-webpki-roots = "0"
 rustls = "0"
 tokio-postgres-rustls = "0"
 

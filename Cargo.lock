@@ -609,7 +609,6 @@ dependencies = [
  "time 0.3.17",
  "tokio-postgres",
  "tokio-postgres-rustls",
- "webpki-roots",
 ]
 
 [[package]]

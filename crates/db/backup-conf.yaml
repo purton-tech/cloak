@@ -27,3 +27,7 @@ datastore:
 # If you want to populate a dev database 
 destination:
   connection_uri: $DEST_DATABASE_URL
+
+# For backing up to Digital Ocean.
+# pg_dump --data-only -d 'POSTGRES_URL' > tmp/dump.sql 
+# psql 'POSTGRES_URL' < tmp/dump.sql
