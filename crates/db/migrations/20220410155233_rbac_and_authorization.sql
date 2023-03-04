@@ -29,10 +29,10 @@ INSERT INTO roles_permissions VALUES('Administrator', 'ManageTeam');
 
 
 -- Give access to the application user.
-GRANT SELECT ON roles_permissions TO application;
+GRANT SELECT ON roles_permissions TO cloak_application;
 
 -- Give access to the readonly user
-GRANT SELECT ON roles_permissions TO readonly;
+GRANT SELECT ON roles_permissions TO cloak_readonly;
 
 -- migrate:down
 DROP TABLE roles_permissions;

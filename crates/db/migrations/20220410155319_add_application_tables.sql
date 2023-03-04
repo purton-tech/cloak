@@ -135,13 +135,13 @@ CREATE TABLE users_environments (
 COMMENT ON TABLE users_environments IS 'When we add a user to a vault we can select which environemnts they are allowed to see.';
 
 -- Give access to application user
-GRANT SELECT, INSERT, UPDATE, DELETE ON environments, vaults, secrets, service_accounts, service_account_secrets TO application;
-GRANT SELECT, INSERT, DELETE ON users_environments, users_vaults TO application;
-GRANT USAGE, SELECT ON environments_id_seq, vaults_id_seq, secrets_id_seq, service_accounts_id_seq, service_account_secrets_id_seq TO application;
+GRANT SELECT, INSERT, UPDATE, DELETE ON environments, vaults, secrets, service_accounts, service_account_secrets TO cloak_application;
+GRANT SELECT, INSERT, DELETE ON users_environments, users_vaults TO cloak_application;
+GRANT USAGE, SELECT ON environments_id_seq, vaults_id_seq, secrets_id_seq, service_accounts_id_seq, service_account_secrets_id_seq TO cloak_application;
 
 -- Give access to readonly user
-GRANT SELECT ON environments, users_environments, vaults, secrets, service_accounts, service_account_secrets, users_vaults  TO readonly;
-GRANT SELECT ON environments_id_seq, vaults_id_seq, secrets_id_seq, service_accounts_id_seq, service_account_secrets_id_seq TO readonly;
+GRANT SELECT ON environments, users_environments, vaults, secrets, service_accounts, service_account_secrets, users_vaults  TO cloak_readonly;
+GRANT SELECT ON environments_id_seq, vaults_id_seq, secrets_id_seq, service_accounts_id_seq, service_account_secrets_id_seq TO cloak_readonly;
 
 -- Manage the updated_at column
 SELECT updated_at('secrets');

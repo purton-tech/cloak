@@ -29,6 +29,13 @@ RUN sudo apt-get update --allow-releaseinfo-change && curl -sL https://aka.ms/In
 # k9s
 RUN curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Linux_x86_64.tar.gz | tar xvz -C /tmp && sudo mv /tmp/k9s /usr/bin
 
+# Digital Ocean
+RUN cd ~ \
+    && curl -OL https://github.com/digitalocean/doctl/releases/download/v1.37.0/doctl-1.37.0-linux-amd64.tar.gz \
+    && tar xvf doctl-1.37.0-linux-amd64.tar.gz \
+    && sudo mv doctl /usr/bin \
+    && rm doctl-1.37.0-linux-amd64.tar.gz
+    
 # download latest replibyte archive for Linux
 RUN curl -L -s https://github.com/Qovery/Replibyte/releases/download/v0.10.0/replibyte_v0.10.0_x86_64-unknown-linux-musl.tar.gz | tar xvz -C /tmp && sudo mv /tmp/replibyte /usr/bin 
   

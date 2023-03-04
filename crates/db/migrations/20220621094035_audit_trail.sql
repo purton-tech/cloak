@@ -42,11 +42,11 @@ COMMENT ON COLUMN audit_trail.action IS 'The action committed. i.e. deleting a s
 COMMENT ON COLUMN audit_trail.description IS 'A text description of what happened';
 
 -- Grant access
-GRANT SELECT, INSERT ON audit_trail TO application;
-GRANT USAGE, SELECT ON audit_trail_id_seq TO application;
+GRANT SELECT, INSERT ON audit_trail TO cloak_application;
+GRANT USAGE, SELECT ON audit_trail_id_seq TO cloak_application;
 
-GRANT SELECT ON audit_trail TO readonly;
-GRANT SELECT ON audit_trail_id_seq TO readonly;
+GRANT SELECT ON audit_trail TO cloak_readonly;
+GRANT SELECT ON audit_trail_id_seq TO cloak_readonly;
 
 -- migrate:down
 DROP TABLE audit_trail;
