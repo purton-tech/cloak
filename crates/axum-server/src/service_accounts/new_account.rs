@@ -23,8 +23,8 @@ pub struct NewServiceAccount {
 pub async fn new(
     Path(organisation_id): Path<i32>,
     current_user: Authentication,
-    Form(new_service_account): Form<NewServiceAccount>,
     Extension(pool): Extension<Pool>,
+    Form(new_service_account): Form<NewServiceAccount>,
 ) -> Result<impl IntoResponse, CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;

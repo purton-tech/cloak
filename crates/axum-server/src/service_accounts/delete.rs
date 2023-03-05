@@ -16,10 +16,10 @@ pub struct DeleteServiceAccount {
 }
 
 pub async fn delete(
+    Extension(pool): Extension<Pool>,
     Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Form(idor_delete_service_account): Form<DeleteServiceAccount>,
-    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;

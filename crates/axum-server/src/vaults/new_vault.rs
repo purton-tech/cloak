@@ -21,10 +21,10 @@ pub struct NewVault {
 }
 
 pub async fn new(
+    Extension(pool): Extension<Pool>,
     Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Form(new_vault): Form<NewVault>,
-    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;

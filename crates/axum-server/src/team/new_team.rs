@@ -17,10 +17,10 @@ pub struct NewTeam {
 }
 
 pub async fn new_team(
+    Extension(pool): Extension<Pool>,
     Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Form(new_team): Form<NewTeam>,
-    Extension(pool): Extension<Pool>,
 ) -> Result<impl IntoResponse, CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;
