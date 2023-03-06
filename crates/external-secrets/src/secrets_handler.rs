@@ -17,6 +17,8 @@ pub async fn get_secrets(
     )
     .await?;
 
+    tracing::info!(message = "Secrets Retrieved", %config.public_key_der_base64);
+
     // You can convert a HashMap to Json. Nice.
     Ok(Json(secrets))
 }
