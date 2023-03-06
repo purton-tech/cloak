@@ -792,7 +792,9 @@ name = "external-secrets"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "base64",
  "grpc-api",
+ "p256",
  "tokio",
  "tracing",
  "tracing-subscriber",

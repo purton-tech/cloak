@@ -41,3 +41,9 @@ impl From<axum::http::uri::InvalidUri> for CustomError {
         CustomError::FaultySetup(err.to_string())
     }
 }
+
+impl From<Box<dyn std::error::Error>> for CustomError {
+    fn from(err: Box<dyn std::error::Error>) -> CustomError {
+        CustomError::FaultySetup(err.to_string())
+    }
+}
