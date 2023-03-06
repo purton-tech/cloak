@@ -52,8 +52,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Run(args) => {
             let env_vars_to_inject = grpc_api::get_secrets(
                 &config.secret_key,
-                &config.public_key_der_base64,
                 &config.api_host_url,
+                &config.public_key_der_base64,
             )
             .await?;
 
@@ -84,8 +84,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Secrets => {
             let secrets: HashMap<String, String> = grpc_api::get_secrets(
                 &config.secret_key,
-                &config.public_key_der_base64,
                 &config.api_host_url,
+                &config.public_key_der_base64,
             )
             .await?;
             let mut table: Vec<SecretRow> = Default::default();
@@ -97,8 +97,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         Commands::Env => {
             let secrets: HashMap<String, String> = grpc_api::get_secrets(
                 &config.secret_key,
-                &config.public_key_der_base64,
                 &config.api_host_url,
+                &config.public_key_der_base64,
             )
             .await?;
             for (name, value) in secrets.into_iter() {

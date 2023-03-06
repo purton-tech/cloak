@@ -8,7 +8,7 @@ use axum::{extract::Extension, response::Html};
 pub async fn get_secrets(
     Extension(_config): Extension<super::config::Config>,
 ) -> Result<Html<String>, CustomError> {
-    tracing::debug!("Here");
+    tracing::info!("Here");
     //Ok(Json(users))
     Ok(Html("Hello".to_string()))
 }
