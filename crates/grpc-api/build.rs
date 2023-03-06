@@ -16,6 +16,8 @@ fn main() {
     rust_grpc_web::configure()
         // Don't generate streaming support (it's not working)
         .support_streaming(false)
+        // Put the output in a different folder than the default otherwise it gets mixed up with
+        // the tonic_build above.
         .out_dir(path)
         .compile(&["api.proto"], &["./"])
         .unwrap();
