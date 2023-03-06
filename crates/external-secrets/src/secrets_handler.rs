@@ -5,11 +5,11 @@ use std::collections::HashMap;
  * secrets and return as JSON
  */
 use crate::errors::CustomError;
-use axum::{extract::Extension, response::Html};
+use axum::{extract::Extension, Json};
 
 pub async fn get_secrets(
     Extension(config): Extension<super::config::Config>,
-) -> Result<Html<String>, CustomError> {
+) -> Result<Json<HashMap<String, String>>, CustomError> {
     let secrets: HashMap<String, String> = grpc_api::get_secrets(
         &config.secret_key,
         &config.api_host_url,
@@ -17,7 +17,6 @@ pub async fn get_secrets(
     )
     .await?;
 
-    dbg!(&secrets);
-
-    Ok(Html("Hello".to_string()))
+    // You can convert a HashMap to Json. Nice.
+    Ok(Json(secrets))
 }
