@@ -345,15 +345,14 @@ dependencies = [
 name = "cli"
 version = "0.1.0"
 dependencies = [
- "aes-gcm",
  "base64",
  "clap",
  "cli-table",
  "dotenv",
+ "grpc-api",
  "p256",
  "prost",
  "reqwest",
- "rust-grpc-web",
  "tokio",
  "tonic",
 ]
@@ -995,7 +994,12 @@ dependencies = [
 name = "grpc-api"
 version = "0.1.0"
 dependencies = [
+ "aes-gcm",
+ "base64",
+ "p256",
  "prost",
+ "reqwest",
+ "rust-grpc-web",
  "serde",
  "tonic",
  "tonic-build",
@@ -1998,7 +2002,7 @@ dependencies = [
 [[package]]
 name = "rust-grpc-web"
 version = "0.1.0"
-source = "git+https://github.com/elliptic-email/rust-grpc-web#5dec4309b8aa22b60ce136736b76d45866fa98fc"
+source = "git+https://github.com/purton-tech/rust-grpc-web#5dec4309b8aa22b60ce136736b76d45866fa98fc"
 dependencies = [
  "proc-macro2",
  "prost-build",

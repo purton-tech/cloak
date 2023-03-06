@@ -1,22 +1,12 @@
-pub mod vault {
-    #![allow(clippy::derive_partial_eq_without_eq)]
-    tonic::include_proto!("vault");
-}
-
 mod config;
 
 use clap::{Parser, Subcommand};
 use cli_table::WithTitle;
-use p256::ecdh::SharedSecret;
-use p256::{elliptic_curve::ecdh, pkcs8::DecodePublicKey, PublicKey};
 use std::collections::HashMap;
 use std::env;
 use std::ffi::OsString;
 use std::process::{Command, Stdio};
 
-use aes_gcm::aead::{generic_array::GenericArray, Aead, Payload};
-use aes_gcm::Aes256Gcm;
-use aes_gcm::KeyInit;
 use cli_table::{print_stdout, Table};
 use dotenv::dotenv;
 
@@ -60,7 +50,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // cargo run -- --api-host-url=http://envoy:7100 secrets
     match &args.command {
         Commands::Run(args) => {
-            let env_vars_to_inject = get_secrets(&config).await?;
+            let env_vars_to_inject = grpc_api::get_secrets(
+                &config.secret_key,
+                &config.public_key_der_base64,
+                &config.api_host_url,
+            )
+            .await?;
 
             let filtered_env: HashMap<String, String> = env::vars()
                 .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
@@ -87,7 +82,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             println!("Public Key {:?}", config.public_key_der_base64);
         }
         Commands::Secrets => {
-            let secrets: HashMap<String, String> = get_secrets(&config).await?;
+            let secrets: HashMap<String, String> = grpc_api::get_secrets(
+                &config.secret_key,
+                &config.public_key_der_base64,
+                &config.api_host_url,
+            )
+            .await?;
             let mut table: Vec<SecretRow> = Default::default();
             for (name, value) in secrets.into_iter() {
                 table.push(SecretRow { name, value })
@@ -95,7 +95,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             print_stdout(table.with_title())?;
         }
         Commands::Env => {
-            let secrets: HashMap<String, String> = get_secrets(&config).await?;
+            let secrets: HashMap<String, String> = grpc_api::get_secrets(
+                &config.secret_key,
+                &config.public_key_der_base64,
+                &config.api_host_url,
+            )
+            .await?;
             for (name, value) in secrets.into_iter() {
                 println!("{}={}", name, value);
             }
@@ -131,70 +136,4 @@ async fn insert_secrets(cmd_args: &[OsString], secrets: &HashMap<String, String>
     }
 
     process_args
-}
-
-async fn get_secrets(
-    config: &config::Config,
-) -> Result<HashMap<String, String>, Box<dyn std::error::Error>> {
-    let response = config
-        .client
-        .get_service_account(vault::GetServiceAccountRequest {
-            ecdh_public_key: config.public_key_der_base64.clone(),
-        })
-        .await?;
-
-    let aad = transform_u32_to_array_of_u8(response.service_account_id);
-
-    let mut env_vars_to_inject: HashMap<String, String> = Default::default();
-    for secret in response.secrets {
-        let key_der = base64::decode(secret.ecdh_public_key).unwrap();
-
-        let public_key = PublicKey::from_public_key_der(&key_der).unwrap();
-
-        let shared_secret = ecdh::diffie_hellman(
-            config.secret_key.to_nonzero_scalar(),
-            public_key.as_affine(),
-        );
-
-        let plaintext_name = decrypt_secret(secret.encrypted_name, &aad, &shared_secret)?;
-        let plaintext_value = decrypt_secret(secret.encrypted_secret_value, &aad, &shared_secret)?;
-        env_vars_to_inject.insert(plaintext_name, plaintext_value);
-    }
-    Ok(env_vars_to_inject)
-}
-
-fn decrypt_secret(
-    nonce_and_cipher: String,
-    aad: &[u8; 4],
-    shared_secret: &SharedSecret,
-) -> Result<String, Box<dyn std::error::Error>> {
-    let nonce_and_cipher: Vec<&str> = nonce_and_cipher.split('|').collect();
-    if let Some(nonce) = nonce_and_cipher.first() {
-        if let Some(cipher) = nonce_and_cipher.get(1) {
-            let nonce_bytes = base64::decode(nonce).unwrap();
-            let cipher_bytes = base64::decode(cipher).unwrap();
-
-            let payload = Payload {
-                msg: &cipher_bytes,
-                aad,
-            };
-            let key: &GenericArray<u8, _> = GenericArray::from_slice(shared_secret.as_bytes());
-            let nonce = GenericArray::from_slice(&nonce_bytes as &[u8]);
-
-            let cipher = <Aes256Gcm>::new(key);
-            let plaintext = cipher.decrypt(nonce, payload).unwrap();
-            let plaintext = std::str::from_utf8(&plaintext).unwrap();
-
-            return Ok(plaintext.to_string());
-        }
-    }
-    Err("Bad request".into())
-}
-
-fn transform_u32_to_array_of_u8(x: u32) -> [u8; 4] {
-    let b4: u8 = ((x >> 24) & 0xff) as u8;
-    let b3: u8 = ((x >> 16) & 0xff) as u8;
-    let b2: u8 = ((x >> 8) & 0xff) as u8;
-    let b1: u8 = (x & 0xff) as u8;
-    [b1, b2, b3, b4]
 }

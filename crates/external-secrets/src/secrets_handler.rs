@@ -3,11 +3,12 @@
  * secrets and return as JSON
  */
 use crate::errors::CustomError;
-use axum::extract::Extension;
+use axum::{extract::Extension, response::Html};
 
 pub async fn get_secrets(
     Extension(_config): Extension<super::config::Config>,
-) -> Result<String, CustomError> {
+) -> Result<Html<String>, CustomError> {
+    tracing::debug!("Here");
     //Ok(Json(users))
-    Ok("Hello".to_string())
+    Ok(Html("Hello".to_string()))
 }

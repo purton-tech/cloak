@@ -9,4 +9,14 @@ fn main() {
         .compile_well_known_types(true)
         .compile(&["api.proto"], &["./"])
         .unwrap();
+
+    // Build a Web gRPC client. As cloudflare doesn't support gRPC.
+    let path = std::path::PathBuf::from(format!("{}/grpc_web", std::env::var("OUT_DIR").unwrap()));
+    std::fs::create_dir_all(&path).unwrap();
+    rust_grpc_web::configure()
+        // Don't generate streaming support (it's not working)
+        .support_streaming(false)
+        .out_dir(path)
+        .compile(&["api.proto"], &["./"])
+        .unwrap();
 }
