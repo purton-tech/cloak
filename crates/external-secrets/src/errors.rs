@@ -1,14 +1,19 @@
+/***
+ * In Rust it's commomn to define your own error type. Mainly this
+ * is so we can alaways return one type of error and then this cocde handles
+ * conversion between the different error types.
+ *
+ * A good article is here https://www.lpalmieri.com/posts/error-handling-rust/
+ **/
 use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
 use std::fmt;
-use db::{TokioPostgresError, PoolError};
 
 #[derive(Debug)]
 pub enum CustomError {
     FaultySetup(String),
-    Database(String),
 }
 
 // Allow the use of "{}" format specifier
@@ -16,10 +21,6 @@ impl fmt::Display for CustomError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
             CustomError::FaultySetup(ref cause) => write!(f, "Setup Error: {}", cause),
-            //CustomError::Unauthorized(ref cause) => write!(f, "Setup Error: {}", cause),
-            CustomError::Database(ref cause) => {
-                write!(f, "Database Error: {}", cause)
-            }
         }
     }
 }
@@ -28,7 +29,6 @@ impl fmt::Display for CustomError {
 impl IntoResponse for CustomError {
     fn into_response(self) -> Response {
         let (status, error_message) = match self {
-            CustomError::Database(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
             CustomError::FaultySetup(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
         };
 
@@ -39,17 +39,5 @@ impl IntoResponse for CustomError {
 impl From<axum::http::uri::InvalidUri> for CustomError {
     fn from(err: axum::http::uri::InvalidUri) -> CustomError {
         CustomError::FaultySetup(err.to_string())
-    }
-}
-
-impl From<TokioPostgresError> for CustomError {
-    fn from(err: TokioPostgresError) -> CustomError {
-        CustomError::Database(err.to_string())
-    }
-}
-
-impl From<PoolError> for CustomError {
-    fn from(err: PoolError) -> CustomError {
-        CustomError::Database(err.to_string())
     }
 }

@@ -793,7 +793,10 @@ name = "external-secrets"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "grpc-api",
  "tokio",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

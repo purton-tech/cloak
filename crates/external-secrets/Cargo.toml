@@ -6,5 +6,10 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+grpc-api = { path = "../grpc-api" }
 axum = "0.6"
 tokio = { version = "1.26.0", default-features = false, features = ["macros", "fs", "rt-multi-thread"] }
+
+# Telemetry
+tracing = "0"
+tracing-subscriber = { version="0", features = ["env-filter"] }

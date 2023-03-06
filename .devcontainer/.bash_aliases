@@ -14,6 +14,8 @@ alias gdb='git branch | grep -v "main" | xargs git branch -D'
 # Watch
 alias watch-app='mold -run cargo watch --workdir /workspace/ -w crates/primer-rsx -w crates/ui-components -w crates/grpc-api -w crates/axum-server -w crates/db -w crates/asset-pipeline/dist -w crates/asset-pipeline/images --no-gitignore -x "run --bin cloak"'
 alias wa=watch-app
+alias watch-es='mold -run cargo watch --workdir /workspace/ -w crates/external-secrets -w crates/grpc-api --no-gitignore -x "run --bin external-secrets"'
+alias wes=watch-es
 alias watch-pipeline='npm run start --prefix /workspace/crates/asset-pipeline'
 alias wp=watch-pipeline
 alias watch-zola='cd /workspace/www && zola serve --drafts --interface 0.0.0.0 --port 7104 --base-url localhost'
