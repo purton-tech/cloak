@@ -22,8 +22,8 @@ pub struct AddMember {
 pub async fn add(
     Path((organisation_id, vault_id)): Path<(i32, i32)>,
     current_user: Authentication,
-    Form(add_member): Form<AddMember>,
     Extension(pool): Extension<Pool>,
+    Form(add_member): Form<AddMember>,
 ) -> Result<impl IntoResponse, CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;

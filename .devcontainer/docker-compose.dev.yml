@@ -4,6 +4,7 @@ services:
   # 7100 - Envoy
   # 7101 - Envoy Admin
   # 7103 - Web App and API server
+  # 7105 - External Secrets Proxy
   # 7110 - Selenium VNC
   # 7125 - Mail
 

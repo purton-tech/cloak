@@ -1,0 +1,22 @@
+[package]
+name = "external-secrets"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+grpc-api = { path = "../grpc-api" }
+axum = "0.6"
+tokio = { version = "1.26.0", default-features = false, features = ["macros", "fs", "rt-multi-thread"] }
+
+# Telemetry
+tracing = "0"
+tracing-subscriber = { version="0", features = ["env-filter"] }
+
+# Elliptic Curve Diffie Helman
+p256 = { version = "0", default-features = false, features = ["ecdh", "pem"] } 
+base64 = "0.13.1" # So we encode DER public key to base64
+
+# Serialize structs
+serde = { version = "1", features = ["derive"] }

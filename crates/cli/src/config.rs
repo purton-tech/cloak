@@ -1,4 +1,4 @@
-use crate::{vault, Cli};
+use crate::Cli;
 use p256::{
     pkcs8::{DecodePrivateKey, EncodePublicKey},
     SecretKey,
@@ -8,14 +8,12 @@ use std::fs;
 
 pub struct Config {
     pub secret_key: SecretKey,
-    pub client: vault::vault_client::Vault,
+    pub api_host_url: String,
     pub public_key_der_base64: String,
 }
 
 impl Config {
     pub fn configure(cli: &Cli) -> Result<Config, Box<dyn Error>> {
-        let client = vault::vault_client::Vault::new(cli.api_host_url.clone());
-
         let secret_key;
 
         if let Some(ecdh_private_key) = &cli.ecdh_private_key {
@@ -34,7 +32,7 @@ impl Config {
 
         let config = Config {
             secret_key,
-            client,
+            api_host_url: cli.api_host_url.clone(),
             public_key_der_base64,
         };
         Ok(config)

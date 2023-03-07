@@ -23,10 +23,6 @@ use tower_http::trace::TraceLayer;
 
 #[tokio::main]
 async fn main() {
-    // Set the RUST_LOG, if it hasn't been explicitly defined
-    if std::env::var_os("RUST_LOG").is_none() {
-        std::env::set_var("RUST_LOG", "app=debug,tower_http=info,tokio_postgres=info")
-    }
     tracing_subscriber::fmt::init();
 
     let config = config::Config::new();
@@ -58,7 +54,7 @@ async fn main() {
 
     let hybrid_make_service = hybrid::hybrid(axum_make_service, grpc_service);
 
-    tracing::debug!("listening on {}", addr);
+    tracing::info!("listening on {}", addr);
     let server = hyper::Server::bind(&addr).serve(hybrid_make_service);
 
     if let Err(e) = server.await {

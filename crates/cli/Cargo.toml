@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+grpc-api = { path = "../grpc-api" }
 tokio = { version = "1", default-features = false, features = ["macros", "rt", "rt-multi-thread"] }
 
 # gRPC dependencies
@@ -21,10 +22,6 @@ dotenv = "0.15.0"
 # Elliptic Curve Diffie Helman
 p256 = { version = "0", default-features = false, features = ["ecdh", "pem"] } 
 base64 = "0.13.1" # So we encode DER public key to base64
-aes-gcm = "0"
 
 # OK, I wanted a pretty table
 cli-table = { version = "0", default-features = false, features = ["derive"] }
-
-[build-dependencies]
-rust-grpc-web = { git = "https://github.com/elliptic-email/rust-grpc-web" }

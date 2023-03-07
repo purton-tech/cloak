@@ -21,8 +21,8 @@ pub struct ConnectServiceAccount {
 pub async fn connect(
     Path(organisation_id): Path<i32>,
     current_user: Authentication,
-    Form(connect_form): Form<ConnectServiceAccount>,
     Extension(pool): Extension<Pool>,
+    Form(connect_form): Form<ConnectServiceAccount>,
 ) -> Result<impl IntoResponse, CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;

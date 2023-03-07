@@ -29,9 +29,9 @@ pub async fn create_invite(
     Path(organisation_id): Path<i32>,
     current_user: Authentication,
     Extension(pool): Extension<Pool>,
+    authentication: Authentication,
     Extension(config): Extension<crate::config::Config>,
     Form(new_invite): Form<NewInvite>,
-    authentication: Authentication,
 ) -> Result<impl IntoResponse, CustomError> {
     let invite_hash = create(&pool, &authentication, &new_invite, organisation_id).await?;
 

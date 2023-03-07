@@ -18,8 +18,8 @@ pub struct DeleteMember {
 pub async fn delete(
     Path(params): Path<(i32, i32)>,
     current_user: Authentication,
-    Form(delete_member): Form<DeleteMember>,
     Extension(pool): Extension<Pool>,
+    Form(delete_member): Form<DeleteMember>,
 ) -> Result<impl IntoResponse, CustomError> {
     // Create a transaction and setup RLS
     let mut client = pool.get().await?;
