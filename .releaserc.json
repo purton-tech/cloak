@@ -22,6 +22,10 @@
         "skipLogin": true
     }],
     ["@semantic-release-plus/docker", {
+        "name": "purtontech/cloak-external-secrets:latest",
+        "skipLogin": true
+    }],
+    ["@semantic-release-plus/docker", {
         "name": "purtontech/cloak-kubernetes:latest",
         "skipLogin": true
     }],
