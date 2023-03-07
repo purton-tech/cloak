@@ -31,6 +31,7 @@ ARG MIGRATIONS_IMAGE_NAME=purtontech/cloak-db-migrations:latest
 ARG ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
 ARG WWW_IMAGE_NAME=purtontech/cloak-website:latest
 ARG KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
+ARG EXTERNAL_SECRETS_IMAGE_NAME=purtontech/cloak-external-secrets:latest
 
 
 WORKDIR /build
@@ -103,6 +104,7 @@ build:
     END
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$APP_EXE_NAME
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/external-secrets
 
 save-artifacts:
     FROM +build
@@ -131,6 +133,14 @@ app-container:
     COPY --dir $PIPELINE_FOLDER/images /build/$PIPELINE_FOLDER/images
     ENTRYPOINT ["./axum-server"]
     SAVE IMAGE --push $APP_IMAGE_NAME
+
+# Acts a proxy between cloak and https://external-secrets.io/
+external-secrets-container:
+    FROM scratch
+    COPY +build/external-secrets axum-server
+    COPY --dir $PIPELINE_FOLDER/images /build/$PIPELINE_FOLDER/images
+    ENTRYPOINT ["./axum-server"]
+    SAVE IMAGE --push $EXTERNAL_SECRETS_IMAGE_NAME    
 
 envoy-container:
     FROM $ENVOY_PROXY

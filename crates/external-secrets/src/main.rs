@@ -14,7 +14,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync + 'static>
 
     // build our application with a route
     let app = Router::new()
-        .route("/", get(secrets_handler::get_secrets))
+        .route("/:key", get(secrets_handler::get_secrets))
         .layer(Extension(config));
 
     // run it

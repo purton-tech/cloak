@@ -25,7 +25,7 @@ k9s --insecure-skip-tls-verify
 
 or
 
-kubectl get pods k9s --insecure-skip-tls-verify
+kubectl get pods --insecure-skip-tls-verify
 ```
 
 ## Install Kubectl
@@ -48,4 +48,24 @@ helm repo add external-secrets https://charts.external-secrets.io
 
 ```sh
 helm install external-secrets external-secrets/external-secrets  -n external-secrets --create-namespace --kube-insecure-skip-tls-verify
+```
+
+## Build our container
+
+```sh
+earthly -P +external-secrets-container
+```
+
+## Add a Private Key as a secret.
+
+```sh
+kubectl --insecure-skip-tls-verify create secret generic cloak-key --from-file=ecdh_private_key=/workspace/cloak.pem
+```
+
+```sh
+kind load docker-image purtontech/cloak-external-secrets:latest
+```
+
+```sh
+kubectl --insecure-skip-tls-verify apply -f crates/external-secrets/yaml
 ```

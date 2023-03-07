@@ -795,6 +795,7 @@ dependencies = [
  "base64",
  "grpc-api",
  "p256",
+ "serde",
  "tokio",
  "tracing",
  "tracing-subscriber",

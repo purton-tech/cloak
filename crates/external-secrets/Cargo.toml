@@ -17,3 +17,6 @@ tracing-subscriber = { version="0", features = ["env-filter"] }
 # Elliptic Curve Diffie Helman
 p256 = { version = "0", default-features = false, features = ["ecdh", "pem"] } 
 base64 = "0.13.1" # So we encode DER public key to base64
+
+# Serialize structs
+serde = { version = "1", features = ["derive"] }
