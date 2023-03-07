@@ -37,5 +37,7 @@ pub async fn get_secrets(
         return Ok(Json(value));
     }
 
+    tracing::error!(message = "Key Not Retrieved", %key);
+
     Err(CustomError::FaultySetup("Key Not Found".to_string()))
 }

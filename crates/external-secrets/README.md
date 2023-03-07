@@ -59,7 +59,7 @@ earthly -P +external-secrets-container
 ## Add a Private Key as a secret.
 
 ```sh
-kubectl --insecure-skip-tls-verify create secret generic cloak-key --from-file=ecdh_private_key=/workspace/cloak.pem
+kubectl --insecure-skip-tls-verify --namespace=external-secrets create secret generic cloak-key --from-file=ecdh_private_key=/workspace/cloak.pem
 ```
 
 ```sh
@@ -68,4 +68,29 @@ kind load docker-image purtontech/cloak-external-secrets:latest
 
 ```sh
 kubectl --insecure-skip-tls-verify apply -f crates/external-secrets/yaml
+kubectl --insecure-skip-tls-verify delete -f crates/external-secrets/yaml
+```
+## Is everything OK?
+
+```sh
+kubectl --insecure-skip-tls-verify describe externalsecret webhook-example
+kubectl --insecure-skip-tls-verify describe secretstore webhook-backend
+```
+
+## Test Cloak Docker Container
+
+```sh
+kubectl --insecure-skip-tls-verify --namespace=external-secrets port-forward deployment/cloak-external-secrets 8105:7105
+```
+
+The access via the borwser i.e.
+
+```
+http://localhost:8105/PULUMI_ACCESS_TOKEN
+```
+
+## Look at the secret
+
+```sh
+kubectl --insecure-skip-tls-verify --namespace=external-secrets  get example-sync/access-token -o yaml
 ```
