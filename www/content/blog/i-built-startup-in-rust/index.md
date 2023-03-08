@@ -158,8 +158,6 @@ So if you make an architecture decision to choose Rust then, well done, you nail
 
 ## Conclusion
 
-Pick the learning curve with the maximum total value.
+Pick technical learning curves that give the maximum total value in best practices and transferability.
 
-I'm happy that one of the decisions I made for my startup was Rust.
-
-My development cycle will be faster, My startup more stable, and I can take that skill on to other projects.
+I'm happy that one of the decisions I made for my startup was Rust. My development cycle will be faster, my startup more stable, and I can take that skill on to other projects.
