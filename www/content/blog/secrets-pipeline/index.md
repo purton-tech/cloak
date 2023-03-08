@@ -20,7 +20,7 @@ Maturity, the more
 
 The bridge. To get secrets into the cluster.
 
-## Picking a learning curve that maximises your return on investemnt (ROI)
+## Picking a learning curve that maximises your return on investment (ROI)
 
 ## A simple secrets pipeline
 
