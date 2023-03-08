@@ -26,7 +26,7 @@ The road to a complete full stack architecture that supports your business is hi
 
 An architecture is a long list of decisions that need to be made which trigger a bunch of learning curves for the team.
 
-An experienced team will be faster as they've hopefully hit a lot of the curves early on.
+An experienced team will be faster as they've hopefully hit a lot of the curves earlier on in their career.
 
 ### Reusable Learning Curves
 
@@ -36,11 +36,11 @@ Basically you **go up a learning curve one time** and that skill might get re-us
 
 Here's some learning curves you could go up that will probably be useful for 10 years or more.
 
-* Kubernetes. Learn one way to deploy an application and learn it well. re-use across cloud providers.
-* Docker. The way to package a binary and make it work anywhere.
-* Postgres. If you learned Postgres back in the early 90's your probably happy with that investment.
-* Pulumi. Infrastructure as code. 
-* HTML, CSS and Typescript. 
+* _Kubernetes_. Learn one way to deploy an application and learn it well. re-use across cloud providers.
+* _Docker_. The way to package a binary and make it work anywhere.
+* _Postgres_. If you learned Postgres back in the early 90's your probably happy with that investment.
+* _Pulumi_. Infrastructure as code. 
+* _HTML_, _CSS_ and _Typescript_. 
 
 If you're looking for something new to learn and you don't have one of the above, maybe it's time.
 
@@ -158,5 +158,8 @@ So if you make an architecture decision to choose Rust then, well done, you nail
 
 ## Conclusion
 
+Pick the learning curve with the maximum total value.
+
 I'm happy that one of the decisions I made for my startup was Rust.
 
+My development cycle will be faster, My startup more stable, and I can take that skill on to other projects.
