@@ -48,6 +48,7 @@ pull-request:
     BUILD +app-container
     BUILD +envoy-container
     BUILD +integration-test
+    BUILD +external-secrets-container
 
 all:
     BUILD +migration-container
