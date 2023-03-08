@@ -152,7 +152,7 @@ Rust supports a lot of software engineering best practices which make us faster 
 
 Whether you build for embedded devices, the web, games, data science or pretty much any software project Rust has got you covered.
 
-It's a reusable learning curve who's results will be usable for another decade or more.
+It's a reusable learning curve resulting in skills that will be valid for another decade or more.
 
 So if you make an architecture decision to choose Rust then, well done, you nailed it. Let's hope you get all the other decisions right too.
 
