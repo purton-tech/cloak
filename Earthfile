@@ -54,6 +54,7 @@ all:
     BUILD +migration-container
     BUILD +app-container
     BUILD +envoy-container
+    BUILD +external-secrets-container
     BUILD +build-cli-osx
     BUILD +kubernetes-container
     BUILD +save-artifacts
