@@ -1,6 +1,6 @@
 +++
 title = "I built a startup in Rust, I would do it again."
-date = 2023-03-16
+date = 2023-03-09
 [extra]
 main_image = "blog/i-built-startup-in-rust/steep-learning-curve.png"
 listing_image = "blog/i-built-startup-in-rust/steep-learning-curve.png"
