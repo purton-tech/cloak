@@ -27,10 +27,10 @@ variables:
         app: envoy
     authLabels:
         app: auth
-    version: 1.19.2
-    hash-db-migrations: sha256:acff527a85f1c555890e643b4154f17735ac4c08cddc37eadcf4f2b4cb5a1b78
+    version: 1.19.3
+    hash-db-migrations: sha256:6ef20f053589bc3decc5c050f5a60535e82487c84ebbc9798a3b01ceda6bd657
     hash-envoy: sha256:5fb60d697a4ac22281df5b586ad409639e39eadfc029d099be8a5a4c9fd27a13
-    hash-server: sha256:2c61afc057e79ffd315b31a199a1a9c5b20b533821afafc7d45ce8e5ad43f1ec
+    hash-server: sha256:b2f70d63df36037cdc20da2b423c462a17a8034b4f14f1ce6f766e8607193720
     db-migrations: purtontech/cloak-db-migrations:${version}@${hash-db-migrations}
     envoy: purtontech/cloak-envoy:${version}@${hash-envoy}
     server: purtontech/cloak-server:${version}@${hash-server}
