@@ -1,4 +1,4 @@
-FROM purtontech/rust-on-nails-devcontainer:1.0.17 AS development
+FROM purtontech/rust-on-nails-devcontainer:1.1.1 AS development
 
 COPY *.bash ./
 
@@ -25,9 +25,6 @@ ARG USERNAME=vscode
 
 # Install az
 RUN sudo apt-get update --allow-releaseinfo-change && curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-
-# k9s
-RUN curl -L -s https://github.com/derailed/k9s/releases/download/v0.24.15/k9s_Linux_x86_64.tar.gz | tar xvz -C /tmp && sudo mv /tmp/k9s /usr/bin
 
 # Digital Ocean
 RUN cd ~ \

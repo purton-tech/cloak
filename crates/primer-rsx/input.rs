@@ -1,8 +1,9 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum InputType {
+    #[default]
     Text,
     Email,
     Password,
@@ -18,14 +19,9 @@ impl InputType {
     }
 }
 
-impl Default for InputType {
-    fn default() -> Self {
-        InputType::Text
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum InputSize {
+    #[default]
     Default,
     Small,
     Large,
@@ -38,12 +34,6 @@ impl InputSize {
             InputSize::Small => "sm",
             InputSize::Large => "large",
         }
-    }
-}
-
-impl Default for InputSize {
-    fn default() -> Self {
-        InputSize::Default
     }
 }
 

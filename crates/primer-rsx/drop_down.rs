@@ -1,8 +1,9 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum Direction {
+    #[default]
     None,
     NorthEast,
     East,
@@ -23,12 +24,6 @@ impl Direction {
             Direction::SouthWest => "dropdown-menu dropdown-menu-sw",
             Direction::West => "dropdown-menu dropdown-menu-w",
         }
-    }
-}
-
-impl Default for Direction {
-    fn default() -> Self {
-        Direction::None
     }
 }
 

@@ -93,7 +93,7 @@ impl grpc_api::vault::vault_server::Vault for VaultService {
             .bind(
                 &transaction,
                 &(req.vault_id as i32),
-                &(authenticated_user.user_id as i32),
+                &(authenticated_user.user_id),
             )
             .one()
             .await
@@ -102,7 +102,7 @@ impl grpc_api::vault::vault_server::Vault for VaultService {
         let user_vault = queries::user_vaults::get()
             .bind(
                 &transaction,
-                &(authenticated_user.user_id as i32),
+                &(authenticated_user.user_id),
                 &(req.vault_id as i32),
             )
             .one()
@@ -186,11 +186,7 @@ impl grpc_api::vault::vault_server::Vault for VaultService {
             if let Some(vault_id) = sa.vault_id {
                 // Blow up, if the user doesn't have access to the vault.
                 queries::service_account_secrets::get_users_vaults()
-                    .bind(
-                        &transaction,
-                        &(authenticated_user.user_id as i32),
-                        &vault_id,
-                    )
+                    .bind(&transaction, &(authenticated_user.user_id), &vault_id)
                     .all()
                     .await
                     .map_err(|e| CustomError::Database(e.to_string()))?;

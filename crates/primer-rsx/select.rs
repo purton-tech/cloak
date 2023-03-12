@@ -1,8 +1,9 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum SelectSize {
+    #[default]
     Default,
     Small,
     Large,
@@ -15,12 +16,6 @@ impl SelectSize {
             SelectSize::Small => "sm",
             SelectSize::Large => "large",
         }
-    }
-}
-
-impl Default for SelectSize {
-    fn default() -> Self {
-        SelectSize::Default
     }
 }
 

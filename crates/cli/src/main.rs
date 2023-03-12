@@ -58,7 +58,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             .await?;
 
             let filtered_env: HashMap<String, String> = env::vars()
-                .filter(|&(ref k, _)| k != "ECDH_PRIVATE_KEY")
+                .filter(|(k, _)| k != "ECDH_PRIVATE_KEY")
                 .collect();
 
             let filtered_env: HashMap<String, String> =

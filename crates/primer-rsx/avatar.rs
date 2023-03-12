@@ -2,20 +2,16 @@
 #![allow(unused_braces)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum AvatarType {
     Organisation,
+    #[default]
     User,
 }
 
-impl Default for AvatarType {
-    fn default() -> Self {
-        AvatarType::User
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum AvatarSize {
+    #[default]
     Small,
     Medium,
     Large,
@@ -30,12 +26,6 @@ impl AvatarSize {
             AvatarSize::Large => "width='24' height='24'",
             AvatarSize::ExtraLarge => "width='24' height='24'",
         }
-    }
-}
-
-impl Default for AvatarSize {
-    fn default() -> Self {
-        AvatarSize::Small
     }
 }
 

@@ -1,8 +1,9 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, Default, PartialEq, Eq)]
 pub enum AlertColor {
+    #[default]
     Default,
     Warn,
     Error,
@@ -17,12 +18,6 @@ impl AlertColor {
             AlertColor::Error => "flash flash-error",
             AlertColor::Success => "flash flash-success",
         }
-    }
-}
-
-impl Default for AlertColor {
-    fn default() -> Self {
-        AlertColor::Default
     }
 }
 

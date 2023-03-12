@@ -1,9 +1,10 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum LabelContrast {
     Primary,
+    #[default]
     Secondary,
 }
 
@@ -16,14 +17,9 @@ impl LabelContrast {
     }
 }
 
-impl Default for LabelContrast {
-    fn default() -> Self {
-        LabelContrast::Secondary
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum LabelColor {
+    #[default]
     Default,
     Accent,
     Success,
@@ -53,14 +49,9 @@ impl LabelColor {
     }
 }
 
-impl Default for LabelColor {
-    fn default() -> Self {
-        LabelColor::Default
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum LabelSize {
+    #[default]
     Small,
     Large,
 }
@@ -71,12 +62,6 @@ impl LabelSize {
             LabelSize::Small => "",
             LabelSize::Large => "Label--large",
         }
-    }
-}
-
-impl Default for LabelSize {
-    fn default() -> Self {
-        LabelSize::Small
     }
 }
 

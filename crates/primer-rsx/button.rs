@@ -1,8 +1,9 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ButtonScheme {
+    #[default]
     Default,
     Primary,
     Outline,
@@ -20,16 +21,11 @@ impl ButtonScheme {
     }
 }
 
-impl Default for ButtonScheme {
-    fn default() -> Self {
-        ButtonScheme::Default
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ButtonType {
     Submit,
     Reset,
+    #[default]
     Button,
 }
 
@@ -43,14 +39,9 @@ impl ButtonType {
     }
 }
 
-impl Default for ButtonType {
-    fn default() -> Self {
-        ButtonType::Button
-    }
-}
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum ButtonSize {
+    #[default]
     Default,
     Small,
     Large,
@@ -63,12 +54,6 @@ impl ButtonSize {
             ButtonSize::Small => "btn-sm",
             ButtonSize::Large => "btn-large",
         }
-    }
-}
-
-impl Default for ButtonSize {
-    fn default() -> Self {
-        ButtonSize::Default
     }
 }
 

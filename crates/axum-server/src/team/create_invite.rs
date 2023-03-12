@@ -105,7 +105,7 @@ pub async fn create(
     let invitation_selector_base64 =
         base64::encode_config(invitation_selector, base64::URL_SAFE_NO_PAD);
     let invitation_verifier = rand::thread_rng().gen::<[u8; 8]>();
-    let invitation_verifier_hash = Sha256::digest(&invitation_verifier);
+    let invitation_verifier_hash = Sha256::digest(invitation_verifier);
     let invitation_verifier_hash_base64 =
         base64::encode_config(invitation_verifier_hash, base64::URL_SAFE_NO_PAD);
     let invitation_verifier_base64 =

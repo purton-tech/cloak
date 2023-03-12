@@ -1,9 +1,10 @@
 #![allow(non_snake_case)]
 use dioxus::prelude::*;
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Default, Copy, Clone, Debug, PartialEq, Eq)]
 pub enum RelativeTimeFormat {
     Datetime,
+    #[default]
     Relative,
     Duration,
     Auto,
@@ -21,12 +22,6 @@ impl RelativeTimeFormat {
             RelativeTimeFormat::Micro => "micro",
             RelativeTimeFormat::Elapsed => "elapsed",
         }
-    }
-}
-
-impl Default for RelativeTimeFormat {
-    fn default() -> Self {
-        RelativeTimeFormat::Relative
     }
 }
 
