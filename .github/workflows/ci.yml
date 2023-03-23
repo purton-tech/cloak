@@ -41,11 +41,11 @@ jobs:
     # Earthly with caching https://docs.earthly.dev/docs/guides/shared-cache
     - name: Run build using Readonly Cache
       if: github.ref != 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache +pull-request
+      run: earthly --allow-privileged --output --ci +pull-request
       
     - name: Run build and Deploy Containers
       if: github.ref == 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache --push +all
+      run: earthly --allow-privileged --output --ci --push +all
 
 
     # Upload the video of our selenium session
