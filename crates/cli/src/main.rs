@@ -1,4 +1,5 @@
 mod config;
+mod init;
 
 use clap::{Parser, Subcommand};
 use cli_table::WithTitle;
@@ -34,7 +35,9 @@ pub enum Commands {
     #[clap(external_subcommand)]
     Run(Vec<OsString>),
     Info,
+    Init,
     Secrets,
+    Refresh,
     Env,
 }
 
@@ -93,6 +96,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 table.push(SecretRow { name, value })
             }
             print_stdout(table.with_title())?;
+        }
+        Commands::Init => {
+            init::init().await;
+        }
+        Commands::Refresh => {
+            println!("Hello ");
         }
         Commands::Env => {
             let secrets: HashMap<String, String> = grpc_api::get_secrets(

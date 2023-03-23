@@ -22,6 +22,8 @@ dotenv = "0.15.0"
 # Elliptic Curve Diffie Helman
 p256 = { version = "0", default-features = false, features = ["ecdh", "pem"] } 
 base64 = "0.13.1" # So we encode DER public key to base64
+rand_core = "0"
+pkcs8 = { version = "0", default-features = false, features = ["encryption", "pem"] }
 
 # OK, I wanted a pretty table
 cli-table = { version = "0", default-features = false, features = ["derive"] }
