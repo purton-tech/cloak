@@ -8,5 +8,6 @@ pub async fn init() {
         .to_pkcs8_encrypted_pem(&mut OsRng, "vja481x", Default::default())
         .unwrap()
         .to_string();
+
     println!("{}", secret_key_serialized);
 }
