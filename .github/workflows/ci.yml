@@ -39,7 +39,7 @@ jobs:
       run: earthly --version
 
     # Earthly with caching https://docs.earthly.dev/docs/guides/shared-cache
-    - name: Run build using Readonly Cache
+    - name: Run build
       if: github.ref != 'refs/heads/main'
       run: earthly --allow-privileged --output --ci +pull-request
       
