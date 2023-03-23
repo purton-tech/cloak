@@ -78,7 +78,6 @@ build-cache:
     RUN cargo chef cook --release --target x86_64-unknown-linux-musl
     SAVE ARTIFACT target
     SAVE ARTIFACT $CARGO_HOME cargo_home
-    SAVE IMAGE --cache-hint
 
 build:
     # Copy in all our crates
