@@ -20,4 +20,10 @@ impl KeyRing {
             KeyRing::default()
         }
     }
+
+    pub fn save(&self) {}
+
+    pub fn add_key(&mut self, key: String) {
+        self.keys.push(key);
+    }
 }

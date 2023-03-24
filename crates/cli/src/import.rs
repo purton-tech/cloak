@@ -12,7 +12,11 @@ pub async fn import() {
 
     println!("{}", secret_key_serialized);
 
-    let keyring = keyring::KeyRing::load();
+    let mut keyring = keyring::KeyRing::load();
+
+    keyring.add_key(secret_key_serialized);
+
+    keyring.save();
 
     dbg!(keyring);
 }

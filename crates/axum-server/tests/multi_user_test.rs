@@ -37,19 +37,33 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
     )
     .await?;
 
+    println!("Testing : set_profile_details");
+
     set_profile_details(driver, &account_owner).await?;
+
+    println!("Testing : add_team_member");
 
     add_team_member(driver, &team_member, &account_owner, config).await?;
 
+    println!("Testing : sign_in_user");
+
     sign_in_user(driver, &account_owner, config).await?;
+
+    println!("Testing : select_first_vault");
 
     // Pull up the vault we created
     common::select_first_vault(driver).await?;
 
+    println!("Testing : add_member_to_vault");
+
     add_member_to_vault(driver, &team_member).await?;
+
+    println!("Testing : sign_in_user");
 
     // Log back in as the member
     sign_in_user(driver, &team_member, config).await?;
+
+    println!("Testing : add_service_account");
 
     // Add a service account
     common::add_service_account(driver).await?;
