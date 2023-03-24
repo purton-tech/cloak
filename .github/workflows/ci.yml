@@ -22,7 +22,7 @@ jobs:
     steps:
     - id: runner
       run: |
-        if ${{ github.actor }} == 'ianpurton'; then
+        if '${{ github.actor }}' == 'ianpurton'; then
         if echo "$SELF_HOSTED_RUNNERS" | grep -q 'arm64'; then
           echo "::set-output name=runner::self-hosted"    
         else
