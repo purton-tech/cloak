@@ -202,6 +202,9 @@ pub async fn force_otp(config: &Config) {
 }
 
 pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
     driver
         .find_element(By::LinkText("Service Accounts"))
         .await?

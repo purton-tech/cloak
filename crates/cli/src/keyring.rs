@@ -35,6 +35,7 @@ impl KeyRing {
 
     fn config_dir() -> String {
         let config_dir = dirs::config_dir().expect("Cloak couldn't get a config directory.");
+        fs::create_dir_all(&config_dir).expect("Problem creating the config folder");
         format!("{}/cloak.json", config_dir.to_string_lossy())
     }
 }
