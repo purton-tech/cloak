@@ -1,4 +1,4 @@
-VERSION 0.6
+VERSION 0.7
 FROM purtontech/rust-on-nails-devcontainer:1.1.3
 
 ARG APP_EXE_NAME=cloak
@@ -33,8 +33,6 @@ USER vscode
 
 dev:
     BUILD +pull-request
-    # On github this check is performed directly by the action
-    BUILD +check-selenium-failure
 
 pull-request:
     BUILD +migration-container
@@ -172,35 +170,27 @@ integration-test:
         --load $APP_IMAGE_NAME=+app-container \
         --load $ENVOY_IMAGE_NAME=+envoy-container
 
-        # Force to command to always be succesful so the artifact is saved. 
-        # https://github.com/earthly/earthly/issues/988
-        RUN dbmate --migrations-dir $DB_FOLDER/migrations up \
-            && docker run -d -p 7103:7103 --rm --network=build_default \
-                -e APP_DATABASE_URL=$APP_DATABASE_URL \
-                -e INVITE_DOMAIN=http://envoy:7100 \
-                -e INVITE_FROM_EMAIL_ADDRESS=support@cloak.com \
-                -e SMTP_HOST=smtp \
-                -e SMTP_PORT=1025 \
-                -e SMTP_USERNAME=thisisnotused \
-                -e SMTP_PASSWORD=thisisnotused \
-                -e SMTP_TLS_OFF='true' \
-                --name app $APP_IMAGE_NAME \
-            && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
-            && cargo test --no-run --release --target x86_64-unknown-linux-musl \
-            && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
-            && (cargo test --release --target x86_64-unknown-linux-musl -- --nocapture || echo fail > ./tmp/fail) \
-            && docker stop app envoy video
-    END
-    # You need the tmp/* if you use just tmp earthly will overwrite the folder
-    SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly/
-
-check-selenium-failure:
-    FROM +integration-test
-    # https://github.com/earthly/earthly/issues/988
-    # If we failed in selenium a fail file will have been created
-    # to get build to pass and see video, run +pull-request
-    IF [ -f ./tmp/earthly/fail ]
-        RUN echo "cargo test has failed." && exit 1
+        TRY
+            RUN dbmate --migrations-dir $DB_FOLDER/migrations up \
+                && docker run -d -p 7103:7103 --rm --network=build_default \
+                    -e APP_DATABASE_URL=$APP_DATABASE_URL \
+                    -e INVITE_DOMAIN=http://envoy:7100 \
+                    -e INVITE_FROM_EMAIL_ADDRESS=support@cloak.com \
+                    -e SMTP_HOST=smtp \
+                    -e SMTP_PORT=1025 \
+                    -e SMTP_USERNAME=thisisnotused \
+                    -e SMTP_PASSWORD=thisisnotused \
+                    -e SMTP_TLS_OFF='true' \
+                    --name app $APP_IMAGE_NAME \
+                && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
+                && cargo test --no-run --release --target x86_64-unknown-linux-musl \
+                && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
+                && cargo test --release --target x86_64-unknown-linux-musl -- --nocapture \
+                && docker stop app envoy video
+        FINALLY
+            # You need the tmp/* if you use just tmp earthly will overwrite the folder
+            SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly/
+        END
     END
 
 build-cli-osx:
