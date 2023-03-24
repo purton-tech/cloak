@@ -1,31 +1,30 @@
 VERSION 0.7
-FROM purtontech/rust-on-nails-devcontainer:1.1.3
+FROM purtontech/rust-on-nails-devcontainer:1.1.7
 
-ARG APP_EXE_NAME=cloak
-ARG CLI_EXE_NAME=cli
-ARG CLI_LINUX_EXE_NAME=cloak-linux
-ARG CLI_MACOS_EXE_NAME=cloak-macos
-ARG DBMATE_VERSION=1.15.0
+ARG --global APP_EXE_NAME=cloak
+ARG --global CLI_EXE_NAME=cli
+ARG --global CLI_LINUX_EXE_NAME=cloak-linux
+ARG --global CLI_MACOS_EXE_NAME=cloak-macos
+ARG --global DBMATE_VERSION=2.2.0
 
 # Folders
-ARG AXUM_FOLDER=crates/axum-server
-ARG DB_FOLDER=crates/db
-ARG GRPC_API_FOLDER=crates/grpc-api
-ARG PIPELINE_FOLDER=crates/asset-pipeline
+ARG --global AXUM_FOLDER=crates/axum-server
+ARG --global DB_FOLDER=crates/db
+ARG --global GRPC_API_FOLDER=crates/grpc-api
+ARG --global PIPELINE_FOLDER=crates/asset-pipeline
 
 # Base images
-ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
-ARG NGINX=nginx:1.21.5
-ARG KUBECTL=bitnami/kubectl:latest
+ARG --global ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
+ARG --global NGINX=nginx:1.21.5
+ARG --global KUBECTL=bitnami/kubectl:latest
 
 # This file builds the following containers
-ARG APP_IMAGE_NAME=purtontech/cloak-server:latest
-ARG MIGRATIONS_IMAGE_NAME=purtontech/cloak-db-migrations:latest
-ARG ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
-ARG WWW_IMAGE_NAME=purtontech/cloak-website:latest
-ARG KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
-ARG EXTERNAL_SECRETS_IMAGE_NAME=purtontech/cloak-external-secrets:latest
-
+ARG --global APP_IMAGE_NAME=purtontech/cloak-server:latest
+ARG --global MIGRATIONS_IMAGE_NAME=purtontech/cloak-db-migrations:latest
+ARG --global ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
+ARG --global WWW_IMAGE_NAME=purtontech/cloak-website:latest
+ARG --global KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
+ARG --global EXTERNAL_SECRETS_IMAGE_NAME=purtontech/cloak-external-secrets:latest
 
 WORKDIR /build
 
@@ -33,6 +32,8 @@ USER vscode
 
 dev:
     BUILD +pull-request
+    # On github this check is performed directly by the action
+    BUILD +check-selenium-failure
 
 pull-request:
     BUILD +migration-container
@@ -76,6 +77,7 @@ build-cache:
     RUN cargo chef cook --release --target x86_64-unknown-linux-musl
     SAVE ARTIFACT target
     SAVE ARTIFACT $CARGO_HOME cargo_home
+    SAVE IMAGE --cache-hint
 
 build:
     # Copy in all our crates
@@ -170,27 +172,35 @@ integration-test:
         --load $APP_IMAGE_NAME=+app-container \
         --load $ENVOY_IMAGE_NAME=+envoy-container
 
-        TRY
-            RUN dbmate --migrations-dir $DB_FOLDER/migrations up \
-                && docker run -d -p 7103:7103 --rm --network=build_default \
-                    -e APP_DATABASE_URL=$APP_DATABASE_URL \
-                    -e INVITE_DOMAIN=http://envoy:7100 \
-                    -e INVITE_FROM_EMAIL_ADDRESS=support@cloak.com \
-                    -e SMTP_HOST=smtp \
-                    -e SMTP_PORT=1025 \
-                    -e SMTP_USERNAME=thisisnotused \
-                    -e SMTP_PASSWORD=thisisnotused \
-                    -e SMTP_TLS_OFF='true' \
-                    --name app $APP_IMAGE_NAME \
-                && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
-                && cargo test --no-run --release --target x86_64-unknown-linux-musl \
-                && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
-                && cargo test --release --target x86_64-unknown-linux-musl -- --nocapture \
-                && docker stop app envoy video
-        FINALLY
-            # You need the tmp/* if you use just tmp earthly will overwrite the folder
-            SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly/
-        END
+        # Force to command to always be succesful so the artifact is saved. 
+        # https://github.com/earthly/earthly/issues/988
+        RUN dbmate --migrations-dir $DB_FOLDER/migrations up \
+            && docker run -d -p 7103:7103 --rm --network=build_default \
+                -e APP_DATABASE_URL=$APP_DATABASE_URL \
+                -e INVITE_DOMAIN=http://envoy:7100 \
+                -e INVITE_FROM_EMAIL_ADDRESS=support@cloak.com \
+                -e SMTP_HOST=smtp \
+                -e SMTP_PORT=1025 \
+                -e SMTP_USERNAME=thisisnotused \
+                -e SMTP_PASSWORD=thisisnotused \
+                -e SMTP_TLS_OFF='true' \
+                --name app $APP_IMAGE_NAME \
+            && docker run -d -p 7100:7100 -p 7101:7101 --rm --network=build_default --name envoy $ENVOY_IMAGE_NAME \
+            && cargo test --no-run --release --target x86_64-unknown-linux-musl \
+            && docker run -d --name video --network=build_default -e DISPLAY_CONTAINER_NAME=build_selenium_1 -e FILE_NAME=chrome-video.mp4 -v /build/tmp:/videos selenium/video:ffmpeg-4.3.1-20220208 \
+            && (cargo test --release --target x86_64-unknown-linux-musl -- --nocapture || echo fail > ./tmp/fail) \
+            && docker stop app envoy video
+    END
+    # You need the tmp/* if you use just tmp earthly will overwrite the folder
+    SAVE ARTIFACT tmp/* AS LOCAL ./tmp/earthly/
+
+check-selenium-failure:
+    FROM +integration-test
+    # https://github.com/earthly/earthly/issues/988
+    # If we failed in selenium a fail file will have been created
+    # to get build to pass and see video, run +pull-request
+    IF [ -f ./tmp/earthly/fail ]
+        RUN echo "cargo test has failed." && exit 1
     END
 
 build-cli-osx:

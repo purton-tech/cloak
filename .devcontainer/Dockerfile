@@ -1,4 +1,4 @@
-FROM purtontech/rust-on-nails-devcontainer:1.1.3 AS development
+FROM purtontech/rust-on-nails-devcontainer:1.1.7 AS development
 
 COPY *.bash ./
 

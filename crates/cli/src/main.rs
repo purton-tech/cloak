@@ -1,5 +1,6 @@
 mod config;
 mod import;
+mod keyring;
 
 use clap::{Parser, Subcommand};
 use cli_table::WithTitle;
@@ -98,7 +99,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             print_stdout(table.with_title())?;
         }
         Commands::Import => {
-            import::init().await;
+            import::import().await;
         }
         Commands::Select => {
             println!("Hello ");
