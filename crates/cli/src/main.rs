@@ -1,5 +1,5 @@
 mod config;
-mod init;
+mod import;
 
 use clap::{Parser, Subcommand};
 use cli_table::WithTitle;
@@ -35,9 +35,9 @@ pub enum Commands {
     #[clap(external_subcommand)]
     Run(Vec<OsString>),
     Info,
-    Init,
+    Import,
     Secrets,
-    Refresh,
+    Select,
     Env,
 }
 
@@ -97,10 +97,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             print_stdout(table.with_title())?;
         }
-        Commands::Init => {
-            init::init().await;
+        Commands::Import => {
+            import::init().await;
         }
-        Commands::Refresh => {
+        Commands::Select => {
             println!("Hello ");
         }
         Commands::Env => {
