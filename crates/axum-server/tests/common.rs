@@ -274,6 +274,9 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
         .click()
         .await?;
 
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
     Ok(())
 }
 
