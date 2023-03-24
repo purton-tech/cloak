@@ -14,7 +14,7 @@ on:
 
 jobs:
 
-  select-runner:
+  selectrunner:
     runs-on: ubuntu-latest
     outputs:
       runner: ${{ steps.runner.outputs.runner }}
@@ -30,8 +30,8 @@ jobs:
         fi
 
   build:
-    needs: [select-runner]
-    runs-on: [${{ needs.select-runner.outputs.runner }}]
+    needs: [selectrunner]
+    runs-on: [${{ needs.selectrunner.outputs.runner }}]
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
