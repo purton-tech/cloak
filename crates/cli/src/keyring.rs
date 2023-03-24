@@ -2,8 +2,14 @@ use serde::{Deserialize, Serialize};
 use std::fs;
 
 #[derive(Debug, Deserialize, Serialize, Default)]
+pub struct ServiceAccount {
+    pub name: String,
+    pub key: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, Default)]
 pub struct KeyRing {
-    pub keys: Vec<String>,
+    pub accounts: Vec<ServiceAccount>,
 }
 
 impl KeyRing {
@@ -29,13 +35,13 @@ impl KeyRing {
             .expect("Problem writing to keyring");
     }
 
-    pub fn add_key(&mut self, key: String) {
-        self.keys.push(key);
+    pub fn add_service_account(&mut self, name: String, key: String) {
+        self.accounts.push(ServiceAccount { name, key });
     }
 
     fn config_dir() -> String {
         let config_dir = dirs::config_dir().expect("Cloak couldn't get a config directory.");
         fs::create_dir_all(&config_dir).expect("Problem creating the config folder");
-        format!("{}/cloak.json", config_dir.to_string_lossy())
+        format!("{}/cloak-keyring.json", config_dir.to_string_lossy())
     }
 }

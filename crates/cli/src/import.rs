@@ -14,7 +14,7 @@ pub async fn import() {
 
     let mut keyring = keyring::KeyRing::load();
 
-    keyring.add_key(secret_key_serialized);
+    keyring.add_service_account("test".to_string(), secret_key_serialized);
 
     keyring.save();
 

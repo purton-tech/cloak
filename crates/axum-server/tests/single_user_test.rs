@@ -63,7 +63,7 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
 
     println!("Testing : add_service_account");
 
-    common::create_a_vault(driver).await?;
+    common::add_service_account(driver).await?;
 
     println!("Testing : add_secrets");
 
