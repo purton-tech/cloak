@@ -79,11 +79,15 @@ jobs:
         if test -f "tmp/earthly/fail"; then
           exit 1
         fi
-
+        
+  release:
+    needs: [build]
+    runs-on: ubuntu-latest
     # If this is a release
     #   create release notes
     #   set the docker version
-    #   
+    # 
+    steps:  
     - name: Semantic Release
       run: | 
         npm i -D @semantic-release/exec
