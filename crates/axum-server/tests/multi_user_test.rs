@@ -228,6 +228,9 @@ async fn add_member_to_vault(driver: &WebDriver, email: &str) -> WebDriverResult
         .click()
         .await?;
 
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
     Ok(())
 }
 
