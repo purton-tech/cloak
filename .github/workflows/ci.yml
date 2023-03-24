@@ -14,7 +14,9 @@ on:
 
 jobs:
 
-  select-runner:
+  # Select a self hosted runner if the username matches else fallback 
+  # to ubuntu-latest
+  choose-runner:
     runs-on: ubuntu-latest
     outputs:
       runner: ${{ steps.runner.outputs.runner }}
@@ -29,8 +31,9 @@ jobs:
         fi
 
   build:
-    needs: [select-runner]
-    runs-on: ${{ needs.select-runner.outputs.runner }}
+    needs: [choose-runner]
+    # Will run on 'ubuntu-latest' or 'self-runner' based on the results of job `choose-runner`
+    runs-on: ${{ needs.choose-runner.outputs.runner }}
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
