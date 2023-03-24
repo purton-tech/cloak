@@ -53,9 +53,19 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
 
     driver.get(format!("{}/auth/sign_up", &config.host)).await?;
 
+    println!("Testing : register_user");
+
     let email = common::register_user(driver, config).await?;
 
+    println!("Testing : create_a_vault");
+
     common::create_a_vault(driver).await?;
+
+    println!("Testing : add_service_account");
+
+    common::create_a_vault(driver).await?;
+
+    println!("Testing : add_secrets");
 
     common::add_secrets(
         driver,
@@ -65,6 +75,8 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
     )
     .await?;
 
+    println!("Testing : add_secrets");
+
     common::add_secrets(
         driver,
         "PRIVATE_KEY2",
@@ -73,17 +85,27 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
     )
     .await?;
 
+    println!("Testing : count_secrets");
+
     let count = common::count_secrets(config, &email).await;
 
     assert_eq!(count, 2);
 
+    println!("Testing : add_service_account");
+
     common::add_service_account(driver).await?;
+
+    println!("Testing : count_service_account_secrets");
 
     let count = common::count_service_account_secrets(config, &email).await;
 
     assert_eq!(count, 2);
 
+    println!("Testing : select_first_vault");
+
     common::select_first_vault(driver).await?;
+
+    println!("Testing : add_secrets");
 
     common::add_secrets(
         driver,
@@ -93,13 +115,19 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
     )
     .await?;
 
+    println!("Testing : count_secrets");
+
     let count = common::count_secrets(config, &email).await;
 
     assert_eq!(count, 3);
 
+    println!("Testing : count_service_account_secrets");
+
     let count = common::count_service_account_secrets(config, &email).await;
 
     assert_eq!(count, 3);
+
+    println!("Testing : add_service_account");
 
     audit_filter(driver, &email).await?;
 
