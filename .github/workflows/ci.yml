@@ -22,10 +22,10 @@ jobs:
     steps:
     - id: runner
       run: |
-        if "${{ github.actor }}" = "ianpurton"; then
+        if [ "${{ github.actor }}" == "ianpurton" ]; then
           echo "::set-output name=runner::self-hosted"    
         else
-          echo "::set-output name=runner::'ubuntu-latest'"
+          echo "::set-output name=runner::ubuntu-latest"
         fi
 
   build:
