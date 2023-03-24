@@ -5,7 +5,7 @@ pub async fn init() {
     let secret_key = p256::SecretKey::random(&mut OsRng);
 
     let secret_key_serialized = secret_key
-        .to_pkcs8_encrypted_pem(&mut OsRng, "vja481xx", Default::default())
+        .to_pkcs8_encrypted_pem(&mut OsRng, "vja481xxx", Default::default())
         .unwrap()
         .to_string();
 

@@ -13,8 +13,25 @@ on:
       - 'www/**'
 
 jobs:
+
+  select-runner:
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.runner.outputs.runner }}
+
+    steps:
+    - id: runner
+      run: |
+        if ${{ github.actor }} == 'ianpurton'; then
+        if echo "$SELF_HOSTED_RUNNERS" | grep -q 'arm64'; then
+          echo "::set-output name=runner::self-hosted"    
+        else
+          echo "::set-output name=runner::'ubuntu-latest'"
+        fi
+
   build:
-    runs-on: [self-hosted]
+    needs: [select-runner]
+    runs-on: [${{ needs.select-runner.outputs.runner }}]
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
