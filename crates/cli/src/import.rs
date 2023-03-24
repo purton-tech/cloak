@@ -2,7 +2,7 @@ use super::keyring;
 use p256::pkcs8::EncodePrivateKey;
 use rand_core::OsRng; // requires 'getrandom' feature
 
-pub async fn import() {
+pub async fn import(name: String, _key: String) {
     let secret_key = p256::SecretKey::random(&mut OsRng);
 
     let secret_key_serialized = secret_key
@@ -14,7 +14,7 @@ pub async fn import() {
 
     let mut keyring = keyring::KeyRing::load();
 
-    keyring.add_service_account("test".to_string(), secret_key_serialized);
+    keyring.add_service_account(name, secret_key_serialized);
 
     keyring.save();
 

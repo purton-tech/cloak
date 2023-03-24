@@ -36,7 +36,10 @@ pub enum Commands {
     #[clap(external_subcommand)]
     Run(Vec<OsString>),
     Info,
-    Import,
+    Import {
+        name: String,
+        key: String,
+    },
     Secrets,
     Select,
     Env,
@@ -98,8 +101,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
             print_stdout(table.with_title())?;
         }
-        Commands::Import => {
-            import::import().await;
+        Commands::Import { name, key } => {
+            import::import(name.into(), key.into()).await;
         }
         Commands::Select => {
             println!("Hello ");
