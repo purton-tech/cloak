@@ -9,6 +9,7 @@ pub struct ServiceAccount {
 
 #[derive(Debug, Deserialize, Serialize, Default)]
 pub struct KeyRing {
+    pub selected_account: u32,
     pub accounts: Vec<ServiceAccount>,
 }
 
@@ -37,6 +38,17 @@ impl KeyRing {
 
     pub fn add_service_account(&mut self, name: String, key: String) {
         self.accounts.push(ServiceAccount { name, key });
+    }
+
+    pub fn list_service_accounts(&self) -> Vec<String> {
+        self.accounts
+            .iter()
+            .map(|account| account.name.clone())
+            .collect()
+    }
+
+    pub fn select_service_account(&mut self, index: u32) {
+        self.selected_account = index;
     }
 
     fn config_dir() -> String {

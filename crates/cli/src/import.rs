@@ -45,6 +45,4 @@ pub async fn import(name: String, key: String, config: &Config) {
     keyring.add_service_account(name, secret_key_serialized);
 
     keyring.save();
-
-    dbg!(keyring);
 }
