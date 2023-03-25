@@ -38,8 +38,6 @@ pub async fn import(name: String, key: String, config: &Config) {
         .unwrap()
         .to_string();
 
-    println!("{}", secret_key_serialized);
-
     let mut keyring = keyring::KeyRing::load();
 
     keyring.add_service_account(name, secret_key_serialized);

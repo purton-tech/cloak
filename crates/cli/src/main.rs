@@ -1,5 +1,6 @@
 mod config;
 mod import;
+mod info;
 mod keyring;
 mod run;
 mod secrets;
@@ -51,7 +52,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     match &args.command {
         Commands::Run(args) => run::run(&config, args).await,
         Commands::Info => {
-            //println!("Public Key {:?}", config.public_key_der_base64);
+            info::info(&config).await;
         }
         Commands::Secrets => {
             secrets::secrets(&config).await;

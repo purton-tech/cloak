@@ -49,6 +49,14 @@ impl KeyRing {
         self.selected_account = index;
     }
 
+    pub fn get_selected_key(&self) -> String {
+        self.accounts
+            .get(self.selected_account as usize)
+            .unwrap()
+            .key
+            .clone()
+    }
+
     fn config_dir() -> String {
         let config_dir = dirs::config_dir().expect("Cloak couldn't get a config directory.");
         fs::create_dir_all(&config_dir).expect("Problem creating the config folder");

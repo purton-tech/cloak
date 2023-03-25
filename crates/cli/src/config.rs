@@ -22,9 +22,14 @@ impl Config {
             );
         } else {
             // Did the user supply a key in a file
-            let pem_string = fs::read_to_string(&cli.ecdh_private_key_file)?;
-            secret_key =
-                Some(SecretKey::from_pkcs8_pem(&pem_string).map_err(|_| "Problem loading key")?);
+            let pem_string = fs::read_to_string(&cli.ecdh_private_key_file);
+            if let Ok(pem_string) = pem_string {
+                secret_key = Some(
+                    SecretKey::from_pkcs8_pem(&pem_string).map_err(|_| "Problem loading key")?,
+                );
+            } else {
+                secret_key = None;
+            }
         }
 
         let config = Config {
@@ -32,6 +37,11 @@ impl Config {
             api_host_url: cli.api_host_url.clone(),
         };
         Ok(config)
+    }
+
+    pub fn get_password(&self) -> String {
+        println!("Enter your password to decrypt the service account.");
+        rpassword::prompt_password("Your password: ").unwrap()
     }
 
     pub fn set_password(&self) -> String {
@@ -50,8 +60,20 @@ impl Config {
      * We look for the key in that order.
      */
     pub async fn get_secrets(&self) -> Option<HashMap<String, String>> {
-        let secret_key = if let Some(secret_key) = &self.secret_key {
-            Some(secret_key)
+        // Did the user supply a key via and env var or a file?
+        if let Some(secret_key) = &self.secret_key {
+            let service_account_public_key = secret_key.public_key();
+
+            let public_key_der = service_account_public_key.to_public_key_der().unwrap();
+            let public_key_der_base64 = base64::encode(public_key_der);
+            let secrets =
+                grpc_api::get_secrets(secret_key, &self.api_host_url, &public_key_der_base64)
+                    .await
+                    .expect(
+                        "Problem retreiving secrets, 
+                        do you have the correct service account key?",
+                    );
+            Some(secrets)
         } else {
             // Try and get a key from the keyring
             let keyring = keyring::KeyRing::load();
@@ -62,21 +84,33 @@ impl Config {
                 );
                 return None;
             }
-            None
-        };
 
-        if let Some(secret_key) = secret_key {
+            let key = keyring.get_selected_key();
+            let password = self.get_password();
+            let secret_key =
+                SecretKey::from_pkcs8_encrypted_pem(&key, password).expect("Problem parsing key");
             let service_account_public_key = secret_key.public_key();
 
             let public_key_der = service_account_public_key.to_public_key_der().unwrap();
             let public_key_der_base64 = base64::encode(public_key_der);
             let secrets =
-                grpc_api::get_secrets(secret_key, &self.api_host_url, &public_key_der_base64)
+                grpc_api::get_secrets(&secret_key, &self.api_host_url, &public_key_der_base64)
                     .await
                     .expect(
-                        "Problem retreiving secrets, do you have the correct service account key?",
+                        "Problem retreiving secrets, 
+                        do you have the correct service account key?",
                     );
-            return Some(secrets);
+            Some(secrets)
+        }
+    }
+
+    pub async fn get_public_key(&self) -> Option<String> {
+        if let Some(secret_key) = &self.secret_key {
+            let service_account_public_key = secret_key.public_key();
+
+            let public_key_der = service_account_public_key.to_public_key_der().unwrap();
+            let public_key_der_base64 = base64::encode(public_key_der);
+            return Some(public_key_der_base64);
         }
 
         None
