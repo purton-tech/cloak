@@ -1,6 +1,9 @@
 pub mod common;
 
+use std::time::Duration;
+
 use thirtyfour::{components::select::SelectElement, prelude::*};
+use tokio::time::sleep;
 
 // let's set up the sequence of steps we want the browser to take
 #[tokio::test(flavor = "multi_thread", worker_threads = 1)]
@@ -22,10 +25,16 @@ async fn audit_filter(driver: &WebDriver, email: &str) -> WebDriverResult<()> {
     let audit_link = driver.find_element(By::LinkText("Audit Trail")).await?;
     audit_link.click().await?;
 
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
+
     let filter_button = driver
         .find_element(By::XPath("//button[text()='Filter']"))
         .await?;
     filter_button.click().await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
     let user_selector = driver.find_element(By::Css("select:first-of-type")).await?;
     let select = SelectElement::new(&user_selector).await?;
@@ -36,6 +45,9 @@ async fn audit_filter(driver: &WebDriver, email: &str) -> WebDriverResult<()> {
         .await?
         .click()
         .await?;
+
+    // Stop stale element error
+    sleep(Duration::from_millis(1000)).await;
 
     // See it in the search results
     let table_cell = driver
@@ -123,7 +135,7 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
 
     assert_eq!(count, 3);
 
-    println!("Testing : add_service_account");
+    println!("Testing : audit_filter");
 
     audit_filter(driver, &email).await?;
 

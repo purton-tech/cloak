@@ -1,6 +1,7 @@
 mod config;
 mod import;
 mod keyring;
+mod select;
 
 use clap::{Parser, Subcommand};
 use cli_table::WithTitle;
@@ -102,10 +103,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             print_stdout(table.with_title())?;
         }
         Commands::Import { name, key } => {
-            import::import(name.into(), key.into()).await;
+            import::import(name.into(), key.into(), &config).await;
         }
         Commands::Select => {
-            println!("Hello ");
+            select::select().await;
         }
         Commands::Env => {
             let secrets: HashMap<String, String> = grpc_api::get_secrets(

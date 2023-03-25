@@ -37,4 +37,9 @@ impl Config {
         };
         Ok(config)
     }
+
+    pub fn set_password(&self) -> String {
+        println!("Please set a password to encrypt this key (Note this doesn't have to be your cloak password)");
+        rpassword::prompt_password("Your password: ").unwrap()
+    }
 }

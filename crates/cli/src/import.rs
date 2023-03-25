@@ -1,3 +1,5 @@
+use crate::config::Config;
+
 use super::keyring;
 use p256::{
     pkcs8::{DecodePrivateKey, EncodePrivateKey},
@@ -5,7 +7,7 @@ use p256::{
 };
 use rand_core::OsRng; // requires 'getrandom' feature
 
-pub async fn import(name: String, key: String) {
+pub async fn import(name: String, key: String, config: &Config) {
     // Pem format is 64 columns wide
     let subs = key
         .as_bytes()
@@ -29,7 +31,7 @@ pub async fn import(name: String, key: String) {
 
     let secret_key = SecretKey::from_pkcs8_pem(&key).expect("Problem Loading Key");
 
-    let password = rpassword::prompt_password("Your password: ").unwrap();
+    let password = config.set_password();
 
     let secret_key_serialized = secret_key
         .to_pkcs8_encrypted_pem(&mut OsRng, password, Default::default())
