@@ -17,8 +17,6 @@ impl KeyRing {
     pub fn load() -> Self {
         let config_dir = Self::config_dir();
 
-        dbg!(&config_dir);
-
         let data = fs::read_to_string(config_dir);
 
         if let Ok(data) = data {

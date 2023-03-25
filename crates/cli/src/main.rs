@@ -1,17 +1,15 @@
 mod config;
 mod import;
 mod keyring;
+mod secrets;
 mod select;
 
 use clap::{Parser, Subcommand};
-use cli_table::WithTitle;
+use std::ffi::OsString;
+
 use std::collections::HashMap;
 use std::env;
-use std::ffi::OsString;
 use std::process::{Command, Stdio};
-
-use cli_table::{print_stdout, Table};
-use dotenv::dotenv;
 
 /// A fictional versioning CLI
 #[derive(Parser)]
@@ -48,8 +46,6 @@ pub enum Commands {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    dotenv().ok();
-
     let args = Cli::parse();
     let config = config::Config::configure(&args)?;
 
@@ -58,49 +54,36 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // cargo run -- --api-host-url=http://envoy:7100 secrets
     match &args.command {
         Commands::Run(args) => {
-            let env_vars_to_inject = grpc_api::get_secrets(
-                &config.secret_key,
-                &config.api_host_url,
-                &config.public_key_der_base64,
-            )
-            .await?;
+            let secrets = config.get_secrets().await;
 
-            let filtered_env: HashMap<String, String> = env::vars()
-                .filter(|(k, _)| k != "ECDH_PRIVATE_KEY")
-                .collect();
+            if let Some(secrets) = secrets {
+                let filtered_env: HashMap<String, String> = env::vars()
+                    .filter(|(k, _)| k != "ECDH_PRIVATE_KEY")
+                    .collect();
 
-            let filtered_env: HashMap<String, String> =
-                filtered_env.into_iter().chain(env_vars_to_inject).collect();
+                let filtered_env: HashMap<String, String> =
+                    filtered_env.into_iter().chain(secrets).collect();
 
-            let cmd_args = insert_secrets(&args[1..], &filtered_env).await;
+                let cmd_args = insert_secrets(&args[1..], &filtered_env).await;
 
-            println!("Calling out to {:?} with {:?}", &args[0], &cmd_args);
+                println!("Calling out to {:?} with {:?}", &args[0], &cmd_args);
 
-            let mut child = Command::new(&args[0])
-                .args(&cmd_args)
-                .stdin(Stdio::null())
-                .stdout(Stdio::inherit())
-                .envs(&filtered_env)
-                .spawn()
-                .expect("Failed to run command");
+                let mut child = Command::new(&args[0])
+                    .args(&cmd_args)
+                    .stdin(Stdio::null())
+                    .stdout(Stdio::inherit())
+                    .envs(&filtered_env)
+                    .spawn()
+                    .expect("Failed to run command");
 
-            child.wait().expect("failed to wait on child");
+                child.wait().expect("failed to wait on child");
+            }
         }
         Commands::Info => {
-            println!("Public Key {:?}", config.public_key_der_base64);
+            //println!("Public Key {:?}", config.public_key_der_base64);
         }
         Commands::Secrets => {
-            let secrets: HashMap<String, String> = grpc_api::get_secrets(
-                &config.secret_key,
-                &config.api_host_url,
-                &config.public_key_der_base64,
-            )
-            .await?;
-            let mut table: Vec<SecretRow> = Default::default();
-            for (name, value) in secrets.into_iter() {
-                table.push(SecretRow { name, value })
-            }
-            print_stdout(table.with_title())?;
+            secrets::secrets(&config).await;
         }
         Commands::Import { name, key } => {
             import::import(name.into(), key.into(), &config).await;
@@ -109,27 +92,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             select::select().await;
         }
         Commands::Env => {
-            let secrets: HashMap<String, String> = grpc_api::get_secrets(
-                &config.secret_key,
-                &config.api_host_url,
-                &config.public_key_der_base64,
-            )
-            .await?;
-            for (name, value) in secrets.into_iter() {
-                println!("{}={}", name, value);
+            let secrets = config.get_secrets().await;
+
+            if let Some(secrets) = secrets {
+                for (name, value) in secrets.into_iter() {
+                    println!("{}={}", name, value);
+                }
             }
         }
     }
 
     Ok(())
-}
-
-#[derive(Table)]
-struct SecretRow {
-    #[table(title = "Name")]
-    name: String,
-    #[table(title = "Value")]
-    value: String,
 }
 
 // The user may wish to use an env var on the command line, so we process them here
