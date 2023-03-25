@@ -23,8 +23,11 @@ jobs:
 
     steps:
     - id: runner
+      # If it's ianpurton and the PR has [self-runner] in the title
+      # then select a self runner
       run: |
-        if [ "${{ github.actor }}" == "ianpurton" ]; then
+        if [ "${{ github.actor }}" == "ianpurton" 
+          && "${{ github.event.pull_request.title }}" == *"[self-hosted]" ]; then
           echo "::set-output name=runner::self-hosted"    
         else
           echo "::set-output name=runner::ubuntu-latest"
