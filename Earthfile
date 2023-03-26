@@ -1,38 +1,30 @@
-VERSION 0.6
-FROM purtontech/rust-on-nails-devcontainer:1.1.1
+VERSION 0.7
+FROM purtontech/rust-on-nails-devcontainer:1.1.7
 
-# Proto compiler and web grpc.
-RUN sudo apt update \
-    && sudo apt install -y protobuf-compiler \
-    && sudo curl -OL https://github.com/grpc/grpc-web/releases/download/1.3.0/protoc-gen-grpc-web-1.3.0-linux-x86_64  \
-    && sudo mv protoc-gen-grpc-web* /usr/local/bin/protoc-gen-grpc-web \
-    && sudo chmod +x /usr/local/bin/protoc-gen-grpc-web
-
-ARG APP_EXE_NAME=cloak
-ARG CLI_EXE_NAME=cli
-ARG CLI_LINUX_EXE_NAME=cloak-linux
-ARG CLI_MACOS_EXE_NAME=cloak-macos
-ARG DBMATE_VERSION=1.15.0
+ARG --global APP_EXE_NAME=cloak
+ARG --global CLI_EXE_NAME=cli
+ARG --global CLI_LINUX_EXE_NAME=cloak-linux
+ARG --global CLI_MACOS_EXE_NAME=cloak-macos
+ARG --global DBMATE_VERSION=2.2.0
 
 # Folders
-ARG AXUM_FOLDER=crates/axum-server
-ARG DB_FOLDER=crates/db
-ARG GRPC_API_FOLDER=crates/grpc-api
-ARG PIPELINE_FOLDER=crates/asset-pipeline
+ARG --global AXUM_FOLDER=crates/axum-server
+ARG --global DB_FOLDER=crates/db
+ARG --global GRPC_API_FOLDER=crates/grpc-api
+ARG --global PIPELINE_FOLDER=crates/asset-pipeline
 
 # Base images
-ARG ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
-ARG NGINX=nginx:1.21.5
-ARG KUBECTL=bitnami/kubectl:latest
+ARG --global ENVOY_PROXY=envoyproxy/envoy:v1.17-latest
+ARG --global NGINX=nginx:1.21.5
+ARG --global KUBECTL=bitnami/kubectl:latest
 
 # This file builds the following containers
-ARG APP_IMAGE_NAME=purtontech/cloak-server:latest
-ARG MIGRATIONS_IMAGE_NAME=purtontech/cloak-db-migrations:latest
-ARG ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
-ARG WWW_IMAGE_NAME=purtontech/cloak-website:latest
-ARG KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
-ARG EXTERNAL_SECRETS_IMAGE_NAME=purtontech/cloak-external-secrets:latest
-
+ARG --global APP_IMAGE_NAME=purtontech/cloak-server:latest
+ARG --global MIGRATIONS_IMAGE_NAME=purtontech/cloak-db-migrations:latest
+ARG --global ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
+ARG --global WWW_IMAGE_NAME=purtontech/cloak-website:latest
+ARG --global KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
+ARG --global EXTERNAL_SECRETS_IMAGE_NAME=purtontech/cloak-external-secrets:latest
 
 WORKDIR /build
 

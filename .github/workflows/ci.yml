@@ -13,8 +13,29 @@ on:
       - 'www/**'
 
 jobs:
-  build:
+
+  # Select a self hosted runner if the username matches else fallback 
+  # to ubuntu-latest
+  choose-runner:
     runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.runner.outputs.runner }}
+
+    steps:
+    - id: runner
+      # If it's ianpurton and the PR has [self-runner] in the title
+      # then select a self runner
+      run: |
+        if [ "${{ github.actor }}" == "ianpurton" ] && [[ "${{ github.event.pull_request.title }}" == *"[self-hosted]"* ]]; then
+          echo "::set-output name=runner::self-hosted"    
+        else
+          echo "::set-output name=runner::ubuntu-latest"
+        fi
+
+  build:
+    needs: [choose-runner]
+    # Will run on 'ubuntu-latest' or 'self-runner' based on the results of job `choose-runner`
+    runs-on: ${{ needs.choose-runner.outputs.runner }}
     env:
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
@@ -39,13 +60,13 @@ jobs:
       run: earthly --version
 
     # Earthly with caching https://docs.earthly.dev/docs/guides/shared-cache
-    - name: Run build using Readonly Cache
+    - name: Run build
       if: github.ref != 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache +pull-request
+      run: earthly --allow-privileged --output --ci +pull-request
       
     - name: Run build and Deploy Containers
       if: github.ref == 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --remote-cache=purtontech/cloak-server:cache --push +all
+      run: earthly --allow-privileged --output --ci --push +all
 
 
     # Upload the video of our selenium session
@@ -60,11 +81,15 @@ jobs:
         if test -f "tmp/earthly/fail"; then
           exit 1
         fi
-
+        
+  release:
+    needs: [build]
+    runs-on: ubuntu-latest
     # If this is a release
     #   create release notes
     #   set the docker version
-    #   
+    # 
+    steps:  
     - name: Semantic Release
       run: | 
         npm i -D @semantic-release/exec
