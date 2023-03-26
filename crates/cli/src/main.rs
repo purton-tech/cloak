@@ -16,6 +16,9 @@ pub struct Cli {
     #[clap(short, long, env = "ECDH_PRIVATE_KEY")]
     pub ecdh_private_key: Option<String>,
 
+    #[clap(short, long, env = "CLOAK_KEYRING_PASSWORD")]
+    pub keyring_password: Option<String>,
+
     #[clap(long, default_value_t=String::from("./cloak.pem"))]
     pub ecdh_private_key_file: String,
 

@@ -8,6 +8,7 @@ use std::{collections::HashMap, error::Error};
 
 pub struct Config {
     pub secret_key: Option<SecretKey>,
+    pub keyring_password: Option<String>,
     pub api_host_url: String,
 }
 
@@ -34,19 +35,29 @@ impl Config {
 
         let config = Config {
             secret_key,
+            keyring_password: cli.keyring_password.clone(),
             api_host_url: cli.api_host_url.clone(),
         };
         Ok(config)
     }
 
     pub fn get_password(&self) -> String {
-        println!("Enter your password to decrypt the service account.");
-        rpassword::prompt_password("Your password: ").unwrap()
+        if let Some(password) = self.keyring_password.clone() {
+            password
+        } else {
+            println!("Enter your password to decrypt the service account.");
+            println!("NOTE: You can set the env var CLOAK_KEYRING_PASSWORD to a password so you don't have to type this each time.");
+            rpassword::prompt_password("Your password: ").unwrap()
+        }
     }
 
     pub fn set_password(&self) -> String {
-        println!("Please set a password to encrypt this key (Note this doesn't have to be your cloak password)");
-        rpassword::prompt_password("Your password: ").unwrap()
+        if let Some(password) = self.keyring_password.clone() {
+            password
+        } else {
+            println!("Please set a password to encrypt this key (Note this doesn't have to be your cloak password)");
+            rpassword::prompt_password("Your password: ").unwrap()
+        }
     }
 
     /***
