@@ -5,6 +5,7 @@ const triggers = () => {
         // Detect when a user clicks a row
         row.addEventListener('click', (event) => {
             event.stopImmediatePropagation()
+            event.preventDefault()
             const attr = row.getAttribute('data-drawer-target');
             if(attr) {
                 const drawer = document.getElementById(attr)

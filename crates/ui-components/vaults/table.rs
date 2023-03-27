@@ -69,6 +69,12 @@ pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                                                 href: "#",
                                                 target: "_top",
                                                 "Delete Vault"
+                                            },
+                                            DropDownLink {
+                                                drawer_trigger: format!("rename-vault-trigger-{}", vault.id),
+                                                href: "#",
+                                                target: "_top",
+                                                "Rename Vault"
                                             }
                                         }
                                     }
