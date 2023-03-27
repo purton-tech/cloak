@@ -84,7 +84,10 @@ jobs:
         
   release:
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      FORCE_COLOR: 1
     # If this is a release
     #   create release notes
     #   set the docker version

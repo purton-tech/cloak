@@ -106,10 +106,11 @@ save-artifacts:
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/$CLI_EXE_NAME AS LOCAL ./tmp/$CLI_LINUX_EXE_NAME
 
 migration-container:
-    FROM debian:bullseye-slim
-    RUN apt-get update -y \  
-        && apt-get install -y --no-install-recommends ca-certificates curl libpq-dev \
-        && rm -rf /var/lib/apt/lists/*
+    FROM alpine
+    RUN apk add --no-cache \
+        curl \
+        postgresql-client \
+        tzdata
     RUN curl -OL https://github.com/amacneil/dbmate/releases/download/v$DBMATE_VERSION/dbmate-linux-amd64 \
         && mv ./dbmate-linux-amd64 /usr/bin/dbmate \
         && chmod +x /usr/bin/dbmate
