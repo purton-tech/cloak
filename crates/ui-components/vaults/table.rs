@@ -12,6 +12,7 @@ pub struct TableProps<'a> {
 pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
     cx.render(rsx!(
         Box {
+            class: "has-data-table",
             BoxHeader {
                 title: "Your Vaults"
             }
