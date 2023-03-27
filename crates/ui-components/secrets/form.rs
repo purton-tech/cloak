@@ -4,19 +4,30 @@ use dioxus::prelude::*;
 use primer_rsx::*;
 
 #[derive(Props, PartialEq)]
-pub struct NewSecretFormProps {
+pub struct SecretFormProps<'a> {
     submit_action: String,
-    user_vault: UserVault,
-    environments: Vec<Environment>,
+    user_vault: &'a UserVault,
+    environments: &'a Vec<Environment>,
     // If the secret is included then edit the exsiting secret
-    secret: Option<Secret>,
+    secret: Option<&'a Secret>,
     trigger_id: String,
 }
 
-pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
+pub fn SecretForm<'a>(cx: Scope<'a, SecretFormProps<'a>>) -> Element {
+    let name = if let Some(secret) = &cx.props.secret {
+        &secret.name
+    } else {
+        ""
+    };
+
+    let value = if let Some(secret) = &cx.props.secret {
+        &secret.secret
+    } else {
+        ""
+    };
+
     cx.render(rsx! {
         form {
-            id: "add-secret-form",
             method: "post",
             action: "{cx.props.submit_action}",
             Drawer {
@@ -39,6 +50,7 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
                             required: true,
                             placeholder: "e.g. DATABASE_URL"
                             label: "Name",
+                            value: name,
                             name: "name"
                         }
                         label {
@@ -50,7 +62,8 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
                             id: "secret-value",
                             autocomplete: "off",
                             required: "",
-                            name: "secret"
+                            name: "secret",
+                            "{value}"
                         }
                         label {
                             "for": "folder",

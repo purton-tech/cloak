@@ -28,12 +28,12 @@ pub fn index(
                     organisation_id: cx.props.organisation_id,
                     vault_id: cx.props.user_vault.vault_id
                 }
-                super::form::NewSecretForm {
+                super::form::SecretForm {
                     submit_action: crate::routes::secrets::new_route(
                         cx.props.user_vault.vault_id,
                         cx.props.organisation_id),
-                    user_vault: cx.props.user_vault.clone(),
-                    environments: cx.props.environments.clone(),
+                    user_vault: &cx.props.user_vault,
+                    environments: &cx.props.environments,
                     trigger_id: NEW_SECRET_DRAW_TRIGGER.to_string()
                 }
             })
@@ -75,6 +75,7 @@ pub fn index(
                             super::table::SecretsTable {
                                 user_vault: cx.props.user_vault.clone(),
                                 secrets: cx.props.secrets.clone(),
+                                environments: cx.props.environments.clone(),
                                 organisation_id: cx.props.organisation_id
                             }
                         }
@@ -86,18 +87,19 @@ pub fn index(
                                     user_vault: cx.props.user_vault.clone(),
                                     secrets: env_secrets.1.clone(),
                                     organisation_id: cx.props.organisation_id,
+                                    environments: cx.props.environments.clone(),
                                     environment: env_secrets.0
                                 }
                             }
                         ))
                     }
                 }
-                super::form::NewSecretForm {
+                super::form::SecretForm {
                     submit_action: crate::routes::secrets::new_route(
                         cx.props.user_vault.vault_id,
                         cx.props.organisation_id),
-                    user_vault: cx.props.user_vault.clone(),
-                    environments: cx.props.environments.clone(),
+                    user_vault: &cx.props.user_vault,
+                    environments: &cx.props.environments,
                     trigger_id: NEW_SECRET_DRAW_TRIGGER.to_string()
                 }
             })

@@ -9,6 +9,7 @@ pub struct TableProps {
     environment: Option<Environment>,
     secrets: Vec<Secret>,
     user_vault: UserVault,
+    environments: Vec<Environment>,
 }
 
 pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
@@ -62,6 +63,11 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                                         drawer_trigger: format!("delete-secret-trigger-{}", secret.id),
                                         href: "#",
                                         "Delete Secret"
+                                    },
+                                    DropDownLink {
+                                        drawer_trigger: format!("edit-secret-trigger-{}", secret.id),
+                                        href: "#",
+                                        "Edit Secret"
                                     }
                                 }
                             }
@@ -78,6 +84,18 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                     user_vault: &cx.props.user_vault,
                     secret: secret,
                     trigger_id: format!("delete-secret-trigger-{}", secret.id),
+                }
+            ))
+        })
+        // Create all the edit drawers
+        cx.props.secrets.iter().map(|secret| {
+            cx.render(rsx!(
+                super::form::SecretForm {
+                    submit_action: "".to_string(),
+                    user_vault: &cx.props.user_vault,
+                    secret: secret,
+                    environments: &cx.props.environments,
+                    trigger_id: format!("edit-secret-trigger-{}", secret.id),
                 }
             ))
         })
