@@ -1,5 +1,5 @@
 VERSION 0.7
-FROM purtontech/rust-on-nails-devcontainer:1.1.7
+FROM purtontech/rust-on-nails-devcontainer:1.1.8
 
 ARG --global APP_EXE_NAME=cloak
 ARG --global CLI_EXE_NAME=cli
