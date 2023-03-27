@@ -93,6 +93,16 @@ pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                         }
                     ))
                 })
+                // Create all the rename drawers
+                cx.props.vaults.iter().map(|vault| {
+                    cx.render(rsx!(
+                        super::rename::RenameVaultDrawer {
+                            organisation_id: cx.props.organisation_id,
+                            vault: vault,
+                            trigger_id: format!("rename-vault-trigger-{}", vault.id),
+                        }
+                    ))
+                })
             }
         }
     ))

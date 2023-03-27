@@ -81,6 +81,13 @@ pub fn AuditAction<'a>(cx: Scope<'a, Props<'a>>) -> Element {
                 "Delete Vault"
             }
         )),
+        AuditAction::RenameVault => cx.render(rsx!(
+            Label {
+                class: "mr-2",
+                label_color: LabelColor::Done,
+                "Rename Vault"
+            }
+        )),
         AuditAction::NewServiceAccount => cx.render(rsx!(
             Label {
                 class: "mr-2",

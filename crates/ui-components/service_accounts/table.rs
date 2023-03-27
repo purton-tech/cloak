@@ -13,6 +13,7 @@ pub struct TableProps {
 pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
     cx.render(rsx!(
         Box {
+            class: "has-data-table",
             BoxHeader {
                 title: "Service Accounts"
             }
