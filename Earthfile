@@ -19,12 +19,12 @@ ARG --global NGINX=nginx:1.21.5
 ARG --global KUBECTL=bitnami/kubectl:latest
 
 # This file builds the following containers
-ARG --global APP_IMAGE_NAME=purtontech/cloak-server:latest
-ARG --global MIGRATIONS_IMAGE_NAME=purtontech/cloak-db-migrations:latest
-ARG --global ENVOY_IMAGE_NAME=purtontech/cloak-envoy:latest
-ARG --global WWW_IMAGE_NAME=purtontech/cloak-website:latest
-ARG --global KUBERNETES_NAME=purtontech/cloak-kubernetes:latest
-ARG --global EXTERNAL_SECRETS_IMAGE_NAME=purtontech/cloak-external-secrets:latest
+ARG --global APP_IMAGE_NAME=purton-tech/cloak-server:latest
+ARG --global MIGRATIONS_IMAGE_NAME=purton-tech/cloak-db-migrations:latest
+ARG --global ENVOY_IMAGE_NAME=purton-tech/cloak-envoy:latest
+ARG --global WWW_IMAGE_NAME=purton-tech/cloak-website:latest
+ARG --global KUBERNETES_NAME=purton-tech/cloak-kubernetes:latest
+ARG --global EXTERNAL_SECRETS_IMAGE_NAME=purton-tech/cloak-external-secrets:latest
 
 WORKDIR /build
 

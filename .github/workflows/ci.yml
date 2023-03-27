@@ -37,8 +37,6 @@ jobs:
     # Will run on 'ubuntu-latest' or 'self-runner' based on the results of job `choose-runner`
     runs-on: ${{ needs.choose-runner.outputs.runner }}
     env:
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       FORCE_COLOR: 1
     steps:
@@ -52,21 +50,27 @@ jobs:
           branch="${GITHUB_REF##*/}"
         fi
         git checkout -b "$branch" || true
-    - name: Docker Login
-      run: docker login --username "$DOCKERHUB_USERNAME" --password "$DOCKERHUB_TOKEN"
+
     - name: Download latest earthly
       run: "sudo /bin/sh -c 'wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly && chmod +x /usr/local/bin/earthly'"
-    - name: Earthly version
-      run: earthly --version
 
-    # Earthly with caching https://docs.earthly.dev/docs/guides/shared-cache
+    - name: Earthly version
+      run: earthly --version 
+         
+    - name: Log in to the Github Container registry
+      uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
     - name: Run build
       if: github.ref != 'refs/heads/main'
       run: earthly --allow-privileged --output --ci +pull-request
       
     - name: Run build and Deploy Containers
       if: github.ref == 'refs/heads/main'
-      run: earthly --allow-privileged --output --ci --push +all
+      run: earthly --allow-privileged --output --ci +all
 
 
     # Upload the video of our selenium session
@@ -82,19 +86,6 @@ jobs:
           exit 1
         fi
         
-  release:
-    needs: [build]
-    runs-on: ubuntu-latest    
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      FORCE_COLOR: 1
-    # If this is a release
-    #   create release notes
-    #   set the docker version
-    # 
-    steps:  
-    - name: Check out repository code
-      uses: actions/checkout@v3
     - name: Semantic Release
       run: | 
         npm i -D @semantic-release/exec

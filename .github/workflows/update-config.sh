@@ -1,5 +1,5 @@
 #!/bin/bash 
-containers=("purtontech/cloak-server" "purtontech/cloak-db-migrations" "purtontech/cloak-envoy")
+containers=("ghcr.io/purton-tech/cloak-server" "ghcr.io/purton-tech/cloak-db-migrations" "ghcr.io/purton-tech/cloak-envoy")
 
 for i in "${containers[@]}"
 do

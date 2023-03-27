@@ -10,23 +10,23 @@
       ]
     }],
     ["@semantic-release-plus/docker", {
-        "name": "purtontech/cloak-server:latest",
+        "name": "ghcr.io/purton-tech/cloak-server:latest",
         "skipLogin": true
     }],
     ["@semantic-release-plus/docker", {
-        "name": "purtontech/cloak-db-migrations:latest",
+        "name": "ghcr.io/purton-tech/cloak-db-migrations:latest",
         "skipLogin": true
     }],
     ["@semantic-release-plus/docker", {
-        "name": "purtontech/cloak-envoy:latest",
+        "name": "ghcr.io/purton-tech/cloak-envoy:latest",
         "skipLogin": true
     }],
     ["@semantic-release-plus/docker", {
-        "name": "purtontech/cloak-external-secrets:latest",
+        "name": "ghcr.io/purton-tech/cloak-external-secrets:latest",
         "skipLogin": true
     }],
     ["@semantic-release-plus/docker", {
-        "name": "purtontech/cloak-kubernetes:latest",
+        "name": "ghcr.io/purton-tech/cloak-kubernetes:latest",
         "skipLogin": true
     }],
     ["@semantic-release/exec", {
