@@ -90,6 +90,8 @@ jobs:
     #   set the docker version
     # 
     steps:  
+    - name: Check out repository code
+      uses: actions/checkout@v3
     - name: Semantic Release
       run: | 
         npm i -D @semantic-release/exec
