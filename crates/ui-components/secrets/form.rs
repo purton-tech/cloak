@@ -8,11 +8,14 @@ pub struct SecretFormProps<'a> {
     submit_action: String,
     user_vault: &'a UserVault,
     environments: &'a Vec<Environment>,
-    // If the secret is included then edit the exsiting secret
+    // If the secret is included then edit the existing secret
     secret: Option<&'a Secret>,
     trigger_id: String,
 }
 
+/***
+ * This form is enhanced by asset-pipeline/web-components/new-secret.ts
+ */
 pub fn SecretForm<'a>(cx: Scope<'a, SecretFormProps<'a>>) -> Element {
     let name = if let Some(secret) = &cx.props.secret {
         &secret.name
@@ -28,6 +31,7 @@ pub fn SecretForm<'a>(cx: Scope<'a, SecretFormProps<'a>>) -> Element {
 
     cx.render(rsx! {
         form {
+            id: "add-secret-form",
             method: "post",
             action: "{cx.props.submit_action}",
             Drawer {

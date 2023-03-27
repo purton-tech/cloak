@@ -19,7 +19,7 @@ export class DownloadableKey extends HTMLElement {
                         
                         const template = document.createElement('template');
                         template.innerHTML = `
-                        <a href="${href}" download="key.pem">key.pem</a>
+                        <a href="${href}" download="cloak.pem">cloak.pem</a>
                         `
                         const templateNode = template.cloneNode(true)
                         if (templateNode instanceof HTMLTemplateElement) {
