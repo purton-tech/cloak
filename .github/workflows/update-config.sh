@@ -5,7 +5,7 @@ for i in "${containers[@]}"
 do
     docker pull $i 
     # i.e. turn "purtontech/cloak-server" into "server"
-    CONFIG_NAME=$(echo $i | cut -c 18-) 
+    CONFIG_NAME=$(echo $i | cut -c 21-) 
     HASH=$(docker inspect --format='{{index .RepoDigests 0}}' $i )
     HASH=$(echo $HASH | sed 's/^.*@//' )
     echo "Name $CONFIG_NAME"
