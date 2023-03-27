@@ -1,15 +1,16 @@
 #![allow(non_snake_case)]
-use db::{Environment, UserVault};
+use db::{Environment, Secret, UserVault};
 use dioxus::prelude::*;
 use primer_rsx::*;
-
-pub static DRAW_TRIGGER: &str = "add-secret-drawer";
 
 #[derive(Props, PartialEq)]
 pub struct NewSecretFormProps {
     submit_action: String,
     user_vault: UserVault,
     environments: Vec<Environment>,
+    // If the secret is included then edit the exsiting secret
+    secret: Option<Secret>,
+    trigger_id: String,
 }
 
 pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
@@ -20,7 +21,7 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
             action: "{cx.props.submit_action}",
             Drawer {
                 label: "Add Secret",
-                trigger_id: DRAW_TRIGGER,
+                trigger_id: &cx.props.trigger_id,
                 component_name: "new-secret",
                 DrawerBody {
                     div {
