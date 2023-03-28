@@ -30,14 +30,18 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                     cx.props.secrets.iter().map(|secret| rsx!(
                         tr {
                             td {
-                                {LazyNodes::new(|f| f.text(format_args!(
-                                    "<ecdh-cipher cipher='{}'
-                                    wrapped-aes-key='{}' 
-                                    ecdh-public-key='{}'></ecdh-cipher>",
-                                    secret.name,
-                                    cx.props.user_vault.encrypted_vault_key,
-                                    cx.props.user_vault.ecdh_public_key
-                                )))}
+                                a {
+                                    "data-drawer-target": "view-secret-trigger-{secret.id}",
+                                    href: "#",
+                                    {LazyNodes::new(|f| f.text(format_args!(
+                                        "<ecdh-cipher cipher='{}'
+                                        wrapped-aes-key='{}' 
+                                        ecdh-public-key='{}'></ecdh-cipher>",
+                                        secret.name,
+                                        cx.props.user_vault.encrypted_vault_key,
+                                        cx.props.user_vault.ecdh_public_key
+                                    )))}
+                                }
                             }
                             td {
                                 "{secret.environment_name}"
@@ -65,9 +69,9 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                                         "Delete Secret"
                                     },
                                     DropDownLink {
-                                        drawer_trigger: format!("edit-secret-trigger-{}", secret.id),
+                                        drawer_trigger: format!("view-secret-trigger-{}", secret.id),
                                         href: "#",
-                                        "Edit Secret"
+                                        "View Secret"
                                     }
                                 }
                             }
@@ -87,15 +91,13 @@ pub fn SecretsTable(cx: Scope<TableProps>) -> Element {
                 }
             ))
         })
-        // Create all the edit drawers
+        // Create all the view drawers
         cx.props.secrets.iter().map(|secret| {
             cx.render(rsx!(
-                super::form::SecretForm {
-                    submit_action: "".to_string(),
-                    user_vault: &cx.props.user_vault,
+                super::view::SecretView {
                     secret: secret,
-                    environments: &cx.props.environments,
-                    trigger_id: format!("edit-secret-trigger-{}", secret.id),
+                    user_vault: &cx.props.user_vault,
+                    trigger_id: format!("view-secret-trigger-{}", secret.id),
                 }
             ))
         })

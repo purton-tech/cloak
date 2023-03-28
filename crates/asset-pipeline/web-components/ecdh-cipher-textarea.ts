@@ -13,7 +13,7 @@ import { Vault } from '../cryptography/vault'
  * 3. Use the agreement to unwrap wrapped-aes-key
  * 4. Use the unwrappede wrapped-aes-key to decrypt the cipher.
  */
-export class ECDHCipher extends HTMLElement {
+export class ECDHTextAreaCipher extends HTMLTextAreaElement {
 
     constructor() {
         super()
@@ -43,6 +43,6 @@ export class ECDHCipher extends HTMLElement {
 
 document.addEventListener('readystatechange', () => {
     if (document.readyState == 'complete') {
-        customElements.define('ecdh-cipher', ECDHCipher);
+        customElements.define('ecdh-cipher-textarea', ECDHTextAreaCipher, { extends: 'textarea' });
     }
 })
