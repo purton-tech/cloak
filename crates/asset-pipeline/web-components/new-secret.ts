@@ -50,7 +50,7 @@ class NewSecret extends SideDrawer {
 
         const vaultId = parseInt(this.vaultIdInput.value)
 
-        if (this.secretForm.checkValidity()) {
+        if (this.secretForm.reportValidity()) {
             try {
                 const plaintextName = this.secretNameInput.value
                 const plaintextValue = this.secretValueInput.value
