@@ -45,6 +45,11 @@ pub fn Select<'a>(cx: Scope<'a, SelectProps<'a>>) -> Element {
     let class = select_size.to_string();
 
     let id = if let Some(id) = cx.props.id { id } else { "" };
+    let req = if cx.props.required.is_some() {
+        "required"
+    } else {
+        ""
+    };
 
     cx.render(rsx!(
         match cx.props.label {
@@ -57,6 +62,7 @@ pub fn Select<'a>(cx: Scope<'a, SelectProps<'a>>) -> Element {
         }
         select {
             id: "{id}",
+            required: "{req}",
             class: "{class}",
             value: "{value}",
             name: "{cx.props.name}",
