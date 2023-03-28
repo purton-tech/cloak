@@ -86,6 +86,10 @@ pub async fn add_secrets(
         .await?;
     secret_field.send_keys(value).await?;
 
+    let env_selector = driver.find_element(By::Css("select:first-of-type")).await?;
+    let select = SelectElement::new(&env_selector).await?;
+    select.select_by_exact_text("Development").await?;
+
     let submit_button = driver
         .find_element(By::XPath("//footer//button[text()='Create']"))
         .await?;
