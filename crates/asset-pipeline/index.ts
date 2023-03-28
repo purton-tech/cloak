@@ -4,7 +4,6 @@ import './scss/index.scss'
 import './web-components/side-drawer'
 import './web-components/side-drawer-trigger'
 import './web-components/ecdh-cipher'
-import './web-components/ecdh-cipher-textarea'
 import './web-components/ecdh-keygen'
 import './web-components/ecdh-non-shareable-keygen'
 import './web-components/snack-bar'
@@ -14,19 +13,6 @@ import './web-components/connect-account'
 import './web-components/downloadable-key'
 import './web-components/add-member'
 import '@github/relative-time-element';
-
-// Front end enhancement
-//import '../templates/vaults/new_vault'
-//import '../templates/vaults/delete_vault'
-//import '../ui-components/secrets/new_secret'
-//import '../templates/service_accounts/new_account'
-//import '../templates/service_accounts/connect_account'
-//import '../templates/service_accounts/view'
-//import '../templates/service_accounts/delete_account_controller'
-//import '../templates/secrets/delete_secret'
-//import '../templates/team/create_invite'
-//import '../templates/members/add_member'
-//import '../templates/members/delete_member'
 
 // Misc.
 import './remember-form'

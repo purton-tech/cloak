@@ -31,7 +31,7 @@ pub fn SecretView<'a>(cx: Scope<'a, SecretViewProps<'a>>) -> Element {
                     }
 
                     {LazyNodes::new(|f| f.text(format_args!(
-                        "<ecdh-cipher-textarea class='border mt-3 p-1' cipher='{}'
+                        "<ecdh-cipher class='border mt-3 p-1' cipher='{}'
                         wrapped-aes-key='{}' 
                         ecdh-public-key='{}'></ecdh-cipher>",
                         cx.props.secret.secret,
