@@ -76,6 +76,10 @@ pub fn SecretForm<'a>(cx: Scope<'a, SecretFormProps<'a>>) -> Element {
                         Select {
                             id: "environment_id",
                             name: "environment_id",
+                            required: true,
+                            option {
+                                "Please Select..."
+                            }
                             cx.props.environments.iter().map(|env| {
                                 cx.render(rsx! (
                                     option {
