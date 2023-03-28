@@ -14,8 +14,20 @@ AND vault_id IN (SELECT vault_id FROM users_vaults WHERE user_id = :current_user
 
 --! get : UserVault()
 SELECT 
-    vault_id, user_id, encrypted_vault_key, ecdh_public_key 
-FROM users_vaults 
+    (
+        SELECT
+            name
+        FROM 
+            vaults 
+        WHERE 
+            id = :vault_id
+    ), 
+    vault_id,
+    user_id,
+    encrypted_vault_key,
+    ecdh_public_key 
+FROM
+    users_vaults 
 WHERE 
     user_id = :user_id AND vault_id = :vault_id;
 

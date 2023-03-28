@@ -43,10 +43,10 @@ pub fn index(
                 CloakLayout {
                     selected_item: SideBar::Secrets,
                     team_id: cx.props.organisation_id,
-                    title: "Secrets",
+                    title: "Secrets for Vault - {cx.props.user_vault.name}",
                     vault_id: cx.props.user_vault.vault_id
                     header: cx.render(rsx!(
-                        h3 { "Secrets" }
+                        h3 { "Secrets for Vault - {cx.props.user_vault.name}" }
                         Button {
                             prefix_image_src: "{button_plus_svg.name}",
                             drawer_trigger: NEW_SECRET_DRAW_TRIGGER,
