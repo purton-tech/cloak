@@ -117,25 +117,30 @@ pub fn DropDownLink<'a>(cx: Scope<'a, DropDownLinkProps<'a>>) -> Element {
         "dropdown-item".to_string()
     };
 
-    let trigger = if let Some(trigger) = cx.props.drawer_trigger.clone() {
-        trigger
-    } else {
-        "".to_string()
-    };
-
     let target = if let Some(target) = cx.props.target {
         target
     } else {
         ""
     };
 
-    cx.render(rsx!(
-        a {
-            class: "{class}",
-            "data-drawer-target": "{trigger}",
-            target: "{target}",
-            href: "{cx.props.href}",
-            &cx.props.children,
-        }
-    ))
+    if let Some(trigger) = &cx.props.drawer_trigger {
+        cx.render(rsx!(
+            a {
+                class: "{class}",
+                "data-drawer-target": "{trigger}",
+                target: "{target}",
+                href: "{cx.props.href}",
+                &cx.props.children,
+            }
+        ))
+    } else {
+        cx.render(rsx!(
+            a {
+                class: "{class}",
+                target: "{target}",
+                href: "{cx.props.href}",
+                &cx.props.children,
+            }
+        ))
+    }
 }
