@@ -9,7 +9,7 @@
 
 # Digital Ocean
 # -------------
-# export ECDH_PRIVATE_KEY=$(openssl pkcs8 -topk8 -nocrypt -in cloak.enc.pem)
+# cloak import deployments M88....
 # cloak pulumi login
 # cloak doctl auth init
 # doctl kubernetes cluster kubeconfig save onchain-k8s-af1ef23
@@ -31,9 +31,9 @@ variables:
     hash-cloak-db-migrations: sha256:79bda00d42111902e80626b5641092727ce30a5c1daadc3d9d09fef1d13121f3
     hash-cloak-envoy: sha256:176f7845d9337e6505eef26c1c5f4870fa1a04acb2da95d1c067a231fc8ec328
     hash-cloak-server: sha256:15763d8b34c95cb3fbf8afd2e2726b6678b4700134c452ec105b4fd4d4256fab
-    db-migrations: purtontech/cloak-db-migrations:${version}@${hash-db-migrations}
-    envoy: purtontech/cloak-envoy:${version}@${hash-envoy}
-    server: purtontech/cloak-server:${version}@${hash-server}
+    db-migrations: ghcr.io/purton-tech/cloak-db-migrations:${version}@${hash-cloak-db-migrations}
+    envoy: ghcr.io/purton-tech/cloak-envoy:${version}@${hash-cloak-envoy}
+    server: ghcr.io/purton-tech/cloak-server:${version}@${hash-cloak-server}
 
 resources:
     envoy-deployment:
