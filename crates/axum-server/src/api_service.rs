@@ -1,6 +1,6 @@
 use crate::{authentication, errors::CustomError};
-use db::queries;
 use db::Pool;
+use db::{queries, Params};
 use grpc_api::vault::*;
 use tonic::{Code, Request, Response, Status};
 
@@ -99,12 +99,12 @@ impl grpc_api::vault::vault_server::Vault for VaultService {
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
 
+        let get_params = queries::user_vaults::GetParams {
+            user_id: authenticated_user.user_id,
+            vault_id: req.vault_id as i32,
+        };
         let user_vault = queries::user_vaults::get()
-            .bind(
-                &transaction,
-                &(authenticated_user.user_id),
-                &(req.vault_id as i32),
-            )
+            .params(&transaction, &get_params)
             .one()
             .await
             .map_err(|e| CustomError::Database(e.to_string()))?;
