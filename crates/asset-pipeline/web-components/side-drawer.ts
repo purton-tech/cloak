@@ -55,11 +55,13 @@ export class SideDrawer extends HTMLElement {
         
                     closeButton.addEventListener("click", function(e) {
                         e.stopPropagation()
+                        e.preventDefault()
                         thiz.open = false
                     });
         
                     overlay.addEventListener("click", function(e) {
                         e.stopPropagation()
+                        e.preventDefault()
                         thiz.open = false
                     });
         

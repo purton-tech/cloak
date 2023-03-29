@@ -1,18 +1,34 @@
 #![allow(non_snake_case)]
-use db::{Environment, UserVault};
+use db::{Environment, Secret, UserVault};
 use dioxus::prelude::*;
 use primer_rsx::*;
 
-pub static DRAW_TRIGGER: &str = "add-secret-drawer";
-
 #[derive(Props, PartialEq)]
-pub struct NewSecretFormProps {
+pub struct SecretFormProps<'a> {
     submit_action: String,
-    user_vault: UserVault,
-    environments: Vec<Environment>,
+    user_vault: &'a UserVault,
+    environments: &'a Vec<Environment>,
+    // If the secret is included then edit the existing secret
+    secret: Option<&'a Secret>,
+    trigger_id: String,
 }
 
-pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
+/***
+ * This form is enhanced by asset-pipeline/web-components/new-secret.ts
+ */
+pub fn SecretForm<'a>(cx: Scope<'a, SecretFormProps<'a>>) -> Element {
+    let name = if let Some(secret) = &cx.props.secret {
+        &secret.name
+    } else {
+        ""
+    };
+
+    let value = if let Some(secret) = &cx.props.secret {
+        &secret.secret
+    } else {
+        ""
+    };
+
     cx.render(rsx! {
         form {
             id: "add-secret-form",
@@ -20,7 +36,7 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
             action: "{cx.props.submit_action}",
             Drawer {
                 label: "Add Secret",
-                trigger_id: DRAW_TRIGGER,
+                trigger_id: &cx.props.trigger_id,
                 component_name: "new-secret",
                 DrawerBody {
                     div {
@@ -38,6 +54,7 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
                             required: true,
                             placeholder: "e.g. DATABASE_URL"
                             label: "Name",
+                            value: name,
                             name: "name"
                         }
                         label {
@@ -49,7 +66,8 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
                             id: "secret-value",
                             autocomplete: "off",
                             required: "",
-                            name: "secret"
+                            name: "secret",
+                            "{value}"
                         }
                         label {
                             "for": "folder",
@@ -58,6 +76,10 @@ pub fn NewSecretForm(cx: Scope<NewSecretFormProps>) -> Element {
                         Select {
                             id: "environment_id",
                             name: "environment_id",
+                            required: true,
+                            option {
+                                "Please Select..."
+                            }
                             cx.props.environments.iter().map(|env| {
                                 cx.render(rsx! (
                                     option {

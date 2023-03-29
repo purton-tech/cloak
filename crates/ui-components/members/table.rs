@@ -12,6 +12,7 @@ pub struct TableProps {
 pub fn MembersTable(cx: Scope<TableProps>) -> Element {
     cx.render(rsx!(
         Box {
+            class: "has-data-table",
             BoxHeader {
                 title: "Secrets"
             }

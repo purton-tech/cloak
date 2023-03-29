@@ -86,6 +86,7 @@ pub fn members(
                 }
 
                 Box {
+                    class: "has-data-table",
                     BoxHeader {
                         title: &cx.props.team_name,
                         Button {

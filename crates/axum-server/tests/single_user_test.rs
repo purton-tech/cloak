@@ -79,7 +79,7 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
         driver,
         "PRIVATE_KEY",
         "1234-5678",
-        "tbody > tr:last-child > td:first-child > ecdh-cipher",
+        "tbody > tr:last-child > td:first-child > a > ecdh-cipher",
     )
     .await?;
 
@@ -89,7 +89,7 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
         driver,
         "PRIVATE_KEY2",
         "1234-5678",
-        "tbody > tr:last-child > td:first-child > ecdh-cipher",
+        "tbody > tr:last-child > td:first-child > a > ecdh-cipher",
     )
     .await?;
 
@@ -119,7 +119,7 @@ async fn single_user(driver: &WebDriver, config: &common::Config) -> WebDriverRe
         driver,
         "WITH_SERVICE_ACCOUNT",
         "1234-5679",
-        "tbody > tr:last-child > td:first-child > ecdh-cipher",
+        "tbody > tr:last-child > td:first-child > a > ecdh-cipher",
     )
     .await?;
 

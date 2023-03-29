@@ -24,7 +24,7 @@ pub fn EmptySecrets(cx: Scope<EmptySecretsProps>) -> Element {
                 heading: "This vault doesn't have any secrets yet",
                 visual: empty_api_keys_svg.name,
                 description: "Create your first secret and add it to the vault",
-                primary_action_drawer: ("Create A New Secret", super::new_secret::DRAW_TRIGGER)
+                primary_action_drawer: ("Create A New Secret", super::index::NEW_SECRET_DRAW_TRIGGER)
             }
         }
     ))

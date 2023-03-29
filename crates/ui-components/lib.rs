@@ -64,6 +64,10 @@ pub mod routes {
         pub fn delete_route(organisation_id: i32) -> String {
             format!("/app/team/{}/vaults/delete", organisation_id)
         }
+
+        pub fn rename_route(organisation_id: i32) -> String {
+            format!("/app/team/{}/vaults/rename", organisation_id)
+        }
     }
 
     pub mod audit {

@@ -36,7 +36,7 @@ export class ECDHCipher extends HTMLElement {
                 })
             })
         } else {
-            console.error('Coulkd not find the HTML elements needed')
+            console.error('Could not find the HTML elements needed')
         }
     }
 }

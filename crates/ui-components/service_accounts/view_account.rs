@@ -22,13 +22,13 @@ pub fn ViewAccountDrawer<'a>(cx: Scope<'a, ViewAccountDrawerProps<'a>>) -> Eleme
                         tabs: cx.render(rsx! {
                             TabHeader {
                                 selected: true,
-                                tab: "Local",
-                                name: "Local"
+                                tab: "Development",
+                                name: "Development"
                             }
                             TabHeader {
                                 selected: false,
-                                tab: "Kubernetes",
-                                name: "Kubernetes"
+                                tab: "Integrations",
+                                name: "Integrations"
                             }
                         })
                         TabPanel {
@@ -50,25 +50,27 @@ pub fn ViewAccountDrawer<'a>(cx: Scope<'a, ViewAccountDrawerProps<'a>>) -> Eleme
                                 }
                                 h5 {
                                     class: "mb-2",
-                                    "2. Download the private key for this service account"
+                                    "2. Import the private key into your cloak keyring"
                                 }
                                 p {
                                     class: "mb-2",
-                                    "Click here "
-                                    {LazyNodes::new(|f| f.text(format_args!(
-                                        "<downloadable-key wrapped-ecdh-private-key='{}'></downloadable-key>", 
-                                        cx.props.service_account.encrypted_ecdh_private_key
-                                    )))}
-                                    " to download your private key. 
-                                    Store it in the folder where you will use the cloak CLI tool."
+                                    "Cut and paste the following into your console."
                                 }
+                                {LazyNodes::new(|f| f.text(format_args!(
+                                    "<keyring-import wrapped-ecdh-private-key='{}' account-name='{}'></keyring-import>", 
+                                    cx.props.service_account.encrypted_ecdh_private_key,
+                                    cx.props.service_account.account_name
+                                )))}
                                 h5 {
                                     class: "mb-2",
                                     "3. View the secrets"
                                 }
                                 p {
                                     class: "mb-2",
-                                    "From the same folder where you downloaded your <code>cloak.pem</code> file run..."
+                                    "Run the following"
+                                }
+                                p {
+                                    class: "mb-2",
                                     code {
                                         "$ cloak secrets"
                                     }
@@ -79,18 +81,24 @@ pub fn ViewAccountDrawer<'a>(cx: Scope<'a, ViewAccountDrawerProps<'a>>) -> Eleme
                                 }
                                 p {
                                     class: "mb-2",
-                                    "From the same folder where you downloaded your <code>cloak.pem</code> file run..."
+                                    "run..."
+                                }
+                                p {
+                                    class: "mb-2",
                                     code {
                                         "$ cloak env > .env"
                                     }
                                 }
                                 h5 {
                                     class: "mb-2",
-                                    "5. Inject secrets into as env vars into a process (Optional)"
+                                    "5. Inject secrets into a process as env vars (Optional)"
                                 }
                                 p {
                                     class: "mb-2",
-                                    "From the same folder where you downloaded your <code>cloak.pem</code> file run..."
+                                    "run..."
+                                }
+                                p {
+                                    class: "mb-2",
                                     code {
                                         "$ cloak run name-of-process"
                                     }

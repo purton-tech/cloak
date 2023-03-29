@@ -13,6 +13,7 @@ pub struct TableProps {
 pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
     cx.render(rsx!(
         Box {
+            class: "has-data-table",
             BoxHeader {
                 title: "Service Accounts"
             }
@@ -36,11 +37,14 @@ pub fn ServiceAccountTable(cx: Scope<TableProps>) -> Element {
                                     if let Some(vault_name) = &service_account.vault_name {
                                         cx.render(rsx!(
                                             td {
+                                                "{service_account.account_name}"
+                                                " ("
                                                 a {
                                                     href: "#",
                                                     "data-drawer-target": "service-account-view-{service_account.id}",
-                                                    "{service_account.account_name}"
+                                                    "Integrate"
                                                 }
+                                                ")"
                                             }
                                             td {
                                                 "{vault_name}"

@@ -1,5 +1,5 @@
 VERSION 0.7
-FROM purtontech/rust-on-nails-devcontainer:1.1.7
+FROM purtontech/rust-on-nails-devcontainer:1.1.8
 
 ARG --global APP_EXE_NAME=cloak
 ARG --global CLI_EXE_NAME=cli
@@ -160,6 +160,7 @@ integration-test:
     # How do we connect to mailhog
     ARG MAILHOG_URL=http://localhost:8025/api/v2/messages?limit=1
     USER root
+    RUN rm /var/run/docker.pid
     WITH DOCKER \
         --compose docker-compose.yml \
         --compose docker-compose.earthly.yml \

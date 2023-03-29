@@ -11,6 +11,7 @@ pub struct TableProps<'a> {
 pub fn AuditTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
     cx.render(rsx!(
         Box {
+            class: "has-data-table",
             BoxHeader {
                 title: "Audit Trail"
             }

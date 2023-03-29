@@ -77,6 +77,14 @@ WHERE
 AND
     :current_user_id IN (SELECT user_id FROM users_vaults WHERE vault_id = :vault_id);
 
+--! rename
+UPDATE
+    vaults
+SET 
+    name = :name
+WHERE
+    id = :vault_id;
+
 --! remove_vault_from_service_accounts
 UPDATE
     service_accounts

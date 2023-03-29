@@ -4,6 +4,8 @@ use db::{Environment, Secret, UserVault};
 use dioxus::prelude::*;
 use primer_rsx::*;
 
+pub static NEW_SECRET_DRAW_TRIGGER: &str = "add-secret-drawer";
+
 #[derive(Props, PartialEq)]
 struct SecretProps {
     organisation_id: i32,
@@ -26,12 +28,13 @@ pub fn index(
                     organisation_id: cx.props.organisation_id,
                     vault_id: cx.props.user_vault.vault_id
                 }
-                super::new_secret::NewSecretForm {
+                super::form::SecretForm {
                     submit_action: crate::routes::secrets::new_route(
                         cx.props.user_vault.vault_id,
                         cx.props.organisation_id),
-                    user_vault: cx.props.user_vault.clone(),
-                    environments: cx.props.environments.clone()
+                    user_vault: &cx.props.user_vault,
+                    environments: &cx.props.environments,
+                    trigger_id: NEW_SECRET_DRAW_TRIGGER.to_string()
                 }
             })
         } else {
@@ -40,13 +43,13 @@ pub fn index(
                 CloakLayout {
                     selected_item: SideBar::Secrets,
                     team_id: cx.props.organisation_id,
-                    title: "Secrets",
+                    title: "Secrets for Vault - {cx.props.user_vault.name}",
                     vault_id: cx.props.user_vault.vault_id
                     header: cx.render(rsx!(
-                        h3 { "Secrets" }
+                        h3 { "Secrets for Vault - {cx.props.user_vault.name}" }
                         Button {
                             prefix_image_src: "{button_plus_svg.name}",
-                            drawer_trigger: super::new_secret::DRAW_TRIGGER,
+                            drawer_trigger: NEW_SECRET_DRAW_TRIGGER,
                             button_scheme: ButtonScheme::Primary,
                             "Create A New Secret"
                         }
@@ -72,6 +75,7 @@ pub fn index(
                             super::table::SecretsTable {
                                 user_vault: cx.props.user_vault.clone(),
                                 secrets: cx.props.secrets.clone(),
+                                environments: cx.props.environments.clone(),
                                 organisation_id: cx.props.organisation_id
                             }
                         }
@@ -83,18 +87,20 @@ pub fn index(
                                     user_vault: cx.props.user_vault.clone(),
                                     secrets: env_secrets.1.clone(),
                                     organisation_id: cx.props.organisation_id,
+                                    environments: cx.props.environments.clone(),
                                     environment: env_secrets.0
                                 }
                             }
                         ))
                     }
                 }
-                super::new_secret::NewSecretForm {
+                super::form::SecretForm {
                     submit_action: crate::routes::secrets::new_route(
                         cx.props.user_vault.vault_id,
                         cx.props.organisation_id),
-                    user_vault: cx.props.user_vault.clone(),
-                    environments: cx.props.environments.clone()
+                    user_vault: &cx.props.user_vault,
+                    environments: &cx.props.environments,
+                    trigger_id: NEW_SECRET_DRAW_TRIGGER.to_string()
                 }
             })
         }

@@ -12,6 +12,7 @@ pub struct TableProps<'a> {
 pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
     cx.render(rsx!(
         Box {
+            class: "has-data-table",
             BoxHeader {
                 title: "Your Vaults"
             }
@@ -68,6 +69,12 @@ pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                                                 href: "#",
                                                 target: "_top",
                                                 "Delete Vault"
+                                            },
+                                            DropDownLink {
+                                                drawer_trigger: format!("rename-vault-trigger-{}", vault.id),
+                                                href: "#",
+                                                target: "_top",
+                                                "Rename Vault"
                                             }
                                         }
                                     }
@@ -83,6 +90,16 @@ pub fn VaultTable<'a>(cx: Scope<'a, TableProps<'a>>) -> Element {
                             organisation_id: cx.props.organisation_id,
                             vault: vault,
                             trigger_id: format!("delete-vault-trigger-{}", vault.id),
+                        }
+                    ))
+                })
+                // Create all the rename drawers
+                cx.props.vaults.iter().map(|vault| {
+                    cx.render(rsx!(
+                        super::rename::RenameVaultDrawer {
+                            organisation_id: cx.props.organisation_id,
+                            vault: vault,
+                            trigger_id: format!("rename-vault-trigger-{}", vault.id),
                         }
                     ))
                 })

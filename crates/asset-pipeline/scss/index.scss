@@ -67,6 +67,11 @@
     }
 }
 
+// Wrap the ext in the secrets view
+overflow-wrap {
+    overflow-wrap: break-word;
+}
+
 // Set the primary button from green to blue.
 :root {
     --color-btn-primary-bg: rgb(53, 89, 199);

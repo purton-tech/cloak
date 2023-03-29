@@ -33,7 +33,7 @@ async fn multi_user(driver: &WebDriver, config: &common::Config) -> WebDriverRes
         driver,
         "ACCOUN_OWNER_SECRET",
         "1234-5679",
-        "tbody > tr:last-child > td:first-child > ecdh-cipher",
+        "tbody > tr:last-child > td:first-child > a > ecdh-cipher",
     )
     .await?;
 

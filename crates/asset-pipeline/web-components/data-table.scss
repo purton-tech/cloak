@@ -6,6 +6,11 @@
     }
 }
 
+// The above doesn'r work on firefox
+.Box.has-data-table > .Box-body {
+    padding: 0;
+}
+
 data-table {
     --base-size-4: 16px;
     --_n-table-td-padding: calc(var(--base-size-4) * 0.5) calc(var(--base-size-4) * 0.5);

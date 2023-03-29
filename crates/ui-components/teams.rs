@@ -27,6 +27,7 @@ pub fn teams(teams: Vec<Team>, organisation_id: i32) -> String {
                     }
                 ))
                 Box {
+                    class: "has-data-table",
                     BoxHeader {
                         title: "Teams"
                     }

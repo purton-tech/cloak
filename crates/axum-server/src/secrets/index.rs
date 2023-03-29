@@ -4,9 +4,9 @@ use axum::{
     extract::{Extension, Path},
     response::Html,
 };
-use db::queries;
 use db::types::public::{AuditAccessType, AuditAction};
 use db::Pool;
+use db::{queries, Params};
 
 pub async fn index(
     Path((team_id, vault_id)): Path<(i32, i32)>,
@@ -28,8 +28,12 @@ pub async fn index(
         .all()
         .await?;
 
+    let get_params = queries::user_vaults::GetParams {
+        user_id: current_user.user_id,
+        vault_id,
+    };
     let user_vault = queries::user_vaults::get()
-        .bind(&transaction, &current_user.user_id, &vault_id)
+        .params(&transaction, &get_params)
         .one()
         .await?;
 
