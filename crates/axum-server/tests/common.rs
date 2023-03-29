@@ -264,7 +264,7 @@ pub async fn add_service_account(driver: &WebDriver) -> WebDriverResult<()> {
     sleep(Duration::from_millis(1000)).await;
 
     driver
-        .find_element(By::LinkText("My Dev Machine"))
+        .find_element(By::LinkText("Integrate"))
         .await?
         .click()
         .await?;
