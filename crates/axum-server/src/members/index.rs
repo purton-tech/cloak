@@ -23,8 +23,12 @@ pub async fn index(
         .await?;
 
     // Blow up if the user doesn't have access to the vault
-    queries::user_vaults::get()
-        .bind(&transaction, &current_user.user_id, &vault_id)
+    let get_params = queries::user_vaults::GetParams {
+        user_id: current_user.user_id,
+        vault_id,
+    };
+    let user_vault = queries::user_vaults::get()
+        .params(&transaction, &get_params)
         .one()
         .await?;
 
@@ -36,15 +40,6 @@ pub async fn index(
     let non_members = queries::user_vaults::get_non_members()
         .bind(&transaction, &team_id, &vault_id)
         .all()
-        .await?;
-
-    let get_params = queries::user_vaults::GetParams {
-        user_id: current_user.user_id,
-        vault_id,
-    };
-    let user_vault = queries::user_vaults::get()
-        .params(&transaction, &get_params)
-        .one()
         .await?;
 
     let environments = queries::environments::get_all()
