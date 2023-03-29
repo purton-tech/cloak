@@ -11,6 +11,7 @@ import './web-components/data-table'
 import './web-components/new-secret'
 import './web-components/connect-account'
 import './web-components/downloadable-key'
+import './web-components/keyring-import'
 import './web-components/add-member'
 import '@github/relative-time-element';
 
