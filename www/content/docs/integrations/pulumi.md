@@ -3,7 +3,7 @@ title = "Pulumi"
 date = 2022-03-01
 +++
 
-When you start to use infrastructure as code tools to manage your deployments you get the opportunity to greatly reduce the number of secretes you need to manage.
+When you start to use infrastructure as code tools to manage your deployments you get the opportunity to greatly reduce the number of secrets you need to manage.
 
 ## Reducing the number of secrets
 
