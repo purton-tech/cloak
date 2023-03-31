@@ -1,8 +1,6 @@
 +++
 title = "Kubernetes"
 date = 2022-03-01
-sort_by = "weight" 
-weight = 20
 +++
 
 ## Cloak
