@@ -7,13 +7,13 @@ date = 2022-03-01
 
 Sync secrets from the [Cloak Encrypted Secrets Platform](https:/cloak.software) to Kubernetes using the External Secrets Operator.
 
-Cloak uses the webhook provider built into the External Secrets Operator but also required a proxy service to handle decrypting secrets when they arrive into your cluster.
+Cloak uses the web hook provider built into the External Secrets Operator but also required a proxy service to handle decrypting secrets when they arrive into your cluster.
 
 ## Key Setup
 
 From the Cloak user interface [create a service account](https://cloak.software/docs/getting-started/03-cli/) and store the private key on your file system.
 
-Now create a kubernetes secret in the same namespace as the External Secrets Operator.
+Now create a Kubernetes secret in the same namespace as the External Secrets Operator.
 
 ```sh
 HISTIGNORE='*kubectl*' kubectl --namespace=external-secrets \

@@ -40,6 +40,7 @@ RBAC
 startup
 destructuring
 onboarding
+Dockerfile
  - blog/_index.md
 sort_by
 class_name
@@ -216,6 +217,7 @@ i-built-startup-in-rust
 90's
 50-100
 CONTRIBUTING.md
+2023-03-09
  - blog/secure-your-development-environment/index.md
 2022-09-08
  - docs/reference/01-security.md
@@ -235,3 +237,5 @@ PBDKF2
 64
 PBKFD2
 Argon2id
+ - docs/integrations/kubernetes.md
+yaml
