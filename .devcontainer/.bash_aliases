@@ -10,6 +10,7 @@ alias gcb='git checkout -b'
 alias gitsetup='git config --global user.name \$NAME && git config --global user.email \$EMAIL && mkdir -p ~/.ssh && cp -u /home/host-ssh/id_rsa ~/.ssh && chmod 600 ~/.ssh/id_rsa && ssh-keygen -y -f ~/.ssh/id_rsa > ~/.ssh/id_rsa.pub'
 alias gcr='f() { git checkout -b $1 origin/$1; }; f'
 alias gdb='git branch | grep -v "main" | xargs git branch -D'
+alias gsu='git submodule update --recursive --remote'
 
 # Watch
 alias watch-app='mold -run cargo watch --workdir /workspace/ -w crates/primer-rsx -w crates/ui-components -w crates/grpc-api -w crates/axum-server -w crates/db -w crates/asset-pipeline/dist -w crates/asset-pipeline/images --no-gitignore -x "run --bin cloak"'
